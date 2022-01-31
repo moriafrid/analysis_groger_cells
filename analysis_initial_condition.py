@@ -6,7 +6,6 @@ import os
 import pickle
 from glob import glob
 spine_type="mouse_spine"
-
 initial_locs=glob('data/fit/'+spine_type+'/*')
 for loc in initial_locs:
     datas=glob(loc+'/different_initial_conditions/RA0*/RA0_fit_results.p')

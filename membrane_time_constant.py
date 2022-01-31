@@ -3,12 +3,16 @@ import numpy as np
 import matplotlib.pyplot as plt
 from scipy.optimize import curve_fit
 import os
+from add_figure import add_figure
+
 def linear(x, m,c):
     return m*x+c
+
 save_folder='data/tau_m'
 path='/ems/elsc-labs/segev-i/moria.fridman/project/data_analysis_git/data_analysis/data/short_pulse/mean_short_pulse_with_parameters.p'
 try:os.mkdir(save_folder)
 except FileExistsError:pass
+
 short_pulse_dict = read_from_pickle(path)
 short_pulse=short_pulse_dict['mean']
 V = np.array(short_pulse[0])
@@ -34,7 +38,6 @@ plt.legend()
 
 plt.savefig(save_folder+'/all_tau')
 plt.show()
-from add_figure import add_figure
 for i,point in enumerate(points):
     add_figure('find tau from '+str(point),'t[ms]','ln(short_pulse)')
     plt.plot(T, log_v, label="ln(short_pulse)", alpha=0.3, lw=3)
