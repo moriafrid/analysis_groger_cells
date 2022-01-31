@@ -116,11 +116,14 @@ def phenomena(t,T,base,x_units='S',Y_units='mV'):
 
 	index2del_1=clear_phenomena(noise11,'noise1',base,bymax=True)
 	index2del_2=clear_phenomena(noise22,'noise2',base,bymax=True)
-	new_V=np.delete(V,list((index2del_1+index2del_2)) ,axis=0)- REST
-	new_short_pulse=np.delete(short_pulse,list(set(index2del_1+index2del_2)) ,axis=0)
-	new_spike=np.delete(spike,list(set(index2del_1+index2del_2)) ,axis=0)
-	new_syn=np.delete(syn,list(set(index2del_1+index2del_2)),axis=0)
-	new_rest4list=np.delete(rest4list,list(set(index2del_1+index2del_2)),axis=0)
+	if len(index2del_1) > 0 or len(index2del_2) > 0:
+		new_V=np.delete(V,list((index2del_1+index2del_2)) ,axis=0)- REST
+		new_short_pulse=np.delete(short_pulse,list(set(index2del_1+index2del_2)) ,axis=0)
+		new_spike=np.delete(spike,list(set(index2del_1+index2del_2)) ,axis=0)
+		new_syn=np.delete(syn,list(set(index2del_1+index2del_2)),axis=0)
+		new_rest4list=np.delete(rest4list,list(set(index2del_1+index2del_2)),axis=0)
+	else:
+		print("Not deleting")
 	# duble_rest_short_pulse=np.mean(new_V[40000:])
 
 	new_short_pulse = [v - new_rest4list[i]-np.mean((v-new_rest4list[i])[:3000]) for i, v in enumerate(new_short_pulse)]
@@ -144,7 +147,7 @@ def phenomena(t,T,base,x_units='S',Y_units='mV'):
 	index2del_short_pulse_begining,new_short_pulse1 = clear_phenomena_partial(new_short_pulse1, 'short_pulse','begining', base ,start=short_pulse_time2clear1-500,end=short_pulse_time2clear1,correct_rest=True)
 	index2del_short_pulse_end = clear_phenomena_partial(new_short_pulse1, 'short_pulse','end', base ,start=short_pulse_time2clear2,end=short_pulse_time2clear2+1000)
 	index2del_syn_begining,new_syn1 = clear_phenomena_partial(new_syn1, 'syn','begining', base, start=syn_time2clear1-500,end=syn_time2clear1,correct_rest=True)
-	new_syn1 = np.delete(new_syn1, list(set(index2del_syn_begining)), axis=0)
+	# new_syn1 = np.delete(new_syn1, list(set(index2del_syn_begining)), axis=0)  # old unused deletion
 	new_syn11=[]
 	for v in new_syn1:
 		v = v - np.mean(v[syn_time2clear1 - 500:syn_time2clear1])
@@ -202,9 +205,8 @@ def phenomena(t,T,base,x_units='S',Y_units='mV'):
 	#add to the other currents for I-V curve
 	add_figure('I_V curve_together', 'points', t.units)
 	plt.plot(new_short_pulse2)
-	'/ems/elsc-labs/segev-i/moria.fridman/project/data_analysis_git/data_analysis/data/traces_img/2017_05_08_A_0006/-50pA.png'
-	plt.savefig('data/traces_img/2017_05_08_A_0006/-50pA')
-	with open('data/traces_img/2017_05_08_A_0006/-50pA.p', 'wb') as f:
+	plt.savefig(base + '/-50pA.png')
+	with open(base + '/-50pA.p', 'wb') as f:
 		pickle.dump({'mean': [np.mean(new_short_pulse2,axis=0) * t.units, T_short_pulse], 'E_pas': E_pases[i],}, f)
 	a=1
 	return REST,np.mean(new_short_pulse2,axis=0)* t.units,T_short_pulse

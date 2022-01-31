@@ -20,16 +20,13 @@ def correct_frequency(pheno):
     y2 = scipy.fftpack.irfft(w2)
     return y2
 
-def check_dynamics(short_pulse,x_short_pulse,folder):
-    try: os.mkdir(folder+'check_dynamic/')
-    except FileExistsError: pass
-    save_folder=folder+'check_dynamic/'
-
+def check_dynamics(short_pulse,x_short_pulse,save_folder):
     add_figure('short_pulse',x_short_pulse.units,short_pulse.units)
     plt.plot(x_short_pulse,short_pulse,'.')
     #plt.plot(x_short_pulse[::2],short_pulse[::2],'.')
     plt.savefig(save_folder+'/short_pulse')
-    plt.show()
+    print("Done {0}".format(save_folder+'/short_pulse'))
+    # plt.show()
     add_figure('2 part of short_pulse on each other',x_short_pulse.units/1000,short_pulse.units)
     min_index=np.argmin(short_pulse)
     max_index=np.argmax(short_pulse)
@@ -41,8 +38,8 @@ def check_dynamics(short_pulse,x_short_pulse,folder):
     plt.plot(x_part2[:len(x_part1)]*1000,part2[:len(x_part1)])
     plt.legend(['beginigng','flip end'])
     plt.savefig(save_folder+'/check_dynamics')
-    plt.show()
-    a=1
+    print("Done {0}".format(save_folder+'/short_pulse'))
+    # plt.show()
 
 
 

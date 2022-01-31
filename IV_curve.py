@@ -11,11 +11,12 @@ import quantities as pq
 def linear(x, m):
     return m*x
 
-def sepereat_by_current(t,T,I,f):
+
+def sepereat_by_current(t,T,I,save_folder):
     add_figure('I_V curve_together', 'points', t.units)
     for v in np.array(t):
         plt.plot(v)
-    plt.savefig('data/traces_img/' + f + '/' + 'I_V_curve_together')
+    plt.savefig(save_folder + '/I_V_curve_together')
     plt.close()
     maxi=[]
     for i,v in enumerate(np.array(t)):
@@ -29,8 +30,8 @@ def sepereat_by_current(t,T,I,f):
         rest_temp = np.mean(v[0:10000])
         plt.plot([0,10000], [rest_temp, rest_temp])
         plt.legend(['full trace','max to calculate','max'])
-        plt.savefig('data/traces_img/'+f+'/'+str(I[i])+'pA.png')
-        with open('data/traces_img/'+f+'/'+str(I[i])+'pA.p', 'wb') as file:
+        plt.savefig(save_folder +'/'+str(I[i])+'pA.png')
+        with open(save_folder+'/'+str(I[i])+'pA.p', 'wb') as file:
             pickle.dump([v*t.units,T[i]], file)
         plt.close()
         maxi.append(max_temp)
@@ -51,17 +52,21 @@ def I_V_curve(maxi,I,save_file):
     plt.plot(I, linear(np.array(I), *popt1),label='fit=I*'+str(round(popt1[0]*1e-12/1e-3*1e12,3))+'pohm')
     plt.legend()
     # plt.legend(['max volt to diffrent current inject','fit=I*'+str(round(popt[0]*1e-12/1e-3*1e12,3))+'pohm',str(I[-1])+'pA'])
-    plt.savefig( save_file+ 'I_V_curve_fit')
+    plt.savefig(save_file + 'I_V_curve_fit')
     print('The input resistance from I_V cureve is ',round(popt[0]*1e-12/1e-3*1e12,3),'pOhm')
     print('The input resistance from I=-50pA is ', round(popt1[0] * 1e-12 / 1e-3 * 1e12, 3), 'pOhm')
     return popt1[0]*10e-12/10e-3*pq.ohm
-def find_maxi(V,f):
+
+
+def find_maxi(V,save_folder):
     plt.plot(V)
     plt.plot(np.arange(np.argmax(V)+750,np.argmin(V)-10),V[np.argmax(V)+750:np.argmin(V)-10])
     plt.plot(np.arange(np.argmax(V)+750,np.argmin(V)-10),np.mean(V[np.argmax(V)+750:np.argmin(V)-10])*np.ones((np.argmin(V)-10)-(np.argmax(V)+750)))
     plt.legend(['full trace','max to calculate','max'])
-    plt.savefig('data/traces_img/' + f + '/-50pA.png')
+    plt.savefig(save_folder + '/-50pA.png')
     return np.mean(V[np.argmax(V)+550:np.argmin(V)-10])
+
+
 if __name__=='__main__':
     I=[-200,-160,-120,-80,-40,-0,40,80,120,160]
     #    creat_data
@@ -80,7 +85,8 @@ if __name__=='__main__':
         T = np.linspace(t_start,t_stop, len(t))
         t_total.append(t[:,0])
         T_total.append(T)
-    maxi=sepereat_by_current(t_total*V_unit,T_total,I,f)
+    save_folder_IV_curve =  'data/traces_img/' + f + '/'
+    maxi=sepereat_by_current(t_total*V_unit,T_total,I,save_folder_IV_curve)
     from open_pickle import read_from_pickle
     mean_short_pulse= read_from_pickle('/ems/elsc-labs/segev-i/moria.fridman/project/data_analysis_git/data_analysis/data/short_pulse/mean_short_pulse_with_parameters.p')
     t_50pA,T_50pA=mean_short_pulse['mean']
@@ -88,7 +94,6 @@ if __name__=='__main__':
     maxi=np.append(maxi,find_maxi(t_50pA,f))
     I.append(-50)
     # I_V_curve(t_total*V_unit, T_total,maxi,I,f)
-    save_folder_IV_curve =  'data/traces_img/' + f + '/'
 
     I_V_curve(maxi, I, save_folder_IV_curve)
     plt.show()
