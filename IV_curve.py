@@ -6,6 +6,7 @@ from add_figure import add_figure
 import pickle
 from scipy.optimize import curve_fit
 import quantities as pq
+from scipy.signal import find_peaks
 
 
 def linear(x, m):
@@ -57,19 +58,30 @@ def I_V_curve(maxi,I,save_file):
     return popt1[0]*10e-12/10e-3*pq.ohm
 
 
-def find_maxi(V,save_folder):
-    plt.plot(V)
-    plt.plot(np.arange(np.argmax(V)+750,np.argmin(V)-10),V[np.argmax(V)+750:np.argmin(V)-10])
-    plt.plot(np.arange(np.argmax(V)+750,np.argmin(V)-10),np.mean(V[np.argmax(V)+750:np.argmin(V)-10])*np.ones((np.argmin(V)-10)-(np.argmax(V)+750)))
-    plt.legend(['full trace','max to calculate','max'])
+def find_maxi(V,save_folder,width=500):
+    peak,dict_peaks=find_peaks(abs(V),width=width)
+    while len(peak)!=1:
+        if len(peak)<1:
+            width-=300
+            peak,dict_peaks=find_peaks(abs(V),width=width)
+        elif len(peak)>1:
+            width+=300
+            peak,dict_peaks=find_peaks(abs(V),width=width)
+    left_ips=int(dict_peaks["left_ips"])+700
+    right_ips=int(dict_peaks["right_ips"])-200
+    plt.plot(V,label='full trace')
+    plt.plot([left_ips,right_ips],[V[left_ips],V[right_ips]],'*')
+    plt.plot(np.arange(left_ips,right_ips),V[left_ips:right_ips],label='max to calculate')
+    plt.plot(np.arange(left_ips,right_ips),np.mean(V[left_ips:right_ips])*np.ones(right_ips-left_ips),label='max')
+    plt.legend()
     plt.savefig(save_folder + '/-50pA.png')
-    return np.mean(V[np.argmax(V)+550:np.argmin(V)-10])
+    return np.mean(V[left_ips:right_ips]),[left_ips,right_ips]
 
 
 if __name__=='__main__':
     I=[-200,-160,-120,-80,-40,-0,40,80,120,160]
     #    creat_data
-    f='2017_05_08_A_0006'
+    f='2017_03_04_A_6-7'
     r=io.AxonIO(f+'.abf')
     bl = r.read_block(lazy=False)
     t_total,T_total,max_t=[],[],[]

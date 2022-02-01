@@ -42,16 +42,14 @@ def split2phenomena(inputs_folder, outputs_folder,important_outputs_folder):
 		bl = r.read_block(lazy=False)
 		hz = [np.array(segment.analogsignals[0].sampling_rate) for segment in bl.segments]
 		t, T, t1, t2 = [], [], [], []
-		second_channel = True
 		for segment in tqdm(bl.segments):
 			t_i = segment.analogsignals[0]
 			channel1 = [v[0] for v in np.array(t_i)]
 			t.append(t_i)
 			t1.append(channel1)
 
-			if second_channel:
-				channel2 = [v[1] for v in np.array(t_i)]
-				t2.append(channel2)
+			channel2 = [v[1] for v in np.array(t_i)]
+			t2.append(channel2)
 			T_i = np.linspace(segment.analogsignals[0].t_start, segment.analogsignals[0].t_stop, int(len(t_i)))
 			T.append(T_i)
 
@@ -64,14 +62,13 @@ def split2phenomena(inputs_folder, outputs_folder,important_outputs_folder):
 		plt.savefig(save_folder + '/first_channel.png')
 		plt.savefig(save_folder + '/first_channel.pdf')
 
-		if second_channel:
-			with open(save_folder + '/second_channel.p', 'wb') as fr:
-				pickle.dump([np.array(t2) * t_i.units, T], fr)
-			plt.close()
-			add_figure(f[f.rfind('/') + 1:-4] + '\n second_channel', T[0].units, t[0].units)
-			plt.plot(np.array(T).flatten(), np.array(t2).flatten())
-			plt.savefig(save_folder + '/second_channel.png')
-			plt.savefig(save_folder + '/second_channel.pdf')
+		with open(save_folder + '/second_channel.p', 'wb') as fr:
+			pickle.dump([np.array(t2) * t_i.units, T], fr)
+		plt.close()
+		add_figure(f[f.rfind('/') + 1:-4] + '\n second_channel', T[0].units, t[0].units)
+		plt.plot(np.array(T).flatten(), np.array(t2).flatten())
+		plt.savefig(save_folder + '/second_channel.png')
+		plt.savefig(save_folder + '/second_channel.pdf')
 
 		# split to syn, short_pulse, spike ,noise
 		if f.endswith(".abf") and "stable_conc_aligned" and "average" in f:  # pattern: *stable_conc_aligned_average*.abf
@@ -81,12 +78,22 @@ def split2phenomena(inputs_folder, outputs_folder,important_outputs_folder):
 			REST, short_pulse, T_short_pulse = phenomena(np.array(t1) * t_i.units, T, base_folder, x_units=T[0].units,
 														 Y_units=t_i.units)
 		elif f.endswith(".abf"):  # moria: check name?
+			fig, axs = plt.subplots(2)
+			fig.suptitle('decide on the right channels')
+			axs[0].plot(np.array(T).flatten(), np.array(t1).flatten())
+			axs[0].set_title('channels1')
+			axs[1].plot(np.array(T).flatten(), np.array(t2).flatten())
+			axs[1].set_title('channels2')
+			plt.show()
+			channels2use=input("This is the second channels , decide what channels to use (1 or 2)")
+			if channels2use=='2':
+				t1=t2
 			# cell_name = '2017_05_08_A_0006'
 			save_folder_IV_curve = save_folder  # moria
 			I = [-200, -160, -120, -80, -40, -0, 40, 80, 120, 160]
 			# print(f,'correct IV_curve')
 			maxi = sepereat_by_current(np.array(t1) * t_i.units, T, I, save_folder_IV_curve)
-			maxi = np.append(maxi, find_maxi(np.array(short_pulse) - REST, save_folder_IV_curve))
+			maxi = np.append(maxi, find_maxi(np.array(short_pulse) - REST, save_folder_IV_curve)[0])
 			I.append(-50)
 			with open(save_folder_IV_curve + 'max_vol_curr_inj.p', 'wb') as fr:
 				pickle.dump([maxi * short_pulse.units, I * pq.pA], fr)

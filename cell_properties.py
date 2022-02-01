@@ -4,26 +4,28 @@ import numpy as np
 import matplotlib.pyplot as plt
 from tqdm import tqdm
 from add_figure import add_figure
-import sys
 from glob import glob
-from extra_function import create_folder_dirr
-# cell = sys.argv[1]
-# folder_=sys.argv[2]
-# save_folder =sys.argv[3]
-cell= '2017_03_04_A_6-7'
+from extra_function import create_folder_dirr,SIGSEGV_signal_arises
+# cell_name = sys.argv[1]
+# folder_= sys.argv[2]
+# data_dir = sys.argv[3] #cells_initial_information
+# save_dir =sys.argv[4] #cells_outputs_data
+
+cell_name= '2017_03_04_A_6-7'
 folder_='/ems/elsc-labs/segev-i/moria.fridman/project/analysis_groger_cells/'
-cell_file = glob(folder_+"cells_initial_information/"+cell+"/*.ASC")[0]
-path_short_pulse=folder_+'cells_important_outputs_data/'+cell+'/data/electrophysio_records/short_pulse/mean_short_pulse.p'
-folder_save=folder_+'cells_outputs_data/'+cell+'/cell_properties/'
+data_dir= "cells_initial_information"
+save_dir ="cells_outputs_data"
+
+cell_file = glob(folder_+data_dir+"/"+cell_name+"/*.ASC")[0]
+path_short_pulse=folder_+save_dir+'/'+cell_name+'/data/electrophysio_records/short_pulse/mean_short_pulse.p'
+folder_save=folder_+save_dir+'/'+cell_name+'/cell_properties/'
+
 h.load_file("import3d.hoc")
 h.load_file("nrngui.hoc")
 h.load_file('stdlib.hoc')
 h.load_file("stdgui.hoc")
 # h.loadfile("stdrun.hoc")
 
-def SIGSEGV_signal_arises(signalNum, stack):
-    print(f"{signalNum} : SIGSEGV arises")
-    # Your code
 signal.signal(signal.SIGSEGV, SIGSEGV_signal_arises)
 
 class Cell: pass
@@ -37,9 +39,12 @@ def mkcell(fname):
     loader.instantiate(c)
     return c
 
+f=open(folder_save+'cell_propertis.txt', 'w')
+f.write('The '+cell_name+ ' cell_propertis\n')
 ######################################################
 # build the model
 ######################################################
+# h.load_file("/ems/elsc-labs/segev-i/moria.fridman/project/analysis_groger_cells/cells_initial_information/2017_03_04_A_6-7/03_24_A_11052017_Splice_Shrink_zvalue_LABEL_Bluecell_Zcorrected_by_Gregor.hoc")
 
 cell=mkcell(cell_file)
 print (cell)
@@ -78,16 +83,23 @@ imp.compute(0)
 imp.input(0)
 imp.compute(0)
 print('the impadence is',imp.input(0))
+f.write('The impadence is '+str(imp.input(0))+'\n')
 
 #print the dendrite diameter:
 soma_ref=h.SectionRef(sec=cell.soma[0])
 print("the soma's childrens diameter is:")
+f.write("\nThe soma's childrens diameter is\n")
+
 for i in range(soma_ref.nchild()):
     print(soma_ref.child[i](0).diam)
+    f.write(str(soma_ref.child[i](0).diam)+"\n")
+
 length=0
 for dend in cell.dend:
     length+=dend.L
 print("total dendritic length is ",length)
+f.write("\nThe total dendritic length is "+str(length)+ "\n")
+f.close()
 #track from the terminals to the soma
 def track_one(terminal):
     h.distance(0, 0.5, sec=soma)
@@ -114,5 +126,3 @@ for terminal in terminals[:-14:2]:
 create_folder_dirr(folder_save)
 plt.savefig(folder_save+'diam-dis.png')
 plt.savefig(folder_save+'diam-dis.pdf')
-plt.show()
-a=1

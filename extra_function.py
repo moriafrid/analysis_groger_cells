@@ -1,4 +1,5 @@
 import os
+from neuron import h
 def create_folders_list(folders_list):
     for curr in folders_list:
         try:
@@ -15,3 +16,20 @@ def create_folder_dirr(folder_dir,start_creat='project'):
             os.makedirs(new_dir)
         except FileExistsError:
             pass
+
+def SIGSEGV_signal_arises(signalNum, stack):
+    print(f"{signalNum} : SIGSEGV arises")
+    # Your code
+
+class Cell: pass
+def mkcell(fname):
+    #def to read ACS file
+    h('objref cell, tobj')
+    loader = h.Import3d_GUI(None)
+    loader.box.unmap()
+    loader.readfile(fname)
+    c = Cell()
+    loader.instantiate(c)
+    return c
+
+# h.load_file('cell_path'+".hoc")

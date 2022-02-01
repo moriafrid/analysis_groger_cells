@@ -120,7 +120,7 @@ def phenomena(t,T,base,x_units='S',Y_units='mV'):
 		new_V=np.delete(V,list((index2del_1+index2del_2)) ,axis=0)- REST
 		new_short_pulse=np.delete(short_pulse,list(set(index2del_1+index2del_2)) ,axis=0)
 		new_spike=np.delete(spike,list(set(index2del_1+index2del_2)) ,axis=0)
-		new_syn=np.delete(syn,list(set(index2del_1+index2del_2)),axis=0)
+		# new_syn=np.delete(syn,list(set(index2del_1+index2del_2)),axis=0)
 		new_rest4list=np.delete(rest4list,list(set(index2del_1+index2del_2)),axis=0)
 	else:
 		print("Not deleting")
@@ -128,43 +128,24 @@ def phenomena(t,T,base,x_units='S',Y_units='mV'):
 
 	new_short_pulse = [v - new_rest4list[i]-np.mean((v-new_rest4list[i])[:3000]) for i, v in enumerate(new_short_pulse)]
 	new_spike = [v - new_rest4list[i]-np.mean((v-new_rest4list[i])[6000:12000]) for i, v in enumerate(new_spike)]
-	new_syn = [v - new_rest4list[i]-np.mean((v-new_rest4list[i])[:2500]) for i, v in enumerate(new_syn)]
 
 	index2del_short_pulse1 = clear_phenomena(new_short_pulse,'short_pulse',base,std_mean=0.2)
 	index2del_spike1 = clear_phenomena(new_spike,'spike',base,std_mean=0.2)
-	index2del_syn1 = clear_phenomena(new_syn,'syn',base,std_mean=0.7)
 
 	new_short_pulse1=np.delete(new_short_pulse,index2del_short_pulse1,axis=0 )
-	new_syn1=np.delete(new_syn,index2del_syn1 ,axis=0)
 
 	temp_short_pulse=np.mean(new_short_pulse1,axis=0)
-	temp_syn=np.mean(new_syn1,axis=0)
 	short_pulse_time2clear1=np.argmax(temp_short_pulse)-10
 	short_pulse_time2clear2=np.argmin(temp_short_pulse)+700
-	syn_time2clear1=np.argmax(temp_syn)-100
-	syn_time2clear2=np.argmax(temp_syn)+200
 #@# add a pickle t save this places
 	index2del_short_pulse_begining,new_short_pulse1 = clear_phenomena_partial(new_short_pulse1, 'short_pulse','begining', base ,start=short_pulse_time2clear1-500,end=short_pulse_time2clear1,correct_rest=True)
 	index2del_short_pulse_end = clear_phenomena_partial(new_short_pulse1, 'short_pulse','end', base ,start=short_pulse_time2clear2,end=short_pulse_time2clear2+1000)
-	index2del_syn_begining,new_syn1 = clear_phenomena_partial(new_syn1, 'syn','begining', base, start=syn_time2clear1-500,end=syn_time2clear1,correct_rest=True)
-	# new_syn1 = np.delete(new_syn1, list(set(index2del_syn_begining)), axis=0)  # old unused deletion
-	new_syn11=[]
-	for v in new_syn1:
-		v = v - np.mean(v[syn_time2clear1 - 500:syn_time2clear1])
-		new_syn11.append(v)
-	plt.plot(v[syn_time2clear1 - 500:syn_time2clear2 + 1000])
-
-	index2del_syn_begining2,new_syn2 = clear_phenomena_partial(new_syn1, 'syn','begining2', base, start=syn_time2clear1-700,end=syn_time2clear1,correct_rest=True)
-	index2del_syn_end = clear_phenomena_partial(new_syn2, 'syn','end', base, start=syn_time2clear2,end=syn_time2clear2+1000,std_max=3.3)
-	index2del_syn_end2 = clear_phenomena_partial(new_syn2, 'syn','end2', base, start=syn_time2clear2+1000,end=syn_time2clear2+3000,std_max=4)
-
 
 	new_short_pulse2 = np.delete(new_short_pulse1, list(set(index2del_short_pulse_begining+index2del_short_pulse_end)), axis=0)+ REST
 	new_spike2 = np.delete(new_spike, index2del_spike1, axis=0) + REST
-	new_syn2 = np.delete(new_syn1, list(set(index2del_syn_begining+index2del_syn_begining2+index2del_syn_end+index2del_syn_end2)), axis=0)+ REST
 
-	names=['short_pulse','spike','syn']
-	for i,phenomena in enumerate([new_short_pulse2,new_spike2,new_syn2]):
+	names=['short_pulse','spike']
+	for i,phenomena in enumerate([new_short_pulse2,new_spike2]):
 		plt.close()
 		add_figure('clear '+names[i],'index',t.units)
 		for v in phenomena:
@@ -177,7 +158,7 @@ def phenomena(t,T,base,x_units='S',Y_units='mV'):
 	with open(base + '/V1/clear_V.p', 'wb') as f:
 		pickle.dump( np.array(new_V), f)
 
-	for i,phenomena in enumerate([new_short_pulse2,new_spike2,new_syn2]):
+	for i,phenomena in enumerate([new_short_pulse2,new_spike2]):
 		add_figure('mean '+names[i],eval('T_'+names[i])[0].units,t.units)
 		mean=np.mean(phenomena,axis=0)
 		plt.plot(eval('T_'+names[i]),mean)
@@ -187,27 +168,19 @@ def phenomena(t,T,base,x_units='S',Y_units='mV'):
 	with open(base + '/V1/mean_V.p', 'wb') as f:
 		pickle.dump( [np.mean(np.array(new_V),axis=0)*t.units,T[0]], f)
 
-	add_figure('mean short syn',T_syn.units,t.units)
-	plt.plot(T_syn[syn_time2clear1-500:syn_time2clear2+1000],np.mean(new_syn2,axis=0)[syn_time2clear1-500:syn_time2clear2+1000])
-	plt.close()
-	with open(base +'syn'+'/mean_syn_short.p', 'wb') as f:
-		pickle.dump([np.mean(new_syn2,axis=0)[syn_time2clear1-500:syn_time2clear2+1000] * t.units,T_syn[syn_time2clear1-500:syn_time2clear2+1000]], f)
-
-	E_pas_syn = np.mean([new_short_pulse2[i][short_pulse_time2clear1 - 500:short_pulse_time2clear1] for i in range(len(new_short_pulse2))])
-	E_pas_short_pulse=np.mean([new_syn2[i][syn_time2clear1-500:syn_time2clear1] for i in range(len(new_syn2))])
-	E_pases=[E_pas_short_pulse,E_pas_syn]
-	point2calculate_E_pas=[short_pulse_time2clear1,syn_time2clear1]
-	names2=['short_pulse','syn']
-	for i, phenomena in enumerate([new_short_pulse2, new_syn2]):
-		mean=np.mean(phenomena,axis=0)
-		with open(base +names2[i]+'/mean_'+names2[i]+'_with_parameters.p', 'wb') as f:
-			pickle.dump({'mean':[mean * t.units, eval('T_' + names2[i])],'E_pas':E_pases[i],'points2calsulate_E_pas':point2calculate_E_pas }, f)
+	E_pas_short_pulse= np.mean([new_short_pulse2[i][short_pulse_time2clear1 - 500:short_pulse_time2clear1] for i in range(len(new_short_pulse2))])
+	E_pases=E_pas_short_pulse
+	point2calculate_E_pas=short_pulse_time2clear1
+	names2='short_pulse'
+	mean=np.mean(new_short_pulse2,axis=0)
+	with open(base +names2+'/mean_'+names2+'_with_parameters.p', 'wb') as f:
+		pickle.dump({'mean':[mean * t.units, eval('T_' + names2)],'E_pas':new_short_pulse2,'points2calsulate_E_pas':point2calculate_E_pas }, f)
 	#add to the other currents for I-V curve
 	add_figure('I_V curve_together', 'points', t.units)
 	plt.plot(new_short_pulse2)
 	plt.savefig(base + '/-50pA.png')
 	with open(base + '/-50pA.p', 'wb') as f:
-		pickle.dump({'mean': [np.mean(new_short_pulse2,axis=0) * t.units, T_short_pulse], 'E_pas': E_pases[i],}, f)
+		pickle.dump({'mean': [np.mean(new_short_pulse2,axis=0) * t.units, T_short_pulse], 'E_pas': E_pases,}, f)
 	a=1
 	return REST,np.mean(new_short_pulse2,axis=0)* t.units,T_short_pulse
 
@@ -223,7 +196,7 @@ def one_data( t,T, base, cut_part=25000):
 	noise1=[]
 	noise2 = []
 
-	while True: #split 1 picture to spyke,synapse,short_pulse and noise
+	while True: #split 1 picture to spike,synapse,short_pulse and noise
 		try:
 			idx = np.where(t2 > 10)[0]
 			if len(idx)==0:

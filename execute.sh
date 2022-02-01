@@ -18,7 +18,9 @@ if [[ $# -ne 1 ]] ; then
 fi
 
 cell_name=$1
-
+folder=$2
+data_dir=$3
+save_dir=$4
 shift $#
 
 # `if [ -n $SLURM_JOB_ID ]` checks if $SLURM_JOB_ID is not an empty string
@@ -35,8 +37,10 @@ path=$(dirname $SCRIPT_PATH)
 # source anaconda3/bin/activate
 # put your script here - example script is sitting with this bash script
 echo python3 $path/main_cell_data.py $cell_name
-python3 $path/main_cell_data.py $cell_name
-#python3 $path/best_with_const_param.py $cell_name
+
+python3 $path/main_cell_data.py $cell_name $folder $data_dir $save_dir
+
+#python3 $path/cell_properties.py $cell_name
 #python3 $path/best_with_const_param.py $cell_name
 #python3 $path/best_with_const_param.py $cell_name
 #python3 $path/best_with_const_param.py $cell_name
