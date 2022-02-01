@@ -128,3 +128,8 @@ dmypy.json
 
 # Pyre type checker
 .pyre/
+
+#folders
+logs/
+cells_outputs_data/
+x86_64/

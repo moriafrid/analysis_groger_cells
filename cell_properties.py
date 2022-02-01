@@ -4,9 +4,17 @@ import numpy as np
 import matplotlib.pyplot as plt
 from tqdm import tqdm
 from add_figure import add_figure
-
-path='/ems/elsc-labs/segev-i/moria.fridman/project/data_analysis_git/data_analysis/data/short_pulse_mean.p'
-folder_='/ems/elsc-labs/segev-i/moria.fridman/project/data_analysis_git/data_analysis/'
+import sys
+from glob import glob
+from extra_function import create_folder_dirr
+# cell = sys.argv[1]
+# folder_=sys.argv[2]
+# save_folder =sys.argv[3]
+cell= '2017_03_04_A_6-7'
+folder_='/ems/elsc-labs/segev-i/moria.fridman/project/analysis_groger_cells/'
+cell_file = glob(folder_+"cells_initial_information/"+cell+"/*.ASC")[0]
+path_short_pulse=folder_+'cells_important_outputs_data/'+cell+'/data/electrophysio_records/short_pulse/mean_short_pulse.p'
+folder_save=folder_+'cells_outputs_data/'+cell+'/cell_properties/'
 h.load_file("import3d.hoc")
 h.load_file("nrngui.hoc")
 h.load_file('stdlib.hoc')
@@ -16,25 +24,24 @@ h.load_file("stdgui.hoc")
 def SIGSEGV_signal_arises(signalNum, stack):
     print(f"{signalNum} : SIGSEGV arises")
     # Your code
-
 signal.signal(signal.SIGSEGV, SIGSEGV_signal_arises)
 
-class Cell() :pass
+class Cell: pass
 def mkcell(fname):
     #def to read ACS file
-  loader = h.Import3d_GUI(None)
-  loader.box.unmap()
-  loader.readfile(fname)
-  c = Cell()
-  loader.instantiate(c)
-  return c
+    h('objref cell, tobj')
+    loader = h.Import3d_GUI(None)
+    loader.box.unmap()
+    loader.readfile(fname)
+    c = Cell()
+    loader.instantiate(c)
+    return c
 
 ######################################################
 # build the model
 ######################################################
 
-fname = "05_08_A_01062017_Splice_shrink_FINISHED_LABEL_Bluecell_spinec91.ASC"
-cell=mkcell(fname)
+cell=mkcell(cell_file)
 print (cell)
 sp = h.PlotShape()
 sp.show(0)  # show diameters
@@ -104,7 +111,8 @@ for terminal in terminals[:-14:2]:
     i+=1
     dis,diam=track_one(terminal)
     plt.plot(dis,diam,alpha=0.5)
-plt.savefig('data/diam-dis.png')
-plt.savefig('data/diam-dis.pdf')
+create_folder_dirr(folder_save)
+plt.savefig(folder_save+'diam-dis.png')
+plt.savefig(folder_save+'diam-dis.pdf')
 plt.show()
 a=1

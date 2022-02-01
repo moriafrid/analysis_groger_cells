@@ -11,7 +11,6 @@ import quantities as pq
 def linear(x, m):
     return m*x
 
-
 def sepereat_by_current(t,T,I,save_folder):
     add_figure('I_V curve_together', 'points', t.units)
     for v in np.array(t):

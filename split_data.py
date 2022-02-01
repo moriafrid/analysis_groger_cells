@@ -10,7 +10,7 @@ from add_figure import add_figure
 import quantities as pq
 from IV_curve import I_V_curve, sepereat_by_current, find_maxi
 from check_dynamics import check_dynamics
-
+import sys
 
 def create_folders(folders_list):
     for curr in folders_list:
@@ -20,22 +20,13 @@ def create_folders(folders_list):
             pass
 
 
-# try:	os.mkdir(folder_ + 'data')
-# except FileExistsError:	pass
-# try:os.mkdir(base+'traces_img')
-# except FileExistsError:pass
-# for phen in ['V1', 'short_pulse', 'syn', 'spike', 'noise']:
-# 	try:os.mkdir(base + phen)
-# 	except FileExistsError:pass
-
-
-def split2phenomena(inputs_folder, important_outputs_folder, all_outputs_folder):
+def split2phenomena(inputs_folder, outputs_folder,important_outputs_folder):
 	"""
 	important_outputs_folder: <repository>/cells_important_outputs_data/<cell_name>
 	all_outputs_folder: <repository>/cells_outputs_data/<cell_name>
 	"""
-	base_folder = os.path.join(important_outputs_folder, 'data', 'electrophysio_records/')
-	base_external_folder = os.path.join(important_outputs_folder, 'data/')
+	base_folder = os.path.join(outputs_folder, 'data', 'electrophysio_records/')
+	base_external_folder = os.path.join(outputs_folder, 'data/')
 	save_external_folder = base_external_folder + '/'
 	folder_names = ['V1', 'short_pulse', 'syn', 'spike', 'noise1', 'noise2']
 	create_folders([os.path.join(base_folder, n) for n in folder_names])
@@ -106,3 +97,9 @@ def split2phenomena(inputs_folder, important_outputs_folder, all_outputs_folder)
 			print("Error. Wrong file ending for " + f)
 
 
+if __name__ == '__main__':
+	cell = sys.argv[1]
+	folder_ = '/ems/elsc-labs/segev-i/moria.fridman/project/analysis_groger_cells/'  # moria
+	split2phenomena(inputs_folder=os.path.join(folder_, 'cells_initial_information', cell),
+                    outputs_folder=os.path.join(folder_, 'cells_outputs_data', cell),
+					important_outputs_folder=os.path.join(folder_, 'cells_important_outputs_data', cell))

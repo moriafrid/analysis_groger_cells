@@ -4,6 +4,8 @@ import numpy as np
 import os
 import matplotlib.pyplot as plt
 import signal
+from add_figure import add_figure
+
 freq=100
 resize_diam_by=2
 do_resize_dend=True
@@ -110,7 +112,6 @@ def plot_records(RM, RA, CM,cell, syn,spine=None,save_name= "lambda"):
         npIvec/=Rin_syn_resize_dend #npIvec*(Rin_syn_0/Rin_syn_resize_dend)
         # npVec_dend=npVec_dend*(Rin_dend_0/Rin_dend_resize_dend)#/=Rin_dend_resize_dend #npVec_dend*(Rin_dend_0/Rin_dend_resize_dend)
         # npVec_soma=npVec_soma*(Rin_soma_0/Rin_soma_resize_dend)#/=Rin_soma_resize_dend#npVec_soma*(Rin_soma_0/Rin_soma_resize_dend)
-    from add_figure import add_figure
     figure, axis = plt.subplots(3, 1)
     axis[0].plot(npTvec,npIvec)
     # axis[0].set_title("spine voltage")
