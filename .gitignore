@@ -133,3 +133,4 @@ dmypy.json
 logs/
 cells_outputs_data/
 x86_64/
+/*/.~lock.Data.xlsx#

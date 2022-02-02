@@ -20,7 +20,7 @@ def create_folders(folders_list):
             pass
 
 
-def split2phenomena(inputs_folder, outputs_folder,important_outputs_folder):
+def split2phenomena(cell_name,inputs_folder, outputs_folder,important_outputs_folder):
 	"""
 	important_outputs_folder: <repository>/cells_important_outputs_data/<cell_name>
 	all_outputs_folder: <repository>/cells_outputs_data/<cell_name>
@@ -84,10 +84,13 @@ def split2phenomena(inputs_folder, outputs_folder,important_outputs_folder):
 			axs[0].set_title('channels1')
 			axs[1].plot(np.array(T).flatten(), np.array(t2).flatten())
 			axs[1].set_title('channels2')
-			plt.show()
-			channels2use=input("This is the second channels , decide what channels to use (1 or 2)")
-			if channels2use=='2':
+			plt.savefig(save_folder + '/IV_curve_channel1&channel2.pdf')
+			if cell_name=="2017_03_04_A_6-7" or cell_name=="2017_05_08_A_5-4":
 				t1=t2
+			# plt.show()
+			# channels2use=input("This is the second channels , decide what channels to use (1 or 2)")
+			# if channels2use=='2':
+			# 	t1=t2
 			# cell_name = '2017_05_08_A_0006'
 			save_folder_IV_curve = save_folder  # moria
 			I = [-200, -160, -120, -80, -40, -0, 40, 80, 120, 160]

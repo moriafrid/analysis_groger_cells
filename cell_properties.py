@@ -5,39 +5,29 @@ import matplotlib.pyplot as plt
 from tqdm import tqdm
 from add_figure import add_figure
 from glob import glob
-from extra_function import create_folder_dirr,SIGSEGV_signal_arises
-# cell_name = sys.argv[1]
-# folder_= sys.argv[2]
-# data_dir = sys.argv[3] #cells_initial_information
-# save_dir =sys.argv[4] #cells_outputs_data
+from extra_function import create_folder_dirr,SIGSEGV_signal_arises,mkcell
+import sys
 
-cell_name= '2017_03_04_A_6-7'
-folder_='/ems/elsc-labs/segev-i/moria.fridman/project/analysis_groger_cells/'
-data_dir= "cells_initial_information"
-save_dir ="cells_outputs_data"
+if len(sys.argv) != 5:
+    cell_name= '2017_05_08_A_4-5'
+    folder_='/ems/elsc-labs/segev-i/moria.fridman/project/analysis_groger_cells/'
+    data_dir= "cells_initial_information"
+    save_dir ="cells_outputs_data"
+else:
+    cell_name = sys.argv[1]
+    folder_= sys.argv[2] #'/ems/elsc-labs/segev-i/moria.fridman/project/analysis_groger_cells/'
+    data_dir = sys.argv[3] #cells_initial_information
+    save_dir =sys.argv[4] #cells_outputs_data
+print(len(sys.argv))
+print(cell_name, folder_+data_dir+"/"+cell_name+"/*.ASC")
 
 cell_file = glob(folder_+data_dir+"/"+cell_name+"/*.ASC")[0]
 path_short_pulse=folder_+save_dir+'/'+cell_name+'/data/electrophysio_records/short_pulse/mean_short_pulse.p'
 folder_save=folder_+save_dir+'/'+cell_name+'/cell_properties/'
 
-h.load_file("import3d.hoc")
-h.load_file("nrngui.hoc")
-h.load_file('stdlib.hoc')
-h.load_file("stdgui.hoc")
-# h.loadfile("stdrun.hoc")
+create_folder_dirr(folder_save)
 
 signal.signal(signal.SIGSEGV, SIGSEGV_signal_arises)
-
-class Cell: pass
-def mkcell(fname):
-    #def to read ACS file
-    h('objref cell, tobj')
-    loader = h.Import3d_GUI(None)
-    loader.box.unmap()
-    loader.readfile(fname)
-    c = Cell()
-    loader.instantiate(c)
-    return c
 
 f=open(folder_save+'cell_propertis.txt', 'w')
 f.write('The '+cell_name+ ' cell_propertis\n')
@@ -123,6 +113,5 @@ for terminal in terminals[:-14:2]:
     i+=1
     dis,diam=track_one(terminal)
     plt.plot(dis,diam,alpha=0.5)
-create_folder_dirr(folder_save)
 plt.savefig(folder_save+'diam-dis.png')
 plt.savefig(folder_save+'diam-dis.pdf')

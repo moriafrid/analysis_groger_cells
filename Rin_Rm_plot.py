@@ -8,40 +8,41 @@ from tqdm import tqdm
 from add_figure import add_figure
 import quantities as pq
 from glob import glob
-import pickle
 from calculate_F_factor import calculate_F_factor
 import signal
-
-
+import sys
+from extra_function import mkcell,SIGSEGV_signal_arises
+from spinse_class import SpinesParams
 
 SPINE_START = 60
 resize_diam_by=1
 CM=2#2/2
 RM=5684*2#*2
 RA=70
-
 do_calculate_F_factor=True
-folder_='/ems/elsc-labs/segev-i/moria.fridman/project/data_analysis_git/data_analysis/'
-h.load_file("import3d.hoc")
-h.load_file("nrngui.hoc")
-h.load_file('stdlib.hoc')
-h.load_file("stdgui.hoc")
-# h.loadfile("stdrun.hoc")
-if do_calculate_F_factor:
-    V_head=0.14
-    spine_neck_diam=0.164
-    spine_neck_L=0.782
+
+if len(sys.argv) != 5:
+    cell_name= '2017_05_08_A_4-5'
+    folder_='/ems/elsc-labs/segev-i/moria.fridman/project/analysis_groger_cells/'
+    data_dir= "cells_initial_information"
+    save_dir ="cells_outputs_data"
+else:
+    cell_name = sys.argv[1]
+    folder_= sys.argv[2] #'/ems/elsc-labs/segev-i/moria.fridman/project/analysis_groger_cells/'
+    data_dir = sys.argv[3] #cells_initial_information
+    save_dir =sys.argv[4] #cells_outputs_data
+
+
+spine=SpinesParams(cell_name)
 
 #F_factor is the correction from the spine A(spine area)/area(without spine)
 # F_factor = {} - take the F_factor for the specific segment
-def change_model_pas(CM=1, RA = 250, RM = 20000.0, E_PAS = -70.0, F_factor = {}):
+def change_model_pas(CM=1, RA = 250, RM = 20000.0, E_PAS = -70.0, F_factor = 1.9):
     #input the neuron property    h.dt = 0.1
 
     h.distance(0,0.5, sec=soma) # it isn't good beacause it change the synapse distance to the soma
     #h.distance(0, sec=soma)
     for sec in cell.all: ##check if we need to insert Ra,cm,g_pas,e_pas to the dendrit or just to the soma
-        if isinstance(cell, Cell):
-            if sec in cell.axon: continue   #@# cell.axon is not exist in hoc object
         sec.Ra = RA
         sec.cm = CM
         sec.g_pas = 1.0 / RM
@@ -51,38 +52,11 @@ def change_model_pas(CM=1, RA = 250, RM = 20000.0, E_PAS = -70.0, F_factor = {})
             # how many segment have diffrent space larger then SPINE_START that decided
             if h.distance(seg) > SPINE_START:
                 if do_calculate_F_factor:
-                    F_factor=calculate_F_factor(cell,V_head,spine_neck_diam,spine_neck_L)
-                else:
-                    F_factor = 1.9#2.0 # F_factor[sec]
+                    F_factor=spine.calculate_F_factor(folder_)
                 seg.cm *= F_factor
                 seg.g_pas *= F_factor
 
 
-class Cell: pass
-def mkcell(fname):
-    #def to read ACS file
-    h('objref cell, tobj')
-    loader = h.Import3d_GUI(None)
-    loader.box.unmap()
-    loader.readfile(fname)
-    c = Cell()
-    loader.instantiate(c)
-    return c
-
-def instantiate_swc(filename):
-    h('objref cell, tobj')
-    h.load_file('allen_model.hoc')
-    h.execute('cell = new allen_model()')
-    h.load_file(filename)
-    nl = h.Import3d_SWC_read()
-    nl.quiet = 1
-    nl.input(filename)
-    i3d = h.Import3d_GUI(nl, 0)
-    i3d.instantiate(h.cell)
-    return h.cell
-def SIGSEGV_signal_arises(signalNum, stack):
-    print(f"{signalNum} : SIGSEGV arises")
-    # Your code
 signal.signal(signal.SIGSEGV, SIGSEGV_signal_arises)
 ######################################################
 # build the model
@@ -90,7 +64,7 @@ signal.signal(signal.SIGSEGV, SIGSEGV_signal_arises)
 
 fname = "05_08_A_01062017_Splice_shrink_FINISHED_LABEL_Bluecell_spinec91.ASC"
 # cell=instantiate_swc('/ems/elsc-labs/segev-i/moria.fridman/project/data_analysis_git/data_analysis/try1.swc')
-cell =mkcell(fname)
+cell =mkcell(data_folder+cell_name+)
 
 ## delete all the axons
 for sec in cell.axon:

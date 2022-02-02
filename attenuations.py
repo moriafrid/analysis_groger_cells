@@ -4,19 +4,26 @@ import numpy as np
 import os
 import matplotlib.pyplot as plt
 import signal
+from extra_function import SIGSEGV_signal_arises,mkcell
 from add_figure import add_figure
 
 freq=100
-resize_diam_by=2
+resize_diam_by=1
 do_resize_dend=True
 norm_Rin=False
-folder_='/ems/elsc-labs/segev-i/moria.fridman/project/data_analysis_git/data_analysis/'
+# cell_name = sys.argv[1]
+# folder_= sys.argv[2]
+# data_dir = sys.argv[3] #cells_initial_information
+# save_dir =sys.argv[4] #cells_outputs_data
+
+folder_='/ems/elsc-labs/segev-i/moria.fridman/project/data_groger_cells/'
+cell_name='05_08_A_01062017'
+
 h.load_file("import3d.hoc")
 h.load_file("nrngui.hoc")
 h.load_file('stdlib.hoc')
 h.load_file("stdgui.hoc")
 
-cell_name='05_08_A_01062017'
 class Cell: pass
 def mkcell(fname):
     #def to read ACS file
@@ -27,31 +34,13 @@ def mkcell(fname):
   loader.instantiate(c)
   return c
 
-def instantiate_swc(filename):
-    h.load_file('import3d.hoc')
-    h('objref cell, tobj')
-    h.load_file('allen_model.hoc')
-    h.execute('cell = new allen_model()')
-    h.load_file(filename)
-    nl = h.Import3d_SWC_read()
-    nl.quiet = 1
-    nl.input(filename)
-    i3d = h.Import3d_GUI(nl, 0)
-    i3d.instantiate(h.cell)
-    return h.cell
-
-def SIGSEGV_signal_arises(signalNum, stack):
-    print(f"{signalNum} : SIGSEGV arises")
-    # Your code
 signal.signal(signal.SIGSEGV, SIGSEGV_signal_arises)
 def change_model_pas(cell, CM=1, RA = 250, RM = 20000.0, E_PAS = -77.5, F_factor = {}, SPINE_START=60):
     #input the neuron property    h.dt = 0.1
 
     h.distance(0,0.5, sec=cell.soma[0]) # it isn't good beacause it change the synapse distance to the soma
     #h.distance(0, sec=soma)
-    for sec in cell.all: ##check if we need to insert Ra,cm,g_pas,e_pas to the dendrit or just to the soma
-        if isinstance(cell, Cell):
-            if sec in cell.axon: continue   #@# cell.axon is not exist in hoc object
+    for sec in h.allsec(): ##check if we need to insert Ra,cm,g_pas,e_pas to the dendrit or just to the soma
         sec.Ra = RA
         sec.cm = CM
         sec.g_pas = 1.0 / RM
@@ -66,7 +55,6 @@ def change_model_pas(cell, CM=1, RA = 250, RM = 20000.0, E_PAS = -77.5, F_factor
 
 def plot_records(RM, RA, CM,cell, syn,spine=None,save_name= "lambda"):
     soma = cell.soma[0]
-    # syn = cell.dend[82]
     folder_="data/Attenuations/"
     try: os.mkdir(folder_)
     except FileExistsError: pass
@@ -218,8 +206,7 @@ syn_poses['05_08_A_01062017']=[(-5.56, -325.88, -451.42)]
 syns = synaptic_loc(cell,syn_poses[cell_name],del_axon=False)['place_as_sec']
 
 for sec in h.allsec():
-    # if isinstance(cell, Cell):
-    # if sec in cell.axon: continue   #@# cell.axon is not exist in hoc object
+
     sec.insert('pas') # insert passive property
     sec.nseg = int(sec.L/10)+1  #decide that the number of segment will be 21 with the same distances
 syn=syns[0]

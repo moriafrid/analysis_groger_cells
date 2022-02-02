@@ -6,14 +6,14 @@
 #SBATCH -e logs/%j.err
 # Ask for one CPU, one GPU, enter the GPU queue, and limit run to 1 days
 #SBATCH -p ss.q
-#SBATCH --mem 2000
+#SBATCH --mem 10000
 #SBATCH -c 1
 #SBATCH -t 1-0
 # check if script is started via SLURM or bash
 # if with SLURM: there variable '$SLURM_JOB_ID' will exist
 
-if [[ $# -ne 1 ]] ; then
-    echo "Wrong usage. need to get cell name to run"
+if [[ $# -ne 4 ]] ; then
+    echo "Wrong usage. not have enought parameters"
     exit 1
 fi
 
@@ -39,9 +39,10 @@ path=$(dirname $SCRIPT_PATH)
 echo python3 $path/main_cell_data.py $cell_name
 
 python3 $path/main_cell_data.py $cell_name $folder $data_dir $save_dir
+python3 $path/cell_properties.py $cell_name $folder $data_dir $save_dir
+#python3 $path/Rin_Rm_plot.py $cell_name $folder $data_dir $save_dir
 
-#python3 $path/cell_properties.py $cell_name
-#python3 $path/best_with_const_param.py $cell_name
-#python3 $path/best_with_const_param.py $cell_name
-#python3 $path/best_with_const_param.py $cell_name
+#python3 $path/attenuations.py $cell_name
+#python3 $path/dendogram.py $cell_name
+#python3 $path/SMAQ_analysis.py $cell_name
 
