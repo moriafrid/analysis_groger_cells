@@ -12,6 +12,8 @@
 # check if script is started via SLURM or bash
 # if with SLURM: there variable '$SLURM_JOB_ID' will exist
 
+echo $#
+
 if [[ $# -ne 4 ]] ; then
     echo "Wrong usage. not have enought parameters"
     exit 1
@@ -39,6 +41,7 @@ path=$(dirname $SCRIPT_PATH)
 echo python3 $path/main_cell_data.py $cell_name
 
 python3 $path/main_cell_data.py $cell_name $folder $data_dir $save_dir
+python3 $path/clear_syn.py $cell_name $folder $save_dir $save_dir
 python3 $path/cell_properties.py $cell_name $folder $data_dir $save_dir
 #python3 $path/Rin_Rm_plot.py $cell_name $folder $data_dir $save_dir
 

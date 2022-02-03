@@ -41,9 +41,6 @@ print (cell)
 sp = h.PlotShape()
 sp.show(0)  # show diameters
 
-for sec in cell.axon:
-   h.delete_section(sec=sec)
-
 soma= cell.soma[0]
 # insert pas to all other section
 for sec in tqdm(h.allsec()):

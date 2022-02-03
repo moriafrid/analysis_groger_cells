@@ -33,14 +33,19 @@ def mkcell(fname):
     loader = h.Import3d_GUI(None)
     loader.box.unmap()
     loader.readfile(fname)
-    c = Cell()
-    loader.instantiate(c)
-    return c
+    cell = Cell()
+    loader.instantiate(cell)
+    try:
+        for sec in cell.axon:
+            h.delete_section(sec=sec)
+    except:
+        print(fname.split('/')[-1] +' dont have axon inside')
+    return cell
 
 def instantiate_swc(filename):
     h.load_file('import3d.hoc')
     h('objref cell, tobj')
-    h.load_file('allen_model.hoc')
+    h.load_file('allen_model.hoc') # why using allen model.hoc?
     h.execute('cell = new allen_model()')
     h.load_file(filename)
     nl = h.Import3d_SWC_read()
@@ -48,6 +53,11 @@ def instantiate_swc(filename):
     nl.input(filename)
     i3d = h.Import3d_GUI(nl, 0)
     i3d.instantiate(h.cell)
+    try:
+        for sec in h.cell.axon:
+            h.delete_section(sec=sec)
+    except:
+        print(filename.split('/')[-1] +' dont have axon inside')
     return h.cell
 
 # h.load_file('cell_path'+".hoc")

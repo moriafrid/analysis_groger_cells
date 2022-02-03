@@ -3,10 +3,10 @@ from neuron import h, gui
 import sys,os
 import matplotlib.pyplot as plt
 from matplotlib.lines import Line2D
-from glob import glob
 import signal
 from find_apic import find_apic
 from find_synaptic_loc import synaptic_loc
+from extra_function import mkcell, SIGSEGV_signal_arises
 
 h.load_file("import3d.hoc")
 h.load_file("nrngui.hoc")
@@ -21,22 +21,7 @@ colors_dict = {"soma":"k",
                "else": "gold",
                "synapse": "grey"}
 
-def SIGSEGV_signal_arises(signalNum, stack):
-    print(f"{signalNum} : SIGSEGV arises")
-    # Your code
-
 signal.signal(signal.SIGSEGV, SIGSEGV_signal_arises)
-
-class Cell: pass
-def mkcell(fname):
-    #def to read ACS file
-    h('objref cell, tobj')
-    loader = h.Import3d_GUI(None)
-    loader.box.unmap()
-    loader.readfile(fname)
-    c = Cell()
-    loader.instantiate(c)
-    return c
 
 def get_segment_length_lamda(seg):
     """
@@ -87,21 +72,9 @@ def get_spine_area():
     neck_area = np.pi * neck_diam * neck_length
     return head_area +neck_area
 
-# def instantiate_swc(filename):
-#     h('objref cell, tobj')
-#     h.load_file('allen_model.hoc')
-#     h.execute('cell = new allen_model()')
-#     h.load_file(filename)
-#     nl = h.Import3d_SWC_read()
-#     nl.quiet = 1
-#     nl.input(filename)
-#     i3d = h.Import3d_GUI(nl, 0)
-#     i3d.instantiate(h.cell)
-#     return h.cell
 
 def change_model_pas(cell, CM=1, RA = 250, RM = 20000.0, E_PAS = -70.0, F_factor = {}):
     #input the neuron property    h.dt = 0.1
-
     h.distance(0,0.5, sec=cell.soma[0]) # it isn't good beacause it change the synapse distance to the soma
     for sec in h.allsec(): ##check if we need to insert Ra,cm,g_pas,e_pas to the dendrit or just to the soma
         sec.Ra = RA
