@@ -46,6 +46,6 @@ python3 $path/cell_properties.py $cell_name $folder $data_dir $save_dir
 python3 $path/Rin_Rm_plot.py $cell_name $folder $data_dir $save_dir
 
 #python3 $path/attenuations.py $cell_name
-#python3 $path/dendogram.py $cell_name
+python3 $path/dendogram.py $cell_name $folder $data_dir $save_dir
 #python3 $path/SMAQ_analysis.py $cell_name
 

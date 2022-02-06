@@ -40,7 +40,11 @@ cell=mkcell(cell_file)
 print (cell)
 sp = h.PlotShape()
 sp.show(0)  # show diameters
-
+try:
+    for sec in cell.axon:
+        h.delete_section(sec=sec)
+except:
+    print(cell_name.split('/')[-1] +' dont have axon inside')
 soma= cell.soma[0]
 # insert pas to all other section
 for sec in tqdm(h.allsec()):

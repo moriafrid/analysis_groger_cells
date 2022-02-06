@@ -35,11 +35,6 @@ def mkcell(fname):
     loader.readfile(fname)
     cell = Cell()
     loader.instantiate(cell)
-    try:
-        for sec in cell.axon:
-            h.delete_section(sec=sec)
-    except:
-        print(fname.split('/')[-1] +' dont have axon inside')
     return cell
 
 def instantiate_swc(filename):

@@ -74,7 +74,11 @@ cell =mkcell(glob(folder_+data_dir+"/"+cell_name+'/*ASC')[0])
 #     spines_seg[i]=spine_location.seg
 
 soma= cell.soma[0]
-
+try:
+    for sec in cell.axon:
+        h.delete_section(sec=sec)
+except:
+    print(cell_name +" don't have axon inside")
 for sec in h.allsec():
     if sec == cell.soma[0]: continue
     sec.diam = sec.diam*resize_diam_by

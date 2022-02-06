@@ -6,33 +6,29 @@ import matplotlib.pyplot as plt
 import signal
 from extra_function import SIGSEGV_signal_arises,mkcell
 from add_figure import add_figure
-
+from math import pi
+from calculate_F_factor import calculate_F_factor
+import sys
 freq=100
 resize_diam_by=1
 do_resize_dend=True
 norm_Rin=False
-# cell_name = sys.argv[1]
-# folder_= sys.argv[2]
-# data_dir = sys.argv[3] #cells_initial_information
-# save_dir =sys.argv[4] #cells_outputs_data
 
-folder_='/ems/elsc-labs/segev-i/moria.fridman/project/data_groger_cells/'
-cell_name='05_08_A_01062017'
 
+if len(sys.argv) != 5:
+    cell_name= '2017_05_08_A_5-4'
+    folder_='/ems/elsc-labs/segev-i/moria.fridman/project/analysis_groger_cells/'
+    data_dir= "cells_initial_information"
+    save_dir ="cells_outputs_data"
+else:
+    cell_name = sys.argv[1]
+    folder_= sys.argv[2] #'/ems/elsc-labs/segev-i/moria.fridman/project/analysis_groger_cells/'
+    data_dir = sys.argv[3] #cells_initial_information
+    save_dir =sys.argv[4] #cells_outputs_data
 h.load_file("import3d.hoc")
 h.load_file("nrngui.hoc")
 h.load_file('stdlib.hoc')
 h.load_file("stdgui.hoc")
-
-class Cell: pass
-def mkcell(fname):
-    #def to read ACS file
-  loader = h.Import3d_GUI(None)
-  loader.box.unmap()
-  loader.readfile(fname)
-  c = Cell()
-  loader.instantiate(c)
-  return c
 
 signal.signal(signal.SIGSEGV, SIGSEGV_signal_arises)
 def change_model_pas(cell, CM=1, RA = 250, RM = 20000.0, E_PAS = -77.5, F_factor = {}, SPINE_START=60):
@@ -198,15 +194,16 @@ fname = glob(cell_name+'*.ASC')[0]
 cell =mkcell(fname)
 print (cell)
 for sec in cell.axon:
-   h.delete_section(sec=sec)
+    h.delete_section(sec=sec)
+    does_axon_inside_cell=False
 soma = cell.soma[0]
 from find_synaptic_loc import synaptic_loc
+
 syn_poses={}
 syn_poses['05_08_A_01062017']=[(-5.56, -325.88, -451.42)]
 syns = synaptic_loc(cell,syn_poses[cell_name],del_axon=False)['place_as_sec']
 
 for sec in h.allsec():
-
     sec.insert('pas') # insert passive property
     sec.nseg = int(sec.L/10)+1  #decide that the number of segment will be 21 with the same distances
 syn=syns[0]
@@ -227,8 +224,7 @@ syn=syns[0]
 # for i,syn in enumerate(syns):
 #     spine_parameters[str(i)]={'location':[syn],'NECK_LENGHT':0.782,'spine_head_vol':}
 passive_val = {'05_08_A_01062017': {'CM': 1.88, 'RA': 95.7, 'RM': 12371}}
-from math import pi
-from calculate_F_factor import calculate_F_factor
+
 if cell_name=='05_08_A_01062017':
     NECK_LENGHT=0.782
     spine_head_vol=0.139
