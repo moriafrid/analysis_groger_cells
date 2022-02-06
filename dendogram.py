@@ -6,7 +6,22 @@ from matplotlib.lines import Line2D
 import signal
 from find_apic import find_apic
 from find_synaptic_loc import synaptic_loc
-from extra_function import mkcell, SIGSEGV_signal_arises
+from extra_function import mkcell, SIGSEGV_signal_arises,create_folder_dirr,create_folders_list
+from spine_classes import  SpineLocatin,get_n_spinese
+
+if len(sys.argv) != 5:
+    cell_name= '2017_05_08_A_5-4'
+    folder_='/ems/elsc-labs/segev-i/moria.fridman/project/analysis_groger_cells/'
+    data_dir= "cells_initial_information"
+    save_dir ="cells_outputs_data"
+else:
+    cell_name = sys.argv[1]
+    folder_= sys.argv[2] #'/ems/elsc-labs/segev-i/moria.fridman/project/analysis_groger_cells/'
+    data_dir = sys.argv[3] #cells_initial_information
+    save_dir =sys.argv[4] #cells_outputs_data
+
+folder_save = folder_+save_dir+'/'+cell_name +'/cell_properties/'
+create_folder_dirr(folder_save)
 
 h.load_file("import3d.hoc")
 h.load_file("nrngui.hoc")
@@ -250,32 +265,33 @@ class Dendogram():
 
 save_folder = 'E_dendogram/'
 save_folder2 = 'M_dendogram/'
-try: os.mkdir(save_folder)
-except:pass
-try: os.mkdir(save_folder2)
-except:pass
+create_folders_list(save_folder,save_folder2)
+
 # for i in [1,2,3,5,8,9,10,11,12]:
-paths = ["05_08_A_01062017_Splice_shrink_FINISHED_LABEL_Bluecell_spinec91.ASC"]
+path = "05_08_A_01062017_Splice_shrink_FINISHED_LABEL_Bluecell_spinec91.ASC"
 syn_poses={}
-syn_poses['05_08_A_01062017_Splice_shrink_FINISHED_LABEL_Bluecell_spinec91']=[(-5.56, -325.88, -451.42)]
-for p in paths:
+# syn_poses['05_08_A_01062017_Splice_shrink_FINISHED_LABEL_Bluecell_spinec91']=[(-5.56, -325.88, -451.42)]
+
+for i in range(get_n_spinese(cell_name)):
+    spines_location=SpineLocatin(cell_name,spine_num=i)
+    syn_poses= (spines_location.locatin_xyz)
+    p= path
     print(p)
-    cell_name=p[:-4]
     # dendogram = Dendogram('dend_only', p, add_sec2)#@#
     # dendogram.cumpute_distances(dendogram.cell.soma[0])#@#
-    dendogram = Dendogram('dend_only', p, add_sec2,dots_loc=syn_poses[cell_name])
+    dendogram = Dendogram('dend_only', p, add_sec2,dots_loc=syn_poses)
     dendogram.cumpute_distances(dendogram.cell.soma[0])
     max_y=dendogram.plot(save_folder2,title=save_folder2[:-2],ylabel="distance from soma (um)")
 
-    dendogram = Dendogram('all', p, add_sec2, del_axon=False,dots_loc=syn_poses[cell_name])
+    dendogram = Dendogram('all', p, add_sec2, del_axon=False,dots_loc=syn_poses)
     dendogram.cumpute_distances(dendogram.cell.soma[0])
     max_y = dendogram.plot(save_folder2,title=save_folder2[:-2],ylabel="distance from soma (um)")
 
-    dendogram = Dendogram('dend_only_with_syn', p, add_sec,dots_loc=syn_poses[cell_name])
+    dendogram = Dendogram('dend_only_with_syn', p, add_sec,dots_loc=syn_poses)
     dendogram.cumpute_distances(dendogram.cell.soma[0])
     max_y = dendogram.plot(save_folder,title=save_folder[:-2],ylabel="distance from soma (lamda)")
 
-    dendogram = Dendogram('all_with_syn', p, add_sec, del_axon=False,dots_loc=syn_poses[cell_name])
+    dendogram = Dendogram('all_with_syn', p, add_sec, del_axon=False,dots_loc=syn_poses)
     dendogram.cumpute_distances(dendogram.cell.soma[0])
     max_y = dendogram.plot(save_folder,title=save_folder[:-2],ylabel="distance from soma (lamda)")
 

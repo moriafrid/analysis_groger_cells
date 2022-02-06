@@ -7,7 +7,8 @@ from glob import glob
 import signal
 import sys
 from extra_function import mkcell,SIGSEGV_signal_arises,create_folder_dirr
-from spinse_class import SpinesParams, SpineLocatin
+from spine_classes import SpinesParams, SpineLocatin,get_n_spinese
+from calculate_F_factor import calculate_F_factor
 
 SPINE_START = 60
 resize_diam_by=1
@@ -62,14 +63,15 @@ signal.signal(signal.SIGSEGV, SIGSEGV_signal_arises)
 ######################################################
 # cell=instantiate_swc('/ems/elsc-labs/segev-i/moria.fridman/project/data_analysis_git/data_analysis/try1.swc')
 cell =mkcell(glob(folder_+data_dir+"/"+cell_name+'/*ASC')[0])
-spine=SpinesParams(cell_name)
-spine_location= SpineLocatin(cell_name)
 
-spines_number=spine.spine_number
-spines_sec,spines_seg=[],[]
-for i in range(spines_number):
-    spines_sec[i]=cell.dend[spine_location.sec]
-    spines_seg[i]=spine_location.seg
+# spines_number=get_n_spinese(cell_name)
+# spine=SpinesParams(cell_name,1)
+# # spine_location= SpineLocatin(cell_name)
+
+# spines_sec,spines_seg=[],[]
+# for i in range(spines_number):
+#     spines_sec[i]=cell.dend[spine_location.sec]
+#     spines_seg[i]=spine_location.seg
 
 soma= cell.soma[0]
 
@@ -78,7 +80,7 @@ for sec in h.allsec():
     sec.diam = sec.diam*resize_diam_by
 
 if do_calculate_F_factor:
-    F_factor=spine.calculate_F_factor(folder_+data_dir)
+    F_factor=calculate_F_factor(cell_name,"mouse_spine",folder_+data_dir)
 else:
     F_factorF_factor=1.9
 #insert pas to all other section
@@ -107,8 +109,13 @@ plt.legend()
 plt.savefig(folder_save+'/Rin_Rm')
 freqs=np.linspace(0,200,num=100)
 
-for spine_sec,spine_seg in zip(spines_sec,spines_seg):
+# for spine_sec,spine_seg in zip(spines_sec,spines_seg):
+for spine_num in range(get_n_spinese(cell_name)):
+    spine=SpineLocatin(cell_name,spine_num=spine_num)
+    spine_sec=cell.dend[spine.sec]
+    spine_seg=spine.seg
     Rin_syn=[]
+    spine_location = SpineLocatin(cell_name, spine_num)
     change_model_pas(CM=1.88, RA=95, RM=12392, E_PAS=-77.3,F_factor= F_factor)
     for freq in freqs:
         imp_0 = h.Impedance(sec=spine_sec)
@@ -120,7 +127,7 @@ for spine_sec,spine_seg in zip(spines_sec,spines_seg):
     imp_0.compute(100)
     plt.plot(100,   imp_0.input(spine_seg, sec=spine_sec)  ,'*')
     plt.legend(['Rin2freq',str([10,   round(imp_0.input(spine_seg, sec=spine_sec),2)])])
-    plt.savefig(folder_save+'/Rin_freq')
+    plt.savefig(folder_save+'/Rin_freq for spinenum '+str(spine_num))
     Rin,dis=[],[]
     freq=100
     h.distance(0,0.5, sec=soma)
@@ -145,7 +152,7 @@ for spine_sec,spine_seg in zip(spines_sec,spines_seg):
     plt.plot( dis_syn,Rin_syn ,'*',label=[round(dis_syn,2),round(Rin_syn,2)])
     plt.text(0,0,'Cm,Ra,Rm=[2,70,5684]')
     plt.legend()
-    plt.savefig(folder_save+'/transfer resistance')
+    plt.savefig(folder_save+'/transfer resistance for spinemum '+str(spine_num))
 
 
 

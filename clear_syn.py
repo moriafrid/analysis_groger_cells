@@ -6,7 +6,7 @@ from add_figure import add_figure
 import pickle
 import sys
 from extra_function import create_folder_dirr
-from spinse_class import Syn2Clear
+from spine_classes import Syn2Clear, SpineLocatin
 
 if len(sys.argv) != 5:
     cell_name= '2017_05_08_A_4-5'

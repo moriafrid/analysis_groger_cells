@@ -43,7 +43,7 @@ echo python3 $path/main_cell_data.py $cell_name
 python3 $path/main_cell_data.py $cell_name $folder $data_dir $save_dir
 python3 $path/clear_syn.py $cell_name $folder $save_dir $save_dir
 python3 $path/cell_properties.py $cell_name $folder $data_dir $save_dir
-#python3 $path/Rin_Rm_plot.py $cell_name $folder $data_dir $save_dir
+python3 $path/Rin_Rm_plot.py $cell_name $folder $data_dir $save_dir
 
 #python3 $path/attenuations.py $cell_name
 #python3 $path/dendogram.py $cell_name
