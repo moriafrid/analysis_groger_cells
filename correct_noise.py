@@ -1,11 +1,10 @@
+#need to be deleted
 import sys,os
 file_dir = os.path.dirname(__file__)
 sys.path.append(file_dir)
 import matplotlib
-from neo import io
 from matplotlib import pyplot as plt
 import numpy as np
-from open_one_data import one_data
 from add_figure import add_figure
 matplotlib.use('agg')
 import pickle
@@ -156,6 +155,48 @@ def fast_clear_noise(data,HZ,name,base,jumps):
 
 	return correct, mean
 
+def one_data( t,T, base, cut_part=25000):
+	idx = np.where(t > 10)[0][0] + cut_part
+	t1 = t[idx:]
+	t2=t1
+	V = []
+	short_pulse = []
+	spike = []
+	syn = []
+	noise1=[]
+	noise2 = []
+
+	while True: #split 1 picture to spike,synapse,short_pulse and noise
+		try:
+			idx = np.where(t2 > 10)[0]
+			if len(idx)==0:
+				break
+			idx=idx[0]+cut_part
+			V.append(t2[:idx])
+			short_pulse.append(t2[11000:17000])
+			syn.append(t2[34000:36500])
+			spike.append(t2[44000:47000])
+			#noise1.append(t2[17000:34000])
+			noise2.append(t2[47000:])
+			t2 = t2[idx:]
+
+		except:
+			break
+
+		syn = reshape_data(syn)
+#	V = reshape_data(V)
+	with open(base+'V.p', 'wb') as f:
+		pickle.dump( np.array(V),f)
+	with open(base+'syn.p', 'wb') as f:
+		pickle.dump( np.array(syn),f)
+	with open(base+'short_pulse.p', 'wb') as f:
+		pickle.dump(np.array(short_pulse), f)
+	with open(base + 'spike.p', 'wb') as f:
+		pickle.dump( np.array(spike), f)
+	with open(base + 'noise.p', 'wb') as f:
+		pickle.dump( np.array(noise2), f)
+	del t2,t1,t,syn,spike,noise2,short_pulse
+	gc.collect()
 
 
 if __name__=='__main__':

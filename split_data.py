@@ -11,16 +11,13 @@ import quantities as pq
 from IV_curve import I_V_curve, sepereat_by_current, find_maxi
 from check_dynamics import check_dynamics
 import sys
-
-def create_folders(folders_list):
-    for curr in folders_list:
-        try:
-            os.makedirs(curr)
-        except FileExistsError:
-            pass
+from extra_function import create_folder_dirr, create_folders_list
+from spine_classes import channel2take
 
 
-def split2phenomena(cell_name,inputs_folder, outputs_folder,important_outputs_folder):
+
+
+def split2phenomena(cell_name,inputs_folder, outputs_folder):
 	"""
 	important_outputs_folder: <repository>/cells_important_outputs_data/<cell_name>
 	all_outputs_folder: <repository>/cells_outputs_data/<cell_name>
@@ -29,14 +26,14 @@ def split2phenomena(cell_name,inputs_folder, outputs_folder,important_outputs_fo
 	base_external_folder = os.path.join(outputs_folder, 'data/')
 	save_external_folder = base_external_folder + '/'
 	folder_names = ['V1', 'short_pulse', 'syn', 'spike', 'noise1', 'noise2']
-	create_folders([os.path.join(base_folder, n) for n in folder_names])
+	create_folders_list([os.path.join(base_folder, n) for n in folder_names])
 
 	abf_files = glob(os.path.join(inputs_folder, '*.abf'))
 	print("Found input files {0} in {1}".format(abf_files, inputs_folder))
 	for f in abf_files[:]:  # take the abf file (from 3)
 		print(f, flush=True)
 		save_folder = os.path.join(base_folder, f[f.rfind('/') + 1:-4]) + '/'
-		create_folders([save_folder])
+		create_folders_list([save_folder])
 
 		r = io.AxonIO(f)
 		bl = r.read_block(lazy=False)
@@ -75,7 +72,10 @@ def split2phenomena(cell_name,inputs_folder, outputs_folder,important_outputs_fo
 			pass
 		elif f.endswith(".abf") and "stable_conc_aligned" in f:  # pattern: *stable_conc_aligned*.abf
 			print(f, 'correct one_data')
-			REST, short_pulse, T_short_pulse = phenomena(np.array(t1) * t_i.units, T, base_folder, x_units=T[0].units,
+			presnaptic_channel=eval('t'+channel2take(cell_name,'electopysio',pre_post='pre'))
+			postsynaptic_channel=eval('t'+channel2take(cell_name,'electopysio',pre_post='post'))
+			#here nedd to be choose what channel is the presynaptic channel and what is the post_synaptic channels
+			REST, short_pulse, T_short_pulse = phenomena(np.array(presnaptic_channel) * t_i.units,postsynaptic_channel, T, base_folder, x_units=T[0].units,
 														 Y_units=t_i.units)
 		elif f.endswith(".abf"):  # moria: check name?
 			fig, axs = plt.subplots(2)
@@ -85,8 +85,7 @@ def split2phenomena(cell_name,inputs_folder, outputs_folder,important_outputs_fo
 			axs[1].plot(np.array(T).flatten(), np.array(t2).flatten())
 			axs[1].set_title('channels2')
 			plt.savefig(save_folder + '/IV_curve_channel1&channel2.pdf')
-			if cell_name=="2017_03_04_A_6-7" or cell_name=="2017_05_08_A_5-4":
-				t1=t2
+			t1=eval('t'+str(channel2take(cell_name,'IV_curve')))
 			# plt.show()
 			# channels2use=input("This is the second channels , decide what channels to use (1 or 2)")
 			# if channels2use=='2':
@@ -101,15 +100,10 @@ def split2phenomena(cell_name,inputs_folder, outputs_folder,important_outputs_fo
 			with open(save_folder_IV_curve + 'max_vol_curr_inj.p', 'wb') as fr:
 				pickle.dump([maxi * short_pulse.units, I * pq.pA], fr)
 			I_V_curve(maxi, I * pq.pA, save_folder_IV_curve)
-			create_folders([save_external_folder + '/check_dynamic/'])
-			check_dynamics(short_pulse, T_short_pulse, outputs_folder + 'cell_properties/check_dynamic/')
+			create_folder_dirr(base_external_folder + 'cell_properties/check_dynamic/')
+			check_dynamics(short_pulse, T_short_pulse, base_external_folder + 'cell_properties/check_dynamic/')
 		else:
 			print("Error. Wrong file ending for " + f)
 
 
-if __name__ == '__main__':
-	cell = sys.argv[1]
-	folder_ = '/ems/elsc-labs/segev-i/moria.fridman/project/analysis_groger_cells/'  # moria
-	split2phenomena(inputs_folder=os.path.join(folder_, 'cells_initial_information', cell),
-                    outputs_folder=os.path.join(folder_, 'cells_outputs_data', cell),
-					important_outputs_folder=os.path.join(folder_, 'cells_important_outputs_data', cell))
+

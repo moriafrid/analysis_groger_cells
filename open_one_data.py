@@ -1,12 +1,11 @@
 import numpy as np
 import pickle
-import gc
-from open_pickle import read_from_pickle
 import matplotlib.pyplot as plt
 from add_figure import add_figure
 import signal
-def SIGSEGV_signal_arises(signalNum, stack):
-    print(f"{signalNum} : SIGSEGV arises")
+from scipy.signal import find_peaks
+from extra_function import SIGSEGV_signal_arises
+
 signal.signal(signal.SIGSEGV, SIGSEGV_signal_arises)
 
 def reshape_data(data):
@@ -18,6 +17,7 @@ def reshape_data(data):
 		else:
 			new.append(i)
 	return new
+
 def clear_phenomena_partial(phenomena,phenomena_name,part_name,base,std_max=3.3,start=None,end=None,correct_rest=False):
 	temp=np.mean(phenomena,axis=0)
 	add_figure('clear part of the graph by max','point','mV')
@@ -80,42 +80,60 @@ def clear_phenomena(phenomena,phenomena_name,base,std_mean=3,std_max=6,bymax=Fal
 	plt.savefig(base+phenomena_name+'/noise2clear_'+phenomena_name)
 	plt.close()
 	return index2del
+def find_places(signal):
+	peak,parameters=find_peaks(abs(signal),prominence=1,distance=100)
+	if len(peak)<2:
+		raise "find peaks didn't found enoght peaks"
+	arregment_peaks=np.argsort(parameters['prominences'])
+	spike_peak=peak[arregment_peaks[-1]]
+	short_pulse_peak=peak[arregment_peaks[-2]]
+	return spike_peak,short_pulse_peak
 
-def phenomena(t,T,base,x_units='S',Y_units='mV'):
+def phenomena(t1,t2,T,base,x_units='S',Y_units='mV'):
+	# this function get two channel and sperete them to the phnomenas : spike, syn, and short_plse
+	# its save them in the base folder and clear short pulse from the initial noises
+	spike_place,short_pulse_place=find_places(np.array(t1[0]))
+	syn_place,_= find_places(np.array(t2[0]))
+	V,short_pulse,spike,syn,noise1,noise2,rest4list,mean_V =[], [],[], [],[],[],[],[]
+	for v in np.array(t1):
+		noise1_temp=(v[short_pulse_place+3000:spike_place-2000])
+		noise2_temp=(v[syn_place+3000:])
+		rest1=np.mean(noise1_temp)
+		rest2=np.mean(noise2_temp)
+		initial_rest=np.mean([rest1,rest2])
+		rest4list.append(initial_rest)
 
-	V,short_pulse,spike,syn,noise1,noise2,rest1,rest2,mean_V =[], [],[], [],[],[],[],[],[]
-	for v in np.array(t):
-		V.append(v)
-		short_pulse.append(v[:10000])
-		noise1.append(v[10000:22000])
-		spike.append(v[22000:34000])
-		syn.append(v[32000:40000])
-		noise2.append(v[40000:])
-		rest1.append(np.mean(v[10000:22000]))
-		rest2.append(np.mean(v[40000:]))
-		mean_V.append(np.mean(v))
-	T_spike=T[0][22000:34000]
-	T_syn=T[0][32000:40000]
-	T_short_pulse=T[0][:10000]
+		V.append(v-initial_rest)
+		short_pulse.append(v[short_pulse_place-4000:short_pulse_place+3000]-initial_rest)
+		noise1.append(v[short_pulse_place+3000:spike_place-1000]-initial_rest)
+		spike.append(v[spike_place-1000:spike_place+2000]-initial_rest)
+		syn.append(v[syn_place-1000:syn_place+1500]-initial_rest)
+		noise2.append(v[syn_place+1500:]-initial_rest)
+		mean_V.append(np.mean(v)-initial_rest)
+	T_short_pulse=T[0][short_pulse_place-4000:short_pulse_place+3000]
+	T_spike=T[0][spike_place-1000:spike_place+2000]
+	T_syn=T[0][syn_place-1000:syn_place+1500]
+
+	T_V=T[0]
+	add_figure('fully experiment',T[0].units,t1.units)
+	for v in V:
+		plt.plot(T_V,v,color='blue')
+	plt.savefig(base + '/V1/V.png')
 	with open(base + '/V1/V.p', 'wb') as f:
 		pickle.dump( [V,T], f)
 	with open(base+'/syn/syn.p', 'wb') as f:
-		pickle.dump( [np.array(syn)*t.units,T_syn], f)
+		pickle.dump( [np.array(syn)*t1.units,T_syn], f)
 	with open(base+'/short_pulse/short_pulse.p', 'wb') as f:
-		pickle.dump([np.array(short_pulse)*t.units,T_short_pulse], f)
+		pickle.dump([np.array(short_pulse)*t1.units,T_short_pulse], f)
 	with open(base + '/spike/spike.p', 'wb') as f:
-		pickle.dump([np.array(spike)*t.units,T_spike], f)
+		pickle.dump([np.array(spike)*t1.units,T_spike], f)
 	with open(base + '/noise1/noise1.p', 'wb') as f:
 		pickle.dump(np.array(noise1), f)
 	with open(base + '/noise2/noise2.p', 'wb') as f:
 		pickle.dump(np.array(noise2), f)
-	rest4list=np.mean([rest1,rest2],axis=0)
 	REST=np.mean(rest4list)
-	noise11 = [v - rest4list[i] for i, v in enumerate(noise1)]
-	noise22 = [v - rest4list[i] for i, v in enumerate(noise2)]
-
-	index2del_1=clear_phenomena(noise11,'noise1',base,bymax=True)
-	index2del_2=clear_phenomena(noise22,'noise2',base,bymax=True)
+	index2del_1=clear_phenomena(noise1,'noise1',base,bymax=True)
+	index2del_2=clear_phenomena(noise2,'noise2',base,bymax=True)
 	if len(index2del_1) > 0 or len(index2del_2) > 0:
 		new_V=np.delete(V,list((index2del_1+index2del_2)) ,axis=0)- REST
 		new_short_pulse=np.delete(short_pulse,list(set(index2del_1+index2del_2)) ,axis=0)
@@ -126,7 +144,7 @@ def phenomena(t,T,base,x_units='S',Y_units='mV'):
 		print("Not deleting")
 	# duble_rest_short_pulse=np.mean(new_V[40000:])
 
-	new_short_pulse = [v - new_rest4list[i]-np.mean((v-new_rest4list[i])[:3000]) for i, v in enumerate(new_short_pulse)]
+	new_short_pulse = [v - -np.mean((v-new_rest4list[i])[:3000]) for i, v in enumerate(new_short_pulse)]
 	new_spike = [v - new_rest4list[i]-np.mean((v-new_rest4list[i])[6000:12000]) for i, v in enumerate(new_spike)]
 
 	index2del_short_pulse1 = clear_phenomena(new_short_pulse,'short_pulse',base,std_mean=0.2)
@@ -147,7 +165,7 @@ def phenomena(t,T,base,x_units='S',Y_units='mV'):
 	names=['short_pulse','spike']
 	for i,phenomena in enumerate([new_short_pulse2,new_spike2]):
 		plt.close()
-		add_figure('clear '+names[i],'index',t.units)
+		add_figure('clear '+names[i],'index',t1.units)
 		for v in phenomena:
 			plt.plot(v,alpha=0.1,lw=0.5,color='grey')
 		plt.plot(np.mean(phenomena,axis=0),'black',lw=3)
@@ -159,14 +177,14 @@ def phenomena(t,T,base,x_units='S',Y_units='mV'):
 		pickle.dump( np.array(new_V), f)
 
 	for i,phenomena in enumerate([new_short_pulse2,new_spike2]):
-		add_figure('mean '+names[i],eval('T_'+names[i])[0].units,t.units)
+		add_figure('mean '+names[i],eval('T_'+names[i])[0].units,t1.units)
 		mean=np.mean(phenomena,axis=0)
 		plt.plot(eval('T_'+names[i]),mean)
 		plt.savefig(base+names[i]+'/mean_'+names[i])
 		with open(base +names[i]+'/mean_'+names[i]+'.p', 'wb') as f:
-			pickle.dump( [mean*t.units,eval('T_'+names[i])], f)
+			pickle.dump( [mean*t1.units,eval('T_'+names[i])], f)
 	with open(base + '/V1/mean_V.p', 'wb') as f:
-		pickle.dump( [np.mean(np.array(new_V),axis=0)*t.units,T[0]], f)
+		pickle.dump( [np.mean(np.array(new_V),axis=0)*t1.units,T[0]], f)
 
 	E_pas_short_pulse= np.mean([new_short_pulse2[i][short_pulse_time2clear1 - 500:short_pulse_time2clear1] for i in range(len(new_short_pulse2))])
 	E_pases=E_pas_short_pulse
@@ -174,63 +192,13 @@ def phenomena(t,T,base,x_units='S',Y_units='mV'):
 	names2='short_pulse'
 	mean=np.mean(new_short_pulse2,axis=0)
 	with open(base +names2+'/mean_'+names2+'_with_parameters.p', 'wb') as f:
-		pickle.dump({'mean':[mean * t.units, eval('T_' + names2)],'E_pas':new_short_pulse2,'points2calsulate_E_pas':point2calculate_E_pas }, f)
+		pickle.dump({'mean':[mean * t1.units, eval('T_' + names2)],'E_pas':new_short_pulse2,'points2calsulate_E_pas':point2calculate_E_pas }, f)
 	#add to the other currents for I-V curve
 	add_figure('I_V curve_together', 'points', t.units)
 	plt.plot(new_short_pulse2)
 	plt.savefig(base + '/-50pA.png')
 	with open(base + '/-50pA.p', 'wb') as f:
-		pickle.dump({'mean': [np.mean(new_short_pulse2,axis=0) * t.units, T_short_pulse], 'E_pas': E_pases,}, f)
+		pickle.dump({'mean': [np.mean(new_short_pulse2,axis=0) * t1.units, T_short_pulse], 'E_pas': E_pases,}, f)
 	a=1
-	return REST,np.mean(new_short_pulse2,axis=0)* t.units,T_short_pulse
+	return REST,np.mean(new_short_pulse2,axis=0)* t1.units,T_short_pulse
 
-
-def one_data( t,T, base, cut_part=25000):
-	idx = np.where(t > 10)[0][0] + cut_part
-	t1 = t[idx:]
-	t2=t1
-	V = []
-	short_pulse = []
-	spike = []
-	syn = []
-	noise1=[]
-	noise2 = []
-
-	while True: #split 1 picture to spike,synapse,short_pulse and noise
-		try:
-			idx = np.where(t2 > 10)[0]
-			if len(idx)==0:
-				break
-			idx=idx[0]+cut_part
-			V.append(t2[:idx])
-			short_pulse.append(t2[11000:17000])
-			syn.append(t2[34000:36500])
-			spike.append(t2[44000:47000])
-			#noise1.append(t2[17000:34000])
-			noise2.append(t2[47000:])
-			t2 = t2[idx:]
-
-		except:
-			break
-
-		syn = reshape_data(syn)
-#	V = reshape_data(V)
-	with open(base+'V.p', 'wb') as f:
-		pickle.dump( np.array(V),f)
-	with open(base+'syn.p', 'wb') as f:
-		pickle.dump( np.array(syn),f)
-	with open(base+'short_pulse.p', 'wb') as f:
-		pickle.dump(np.array(short_pulse), f)
-	with open(base + 'spike.p', 'wb') as f:
-		pickle.dump( np.array(spike), f)
-	with open(base + 'noise.p', 'wb') as f:
-		pickle.dump( np.array(noise2), f)
-	del t2,t1,t,syn,spike,noise2,short_pulse
-	gc.collect()
-
-
-if __name__=='__main__':
-	path='/ems/elsc-labs/segev-i/moria.fridman/project/data_analysis_git/data_analysis/data/traces_img/2017_05_08_A_4-5_stable_conc_aligned_selected_Moria/first_channel.p'
-	t,T=read_from_pickle(path)
-	phenomena(t,T, 'data/')
-	b=1

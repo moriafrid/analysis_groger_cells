@@ -6,7 +6,8 @@ from add_figure import add_figure
 import pickle
 import sys
 from extra_function import create_folder_dirr
-from spine_classes import Syn2Clear, SpineLocatin
+from spine_classes import  SpineLocatin
+from syn2clear_data import Syn2Clear
 
 if len(sys.argv) != 5:
     cell_name= '2017_05_08_A_4-5'
@@ -18,7 +19,7 @@ else:
     folder_= sys.argv[2] #'/ems/elsc-labs/segev-i/moria.fridman/project/analysis_groger_cells/'
     data_dir = sys.argv[3] #cells_initial_information
     save_dir =sys.argv[4] #cells_outputs_data
-folder_save=folder_+save_dir+'/'+cell_name+'/data/clear_syn/' #(path)
+folder_save=folder_+save_dir+'/'+cell_name+'/data/electrophysio_records/clear_syn/' #(path)
 create_folder_dirr(folder_save)
 path1=folder_save+'syn2clear'
 try:os.mkdir(path1)

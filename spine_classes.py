@@ -8,6 +8,33 @@ def get_n_spinese(cell_name):
     if cell_name == "2017_05_08_A_5-4":
         return 2
 
+def channel2take(cell_name,type,pre_post=None):
+    if type=="electopysio":
+        if pre_post is None:
+            raise "need to take pre_post to be 'pre' for presynaptic neuron or 'post for postsynaptic b=neuron"
+        if cell_name == "2017_03_04_A_6-7":
+            pre='1'
+            post='2'
+        elif cell_name == "2017_05_08_A_4-5":
+            pre='2'
+            post='1'
+        elif cell_name == "2017_05_08_A_5-4":
+            pre='1'
+            post='2'
+        if pre_post=='pre':
+            return pre
+        elif pre_post=='post':
+            return post
+    if type=="IV_curve":
+        if cell_name == "2017_03_04_A_6-7":
+            return 2
+        elif cell_name == "2017_05_08_A_4-5":
+            return 1
+        elif cell_name == "2017_05_08_A_5-4":
+            return 2
+    else:
+        raise "this isn't correct channels"
+
 class SpinesParams:
     def __init__(self, cell_name,spine_num=5):
         self.cell_name=cell_name

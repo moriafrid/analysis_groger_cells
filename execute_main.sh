@@ -12,7 +12,7 @@
 # check if script is started via SLURM or bash
 # if with SLURM: there variable '$SLURM_JOB_ID' will exist
 
-echo $#
+echo "the number parameters the function get is "$#
 
 if [[ $# -ne 4 ]] ; then
     echo "Wrong usage. not have enought parameters"
@@ -36,23 +36,15 @@ fi
 # get script's path to allow running from any folder without errors
 path=$(dirname $SCRIPT_PATH)
 # If necessary, activate anaconda installed on your user (Default: /ems/..../<lab>/<user>/anaconda3
-# source anaconda3/bin/activate
 conda init
 conda activate project
+# source anaconda3/bin/activate
 # put your script here - example script is sitting with this bash script
 echo python3 $path/main_cell_data.py $cell_name
+python3 $path/main_cell_data.py $cell_name $folder $data_dir $save_dir
 
-#python3 $path/main_cell_data.py $cell_name $folder $data_dir $save_dir
+timeout 60
 echo python3 $path/clear_syn.py $cell_name
+echo "before run the execute_level1 remaind to choose the correct syn from the diraction" $folder $save_dir
 python3 $path/clear_syn.py $cell_name $folder $save_dir $save_dir
-
-echo python3 $path/cell_properties.py $cell_name
-python3 $path/cell_properties.py $cell_name $folder $data_dir $save_dir
-
-echo python3 $path/Rin_Rm_plot.py $cell_name
-python3 $path/Rin_Rm_plot.py $cell_name $folder $data_dir $save_dir
-
-python3 $path/dendogram.py $cell_name $folder $data_dir $save_dir
-#python3 $path/attenuations.py $cell_name $folder $data_dir $save_dir $passive_val
-#python3 $path/SMAQ_analysis.py $cell_name
-
+echo "execute_main is complite to run"

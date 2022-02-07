@@ -22,8 +22,7 @@ if __name__ == '__main__':
 
     folder_ = '/ems/elsc-labs/segev-i/moria.fridman/project/analysis_groger_cells/'  # moria
     split2phenomena(cell_name,inputs_folder=os.path.join(folder_, data_dir, cell_name),
-                    outputs_folder=os.path.join(folder_, save_dir, cell_name),
-                    important_outputs_folder=os.path.join(folder_, 'cells_important_outputs_data', cell_name),)
+                    outputs_folder=os.path.join(folder_, save_dir, cell_name))
 
     # os.system(" ".join(["cell_properties.py ",cell,"/ems/elsc-labs/segev-i/moria.fridman/project/analysis_groger_cells/","cells_initial_information","cells_outputs_data"]))
     # Rin_Rm_plot.py

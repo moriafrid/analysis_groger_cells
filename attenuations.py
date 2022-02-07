@@ -223,8 +223,10 @@ syn=syns[0]
 
 # for i,syn in enumerate(syns):
 #     spine_parameters[str(i)]={'location':[syn],'NECK_LENGHT':0.782,'spine_head_vol':}
-passive_val = {'05_08_A_01062017': {'CM': 1.88, 'RA': 95.7, 'RM': 12371}}
-
+passive_val = {'05_08_A_01062017': {'CM': 1.88, 'RA': 95.7, 'RM': 12371}} #?#moria change for getting correct passive val
+from spine_classes import SpinesParams,get_n_spinese
+number_of_spine= get_n_spinese(cell_name)
+spine=SpinesParams(cell_name,number_of_spine)
 if cell_name=='05_08_A_01062017':
     NECK_LENGHT=0.782
     spine_head_vol=0.139

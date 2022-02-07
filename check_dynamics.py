@@ -5,7 +5,7 @@ from add_figure import add_figure
 def check_dynamics(short_pulse,x_short_pulse,save_folder):
     add_figure('short_pulse',x_short_pulse.units,short_pulse.units)
     plt.plot(x_short_pulse,short_pulse,'.')
-    plt.savefig(save_folder+'/short_pulse')
+    plt.savefig(save_folder+'/the short pulse')
     print("Done {0}".format(save_folder+'/short_pulse'))
     add_figure('2 part of short_pulse on each other',x_short_pulse.units/1000,short_pulse.units)
     min_index=np.argmin(short_pulse)
