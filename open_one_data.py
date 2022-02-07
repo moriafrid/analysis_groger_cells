@@ -139,13 +139,12 @@ def phenomena(t1,t2,T,base,x_units='S',Y_units='mV'):
 		new_short_pulse=np.delete(short_pulse,list(set(index2del_1+index2del_2)) ,axis=0)
 		new_spike=np.delete(spike,list(set(index2del_1+index2del_2)) ,axis=0)
 		# new_syn=np.delete(syn,list(set(index2del_1+index2del_2)),axis=0)
-		new_rest4list=np.delete(rest4list,list(set(index2del_1+index2del_2)),axis=0)
 	else:
 		print("Not deleting")
 	# duble_rest_short_pulse=np.mean(new_V[40000:])
 
-	new_short_pulse = [v - -np.mean((v-new_rest4list[i])[:3000]) for i, v in enumerate(new_short_pulse)]
-	new_spike = [v - new_rest4list[i]-np.mean((v-new_rest4list[i])[6000:12000]) for i, v in enumerate(new_spike)]
+	new_short_pulse = [v -np.mean(v[:3000]) for i, v in enumerate(new_short_pulse)]
+	new_spike = [v -np.mean(v[6000:12000]) for i, v in enumerate(new_spike)]
 
 	index2del_short_pulse1 = clear_phenomena(new_short_pulse,'short_pulse',base,std_mean=0.2)
 	index2del_spike1 = clear_phenomena(new_spike,'spike',base,std_mean=0.2)
@@ -155,7 +154,7 @@ def phenomena(t1,t2,T,base,x_units='S',Y_units='mV'):
 	temp_short_pulse=np.mean(new_short_pulse1,axis=0)
 	short_pulse_time2clear1=np.argmax(temp_short_pulse)-10
 	short_pulse_time2clear2=np.argmin(temp_short_pulse)+700
-#@# add a pickle t save this places
+#@# add a pickle to save this places
 	index2del_short_pulse_begining,new_short_pulse1 = clear_phenomena_partial(new_short_pulse1, 'short_pulse','begining', base ,start=short_pulse_time2clear1-500,end=short_pulse_time2clear1,correct_rest=True)
 	index2del_short_pulse_end = clear_phenomena_partial(new_short_pulse1, 'short_pulse','end', base ,start=short_pulse_time2clear2,end=short_pulse_time2clear2+1000)
 
