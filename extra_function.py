@@ -55,4 +55,18 @@ def instantiate_swc(filename):
         print(filename.split('/')[-1] +' dont have axon inside')
     return h.cell
 
-# h.load_file('cell_path'+".hoc")
+class hoc_cell:
+    def __init__(self, hoc_dir):
+        h.load_file(hoc_dir)
+        self.dend = h.dend
+        self.apic = h.apic
+        self.soma = h.soma
+        try:
+            self.axon = h.axon
+        except:
+            print('no axon in this cell')
+
+def load_hoc(hoc_dir):
+    return hoc_cell(hoc_dir)
+
+

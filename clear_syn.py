@@ -5,12 +5,14 @@ import os
 from add_figure import add_figure
 import pickle
 import sys
-from extra_function import create_folder_dirr
+from extra_function import create_folder_dirr,create_folders_list
 from spine_classes import  SpineLocatin
 from syn2clear_data import Syn2Clear
+from scipy.signal import find_peaks
+
 
 if len(sys.argv) != 5:
-    cell_name= '2017_05_08_A_4-5'
+    cell_name= '2017_03_04_A_6-7'
     folder_='/ems/elsc-labs/segev-i/moria.fridman/project/analysis_groger_cells/'
     data_dir= "cells_outputs_data"
     save_dir ="cells_outputs_data"
@@ -19,32 +21,57 @@ else:
     folder_= sys.argv[2] #'/ems/elsc-labs/segev-i/moria.fridman/project/analysis_groger_cells/'
     data_dir = sys.argv[3] #cells_initial_information
     save_dir =sys.argv[4] #cells_outputs_data
+folder_data=    folder_+data_dir+'/'+cell_name+'/data/electrophysio_records/syn/syn.p'
 folder_save=folder_+save_dir+'/'+cell_name+'/data/electrophysio_records/clear_syn/' #(path)
 create_folder_dirr(folder_save)
-path1=folder_save+'syn2clear'
-try:os.mkdir(path1)
-except FileExistsError:pass
-V_units,t_units=read_from_pickle(folder_+data_dir+'/'+cell_name+'/data/electrophysio_records/syn/syn.p')
+path1=folder_save+'syn2clear/'
+create_folders_list([path1])
+
+V_units,t_units=read_from_pickle(folder_data)
 V=np.array(V_units)
-temp_syn=np.mean(V,axis=0)
-syn_time2clear1=np.argmax(temp_syn)-100
-syn_time2clear2=np.argmax(temp_syn)+200
-rest,new_syn=[],[]
-for v in V:
-    rest.append(np.mean(v[syn_time2clear1 - 100:syn_time2clear1]))
-    v = v - np.mean(v[syn_time2clear1 - 100:syn_time2clear1])
-    new_syn.append(v[syn_time2clear1 - 500:syn_time2clear2 + 1000])
+syn_mean=np.mean(V,axis=0)
+syn_time2clear1=np.argmax(syn_mean)-100
+syn_time2clear2=np.argmax(syn_mean)+40
+
+
+rest=[]
+
+	# syn_time2clear1,syn_temp=find_places(syn_mean,prominence=2,two_peak=False)
+	# index2del_syn = clear_phenomena_partial(syn, 'short_pulse','center_end', base ,prominanace=3,start=syn_time2clear1+300,end=len(syn[0]))
+	# new_syn = np.delete(syn, list(index2del_syn), axis=0)
+
+for i,v in enumerate(V):
+    spike_place1,_=find_peaks(v[:syn_time2clear1],prominence=3)
+    spike_place2,_=find_peaks(v[syn_time2clear2:],prominence=3)
+    rest_temp=np.mean(v[syn_time2clear1 - 100:syn_time2clear1])
+    rest.append(rest_temp)
+    V[i] = v - rest_temp
+    # new_syn.append(v[syn_time2clear1 - 500:syn_time2clear2 + 1000])
+    # spike_peaks,_=find_peaks(v,prominence=3)
+    if len(spike_place1)>0:
+        for spike_peak in spike_place1:
+            if spike_peak+400<syn_time2clear1 - 100:
+                V[i][:spike_peak+400]=None
+                print('spike in trace '+str(i)+' is remove from place '+ str(spike_peak)+ ' to the end')
+            else:
+                V[i]=None
+    if len(spike_place2)>0:
+        for spike_peak in spike_place2:
+            V[i][spike_peak-20:]=None
+            print('spike in trace '+str(i)+' is remove from place '+ str(spike_peak)+ ' to the end')
 REST=np.mean(rest)
-t=t_units[syn_time2clear1 - 500:syn_time2clear2 + 1000]
-for i,bolt_trace in enumerate(new_syn):
+# t=t_units[syn_time2clear1 - 500:syn_time2clear2 + 1000]
+t=t_units
+for i,bolt_trace in enumerate(V):
+    plt.close()
     add_figure('trace num '+str(i)+'\nmean on 100 points',str(syn_time2clear1 - 500)+':'+str(syn_time2clear2 + 1000),'mv')
-    for v in new_syn:
-        plt.plot(v,'grey', alpha=0.05,lw=0.5)
-    mean_syn=np.mean(new_syn,axis=0)
+    for v in V:
+        plt.plot(v,'grey', alpha=0.1,lw=0.5)
+    mean_syn=np.mean(V,axis=0)
     plt.plot(mean_syn,'black',lw=2)
     plt.plot(bolt_trace,'green',alpha=0.5,lw=1)
     print(i)
-    plt.savefig(path1+'/trace_num'+str(i))
+    plt.savefig(path1+'trace_num'+str(i))
     plt.close()
 
 syns_records=Syn2Clear(cell_name)
@@ -53,12 +80,10 @@ cut_on_1000=syns_records.cut_on_1000
 rigth=syns_records.rigth
 false=syns_records.false
 path2=folder_save+'syn2clear_again'
-
-try:os.mkdir(path2)
-except FileExistsError:pass
+create_folders_list([path2])
 new_syn1=[]
 for num in rigth:
-    new_syn1.append(new_syn[num])
+    new_syn1.append(V[num])
 
 for i,bolt_trace in enumerate(new_syn1):
     add_figure('trace num '+str(i)+'\nmean on 100 points',str(syn_time2clear1 - 500)+':'+str(syn_time2clear2 + 1000),'mv')

@@ -93,9 +93,9 @@ def correct_rest(phenomena,rest_point=[]):
 		new_phenomena.append(v)
 		rest.append(np.mean(v[rest_point[0]:rest_point[1]]))
 	return new_phenomena,rest
-def find_places(signal,prominence=1):
+def find_places(signal,prominence=1,two_peak=True):
 	peak,parameters=find_peaks(signal,prominence=prominence,distance=100)
-	if len(peak)<2:
+	if len(peak)<2 and two_peak:
 		raise "find peaks didn't found enoght peaks"
 	arregment_peaks=np.argsort(parameters['prominences'])
 	spike_peak=peak[arregment_peaks[-1]]
@@ -114,7 +114,6 @@ def phenomena(t1,t2,T,base,x_units='S',Y_units='mV'):
 	for v in np.array(t1):
 		noise1_temp=(v[short_pulse_place+3000:spike_place-1000])
 		noise2_temp=(v[syn_place+3000:])
-		# noise3_temp=(v[syn_place+3000:])
 		rest1=np.mean(noise1_temp)
 		rest2=np.mean(noise2_temp)
 		initial_rest=np.nanmean([rest1,rest2])
@@ -124,7 +123,6 @@ def phenomena(t1,t2,T,base,x_units='S',Y_units='mV'):
 		short_pulse.append(v[short_pulse_place-4000:short_pulse_place+3000]-initial_rest)
 		noise1.append(v[short_pulse_place+3000:spike_place-1000]-initial_rest)
 		spike.append(v[spike_place-1000:spike_place+2000]-initial_rest)
-		# noise3.append()
 		syn.append(v[syn_place-1000:syn_place+1500]-initial_rest)
 		noise2.append(v[syn_place+1500:]-initial_rest)
 		mean_V.append(np.mean(v)-initial_rest)
@@ -161,8 +159,12 @@ def phenomena(t1,t2,T,base,x_units='S',Y_units='mV'):
 	#
 	new_short_pulse1,E_pas_short_pulse_0=correct_rest(short_pulse,[short_pulse_time2clear1-500,short_pulse_time2clear1-10]) #moria not change a lot
 	index2del_short_pulse = clear_phenomena_partial(new_short_pulse1, 'short_pulse','center_end', base ,prominanace=1.4,start=short_pulse_time2clear1-500,end=short_pulse_time2clear2+1000)
-
 	new_short_pulse2 = np.delete(new_short_pulse1, list(index2del_short_pulse), axis=0)+ REST
+
+	# syn_mean=np.mean(short_pulse,axis=0)
+	# syn_time2clear1,syn_temp=find_places(syn_mean,prominence=2,two_peak=False)
+	# index2del_syn = clear_phenomena_partial(syn, 'short_pulse','center_end', base ,prominanace=3,start=syn_time2clear1+300,end=len(syn[0]))
+	# new_syn = np.delete(syn, list(index2del_syn), axis=0)
 
 	names=['short_pulse','spike']
 	for i,phenomena in enumerate([new_short_pulse2,spike]):
