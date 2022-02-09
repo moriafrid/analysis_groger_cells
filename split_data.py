@@ -10,12 +10,8 @@ from add_figure import add_figure
 import quantities as pq
 from IV_curve import I_V_curve, sepereat_by_current, find_maxi
 from check_dynamics import check_dynamics
-import sys
 from extra_function import create_folder_dirr, create_folders_list
 from spine_classes import channel2take
-
-
-
 
 def split2phenomena(cell_name,inputs_folder, outputs_folder):
 	"""

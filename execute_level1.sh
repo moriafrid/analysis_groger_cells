@@ -14,15 +14,16 @@
 
 echo $#
 
-if [[ $# -ne 4 ]] ; then
+if [[ $# -ne 5 ]] ; then
     echo "Wrong usage. not have enought parameters"
     exit 1
 fi
 
 cell_name=$1
-folder=$2
-data_dir=$3
-save_dir=$4
+file_type2read=$2
+folder=$3
+data_dir=$4
+save_dir=$5
 shift $#
 
 # `if [ -n $SLURM_JOB_ID ]` checks if $SLURM_JOB_ID is not an empty string
@@ -40,19 +41,23 @@ path=$(dirname $SCRIPT_PATH)
 conda init
 conda activate project
 # put your script here - example script is sitting with this bash script
-echo python3 $path/main_cell_data.py $cell_name
+
 
 #python3 $path/main_cell_data.py $cell_name $folder $data_dir $save_dir
 echo python3 $path/clear_syn.py $cell_name
 python3 $path/clear_syn.py $cell_name $folder $save_dir $save_dir
 
-echo python3 $path/cell_properties.py $cell_name
-python3 $path/cell_properties.py $cell_name $folder $data_dir $save_dir
+echo python3 $path/cell_properties.py $cell_name $file_type2read
+python3 $path/cell_properties.py $cell_name $file_type2read $folder $data_dir $save_dir
 
-echo python3 $path/Rin_Rm_plot.py $cell_name
-python3 $path/Rin_Rm_plot.py $cell_name $folder $data_dir $save_dir
+echo python3 $path/Rin_Rm_plot.py $cell_name $file_type2read
+python3 $path/Rin_Rm_plot.py $cell_name $file_type2read $folder $data_dir $save_dir
 
-python3 $path/dendogram.py $cell_name $folder $data_dir $save_dir
-#python3 $path/attenuations.py $cell_name $folder $data_dir $save_dir $passive_val
+echo python3 $path/Rin_Rm_plot.py $cell_name $file_type2read
+python3 $path/dendogram.py $cell_name $file_type2read $folder $data_dir $save_dir
+
 #python3 $path/SMAQ_analysis.py $cell_name
+
+echo "execute_level1 is complite to run"
+
 

@@ -23,7 +23,7 @@ def SIGSEGV_signal_arises(signalNum, stack):
 
 
 class Cell: pass
-def mkcell(fname):
+def load_ASC(ASC_dir):
     h.load_file("import3d.hoc")
     h.load_file("nrngui.hoc")
     h.load_file('stdlib.hoc')
@@ -32,9 +32,10 @@ def mkcell(fname):
     h('objref cell, tobj')
     loader = h.Import3d_GUI(None)
     loader.box.unmap()
-    loader.readfile(fname)
+    loader.readfile(ASC_dir)
     cell = Cell()
     loader.instantiate(cell)
+    cell.soma=cell.soma[0]
     return cell
 
 def instantiate_swc(filename):
@@ -59,12 +60,19 @@ class hoc_cell:
     def __init__(self, hoc_dir):
         h.load_file(hoc_dir)
         self.dend = h.dend
-        self.apic = h.apic
         self.soma = h.soma
         try:
             self.axon = h.axon
         except:
             print('no axon in this cell')
+        try:
+            self.apic = h.apic
+        except:
+            print('no apical dendrite in this cell')
+        try:
+            self.basal = h.basal
+        except:
+            print('no basal dendrite in this cell')
 
 def load_hoc(hoc_dir):
     return hoc_cell(hoc_dir)

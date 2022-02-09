@@ -8,14 +8,16 @@ if __name__ == '__main__':
 
     if len(sys.argv) != 5:
         cell_name= '2017_05_08_A_4-5'
+        file_type='ASC'
         folder_='/ems/elsc-labs/segev-i/moria.fridman/project/analysis_groger_cells/'
         data_dir= "cells_initial_information"
         save_dir ="cells_outputs_data"
     else:
         cell_name = sys.argv[1]
-        folder_= sys.argv[2] #'/ems/elsc-labs/segev-i/moria.fridman/project/analysis_groger_cells/'
-        data_dir = sys.argv[3] #cells_initial_information
-        save_dir =sys.argv[4] #cells_outputs_data
+        file_type=sys.argv[2]
+        folder_= sys.argv[3] #'/ems/elsc-labs/segev-i/moria.fridman/project/analysis_groger_cells/'
+        data_dir = sys.argv[4] #cells_initial_information
+        save_dir =sys.argv[5] #cells_outputs_data
         print(cell_name,flush=True)
 
     #### creat the data

@@ -6,7 +6,7 @@ from add_figure import add_figure
 from glob import glob
 import signal
 import sys
-from extra_function import mkcell,SIGSEGV_signal_arises,create_folder_dirr
+from extra_function import load_ASC,load_hoc,SIGSEGV_signal_arises,create_folder_dirr
 from spine_classes import SpinesParams, SpineLocatin,get_n_spinese
 from calculate_F_factor import calculate_F_factor
 
@@ -17,23 +17,22 @@ RM=5684*2#*2
 RA=70
 do_calculate_F_factor=True
 
-if len(sys.argv) != 5:
+if len(sys.argv) != 6:
     cell_name= '2017_05_08_A_4-5'
-    # change_diam_by = 1
-    # shrinkage_factor = 1
-    # change_length_by = 1
+    file_type2read= 'ASC'
     folder_='/ems/elsc-labs/segev-i/moria.fridman/project/analysis_groger_cells/'
     data_dir= "cells_initial_information"
     save_dir ="cells_outputs_data"
 else:
     cell_name = sys.argv[1]
-    # change_diam_by = 1
-    # shrinkage_factor = 1
-    # change_length_by = 1
-    folder_= sys.argv[2] #'/ems/elsc-labs/segev-i/moria.fridman/project/analysis_groger_cells/'
-    data_dir = sys.argv[3] #cells_initial_information
-    save_dir =sys.argv[4] #cells_outputs_data
+    file_type2read=sys.argv[2]
+    folder_= sys.argv[3] #'/ems/elsc-labs/segev-i/moria.fridman/project/analysis_groger_cells/'
+    data_dir = sys.argv[4] #cells_initial_information
+    save_dir =sys.argv[5] #cells_outputs_data
+print("the number of parameters that sys loaded is "+len(sys.argv))
 
+cell_file = glob(folder_+data_dir+"/"+cell_name+"/*."+file_type2read)[0]
+print("cell file is " +cell_file)
 folder_save = folder_+save_dir+'/'+cell_name +'/cell_properties/Rin_Rm/'
 create_folder_dirr(folder_save)
 
@@ -62,6 +61,10 @@ signal.signal(signal.SIGSEGV, SIGSEGV_signal_arises)
 # build the model
 ######################################################
 # cell=instantiate_swc('/ems/elsc-labs/segev-i/moria.fridman/project/data_analysis_git/data_analysis/try1.swc')
+if file_type2read=='ASC':
+    cell=load_ASC(cell_file)
+elif file_type2read=='hoc':
+    cell=load_hoc(cell_file)
 cell =mkcell(glob(folder_+data_dir+"/"+cell_name+'/*ASC')[0])
 
 # spines_number=get_n_spinese(cell_name)

@@ -8,8 +8,6 @@ def synaptic_loc(cell,syn_poses,del_axon=True):
     #syn_poses should be (x,y,z) coordinates
     h.load_file("import3d.hoc")
     h.load_file("nrngui.hoc")
-    # file_name=glob(cell_name+'*.ASC')
-    # cell = mkcell(file_name[0])
     secs,dends,dists,dends_name=[],[],[],[]
     for i in range(len(syn_poses)):
         secs.append(None)
@@ -44,20 +42,9 @@ def syn_dis_from_soma(cell,synapses_locations):
     for syn_loc in synapses_locations:
         synapses_dis_from_soma.append([syn_loc[0], h.distance(eval('cell.' + syn_loc[0])(syn_loc[1]))])
     return synapses_dis_from_soma
-def SIGSEGV_signal_arises(signalNum, stack):
-    print(f"{signalNum} : SIGSEGV arises")
 
-class Cell(): pass
-def mkcell(fname):
-    # def to read ACS file
-    loader = h.Import3d_GUI(None)
-    loader.box.unmap()
-    loader.readfile(fname)
-    c = Cell()
-    loader.instantiate(c)
-    return c
 if __name__=='__main__':
-
+    from extra_function import mkcell,SIGSEGV_signal_arises
 
     signal.signal(signal.SIGSEGV, SIGSEGV_signal_arises)
 

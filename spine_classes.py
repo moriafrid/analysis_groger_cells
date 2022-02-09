@@ -41,7 +41,7 @@ class SpinesParams:
         if cell_name == "2017_05_08_A_4-5":
             self.V_spine=0.16884774101 #[µm^3]
             self.V_head=0.13906972096 #4/3*pi*self.R_head**3
-            self.v_neck=0.02977802005
+            self.V_neck=0.02977802005
             self.neck_length = 0.782 #µm
             self.neck_diam = 0.164 #µm
             self.R_head = (self.V_spine/(4*pi/3))**(1/3) #0.32µm
@@ -51,7 +51,7 @@ class SpinesParams:
             if spine_num==0:
                 self.V_spine=0.06818310193 #[µm^3]
                 self.V_head=0.03371715503 #[µm^3] #4/3*pi*self.R_head**3
-                self.v_neck=0.0344659469 #[µm^3]
+                self.V_neck=0.0344659469 #[µm^3]
                 self.neck_length = 1.266 #µm
                 self.neck_diam =0.125 #µm
                 self.R_head = (self.V_spine/(4*pi/3))**(1/3) #µm
@@ -60,7 +60,7 @@ class SpinesParams:
             elif spine_num==1:
                 self.V_spine=0.02865474235 #[µm^3]
                 self.V_head=0.01125841287 #[µm^3] #4/3*pi*self.R_head**3
-                self.v_neck=0.01739632948 #[µm^3]
+                self.V_neck=0.01739632948 #[µm^3]
                 self.neck_length = 1.121 #µm
                 self.neck_diam =0.102 #µm
                 self.R_head = (self.V_spine/(4*pi/3))**(1/3) #µm
@@ -72,7 +72,7 @@ class SpinesParams:
             if spine_num==0:
                 self.V_spine=0.08501695029 #[µm^3]
                 self.V_head=0.0745871871 #[µm^3] #4/3*pi*self.R_head**3
-                self.v_neck=0.01042976319 #[µm^3]
+                self.V_neck=0.01042976319 #[µm^3]
 
                 self.neck_length = 0.763 #µm
                 self.neck_diam =0.134 #µm
@@ -83,7 +83,7 @@ class SpinesParams:
             elif spine_num==1:
                 self.V_spine=0.0783942101 #[µm^3]
                 self.V_head=0.06459193692 #[µm^3] #4/3*pi*self.R_head**3
-                self.v_neck=0.01380227318 #[µm^3]
+                self.V_neck=0.01380227318 #[µm^3]
 
                 self.neck_length = 0.905 #µm
                 self.neck_diam =0.039 #µm
