@@ -6,7 +6,7 @@ from matplotlib.lines import Line2D
 import signal
 from find_apic import find_apic
 from find_synaptic_loc import synaptic_loc
-from extra_function import mkcell, SIGSEGV_signal_arises,create_folder_dirr,create_folders_list
+from extra_function import load_ASC, SIGSEGV_signal_arises,create_folder_dirr,create_folders_list
 from spine_classes import  SpineLocatin,get_n_spinese
 from glob import glob
 h.load_file("import3d.hoc")
@@ -125,7 +125,7 @@ class Dendogram():
                  F_factor=2.03):
         self.name=name
         self.colors_dict = color_dict
-        self.cell = mkcell(morph_path)
+        self.cell = load_ASC(morph_path,delete_axon=False)
         self.does_axon_inside_cell=True
         if del_axon:
             try:

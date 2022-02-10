@@ -22,20 +22,59 @@ def SIGSEGV_signal_arises(signalNum, stack):
     # Your code
 
 
-class Cell: pass
-def load_ASC(ASC_dir):
+class Cell:
+    pass
+
+    def start(self):
+        self.change_to_lists()
+        self.delete_axon()
+
+    def delete_axon(self):
+        for sec in self.axon:
+            h.delete_section(sec=sec)
+        self.axon = []
+
+    def change_to_lists(self):
+        self.dend = list(self.dend)
+        try:
+            self.apic=list(self.apic)
+        except:
+            self.apic=[]
+        try:
+            self.axon=list(self.axon)
+        except:
+            self.axon=[]
+        if not len(self.soma)==1:
+            self.dend += [h.soma[i] for i in range(1, len(h.soma),1)]
+
+        self.soma=self.soma[0]
+
+    def all_sec(self):
+        return [self.soma]+self.apic+self.dend+self.axon
+
+    def __del__(self):
+        for sec in self.all_sec():
+            h.delete_section(sec=sec)
+        self.dend = []
+        self.apic = []
+        self.axon =[]
+
+def load_ASC(ASC_dir,delete_axon=True):
     h.load_file("import3d.hoc")
     h.load_file("nrngui.hoc")
     h.load_file('stdlib.hoc')
     h.load_file("stdgui.hoc")
     #def to read ACS file
     h('objref cell, tobj')
+    # h('create dend, apic, axon, soma')
     loader = h.Import3d_GUI(None)
     loader.box.unmap()
     loader.readfile(ASC_dir)
     cell = Cell()
     loader.instantiate(cell)
-    cell.soma=cell.soma[0]
+    cell.change_to_lists()
+    if delete_axon:
+        cell.delete_axon()
     return cell
 
 def instantiate_swc(filename):
@@ -58,23 +97,40 @@ def instantiate_swc(filename):
 
 class hoc_cell:
     def __init__(self, hoc_dir):
-        h.load_file(hoc_dir)
-        self.dend = h.dend
-        self.soma = h.soma
+        h.load_file(1, hoc_dir)
+        self.dend = list(h.dend) + [h.soma[i] for i in range(1, len(h.soma),1)]
+        self.soma = h.soma[0]
         try:
-            self.axon = h.axon
+            self.axon = list(h.axon)
         except:
             print('no axon in this cell')
+            self.axon=[]
         try:
-            self.apic = h.apic
+            self.apic = list(h.apic)
         except:
+            self.apic=[]
             print('no apical dendrite in this cell')
-        try:
-            self.basal = h.basal
-        except:
-            print('no basal dendrite in this cell')
 
-def load_hoc(hoc_dir):
-    return hoc_cell(hoc_dir)
+    def all_sec(self):
+        return [self.soma]+self.apic+self.dend+self.axon
+
+    def delete_axon(self):
+        for sec in self.axon:
+            h.delete_section(sec=sec)
+        self.axon = []
+
+    def __del__(self):
+        for sec in self.all_sec():
+            h.delete_section(sec=sec)
+        self.dend = []
+        self.apic = []
+        self.axon =[]
+
+def load_hoc(hoc_dir,delete_axon=True):
+    cell = None
+    if delete_axon:
+        cell=hoc_cell(hoc_dir)
+    cell.delete_axon()
+    return cell
 
 

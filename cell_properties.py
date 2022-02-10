@@ -51,7 +51,7 @@ except:
     print(cell_name.split('/')[-1] +' dont have axon inside')
 soma= cell.soma
 # insert pas to all other section
-for sec in tqdm(h.allsec()):
+for sec in tqdm(cell.all()):
     sec.insert('pas') # insert passive property
     sec.nseg = int(sec.L/10)+1  #decide that the number of segment will be 21 with the same distances
 

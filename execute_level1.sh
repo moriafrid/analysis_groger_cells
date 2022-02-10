@@ -53,8 +53,10 @@ python3 $path/cell_properties.py $cell_name $file_type2read $folder $data_dir $s
 echo python3 $path/Rin_Rm_plot.py $cell_name $file_type2read
 python3 $path/Rin_Rm_plot.py $cell_name $file_type2read $folder $data_dir $save_dir
 
-echo python3 $path/Rin_Rm_plot.py $cell_name $file_type2read
-python3 $path/dendogram.py $cell_name $file_type2read $folder $data_dir $save_dir
+#echo python3 $path/dendogram.py $cell_name $file_type2read
+#python3 $path/dendogram.py $cell_name $file_type2read $folder $data_dir $save_dir
+#echo python3 $path/attenuations.py $cell_name $file_type2read $passive_val
+#python3 $path/attenuations.py $cell_name $file_type2read $folder $data_dir $save_dir $passive_val
 
 #python3 $path/SMAQ_analysis.py $cell_name
 

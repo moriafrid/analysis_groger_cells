@@ -7,7 +7,9 @@ from glob import glob
 import signal
 import sys
 from extra_function import load_ASC,load_hoc,SIGSEGV_signal_arises,create_folder_dirr
-from spine_classes import SpinesParams, SpineLocatin,get_n_spinese
+from read_spine_properties import get_n_spinese,get_spine_xyz
+from find_synaptic_loc import synaptic_loc
+# from spine_classes import SpinesParams, SpineLocatin
 from calculate_F_factor import calculate_F_factor
 
 SPINE_START = 60
@@ -18,7 +20,7 @@ RA=70
 do_calculate_F_factor=True
 
 if len(sys.argv) != 6:
-    cell_name= '2017_05_08_A_4-5'
+    cell_name= '2017_03_04_A_6-7'
     file_type2read= 'ASC'
     folder_='/ems/elsc-labs/segev-i/moria.fridman/project/analysis_groger_cells/'
     data_dir= "cells_initial_information"
@@ -29,7 +31,7 @@ else:
     folder_= sys.argv[3] #'/ems/elsc-labs/segev-i/moria.fridman/project/analysis_groger_cells/'
     data_dir = sys.argv[4] #cells_initial_information
     save_dir =sys.argv[5] #cells_outputs_data
-print("the number of parameters that sys loaded is "+len(sys.argv))
+print("the number of parameters that sys loaded is ",len(sys.argv))
 
 cell_file = glob(folder_+data_dir+"/"+cell_name+"/*."+file_type2read)[0]
 print("cell file is " +cell_file)
@@ -43,7 +45,7 @@ def change_model_pas(CM=1, RA = 250, RM = 20000.0, E_PAS = -70.0, F_factor ={}):
     #input the neuron property
     h.dt = 0.1
     h.distance(0,0.5, sec=soma)
-    for sec in h.allsec(): ##check if we need to insert Ra,cm,g_pas,e_pas to the dendrit or just to the soma
+    for sec in cell.all_sec(): ##check if we need to insert Ra,cm,g_pas,e_pas to the dendrit or just to the soma
         sec.Ra = RA
         sec.cm = CM
         sec.g_pas = 1.0 / RM
@@ -61,11 +63,11 @@ signal.signal(signal.SIGSEGV, SIGSEGV_signal_arises)
 # build the model
 ######################################################
 # cell=instantiate_swc('/ems/elsc-labs/segev-i/moria.fridman/project/data_analysis_git/data_analysis/try1.swc')
+cell=None
 if file_type2read=='ASC':
     cell=load_ASC(cell_file)
 elif file_type2read=='hoc':
     cell=load_hoc(cell_file)
-cell =mkcell(glob(folder_+data_dir+"/"+cell_name+'/*ASC')[0])
 
 # spines_number=get_n_spinese(cell_name)
 # spine=SpinesParams(cell_name,1)
@@ -76,24 +78,25 @@ cell =mkcell(glob(folder_+data_dir+"/"+cell_name+'/*ASC')[0])
 #     spines_sec[i]=cell.dend[spine_location.sec]
 #     spines_seg[i]=spine_location.seg
 
-soma= cell.soma[0]
-try:
-    for sec in cell.axon:
-        h.delete_section(sec=sec)
-except:
-    print(cell_name +" don't have axon inside")
-for sec in h.allsec():
-    if sec == cell.soma[0]: continue
+# try:
+#     for sec in cell.axon:
+#         h.delete_section(sec=sec)
+#     print("cell.axons is deleted")
+# except:
+#     print("this cell don't have axon inside")
+soma= cell.soma
+for sec in cell.all_sec():
+    if sec == cell.soma: continue
     sec.diam = sec.diam*resize_diam_by
 
 if do_calculate_F_factor:
-    F_factor=calculate_F_factor(cell_name,"mouse_spine",folder_+data_dir)
+    F_factor=calculate_F_factor(cell,"mouse_spine",file_type2read,folder_+data_dir)
 else:
     F_factorF_factor=1.9
 #insert pas to all other section
 h.celsius = 30
 
-for sec in tqdm(h.allsec()):
+for sec in tqdm(cell.all_sec()):
     sec.insert('pas') # insert passive property
     sec.nseg = int(sec.L/10)+1  #decide that the number of segment will be 21 with the same distances
 change_model_pas(CM=CM, RA = RA, RM =RM, E_PAS = -77.3,F_factor= F_factor)
@@ -118,12 +121,13 @@ freqs=np.linspace(0,200,num=100)
 
 # for spine_sec,spine_seg in zip(spines_sec,spines_seg):
 for spine_num in range(get_n_spinese(cell_name)):
-    spine=SpineLocatin(cell_name,spine_num=spine_num)
-    spine_sec=cell.dend[spine.sec]
-    spine_seg=spine.seg
+
+    spine_xyz=get_spine_xyz(cell_name,spine_num=spine_num)
+    cell_asc_dir= glob(folder_+data_dir+"/"+cell_name+"/*.ASC")[0]
+    spine_sec,spine_seg=synaptic_loc(cell_asc_dir,[spine_xyz])['place_as_sec']
+
     Rin_syn=[]
-    spine_location = SpineLocatin(cell_name, spine_num)
-    change_model_pas(CM=1.88, RA=95, RM=12392, E_PAS=-77.3,F_factor= F_factor)
+    change_model_pas(CM=1.88, RA=95, RM=12392, E_PAS=-77.3,F_factor= F_factor) #moria need to change for good passive value
     for freq in freqs:
         imp_0 = h.Impedance(sec=spine_sec)
         imp_0.loc(spine_seg, sec=spine_sec)
