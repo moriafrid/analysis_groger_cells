@@ -26,3 +26,4 @@ conda activate project
 # put your script here - example script is sitting with this bash script
 /ems/elsc-labs/segev-i/moria.fridman/project/analysis_groger_cells/find_synaptic_loc.py
 python3 $path/find_synaptic_loc.py
+#python3 $path/plot_neuron_3D.py

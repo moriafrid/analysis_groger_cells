@@ -1,12 +1,12 @@
 import numpy as np
 from neuron import h,gui
 import signal
-import xlsxwriter
 import pickle
-
+from matplotlib import pyplot as plt
 from extra_function import load_ASC
 from glob import glob
-def synaptic_loc_one(cell_ASC,syn_pos):
+import xlsxwriter
+def synaptic_loc_one(cell_ASC,syn_pos):###need a lot of correction moria
     cell=load_ASC(cell_ASC)
     #syn_pose should be (x,y,z) coordinates
     h.load_file("import3d.hoc")
@@ -99,15 +99,48 @@ def synaptic_loc(cell_dir,syn_poses_list,return_more_than_one=False, part='all',
                     secs[j] = [sec, accumalate_len / total_len]
                     dends[j]=[sec,round(accumalate_len / total_len,3)]
                     dends_name[j]=[str(sec)[str(sec).find('>')+2:],round(accumalate_len / total_len,3)]
-    from matplotlib import pyplot as plt
+    plt.figure()
     for p in all_points:
-        plt.scatter(p[0], p[1], color='k',s=1)
+        plt.scatter(p[0], p[1], color='k',s=0.5)
+
+    sec=eval('cell.'+dends_name[0][0])
+    initial_point = np.array([sec.x3d(0), sec.y3d(0), sec.z3d(0)])
+    points_dend = [initial_point]
+    for i in range(1,sec.n3d()):
+        dend_pos = np.array([sec.x3d(i), sec.y3d(i), sec.z3d(i)])
+        points_diffrance = dend_pos-initial_point
+        distance = np.linalg.norm(initial_point - dend_pos)
+        number_of_steps =int(np.ceil(distance))
+        for step_number in range(1, number_of_steps, 1):
+            intermideate_point = initial_point.copy() + points_diffrance*step_number/number_of_steps
+            points_dend.append(intermideate_point)
+        points_dend.append(dend_pos)
+        initial_point = dend_pos
+    for p in points_dend:
+        plt.scatter(p[0], p[1], color='g',s=0.5)
+
     for j, syn_pos in enumerate(syn_poses_list):
         dis_from_soma[j]=syn_dis_from_soma(cell,dends_name[j])
-        plt.scatter(syn_pos[0], syn_pos[1], color='cyan')
-        plt.text(0.1,0.1,str(syn_pos)+'dis from soma='+str(dis_from_soma[j]))
-        plt.savefig(save_place)
+        plt.scatter(syn_pos[j][0], syn_pos[j][1],s=0.7, color='cyan')
+        plt.text(-50,-50,str(syn_pos)+'dis from soma='+str(dis_from_soma[j]))
+    color_code={'basal':'blue','apical':'red','axon':'green','soma':'purple','synapse':'cyan','syn_trunk':'green'}
+    # soma_point=[]
+    for i in range(cell.soma.n3d()):
+        # soma_point.append(np.array([sec.x3d(i), sec.y3d(i), sec.z3d(i)]))
+        plt.scatter(sec.x3d(i), sec.y3d(i),s=0.5, color=color_code['soma'])
 
+    legend_elements = [
+    plt.scatter(syn_pos[0][0], syn_pos[0][1], color='black', lw=0.1, label="all_point"),
+    plt.scatter(syn_pos[0][0], syn_pos[0][1], color='green', lw=0.1, label="syn_trunk"),
+    plt.scatter(syn_pos[0][0], syn_pos[0][1], color=color_code['soma'],lw=0.1, label="soma"),
+    plt.scatter(syn_pos[0][0], syn_pos[0][1], color='cyan', lw=0.1, label="synapse")
+        ]
+    plt.legend(handles=legend_elements, loc="best")
+    plt.savefig(save_place+'.pdf')
+    plt.savefig(save_place)
+    plt.close()
+    with open(save_place + '_neuron_morphology.p', 'wb') as f:
+        pickle.dump({"all_point":all_points,"syn_pos":xyz,"syn_sec_pos":dends_name}, f)
     if return_more_than_one:
         return {'place_name':dends_name,'place_as_sec':dends,'dist_from_soma':dis_from_soma,'dist':dists, 'part':part}
     else:
@@ -126,15 +159,19 @@ if __name__=='__main__':
     folder_save='/ems/elsc-labs/segev-i/moria.fridman/project/analysis_groger_cells/cells_outputs_data/'
     for cell_name in ['2017_05_08_A_4-5','2017_05_08_A_5-4','2017_03_04_A_6-7']:
         dict={}
+        xyz,dend_part=[],[]
     # for cell_name in ['2017_05_08_A_5-4']:
         dir=glob(folder_data+cell_name+'/*ASC')[0]
         for i in range(get_n_spinese(cell_name)):
-            xyz=get_spine_xyz(cell_name,i)
-            dend_part = get_spine_part(cell_name,i)
-            # print(cell_name,synaptic_loc(dir,[xyz]))
-            dict[cell_name+'_'+str(i)]=synaptic_loc(dir,[xyz], part='all', save_place=folder_save+cell_name+'/syn_'+str(i)),xyz
+            xyz.append(get_spine_xyz(cell_name,i))
+            dend_part.append(get_spine_part(cell_name,i))
+            print(cell_name,[xyz])
+        dict[cell_name]=synaptic_loc(dir,[xyz], part='all', save_place=folder_save+cell_name+'/synapses',return_more_than_one=True),xyz
             # dict[cell_name+'_'+str(i)]=synaptic_loc(dir,[xyz], part=dend_part),xyz
 
     with open(folder_save + 'synaptic_location.p', 'wb') as f:
         pickle.dump( dict, f)
+    with open(folder_save+'synaptic_location.txt', 'w') as f:
+        f.write('synaptic_location')
+        f.write(dict)
     a=1
