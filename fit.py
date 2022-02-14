@@ -10,71 +10,62 @@ from add_figure import add_figure
 from glob import glob
 import pickle
 from calculate_F_factor import calculate_F_factor
+from extra_function import load_ASC,load_hoc,SIGSEGV_signal_arises,create_folder_dirr
+import sys
 
-path_single_traces=glob('data/traces_img/2017_05_08_A_0006/*pA.p')
-path=path_single_traces[0]
-I=int(path[path.rfind('/')+1:path.rfind('pA')])
-# path1='/ems/elsc-labs/segev-i/moria.fridman/project/data_analysis_git/data_analysis/data/short_pulse_mean.p'
-path='/ems/elsc-labs/segev-i/moria.fridman/project/data_analysis_git/data_analysis/data/short_pulse/mean_short_pulse_with_parameters.p'
-
+signal.signal(signal.SIGSEGV, SIGSEGV_signal_arises)
+if len(sys.argv) != 6:
+    cell_name= '2017_03_04_A_6-7'
+    folder_='/ems/elsc-labs/segev-i/moria.fridman/project/analysis_groger_cells/'
+    cell_type='ASC'
+    resize_diam_by=2
+    shrinkage_factor=1
+else:
+    cell_name = sys.argv[1]
+    folder_= sys.argv[2] #'/ems/elsc-labs/segev-i/moria.fridman/project/analysis_groger_cells/cells_outputs_data'
+    cell_type=sys.argv[3] #hoc ar ASC
+    resize_diam_by = sys.argv[4] #how much the cell sweel during the electrophisiology records
+    shrinkage_factor =sys.argv[5] #how much srinkage the cell get between electrophysiology record and LM
+# path_single_traces=glob('data/traces_img/2017_05_08_A_0006/*pA.p')
+# path=path_single_traces[0]
+# I=int(path[path.rfind('/')+1:path.rfind('pA')])
+# folder_='/ems/elsc-labs/segev-i/moria.fridman/project/data_analysis_git/data_analysis/'
+# path='/ems/elsc-labs/segev-i/moria.fridman/project/data_analysis_git/data_analysis/data/short_pulse/mean_short_pulse_with_parameters.p'
+# folder_='/ems/elsc-labs/segev-i/moria.fridman/project/analysis_groger_cells/cells_outputs_data'
+data_dir= "cells_initial_information/"
+save_dir ="cells_outputs_data/"
+path_short_pulse=glob(folder_+save_dir+cell_name+'/data/electrophysio_records/short_pulse/mean_short_pulse_with_parameters.p')[0]
+cell_file=glob(folder_+data_dir+cell_name+'/*'+cell_type)[0]
+save_folder=folder_+save_dir+cell_name+'/fit_short_pulse/'
 I=-50
+save_folder+=str(I)+'pA/'
+save_folder+='dend*'+str(round(resize_diam_by,2))+' &F_shrinkage='+str(round(shrinkage_factor,2))+'/'
+do_calculate_F_factor=False
+
+# if resize_diam_by!=1 and shrinkage_factor!=1:
+#     save_folder+='dend*'+str(round(resize_diam_by,2))+' &F_shrinkage='+str(round(shrinkage_factor,2))
+# elif resize_diam_by!=1:
+#     save_folder+='dend*'+str(resize_diam_by)+'_'
+# elif shrinkage_factor!=1:
+#     save_folder+='F_shrinkage='+str(round(shrinkage_factor,2))
+
 
 SPINE_START = 60
 shrinkage_factor=1#1.0/0.7
 resize_diam_by=1
+spine_type="mouse_spine"
 
 CM=1#2/2
 RM=15000#5684*2#*2
-RA=100
-
-start_fit= 2000
-end_fit=4900#3960
+RA=150
 
 print('the injection current is',I,flush=True)
-folder_='/ems/elsc-labs/segev-i/moria.fridman/project/data_analysis_git/data_analysis/'
-h.load_file("import3d.hoc")
-h.load_file("nrngui.hoc")
-h.load_file('stdlib.hoc')
-h.load_file("stdgui.hoc")
-# h.loadfile("stdrun.hoc")
-do_calculate_F_factor=True
-spine_type="mouse_spine"
-if spine_type=="groger_spine":
-    V_head=0.14
-    spine_neck_diam=0.164
-    spine_neck_L=0.782
-elif spine_type=="mouse_spine":
-    #mouse
-    from math import pi
-    head_area=0.37
-    r_head=np.sqrt(head_area/(4*pi))
-    spine_neck_L=0.73
-    # HEAD_DIAM=0.667
-    spine_neck_diam=0.25 #0.164/07=0.23
-    spine_density=1.08
-    V_head=4/3*pi*r_head**3
 
-def SIGSEGV_signal_arises(signalNum, stack):
-    print(f"{signalNum} : SIGSEGV arises")
-    # Your code
-signal.signal(signal.SIGSEGV, SIGSEGV_signal_arises)
-def get_inj(T,I,V):
-    #found the begining,end and median of the injection
-    I_abs = np.abs(I)
-    inj_start = np.where(I_abs > I_abs.max() / 4.0)[0][0] - 1
-    inj_end = np.where(I_abs > I_abs.max() / 4.0)[0][-1]
-    inj = np.median(I[inj_start:inj_end])
-    return inj, T[inj_start], T[inj_end]
-
-# the function that looking for the best parameter fit
-#F_factor is the correction from the spine A(spine area)/area(without spine)
-# F_factor = {} - take the F_factor for the specific segment
-def change_model_pas(CM=1, RA = 250, RM = 20000.0, E_PAS = -70.0, F_factor = {}):
+def change_model_pas(CM=1, RA = 250, RM = 20000.0, E_PAS = -70.0):
     #input the neuron property    h.dt = 0.1
-
     h.distance(0,0.5, sec=soma) # it isn't good beacause it change the synapse distance to the soma
     #h.distance(0, sec=soma)
-    for sec in h.allsec(): ##check if we need to insert Ra,cm,g_pas,e_pas to the dendrit or just to the soma
+    for sec in cell.all_sec(): ##check if we need to insert Ra,cm,g_pas,e_pas to the dendrit or just to the soma
         sec.Ra = RA
         sec.cm = CM#*(1.0/0.7)
         sec.g_pas = (1.0 / RM)#*(1.0/0.7)
@@ -83,10 +74,6 @@ def change_model_pas(CM=1, RA = 250, RM = 20000.0, E_PAS = -70.0, F_factor = {})
         for seg in sec: #count the number of segment and calclate g_factor and total dend distance,
             # how many segment have diffrent space larger then SPINE_START that decided
             if h.distance(seg) > SPINE_START:
-                if do_calculate_F_factor:
-                    F_factor=calculate_F_factor(cell,V_head,spine_neck_diam,spine_neck_L)
-                else:
-                    F_factor = 1.9#2.0 # F_factor[sec]
                 seg.cm *= F_factor
                 seg.g_pas *= F_factor
 
@@ -94,26 +81,7 @@ def change_model_pas(CM=1, RA = 250, RM = 20000.0, E_PAS = -70.0, F_factor = {})
 
 ## e_pas is the equilibrium potential of the passive current
 def plot_res(RM, RA, CM, save_name= "fit",print_full_graph=False):
-    folder_="data/fit/"
-    try: os.mkdir(folder_)
-    except FileExistsError: pass
-    if resize_diam_by!=1 and shrinkage_factor!=1:
-        try: os.mkdir(folder_+'dend*'+str(round(resize_diam_by,2))+' &shrinkage by '+str(round(shrinkage_factor,2))+'_'+str(I)+'pA/')
-        except FileExistsError: pass
-        save_folder=folder_+'dend*'+str(round(resize_diam_by,2))+' &shrinkage by '+str(round(shrinkage_factor,2))+'_'+str(I)+'pA/'
-    elif resize_diam_by!=1:
-        try: os.mkdir(folder_+'dend*'+str(resize_diam_by)+'_'+str(I)+'pA/')
-        except FileExistsError: pass
-        save_folder=folder_+'dend*'+str(resize_diam_by)+'_'+str(I)+'pA/'
-    elif shrinkage_factor!=1:
-        try: os.mkdir(folder_+'F_shrinkage='+str(round(shrinkage_factor,2))+'_'+str(I)+'pA/')
-        except FileExistsError: pass
-        save_folder=folder_+'F_shrinkage='+str(round(shrinkage_factor,2))+'_'+str(I)+'pA/'
-    else:
-        try: os.mkdir(folder_+str(I)+'pA/')
-        except FileExistsError: pass
-        save_folder=folder_+str(I)+'pA/'
-
+    create_folder_dirr(save_folder)
     # creat a clamp and record it for the chosen parameter
     ## save_name need to incloud the folder path
     change_model_pas(CM=CM, RA=RA, RM=RM, E_PAS = E_PAS)
@@ -126,7 +94,7 @@ def plot_res(RM, RA, CM, save_name= "fit",print_full_graph=False):
     h.run()
     npTvec = np.array(Tvec)
     npVec = np.array(Vvec)
-    add_figure("fit "+str(I)+"pA\nRM="+str(round(RM,1))+",RA="+str(round(RA,1))+",CM="+str(round(CM,2)),'mS','mV')
+    add_figure(cell_name+" fit "+str(I)+"pA\nRM="+str(round(RM,1))+",RA="+str(round(RA,1))+",CM="+str(round(CM,2)),'mS','mV')
     plt.plot(npTvec[start_fit:end_fit], npVec[start_fit:end_fit], color = 'r', linestyle ="--") #plot the recorded short_pulse
     plt.plot(T[start_fit:end_fit], V[start_fit:end_fit], color = 'green')
     plt.legend(['NEURON_sim','decay_to_fitting'])
@@ -154,9 +122,6 @@ def plot_res(RM, RA, CM, save_name= "fit",print_full_graph=False):
         plt.savefig(save_folder+'/'+save_name+"_full_graph.png")
         plt.close()
     return save_folder
-
-
-
 
 def efun(vals):
     #check the fitting
@@ -204,81 +169,80 @@ def efun(vals):
 
     return error_2 + (end_fit-start_fit)*error_3  #@# ask yoni if the calculation is right
 
-class Cell: pass
-def mkcell(fname):
-    #def to read ACS file
-    h('objref cell, tobj')
-    loader = h.Import3d_GUI(None)
-    loader.box.unmap()
-    loader.readfile(fname)
-    c = Cell()
-    loader.instantiate(c)
-    return c
-def instantiate_swc(filename):
-    h('objref cell, tobj')
-    h.load_file('allen_model.hoc')
-    h.execute('cell = new allen_model()')
-    h.load_file(filename)
-    nl = h.Import3d_SWC_read()
-    nl.quiet = 1
-    nl.input(filename)
-    i3d = h.Import3d_GUI(nl, 0)
-    i3d.instantiate(h.cell)
-    return h.cell
+
 #########################################
 # build the model
 ######################################################
 
-fname = "05_08_A_01062017_Splice_shrink_FINISHED_LABEL_Bluecell_spinec91.ASC"
+# fname =glob(folder_+cell_name+ "/05_08_A_01062017_Splice_shrink_FINISHED_LABEL_Bluecell_spinec91.ASC"
 # cell=instantiate_swc('/ems/elsc-labs/segev-i/moria.fridman/project/data_analysis_git/data_analysis/try1.swc')
-cell =mkcell(fname)
+cell=None
+if cell_type=='ASC':
+    cell =load_ASC(cell_file)
+elif cell_type=='hoc':
+    cell =load_hoc(cell_file)
+
 print (cell)
 sp = h.PlotShape()
 sp.show(0)  # show diameters
 ## delete all the axons
-for sec in cell.axon:
-   h.delete_section(sec=sec)
+# for sec in cell.axon:
+#    h.delete_section(sec=sec)
 
-soma= cell.soma[0]
+soma= cell.soma
 
 #insert pas to all other section
 for sec in tqdm(h.allsec()):
     sec.insert('pas') # insert passive property
     sec.nseg = int(sec.L/10)+1  #decide that the number of segment will be 21 with the same distances
-for sec in h.allsec():
+for sec in cell.all_sec():
     sec.diam = sec.diam*resize_diam_by
     sec.L*=shrinkage_factor
 
-
-
-# clamp = h.IClamp(cell.dend[82](0.996)) # insert clamp(constant potentientiol) at the soma's center
-clamp = h.IClamp(soma(0.5)) # insert clamp(constant potentientiol) at the soma's center
-clamp.amp = I/1000#-0.05 ## supopsed to be 0.05nA
-if path in path_single_traces:
-    start_inj=10500
-    end_inj= 20400
-    hz=0.1
-    clamp.dur = (end_inj-start_inj)*hz
-    clamp.delay = start_inj*hz
+if do_calculate_F_factor:
+    F_factor=calculate_F_factor(cell,'mouse_spine')
 else:
-    clamp.dur = 200
-    clamp.delay = 296
-######################################################
-# load the data and see what we have
-######################################################
-short_pulse_dict = read_from_pickle(path)
+    F_factor = 1.9
+print('F_factor=',F_factor)
+
+short_pulse_dict = read_from_pickle(path_short_pulse)
 short_pulse=short_pulse_dict['mean']
 V = np.array(short_pulse[0])
 short_pulse[1]=short_pulse[1].rescale('ms')
 T = np.array(short_pulse[1])
 T = T-T[0]
 T=T
-if path in path_single_traces:
-    E_PAS = np.mean(V[:9000])
-    end_fit=len(T)
-else:
-    E_PAS = np.mean(V[2945-500:2945])
-    # E_PAS = np.mean(V[:2000])
+# clamp = h.IClamp(cell.dend[82](0.996)) # insert clamp(constant potentientiol) at the soma's center
+clamp = h.IClamp(soma(0.5)) # insert clamp(constant potentientiol) at the soma's center
+clamp.amp = I/1000#-0.05 ## supopsed to be 0.05nA
+from extra_fit_func import find_injection
+hz=0.1 #moria
+start,end=find_injection(V,duration=int(200/hz))
+clamp.delay = T[start]#296
+clamp.dur =end-start# 200 #end-start
+E_PAS=np.mean(V[:start])#short_pulse_dict['E_pas']#np.mean(V[:start]) #or read it from the pickle
+start_fit= start#2000   #moria
+end_fit=end-100#4900#3960  #moria
+
+# if path in path_single_traces:
+#     start_inj=10500
+#     end_inj= 20400
+#     hz=0.1
+#     clamp.dur = (end_inj-start_inj)*hz
+#     clamp.delay = start_inj*hz
+# else:
+#     clamp.dur = 200
+#     clamp.delay = 296
+######################################################
+# load the data and see what we have
+######################################################
+
+# if path in path_single_traces:
+#     E_PAS = np.mean(V[:9000])
+#     end_fit=len(T)
+# else:
+#     E_PAS = np.mean(V[2945-500:2945])
+#     # E_PAS = np.mean(V[:2000])
 
 h.tstop = (T[-1]-T[0])
 h.v_init=E_PAS

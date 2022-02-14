@@ -1,4 +1,3 @@
-from fit_fun import efun,plot_res,change_model_pas
 # from builder import Builder
 from open_pickle import read_from_pickle
 import numpy as np
@@ -10,41 +9,34 @@ from calculate_F_factor import calculate_F_factor
 from add_figure import add_figure
 import pickle
 import signal
+from glob import glob
+import sys
 do_calculate_F_factor=True
 spine_type="mouse_spine"
-initial_folder = "data/fit/"
+# initial_folder = "data/fit/"
+if len(sys.argv) != 6:
+   cell_name= '2017_03_04_A_6-7'
+   folder_='/ems/elsc-labs/segev-i/moria.fridman/project/analysis_groger_cells/'
+   cell_type='ASC'
+   resize_diam_by=1
+   shrinkage_factor=1
+else:
+   cell_name = sys.argv[1]
+   folder_= sys.argv[2] #'/ems/elsc-labs/segev-i/moria.fridman/project/analysis_groger_cells/cells_outputs_data'
+   cell_type=sys.argv[3] #hoc ar ASC
+   resize_diam_by = sys.argv[4] #how much the cell sweel during the electrophisiology records
+   shrinkage_factor =sys.argv[5] #how much srinkage the cell get between electrophysiology record and LM
+data_dir= "cells_initial_information/"
+save_dir ="cells_outputs_data/"
+path_short_pulse=glob(folder_+save_dir+cell_name+'/data/electrophysio_records/short_pulse/mean_short_pulse_with_parameters.p')[0]
+cell_file=glob(folder_+data_dir+cell_name+'/*'+cell_type)[0]
+initial_folder=folder_+data_dir+cell_name+'/fit_short_pulse/'
+# shrinkage_factor=1.0/0.7
+# resize_diam_by=1.2
+# initial_folder+=spine_type
+initial_folder+="/dend*"+str(round(resize_diam_by,2))+'&F_shrinkage='+str(round(shrinkage_factor,2))
+initial_folder+="/different_initial_conditions/"
 
-shrinkage_factor=1.0/0.7
-resize_diam_by=1.2
-
-try:os.mkdir(initial_folder)
-except FileExistsError:pass
-try:os.mkdir(initial_folder+spine_type)
-except FileExistsError:pass
-# try:os.mkdir(initial_folder+spine_type+"/different_initial_conditions")
-# except FileExistsError:pass
-
-if resize_diam_by!=1 and shrinkage_factor!=1:
-    initial_folder=initial_folder+spine_type+"/dend*"+str(round(resize_diam_by,2))+' &shrinkage by '+str(round(shrinkage_factor,2))
-    try: os.mkdir(initial_folder)
-    except FileExistsError: pass
-elif resize_diam_by!=1:
-    initial_folder=initial_folder+spine_type+"/dend*"+str(round(resize_diam_by,2))
-    try: os.mkdir(initial_folder)
-    except FileExistsError: pass
-elif shrinkage_factor!=1:
-    initial_folder=initial_folder+spine_type+"/F_shrinkage="+str(round(shrinkage_factor,2))
-    try: os.mkdir(initial_folder)
-    except FileExistsError: pass
-try:os.mkdir(initial_folder+"/different_initial_conditions")
-except FileExistsError:pass
-initial_folder=initial_folder+"/different_initial_conditions/"
-
-h.load_file("import3d.hoc")
-h.load_file("nrngui.hoc")
-h.load_file('stdlib.hoc')
-h.load_file("stdgui.hoc")
-# h.loadfile("stdrun.hoc")
 if spine_type=="groger_spine":
     V_head=0.14
     spine_neck_diam=0.164
@@ -60,33 +52,23 @@ elif spine_type=="mouse_spine":
     spine_density=1.08
     V_head=4/3*pi*r_head**3
 
-def mkcell(fname):
-    #def to read ACS file
-    h('objref cell, tobj')
-    loader = h.Import3d_GUI(None)
-    loader.box.unmap()
-    loader.readfile(fname)
-    c = Cell()
-    loader.instantiate(c)
-    return c
-
-def instantiate_swc(filename):
-    h('objref cell, tobj')
-    h.load_file('allen_model.hoc')
-    h.execute('cell = new allen_model()')
-    h.load_file(filename)
-    nl = h.Import3d_SWC_read()
-    nl.quiet = 1
-    nl.input(filename)
-    i3d = h.Import3d_GUI(nl, 0)
-    i3d.instantiate(h.cell)
-    return h.cell
-
-def SIGSEGV_signal_arises(signalNum, stack):
-    print(f"{signalNum} : SIGSEGV arises")
-    # Your code
 signal.signal(signal.SIGSEGV, SIGSEGV_signal_arises)
 
+def change_model_pas(CM=1, RA = 250, RM = 20000.0, E_PAS = -70.0):
+   #input the neuron property    h.dt = 0.1
+   h.distance(0,0.5, sec=soma) # it isn't good beacause it change the synapse distance to the soma
+   #h.distance(0, sec=soma)
+   for sec in cell.all_sec(): ##check if we need to insert Ra,cm,g_pas,e_pas to the dendrit or just to the soma
+       sec.Ra = RA
+       sec.cm = CM#* shrinkage_factor    #*(1.0/0.7)
+       sec.g_pas = (1.0 / RM)#*shrinkage_factor  #*(1.0/0.7)
+       sec.e_pas = E_PAS
+   for sec in cell.dend:
+       for seg in sec: #count the number of segment and calclate g_factor and total dend distance,
+           # how many segment have diffrent space larger then SPINE_START that decided
+           if h.distance(seg) > SPINE_START:
+               seg.cm *= F_factor
+               seg.g_pas *= F_factor
 
 def change_model_pas(CM=1, RA = 250, RM = 20000.0, E_PAS = -70.0, F_factor = 1.9):
     h.dt = 0.1

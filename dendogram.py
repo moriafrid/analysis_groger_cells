@@ -9,10 +9,7 @@ from find_synaptic_loc import synaptic_loc
 from extra_function import load_ASC, SIGSEGV_signal_arises,create_folder_dirr,create_folders_list
 from spine_classes import  SpineLocatin,get_n_spinese
 from glob import glob
-h.load_file("import3d.hoc")
-h.load_file("nrngui.hoc")
-h.load_file('stdlib.hoc')
-h.load_file("stdgui.hoc")
+
 if len(sys.argv) != 5:
     cell_name= '2017_05_08_A_5-4'
     folder_='/ems/elsc-labs/segev-i/moria.fridman/project/analysis_groger_cells/'
@@ -94,7 +91,7 @@ def get_spine_area():
 
 def change_model_pas(cell, CM=1, RA = 250, RM = 20000.0, E_PAS = -70.0, F_factor = {}):
     #input the neuron property    h.dt = 0.1
-    h.distance(0,0.5, sec=cell.soma[0]) # it isn't good beacause it change the synapse distance to the soma
+    h.distance(0,0.5, sec=cell.soma) # it isn't good beacause it change the synapse distance to the soma
     for sec in h.allsec(): ##check if we need to insert Ra,cm,g_pas,e_pas to the dendrit or just to the soma
         sec.Ra = RA
         sec.cm = CM
@@ -148,7 +145,7 @@ class Dendogram():
         self.cell=change_model_pas(self.cell, CM=1.88, RA = 95.7, RM = 12371, E_PAS = -77.0,F_factor=2.03)
         self.morph_path=morph_path
         self.tree_dendogram_dist = dict()
-        self.tree_dendogram_dist[self.cell.soma[0]] = 0
+        self.tree_dendogram_dist[self.cell.soma] = 0
         self.add_sec = length_function
         self.diam_factor=diam_factor
         try: self.apic=self.cell.apic
@@ -251,12 +248,12 @@ class Dendogram():
         x_pos = 0.0
         start_pos=0.0
         self.done_section = set()
-        for i in range(0, int(h.SectionRef(sec=self.cell.soma[0]).nchild()), 1):
-            sec = h.SectionRef(sec=self.cell.soma[0]).child[i]
+        for i in range(0, int(h.SectionRef(sec=self.cell.soma).nchild()), 1):
+            sec = h.SectionRef(sec=self.cell.soma).child[i]
             if sec in self.apic:
                 x_pos, start_pos = self.plot_func(sec, x_pos, color=self.get_color(sec))
         for i in range(0, int(h.SectionRef(sec=self.cell.soma[0]).nchild()), 1):
-            sec = h.SectionRef(sec=self.cell.soma[0]).child[i]
+            sec = h.SectionRef(sec=self.cell.soma).child[i]
             if sec not in self.apic:
                 x_pos, end_pos = self.plot_func(sec, x_pos, color=self.get_color(sec))
         plt.plot([start_pos, end_pos], [0] * 2, color=self.colors_dict["soma"], linewidth=1 if self.diam_factor is None else self.cell.soma[0].diam *self.diam_factor)
@@ -311,19 +308,19 @@ for i in range(get_n_spinese(cell_name)):
     # dendogram = Dendogram('dend_only', p, add_sec2)#@#
     # dendogram.cumpute_distances(dendogram.cell.soma[0])#@#
     dendogram = Dendogram('dend_only', morph_path, add_sec2,dots_loc=syn_poses)
-    dendogram.cumpute_distances(dendogram.cell.soma[0])
+    dendogram.cumpute_distances(dendogram.cell.soma)
     max_y=dendogram.plot(save_folder_M,title=save_folder_M.split('/')[-2],ylabel="distance from soma (um)")
 
     dendogram = Dendogram('all', morph_path, add_sec2, del_axon=False,dots_loc=syn_poses)
-    dendogram.cumpute_distances(dendogram.cell.soma[0])
+    dendogram.cumpute_distances(dendogram.cell.soma)
     max_y = dendogram.plot(save_folder_M,title=save_folder_M.split('/')[-2],ylabel="distance from soma (um)")
 
     dendogram = Dendogram('dend_only_with_syn', morph_path, add_sec,dots_loc=syn_poses)
-    dendogram.cumpute_distances(dendogram.cell.soma[0])
+    dendogram.cumpute_distances(dendogram.cell.soma)
     max_y = dendogram.plot(save_folder_E,title=save_folder_E.split('/')[-2],ylabel="distance from soma (lamda)")
 
     dendogram = Dendogram('all_with_syn', morph_path, add_sec, del_axon=False,dots_loc=syn_poses)
-    dendogram.cumpute_distances(dendogram.cell.soma[0])
+    dendogram.cumpute_distances(dendogram.cell.soma)
     max_y = dendogram.plot(save_folder_E,title=save_folder_E.split('/')[-2],ylabel="distance from soma (lamda)")
 
 

@@ -27,7 +27,6 @@ class Cell:
 
     def start(self):
         self.change_to_lists()
-        self.delete_axon()
 
     def delete_axon(self):
         for sec in self.axon:
@@ -44,10 +43,10 @@ class Cell:
             self.axon=list(self.axon)
         except:
             self.axon=[]
-        if not len(self.soma)==1:
+        if not len(self.soma)<=1:
             self.dend += [h.soma[i] for i in range(1, len(h.soma),1)]
-
         self.soma=self.soma[0]
+
 
     def all_sec(self):
         return [self.soma]+self.apic+self.dend+self.axon
@@ -127,7 +126,6 @@ class hoc_cell:
         self.axon =[]
 
 def load_hoc(hoc_dir,delete_axon=True):
-    cell = None
     if delete_axon:
         cell=hoc_cell(hoc_dir)
     cell.delete_axon()

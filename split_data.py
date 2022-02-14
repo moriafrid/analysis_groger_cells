@@ -83,10 +83,6 @@ def split2phenomena(cell_name,inputs_folder, outputs_folder):
 			plt.savefig(save_folder + '/IV_curve_channel1&channel2.pdf')
 			t1=eval('t'+str(channel2take(cell_name,'IV_curve')))
 			# plt.show()
-			# channels2use=input("This is the second channels , decide what channels to use (1 or 2)")
-			# if channels2use=='2':
-			# 	t1=t2
-			# cell_name = '2017_05_08_A_0006'
 			save_folder_IV_curve = save_folder  # moria
 			I = [-200, -160, -120, -80, -40, -0, 40, 80, 120, 160]
 			# print(f,'correct IV_curve')

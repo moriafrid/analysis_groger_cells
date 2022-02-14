@@ -7,9 +7,10 @@ from glob import glob
 from extra_function import load_ASC,load_hoc
 from read_spine_properties import get_F_factor_params
 ######################################################
-def calculate_F_factor(cell,spine_type,spines_density=1.08,spine_num=1):
+def calculate_F_factor(cell,spine_type,spines_density=1.08,spine_num=1, is_debug_print=False):
     #spine type can be the cell_name or "mouse_spine", "human_spine" or "shaft_spine"
-    print("the spine_type for calculate the F_factor is "+spine_type)
+    if is_debug_print:
+        print("the spine_type for calculate the F_factor is "+spine_type)
     R_head,neck_diam,neck_length,spines_density_temp=get_F_factor_params(spine_type)
     if not np.isnan(spines_density_temp):
         spines_density=spines_density_temp

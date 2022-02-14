@@ -1,4 +1,4 @@
-from fit_fun import efun,plot_res,change_model_pas
+
 from builder import Builder
 from open_pickle import read_from_pickle
 import numpy as np
@@ -9,40 +9,27 @@ from simulation import SpineParams
 from calculate_F_factor import calculate_F_factor
 from add_figure import add_figure
 import pickle
+from extra_function import create_folder_dirr
+from calculate_tau_m import calculate_tau_m
 from math import pi
-initial_folder = "data/fit/"
+# initial_folder = "data/fit/"
 do_calculate_F_factor=True
 spine_type="mouse_spine"
 
 shrinkage_factor=1.2#1.0/0.7
 resize_diam_by=1
 
-
-try:os.mkdir(initial_folder+spine_type)
-except FileExistsError:pass
-
 if resize_diam_by!=1 and shrinkage_factor!=1:
     initial_folder=initial_folder+spine_type+"/dend*"+str(round(resize_diam_by,2))+' &shrinkage by '+str(round(shrinkage_factor,2))
-    try: os.mkdir(initial_folder)
-    except FileExistsError: pass
 elif resize_diam_by!=1:
     initial_folder=initial_folder+spine_type+"/dend*"+str(round(resize_diam_by,2))
-    try: os.mkdir(initial_folder)
-    except FileExistsError: pass
 elif shrinkage_factor!=1:
     initial_folder=initial_folder+spine_type+"/F_shrinkage="+str(round(shrinkage_factor,2))
-    try: os.mkdir(initial_folder)
-    except FileExistsError: pass
 else:
     initial_folder=initial_folder+spine_type+"/no change"
-    try: os.mkdir(initial_folder)
-    except FileExistsError: pass
 
-try:os.mkdir(initial_folder+"/const_param")
-except FileExistsError:pass
-try:os.mkdir(initial_folder+"/const_param/RA")
-except FileExistsError:pass
 initial_folder = initial_folder+"/const_param/RA"
+create_folder_dirr(initial_folder)
 
 if spine_type=="groger_spine":
     V_head=0.14
@@ -74,7 +61,7 @@ def change_model_pas(CM=1, RA = 250, RM = 20000.0, E_PAS = -70.0, F_factor = 1.9
             # how many segment have diffrent space larger then SPINE_START that decided
             if h.distance(seg) > SPINE_START:
                 if do_calculate_F_factor:
-                    F_factor=calculate_F_factor(cell,V_head,spine_neck_diam,spine_neck_L)
+                    F_factor=calculate_F_factor(cell,'mouse_spine')
                 seg.cm *= F_factor
                 seg.g_pas *= F_factor
 
@@ -161,7 +148,7 @@ if __name__=='__main__':
     imp = h.Impedance(sec=soma)
     imp.loc(soma(0.5))
     RA=np.arange(200, 300, 2)
-    tau_m=25716#ms*10^3=micro s
+    tau_m=calculate_tau_m()#25716#ms*10^3=micro s #
     d=soma.diam
     ra_error=[]
     params_dict=[]

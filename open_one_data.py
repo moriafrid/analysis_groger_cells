@@ -196,7 +196,8 @@ def phenomena(t1,t2,T,base,x_units='S',Y_units='mV'):
 	names2='short_pulse'
 	mean=np.mean(new_short_pulse2,axis=0)
 	with open(base +names2+'/mean_'+names2+'_with_parameters.p', 'wb') as f:
-		pickle.dump({'mean':[mean * t1.units, eval('T_' + names2)],'E_pas':E_pas_short_pulse+REST,'points2calsulate_E_pas':point2calculate_E_pas }, f)
+			pickle.dump({'mean':[mean * t1.units, eval('T_' + names2)],'E_pas':REST,'points2calsulate_E_pas':point2calculate_E_pas }, f)
+		# pickle.dump({'mean':[mean * t1.units, eval('T_' + names2)],'E_pas':E_pas_short_pulse+REST,'points2calsulate_E_pas':point2calculate_E_pas }, f)
 	#add to the other currents for I-V curve
 	add_figure('I_V curve_together', 'points', t1.units)
 	plt.plot(new_short_pulse2)

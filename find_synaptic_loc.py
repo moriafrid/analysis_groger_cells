@@ -5,7 +5,8 @@ import pickle
 from matplotlib import pyplot as plt
 from extra_function import load_ASC
 from glob import glob
-import xlsxwriter
+import pandas as pd
+
 def synaptic_loc_one(cell_ASC,syn_pos):###need a lot of correction moria
     cell=load_ASC(cell_ASC)
     #syn_pose should be (x,y,z) coordinates
@@ -127,13 +128,13 @@ def synaptic_loc(cell_dir,syn_poses_list,return_more_than_one=False, part='all',
     # soma_point=[]
     for i in range(cell.soma.n3d()):
         # soma_point.append(np.array([sec.x3d(i), sec.y3d(i), sec.z3d(i)]))
-        plt.scatter(sec.x3d(i), sec.y3d(i),s=0.5, color=color_code['soma'])
+        plt.scatter(cell.soma.x3d(i), cell.soma.y3d(i),s=0.5, color=color_code['soma'])
 
     legend_elements = [
-    plt.scatter(syn_pos[0][0], syn_pos[0][1], color='black', lw=0.1, label="all_point"),
-    plt.scatter(syn_pos[0][0], syn_pos[0][1], color='green', lw=0.1, label="syn_trunk"),
-    plt.scatter(syn_pos[0][0], syn_pos[0][1], color=color_code['soma'],lw=0.1, label="soma"),
-    plt.scatter(syn_pos[0][0], syn_pos[0][1], color='cyan', lw=0.1, label="synapse")
+    plt.scatter(syn_pos[0][0], syn_pos[0][1], color='black', s=0.5,lw=0.1, label="all_point"),
+    plt.scatter(syn_pos[0][0], syn_pos[0][1], color='green',s=0.5, lw=0.1, label="syn_trunk"),
+    plt.scatter(syn_pos[0][0], syn_pos[0][1], color=color_code['soma'],s=0.5,lw=0.1, label="soma"),
+    plt.scatter(syn_pos[0][0], syn_pos[0][1], color='cyan', s=0.5,lw=0.1, label="synapse")
         ]
     plt.legend(handles=legend_elements, loc="best")
     plt.savefig(save_place+'.pdf')
@@ -174,4 +175,6 @@ if __name__=='__main__':
     with open(folder_save+'synaptic_location.txt', 'w') as f:
         f.write('synaptic_location')
         f.write(dict)
+    df1 = pd.DataFrame(dict)
+    df1.to_excel(folder_save+"tau_m_cells.xlsx")
     a=1

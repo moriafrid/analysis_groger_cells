@@ -1,4 +1,3 @@
-from fit_fun import efun,plot_res,change_model_pas
 from builder import Builder
 from open_pickle import read_from_pickle
 import numpy as np
@@ -10,6 +9,7 @@ import calculate_F_factor
 from add_figure import add_figure
 import pickle
 do_calculate_F_factor=True
+
 if do_calculate_F_factor:
     V_head=0.14
     spine_neck_diam=0.164
