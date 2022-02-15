@@ -1,95 +1,65 @@
-# from builder import Builder
 from open_pickle import read_from_pickle
 import numpy as np
 from neuron import h,gui
 import os
 import  matplotlib.pyplot as plt
-from simulation import SpineParams
 from calculate_F_factor import calculate_F_factor
 from add_figure import add_figure
 import pickle
 import signal
 from glob import glob
 import sys
-do_calculate_F_factor=True
+from extra_function import load_ASC,load_hoc,SIGSEGV_signal_arises,create_folder_dirr,create_folders_list
+from extra_fit_func import find_injection
+
+
+do_calculate_F_factor=False
 spine_type="mouse_spine"
-# initial_folder = "data/fit/"
+print(sys.argv,flush=True)
 if len(sys.argv) != 6:
-   cell_name= '2017_03_04_A_6-7'
-   folder_='/ems/elsc-labs/segev-i/moria.fridman/project/analysis_groger_cells/'
-   cell_type='ASC'
-   resize_diam_by=1
-   shrinkage_factor=1
+    cell_name= '2017_03_04_A_6-7'
+    file_type='ASC'
+    resize_diam_by=1
+    shrinkage_factor=1
+    folder_='/ems/elsc-labs/segev-i/moria.fridman/project/analysis_groger_cells/'
 else:
    cell_name = sys.argv[1]
-   folder_= sys.argv[2] #'/ems/elsc-labs/segev-i/moria.fridman/project/analysis_groger_cells/cells_outputs_data'
-   cell_type=sys.argv[3] #hoc ar ASC
-   resize_diam_by = sys.argv[4] #how much the cell sweel during the electrophisiology records
-   shrinkage_factor =sys.argv[5] #how much srinkage the cell get between electrophysiology record and LM
+   file_type=sys.argv[2] #hoc ar ASC
+   resize_diam_by = float(sys.argv[3]) #how much the cell sweel during the electrophisiology records
+   shrinkage_factor =float(sys.argv[4]) #how much srinkage the cell get between electrophysiology record and LM
+   folder_= sys.argv[5] #'/ems/elsc-labs/segev-i/moria.fridman/project/analysis_groger_cells/cells_outputs_data'
+   if not folder_.endswith("/"):
+       folder_ += "/"
 data_dir= "cells_initial_information/"
 save_dir ="cells_outputs_data/"
-path_short_pulse=glob(folder_+save_dir+cell_name+'/data/electrophysio_records/short_pulse/mean_short_pulse_with_parameters.p')[0]
-cell_file=glob(folder_+data_dir+cell_name+'/*'+cell_type)[0]
-initial_folder=folder_+data_dir+cell_name+'/fit_short_pulse/'
-# shrinkage_factor=1.0/0.7
-# resize_diam_by=1.2
+print(folder_+save_dir+cell_name+'/data/electrophysio_records/short_pulse/mean_short_pulse_with_parameters.p')
+short_pulse_file=glob(folder_+save_dir+cell_name+'/data/electrophysio_records/short_pulse/mean_short_pulse_with_parameters.p')[0]
+
+print(folder_+data_dir+cell_name+'/*'+file_type)
+cell_file=glob(folder_+data_dir+cell_name+'/*'+file_type)[0]
+initial_folder=folder_+save_dir+cell_name+'/fit_short_pulse_'+file_type+'/'
 # initial_folder+=spine_type
 initial_folder+="/dend*"+str(round(resize_diam_by,2))+'&F_shrinkage='+str(round(shrinkage_factor,2))
 initial_folder+="/different_initial_conditions/"
-
-if spine_type=="groger_spine":
-    V_head=0.14
-    spine_neck_diam=0.164
-    spine_neck_L=0.782
-elif spine_type=="mouse_spine":
-    #mouse
-    from math import pi
-    head_area=0.37
-    r_head=np.sqrt(head_area/(4*pi))
-    spine_neck_L=0.73
-    # HEAD_DIAM=0.667
-    spine_neck_diam=0.25 #0.164/07=0.23
-    spine_density=1.08
-    V_head=4/3*pi*r_head**3
-
+create_folder_dirr(initial_folder)
 signal.signal(signal.SIGSEGV, SIGSEGV_signal_arises)
 
 def change_model_pas(CM=1, RA = 250, RM = 20000.0, E_PAS = -70.0):
-   #input the neuron property    h.dt = 0.1
-   h.distance(0,0.5, sec=soma) # it isn't good beacause it change the synapse distance to the soma
-   #h.distance(0, sec=soma)
-   for sec in cell.all_sec(): ##check if we need to insert Ra,cm,g_pas,e_pas to the dendrit or just to the soma
+   h.dt = 0.1
+   h.distance(0,0.5, sec=soma)
+   for sec in cell.all_sec():
        sec.Ra = RA
-       sec.cm = CM#* shrinkage_factor    #*(1.0/0.7)
-       sec.g_pas = (1.0 / RM)#*shrinkage_factor  #*(1.0/0.7)
+       sec.cm = CM  # *shrinkage_factor    #*(1.0/0.7)
+       sec.g_pas = (1.0 / RM)  #*shrinkage_factor  #*(1.0/0.7)
        sec.e_pas = E_PAS
    for sec in cell.dend:
        for seg in sec: #count the number of segment and calclate g_factor and total dend distance,
-           # how many segment have diffrent space larger then SPINE_START that decided
            if h.distance(seg) > SPINE_START:
                seg.cm *= F_factor
                seg.g_pas *= F_factor
 
-def change_model_pas(CM=1, RA = 250, RM = 20000.0, E_PAS = -70.0, F_factor = 1.9):
-    h.dt = 0.1
-    h.distance(0,0.5, sec=soma) # it isn't good beacause it change the synapse distance to the soma
-    #h.distance(0, sec=soma)
-    for sec in h.allsec(): ##check if we need to insert Ra,cm,g_pas,e_pas to the dendrit or just to the soma
-        sec.Ra = RA
-        sec.cm = CM*(1.0/0.7)
-        sec.g_pas = (1.0 / RM)*(1.0/0.7)
-        sec.e_pas = E_PAS
-    for sec in cell.dend:
-        for seg in sec: #count the number of segment and calclate g_factor and total dend distance,
-            # how many segment have diffrent space larger then SPINE_START that decided
-            if h.distance(seg) > SPINE_START:
-                if do_calculate_F_factor:
-                    F_factor=calculate_F_factor(cell,V_head,spine_neck_diam,spine_neck_L)
-                seg.cm *= F_factor
-                seg.g_pas *= F_factor
-
 def plot_res(RM, RA, CM, save_folder="data/fit/",save_name= "fit",print_full_graph=False):
-    change_model_pas(CM=CM, RA=RA, RM=RM, E_PAS = E_PAS,F_factor=F_factor)
+    change_model_pas(CM=CM, RA=RA, RM=RM, E_PAS = E_PAS)
     Vvec = h.Vector()
     Tvec = h.Vector()
     Vvec.record(soma(0.5)._ref_v)
@@ -108,9 +78,9 @@ def plot_res(RM, RA, CM, save_folder="data/fit/",save_name= "fit",print_full_gra
     exp_V = V
     npVec = npVec
     npVec = npVec[:len(exp_V)]
-    error_1 = np.sqrt(np.sum(np.power(np.mean(exp_V[:2000]) - np.mean(npVec[:2000]), 2)))  # error from mean rest
-    error_2 = np.sqrt(np.sum(np.power(exp_V[start_fit+950:end_fit-1000] - npVec[start_fit+950:end_fit-1000], 2)))#/(end_fit-start_fit))  #  error for the decay
-    error_3 = np.sqrt(np.sum(np.power(np.mean(exp_V[4100:4900]) - np.mean(npVec[4100:4900]), 2)))  # error for maximal voltage
+    error_1 = np.sqrt(np.sum(np.power(np.mean(exp_V[:start_fit-10]) - np.mean(npVec[:start_fit-10]), 2)))  # error from mean rest
+    error_2 = np.sqrt(np.sum(np.power(exp_V[start_fit:end_fit] - npVec[start_fit:end_fit], 2))/(end_fit-start_fit))  #  error for the decay
+    error_3 = np.sqrt(np.sum(np.power(np.mean(exp_V[end_fit-800:end_fit]) - np.mean(npVec[end_fit-800:end_fit]), 2)))  # error for maximal voltage
     error_tot = np.sqrt(np.sum(np.power(exp_V - npVec, 2))/len(exp_V)) # mean square error
 
     print('error_total=',round(error_tot,3))
@@ -120,67 +90,58 @@ def plot_res(RM, RA, CM, save_folder="data/fit/",save_name= "fit",print_full_gra
     return error_2, (error_2 + error_3*10)/960
 
 def efun(vals):
-    if RM_IX != -1 :
-        if vals.x[RM_IX] > 100000:
-            return (1e6)
-        RM = vals.x[RM_IX]
-    else: RM = RM_const
+   #check the fitting
+   # if the parameter incloud the fitting (not aqual to 1) check that the result is makes sense, if not return 1e6
+   # if the result is make sense calculate the error between the record simulation and the initial data record
+   ## *_IX is the parameter we play with them
+   ## *_const is the basic parameters we return if the  result doesn't make sense
+   if RM_IX != -1 :
+       if vals.x[RM_IX] > 100000:
+           return (1e6)
+       RM = vals.x[RM_IX]
+   else: RM = RM_const
 
-    if CM_IX != -1:
-        if vals.x[CM_IX] >4 :
-            return (1e6)
-        CM = vals.x[CM_IX]
-    else:CM = CM_const
+   if CM_IX != -1:
+       if vals.x[CM_IX] >3 :
+           return (1e6)
+       CM = vals.x[CM_IX]
+   else:CM = CM_const
 
-    if RA_IX != -1:
-        if vals.x[RA_IX] > 350:
-            return (1e6)
-        RA = vals.x[RA_IX]
-    else:RA = RA_const
-    if (CM < 0.3 or RM < 2000 or RA <49):
-        return 1e6
-    # print('RA:',RA, '   CM:',CM, '   RM:',RM)
+   if RA_IX != -1:
+       if vals.x[RA_IX] > 300:
+           return (1e6)
+       RA = vals.x[RA_IX]
+   else:RA = RA_const
+   if (CM < 0.3 or RM < 2000 or RA <50):
+       return 1e6
+   # print('RA:',RA, '   CM:',CM, '   RM:',RM)
 
-    change_model_pas(CM=CM, RA=RA, RM = RM, E_PAS = E_PAS,F_factor=F_factor)
-    Vvec = h.Vector()
-    Vvec.record(soma(0.5)._ref_v)
-    h.run()
-    npVec = np.array(Vvec)
+   change_model_pas(CM=CM, RA=RA, RM = RM, E_PAS = E_PAS)
+   Vvec = h.Vector()
+   Vvec.record(soma(0.5)._ref_v)
 
-    exp_V = V#[int(180.0/h.dt):int(800.0/h.dt)]
-    npVec = npVec#[int(180.0/h.dt):int(800.0/h.dt)]
-    npVec = npVec[:len(exp_V)]
-    error_tot = np.sqrt(np.sum(np.power(exp_V - npVec, 2)))#/len(exp_V)) # mean square error
-    error_1 = np.sqrt(np.sum(np.power(np.mean(exp_V[:2000]) - np.mean(npVec[:2000]), 2)))  # error from mean rest
-    error_2 = np.sqrt(np.sum(np.power(exp_V[start_fit+950:end_fit-1000] - npVec[start_fit+950:end_fit-1000], 2))) #/(end_fit-start_fit)  #  error for the decay
-    error_3 = np.sqrt(np.sum(np.power(np.mean(exp_V[4100:4900]) - np.mean(npVec[4100:4900]), 2)))  # error for maximal voltage
+   h.run()
+   npVec = np.array(Vvec)
 
-    return error_2 + ((end_fit-1000) - (start_fit+950)) * error_3
+   exp_V = V     #[int(180.0/h.dt):int(800.0/h.dt)]
+   npVec = npVec #[int(180.0/h.dt):int(800.0/h.dt)]
+   npVec = npVec[:len(exp_V)]
+   error_tot = np.sqrt(np.sum(np.power(exp_V - npVec, 2)))#/len(exp_V)) # mean square error
 
-def initiate_simulation(self):
-    clamp = h.IClamp(self.soma(0.5))  # insert clamp(constant potentientiol) at the soma's center
-    clamp.amp = -0.05  ## supopsed to be 0.05nA
-    clamp.dur = 200
-    clamp.delay = 296
-    ######################################################
-    # load the data and see what we have
-    ######################################################
-    V = np.array(self.short_pulse[0])
-    T = np.array(self.short_pulse[1])
-    T = T - T[0]
-    E_PAS = np.mean(V[:2000])
-    h.tstop = (T[-1] - T[0]) * 1000
-    h.v_init = E_PAS
-    h.dt = 0.1
-    h.steps_per_ms = h.dt
-    return E_PAS, T, V
+
+   error_1 = np.sqrt(np.sum(np.power(np.mean(exp_V[:start_fit]) - np.mean(npVec[:start_fit]), 2)))  # error from mean rest
+   error_2 = np.sqrt(np.sum(np.power(exp_V[start_fit:end_fit] - npVec[start_fit:end_fit], 2))) #/(end_fit-start_fit)  #  error for the decay
+   error_3 = np.sqrt(np.sum(np.power(np.mean(exp_V[end_fit-800:end_fit]) - np.mean(npVec[end_fit-800:end_fit]), 2)))  # error for maximal voltage
+
+   return error_2 + (end_fit-start_fit)*error_3
+
 
 def fit2short_pulse(cell,short_pulse,folder="",CM=1,RM=10000,RA=100):
     opt_vals = h.Vector(3)
     opt_vals.x[RM_IX] =RM
     opt_vals.x[RA_IX] = RA
     opt_vals.x[CM_IX] = CM
-    change_model_pas(CM=CM, RA=RA, RM=RM, E_PAS=E_PAS,F_factor=F_factor)
+    change_model_pas(CM=CM, RA=RA, RM=RM, E_PAS=E_PAS)
     plot_res(CM=CM, RM=RM, RA=RA,save_folder=folder, save_name=" before")
     for i in range(3):
         RMSD = h.fit_praxis(efun,opt_vals)   #@# take too much time if the fitting isn't found
@@ -198,47 +159,54 @@ def fit2short_pulse(cell,short_pulse,folder="",CM=1,RM=10000,RA=100):
     }, open(folder+"/fit_result.p", "wb"))
     return {"CM": CM,"RM": RM,"RA": RA,"error":[error2,precent_error,RMSD]}
 if __name__=='__main__':
-    I = -50
-    cell_file= "05_08_A_01062017_Splice_shrink_FINISHED_LABEL_Bluecell_spinec91.ASC"
-    short_pulse_file="data/short_pulse/mean_short_pulse_with_parameters.p"
-    short_pulse=read_from_pickle(short_pulse_file)
-    class Cell:pass
-    cell = mkcell(cell_file)
+    I = -50 #pA
+    hz=0.1
+    cell=None
+    if file_type=='ASC':
+       cell =load_ASC(cell_file)
+    elif file_type=='hoc':
+       cell =load_hoc(cell_file)
+
     sp = h.PlotShape()
     sp.show(0)  # show diameters
     for sec in h.allsec():
         sec.diam = sec.diam*resize_diam_by
         sec.L*=shrinkage_factor
-    ## delete all the axons
-    for sec in cell.axon:
-        h.delete_section(sec=sec)
+    # ## delete all the axons
+    # for sec in cell.axon:
+    #     h.delete_section(sec=sec)
     for sec in h.allsec():
         sec.insert('pas') # insert passive property
         sec.nseg = int(sec.L/10)+1  #decide that the number of segment will be 21 with the same distances
 
-    short_pulse=read_from_pickle(short_pulse_file)
+    if do_calculate_F_factor:
+       F_factor=calculate_F_factor(cell,'mouse_spine')
+    else:
+       F_factor = 1.9
 
-    SPINE_START = 60
-    start_fit =  2000
-    end_fit =  4900
-    spine=SpineParams()
-    F_factor = 2.03#calculate_F_factor(cell, spine.V_head, spine.neck_diam, spine.neck_L)
-    soma=cell.soma[0]
-    clamp = h.IClamp(soma(0.5)) # insert clamp(constant potentientiol) at the soma's center
-    clamp.amp = -0.05
-    clamp.dur = 200
-    clamp.delay = 296
     ######################################################
     # load the data and see what we have
     ######################################################
+    short_pulse=read_from_pickle(short_pulse_file)
+
     V = np.array(short_pulse['mean'][0])
     T = np.array(short_pulse['mean'][1].rescale('ms'))
     T = T-T[0]
+    SPINE_START = 60
 
+    start,end=find_injection(V,duration=int(200/hz))
+    soma=cell.soma
+    clamp = h.IClamp(soma(0.5)) # insert clamp(constant potentientiol) at the soma's center
+    clamp.amp = I/1000 #pA
+    clamp.delay = T[start]#296
+    clamp.dur =T[end]-T[start]# 200 #end-start
+    E_PAS=np.mean(V[:start])#short_pulse['E_pas']#np.mean(V[:start]) #or read it from the pickle
+    start_fit= start#2000   #moria
+    end_fit=end-100#4900#3960  #moria
     E_PAS = short_pulse['E_pas']
     h.tstop = (T[-1]-T[0])
     h.v_init=E_PAS
-    h.dt = 0.1
+    h.dt = hz
     h.steps_per_ms = h.dt
     CM_IX = 2
     RM_IX=0
@@ -255,28 +223,24 @@ if __name__=='__main__':
     RA = 100
 
     ra_folder = initial_folder + "/RA0_50:100:0.5"
-    try:os.mkdir(ra_folder)
-    except FileExistsError:pass
+    create_folders_list([ra_folder])
     RAs = np.arange(50,100,0.5)
     solution_RA0={}
     for ra in RAs:
         folder = ra_folder + "/RA0=" + str(ra)
-        try:os.mkdir(folder)
-        except FileExistsError:pass
+        create_folders_list([folder])
         solution_RA0["RA0=" + str(ra)] = fit2short_pulse(cell, short_pulse, folder=folder, CM=CM, RM=RM, RA=ra)
         pickle.dump(solution_RA0, open(ra_folder + "/RA0_fit_results.p", "wb"))
 
     ra_folder = initial_folder + "/RA0_100:300:2"
-    try:os.mkdir(ra_folder)
-    except FileExistsError:pass
+    create_folders_list([ra_folder])
     RAs = np.arange(100,300,2.)
     solution_RA0={}
     for ra in RAs:
         folder = ra_folder + "/RA0=" + str(ra)
-        try:os.mkdir(folder)
-        except FileExistsError:pass
+        create_folders_list([folder])
         solution_RA0["RA0=" + str(ra)] = fit2short_pulse(cell, short_pulse, folder=folder, CM=CM, RM=RM, RA=ra)
-    pickle.dump(solution_RA0, open(ra_folder + "/RA0_fit_results.p", "wb"))
+        pickle.dump(solution_RA0, open(ra_folder + "/RA0_fit_results.p", "wb"))
     # cm_folder = initial_folder+"/CM0"
     # try:os.mkdir(cm_folder)
     # except FileExistsError:pass

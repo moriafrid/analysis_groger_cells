@@ -5,8 +5,29 @@ from add_figure import add_figure
 import os
 import pickle
 from glob import glob
+import sys
 spine_type="mouse_spine"
-initial_locs=glob('data/fit/'+spine_type+'/*')
+print(sys.argv,flush=True)
+if len(sys.argv) != 6:
+    cell_name= '2017_05_08_A_4-5'
+    file_type='ASC'
+    resize_diam_by=1
+    shrinkage_factor=1
+    folder_='/ems/elsc-labs/segev-i/moria.fridman/project/analysis_groger_cells/'
+else:
+   cell_name = sys.argv[1]
+   file_type=sys.argv[2] #hoc ar ASC
+   resize_diam_by = float(sys.argv[3]) #how much the cell sweel during the electrophisiology records
+   shrinkage_factor =float(sys.argv[4]) #how much srinkage the cell get between electrophysiology record and LM
+   folder_= sys.argv[5] #'/ems/elsc-labs/segev-i/moria.fridman/project/analysis_groger_cells/cells_outputs_data'
+   if not folder_.endswith("/"):
+       folder_ += "/"
+save_dir ="cells_outputs_data/"
+initial_folder=folder_+save_dir+cell_name+'/fit_short_pulse_'+file_type+'/'
+# initial_folder+=spine_type
+# initial_folder+="/dend*"+str(round(resize_diam_by,2))+'&F_shrinkage='+str(round(shrinkage_factor,2))
+initial_locs=glob(initial_folder+'/*')
+
 for loc in initial_locs:
     datas=glob(loc+'/different_initial_conditions/RA0*/RA0_fit_results.p')
     for data in datas:

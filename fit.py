@@ -4,7 +4,6 @@ from neuron import h, gui
 import numpy as np
 import matplotlib.pyplot as plt
 from open_pickle import read_from_pickle
-import os
 from tqdm import tqdm
 from add_figure import add_figure
 from glob import glob
@@ -15,17 +14,19 @@ import sys
 
 signal.signal(signal.SIGSEGV, SIGSEGV_signal_arises)
 if len(sys.argv) != 6:
-    cell_name= '2017_03_04_A_6-7'
+    cell_name= '2017_05_08_A_5-4'
+    file_type='ASC'
+    resize_diam_by=1.0
+    shrinkage_factor=1.0
     folder_='/ems/elsc-labs/segev-i/moria.fridman/project/analysis_groger_cells/'
-    cell_type='ASC'
-    resize_diam_by=2
-    shrinkage_factor=1
+
 else:
     cell_name = sys.argv[1]
-    folder_= sys.argv[2] #'/ems/elsc-labs/segev-i/moria.fridman/project/analysis_groger_cells/cells_outputs_data'
-    cell_type=sys.argv[3] #hoc ar ASC
-    resize_diam_by = sys.argv[4] #how much the cell sweel during the electrophisiology records
-    shrinkage_factor =sys.argv[5] #how much srinkage the cell get between electrophysiology record and LM
+    file_type=sys.argv[2] #hoc ar ASC
+    resize_diam_by = float(sys.argv[3]) #how much the cell sweel during the electrophisiology records
+    shrinkage_factor =float(sys.argv[4]) #how much srinkage the cell get between electrophysiology record and LM
+    folder_= sys.argv[5] #'/ems/elsc-labs/segev-i/moria.fridman/project/analysis_groger_cells/cells_outputs_data'
+
 # path_single_traces=glob('data/traces_img/2017_05_08_A_0006/*pA.p')
 # path=path_single_traces[0]
 # I=int(path[path.rfind('/')+1:path.rfind('pA')])
@@ -35,20 +36,13 @@ else:
 data_dir= "cells_initial_information/"
 save_dir ="cells_outputs_data/"
 path_short_pulse=glob(folder_+save_dir+cell_name+'/data/electrophysio_records/short_pulse/mean_short_pulse_with_parameters.p')[0]
-cell_file=glob(folder_+data_dir+cell_name+'/*'+cell_type)[0]
-save_folder=folder_+save_dir+cell_name+'/fit_short_pulse/'
+cell_file=glob(folder_+data_dir+cell_name+'/*'+file_type)[0]
+save_folder=folder_+save_dir+cell_name+'/fit_short_pulse_'+file_type+'/'
+
 I=-50
-save_folder+=str(I)+'pA/'
-save_folder+='dend*'+str(round(resize_diam_by,2))+' &F_shrinkage='+str(round(shrinkage_factor,2))+'/'
+# save_folder+=str(I)+'pA/'
+save_folder+='dend*'+str(round(resize_diam_by,2))+'&F_shrinkage='+str(round(shrinkage_factor,2))+'/basic_fit'
 do_calculate_F_factor=False
-
-# if resize_diam_by!=1 and shrinkage_factor!=1:
-#     save_folder+='dend*'+str(round(resize_diam_by,2))+' &F_shrinkage='+str(round(shrinkage_factor,2))
-# elif resize_diam_by!=1:
-#     save_folder+='dend*'+str(resize_diam_by)+'_'
-# elif shrinkage_factor!=1:
-#     save_folder+='F_shrinkage='+str(round(shrinkage_factor,2))
-
 
 SPINE_START = 60
 shrinkage_factor=1#1.0/0.7
@@ -103,9 +97,9 @@ def plot_res(RM, RA, CM, save_name= "fit",print_full_graph=False):
     exp_V = V#[int(180.0 / h.dt):int(800.0 / h.dt)]
     npVec = npVec#[int(180.0 / h.dt):int(800.0 / h.dt)]
     npVec = npVec[:len(exp_V)]
-    error_1 = np.sqrt(np.sum(np.power(np.mean(exp_V[:2000]) - np.mean(npVec[:2000]), 2)))  # error from mean rest
+    error_1 = np.sqrt(np.sum(np.power(np.mean(exp_V[:start]) - np.mean(npVec[:start]), 2)))  # error from mean rest
     error_2 = np.sqrt(np.sum(np.power(exp_V[start_fit:end_fit] - npVec[start_fit:end_fit], 2))/(end_fit-start_fit))  #  error for the decay
-    error_3 = np.sqrt(np.sum(np.power(np.mean(exp_V[4100:4900]) - np.mean(npVec[4100:4900]), 2)))  # error for maximal voltage
+    error_3 = np.sqrt(np.sum(np.power(np.mean(exp_V[end_fit-800:end_fit]) - np.mean(npVec[end_fit-800:end_fit]), 2)))  # error for maximal voltage
     error_tot = np.sqrt(np.sum(np.power(exp_V - npVec, 2))/len(exp_V)) # mean square error
 
     print('error_total=',round(error_tot,3))
@@ -136,7 +130,7 @@ def efun(vals):
     else: RM = RM_const
 
     if CM_IX != -1:
-        if vals.x[CM_IX] >2 :
+        if vals.x[CM_IX] >3 :
             return (1e6)
         CM = vals.x[CM_IX]
     else:CM = CM_const
@@ -163,11 +157,11 @@ def efun(vals):
     error_tot = np.sqrt(np.sum(np.power(exp_V - npVec, 2)))#/len(exp_V)) # mean square error
 
 
-    error_1 = np.sqrt(np.sum(np.power(np.mean(exp_V[:2000]) - np.mean(npVec[:2000]), 2)))  # error from mean rest
+    error_1 = np.sqrt(np.sum(np.power(np.mean(exp_V[:start_fit]) - np.mean(npVec[:start_fit]), 2)))  # error from mean rest
     error_2 = np.sqrt(np.sum(np.power(exp_V[start_fit:end_fit] - npVec[start_fit:end_fit], 2))) #/(end_fit-start_fit)  #  error for the decay
-    error_3 = np.sqrt(np.sum(np.power(np.mean(exp_V[4100:4900]) - np.mean(npVec[4100:4900]), 2)))  # error for maximal voltage
+    error_3 = np.sqrt(np.sum(np.power(np.mean(exp_V[end_fit-800:end_fit]) - np.mean(npVec[end_fit-800:end_fit]), 2)))  # error for maximal voltage
 
-    return error_2 + (end_fit-start_fit)*error_3  #@# ask yoni if the calculation is right
+    return error_2 + (end_fit-start_fit)*error_3
 
 
 #########################################
@@ -177,9 +171,9 @@ def efun(vals):
 # fname =glob(folder_+cell_name+ "/05_08_A_01062017_Splice_shrink_FINISHED_LABEL_Bluecell_spinec91.ASC"
 # cell=instantiate_swc('/ems/elsc-labs/segev-i/moria.fridman/project/data_analysis_git/data_analysis/try1.swc')
 cell=None
-if cell_type=='ASC':
+if file_type=='ASC':
     cell =load_ASC(cell_file)
-elif cell_type=='hoc':
+elif file_type=='hoc':
     cell =load_hoc(cell_file)
 
 print (cell)
@@ -219,7 +213,7 @@ from extra_fit_func import find_injection
 hz=0.1 #moria
 start,end=find_injection(V,duration=int(200/hz))
 clamp.delay = T[start]#296
-clamp.dur =end-start# 200 #end-start
+clamp.dur =T[end]-T[start]# 200 #end-start
 E_PAS=np.mean(V[:start])#short_pulse_dict['E_pas']#np.mean(V[:start]) #or read it from the pickle
 start_fit= start#2000   #moria
 end_fit=end-100#4900#3960  #moria
@@ -246,7 +240,7 @@ end_fit=end-100#4900#3960  #moria
 
 h.tstop = (T[-1]-T[0])
 h.v_init=E_PAS
-h.dt = 0.1
+h.dt = hz#0.1
 h.steps_per_ms = h.dt
 
 CM_IX = 2
@@ -254,7 +248,7 @@ RM_IX=0
 RA_IX = 1
 
 RM_const = 60000.0
-RA_const = 100
+RA_const = 150
 CM_const = 1.0
 
 print("free params:")
