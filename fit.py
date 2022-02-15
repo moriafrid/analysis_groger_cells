@@ -30,9 +30,7 @@ else:
 # path_single_traces=glob('data/traces_img/2017_05_08_A_0006/*pA.p')
 # path=path_single_traces[0]
 # I=int(path[path.rfind('/')+1:path.rfind('pA')])
-# folder_='/ems/elsc-labs/segev-i/moria.fridman/project/data_analysis_git/data_analysis/'
-# path='/ems/elsc-labs/segev-i/moria.fridman/project/data_analysis_git/data_analysis/data/short_pulse/mean_short_pulse_with_parameters.p'
-# folder_='/ems/elsc-labs/segev-i/moria.fridman/project/analysis_groger_cells/cells_outputs_data'
+
 data_dir= "cells_initial_information/"
 save_dir ="cells_outputs_data/"
 path_short_pulse=glob(folder_+save_dir+cell_name+'/data/electrophysio_records/short_pulse/mean_short_pulse_with_parameters.p')[0]
@@ -214,7 +212,7 @@ hz=0.1 #moria
 start,end=find_injection(V,duration=int(200/hz))
 clamp.delay = T[start]#296
 clamp.dur =T[end]-T[start]# 200 #end-start
-E_PAS=np.mean(V[:start])#short_pulse_dict['E_pas']#np.mean(V[:start]) #or read it from the pickle
+E_PAS=short_pulse_dict['E_pas'] #np.mean(V[:start]) #or read it from the pickle
 start_fit= start#2000   #moria
 end_fit=end-100#4900#3960  #moria
 

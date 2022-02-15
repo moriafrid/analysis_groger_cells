@@ -200,10 +200,9 @@ if __name__=='__main__':
     clamp.amp = I/1000 #pA
     clamp.delay = T[start]#296
     clamp.dur =T[end]-T[start]# 200 #end-start
-    E_PAS=np.mean(V[:start])#short_pulse['E_pas']#np.mean(V[:start]) #or read it from the pickle
+    E_PAS=short_pulse['E_pas']#np.mean(V[:start]) #or read it from the pickle
     start_fit= start#2000   #moria
     end_fit=end-100#4900#3960  #moria
-    E_PAS = short_pulse['E_pas']
     h.tstop = (T[-1]-T[0])
     h.v_init=E_PAS
     h.dt = hz
@@ -264,10 +263,6 @@ if __name__=='__main__':
     #     except FileExistsError:pass
     #     solution_RM0["RM0="+str(rm)]=fit2short_pulse(cell,short_pulse,folder=folder,CM=CM,RM=rm,RA=RA)
     # pickle.dump(solution_RM0 , open(rm_folder+"/RM0_fit_results.p", "wb"))
-
-
-
-
 
     # CM_RA_RM_folder = initial_folder + "/CM0_RM0_RA0"
     # try:os.mkdir(CM_RA_RM_folder)
