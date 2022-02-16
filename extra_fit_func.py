@@ -10,15 +10,16 @@ def get_inj(T,I,V):
     inj = np.median(I[inj_start:inj_end])
     return inj, T[inj_start], T[inj_end]
 
-def find_injection(V,prominence=1,duration=200):
+def find_injection(V,prominence=1,duration=200, E_PAS = -70):
     peak=[]
     while len(peak)<1:
-        peak,par=find_peaks(abs(V),prominence=prominence)
+        peak,par=find_peaks(abs(V), prominence=prominence)
         print('peak place is', peak)
         prominence-=0.3
     end=peak[np.argmax(par['prominences'])]
     start=end-duration
-    return start ,end
+    idx_start = np.where(V[start:]<E_PAS)[0][0] + start
+    return idx_start ,end
 
 def initiate_simulation(self):
     clamp = h.IClamp(self.soma(0.5))  # insert clamp(constant potentientiol) at the soma's center

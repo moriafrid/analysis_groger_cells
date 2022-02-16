@@ -97,8 +97,12 @@ def instantiate_swc(filename):
 class hoc_cell:
     def __init__(self, hoc_dir):
         h.load_file(1, hoc_dir)
-        self.dend = list(h.dend) + [h.soma[i] for i in range(1, len(h.soma),1)]
-        self.soma = h.soma[0]
+        try:
+            self.dend = list(h.dend) + [h.soma[i] for i in range(1, len(h.soma),1)]
+            self.soma = h.soma[0]
+        except:
+            self.dend = list(h.dend)
+            self.soma = h.soma
         try:
             self.axon = list(h.axon)
         except:
@@ -126,9 +130,9 @@ class hoc_cell:
         self.axon =[]
 
 def load_hoc(hoc_dir,delete_axon=True):
+    cell=hoc_cell(hoc_dir)
     if delete_axon:
-        cell=hoc_cell(hoc_dir)
-    cell.delete_axon()
+        cell.delete_axon()
     return cell
 
 

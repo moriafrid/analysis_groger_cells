@@ -111,6 +111,7 @@ def phenomena(t1,t2,T,base,x_units='S',Y_units='mV'):
 		short_pulse_place=spike_place2
 	syn_place,_= find_places(np.mean(t2,axis=0))
 	V,short_pulse,spike,syn,noise1,noise2,rest4list,mean_V =[], [],[], [],[],[],[],[]
+	syn0,short_pulse0,spike0=[],[],[]
 	for v in np.array(t1):
 		noise1_temp=(v[short_pulse_place+3000:spike_place-1000])
 		noise2_temp=(v[syn_place+3000:])
@@ -126,15 +127,22 @@ def phenomena(t1,t2,T,base,x_units='S',Y_units='mV'):
 		syn.append(v[syn_place-1000:syn_place+1500]-initial_rest)
 		noise2.append(v[syn_place+1500:]-initial_rest)
 		mean_V.append(np.mean(v)-initial_rest)
+
+		short_pulse0.append(v[short_pulse_place-4000:short_pulse_place+3000])
+		spike0.append(v[spike_place-1000:spike_place+2000])
+		syn0.append(v[syn_place-1000:syn_place+1500])
+
+
 	T_short_pulse=T[0][short_pulse_place-4000:short_pulse_place+3000]
 	T_spike=T[0][spike_place-1000:spike_place+2000]
 	T_syn=T[0][syn_place-1000:syn_place+1500]
-
 	T_V=T[0]
-	add_figure('fully experiment',T[0].units,t1.units)
-	for v in V:
-		plt.plot(T_V,v,color='blue')
-	plt.savefig(base + '/V1/V.png')
+	for y_phen,x,name in zip([syn0,short_pulse0,spike0],[T_syn,T_short_pulse,T_spike],['syn/initial_syn','short_pulse/initial_short_pulse','spike/initial_spike']):
+		add_figure('initial data','ms','mV')
+		for y in y_phen:
+			plt.plot(x,y)
+		plt.savefig(base + name+'.pdf')
+		plt.close()
 	with open(base + '/V1/V.p', 'wb') as f:
 		pickle.dump( [V,T], f)
 	with open(base+'/syn/syn.p', 'wb') as f:
@@ -148,7 +156,6 @@ def phenomena(t1,t2,T,base,x_units='S',Y_units='mV'):
 	with open(base + '/noise2/noise2.p', 'wb') as f:
 		pickle.dump(np.array(noise2), f)
 	REST=np.mean(rest4list)
-
 	short_pulse_mean=np.mean(short_pulse,axis=0)
 	short_pulse_time2clear1,_=find_places(short_pulse_mean,prominence=0.05)
 	short_pulse_time2clear2,_=find_places(abs(short_pulse_mean),prominence=0.05)

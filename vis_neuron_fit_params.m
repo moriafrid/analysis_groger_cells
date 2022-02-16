@@ -3,7 +3,7 @@
 function varargout = vis_neuron_fit_params(varargin)
     % VIS_NEURON_FIT_PARAMS MATLAB code for vis_neuron_fit_params.fig
     % Edit the above text to modify the response to help vis_neuron_fit_params
-    % Last Modified by GUIDE v2.5 14-Feb-2022 15:52:26
+    % Last Modified by GUIDE v2.5 14-Feb-2022 21:27:21
 
     % Begin initialization code - DO NOT EDIT
     gui_Singleton = 1;
@@ -32,6 +32,12 @@ function h_err_param_slider_CreateFcn(hObject, ~, handles)
 end
 
 function h_err_params_list_CreateFcn(hObject, ~, handles)
+    if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
+        set(hObject,'BackgroundColor','white');
+    end
+end
+
+function h_err_params_2nd_list_CreateFcn(hObject, eventdata, handles)
     if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
         set(hObject,'BackgroundColor','white');
     end
@@ -77,7 +83,10 @@ function vis_neuron_fit_params_OpeningFcn(hObject, ~, handles, varargin)
     params_list = db_options(arrayfun(@(curr) isempty(strfind(curr{1}, "error_")), db_options));
     err_list = db_options(arrayfun(@(curr) ~isempty(strfind(curr{1}, "error_")), db_options));
     handles.h_err_params_list.String = params_list;
+    handles.h_err_params_2nd_list.String = params_list;
     handles.h_errors_list.String = err_list;
+    
+    update_plot(handles); % plot things
 
     % Update handles structure
     guidata(hObject, handles);
@@ -86,7 +95,7 @@ function vis_neuron_fit_params_OpeningFcn(hObject, ~, handles, varargin)
     % uiwait(handles.figure1);
 end
 
-function figure1_DeleteFcn(hObject, eventdata, handles)
+function figure1_DeleteFcn(~, ~, handles)
 % hObject    handle to figure1 (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
@@ -127,6 +136,73 @@ function simulation_results = load_csv_data(filename)
     simulation_results = readtable(filename, opts);
 end
 
+function update_plot(handles)
+    global db;
+    
+    h_ax = handles.h_ax_err_landscape;
+    
+    options_list = cellstr(handles.h_err_params_list.String);
+    fieldname_1 = options_list(handles.h_err_params_list.Value);
+    options_list = cellstr(handles.h_err_params_2nd_list.String);
+    fieldname_2 = options_list(handles.h_err_params_2nd_list.Value);
+    options_list = cellstr(handles.h_errors_list.String);
+    fieldname_err = options_list(handles.h_errors_list.Value);
+    
+    is_2d = strcmp(fieldname_1{:}, fieldname_2{:});
+    if isempty(h_ax.Children) || ~isfield(handles, 'h_scatter')
+        if ~isfield(handles, 'h_scatter')
+            cla(h_ax);
+        end
+        if is_2d
+            handles.h_scatter = scatter(h_ax, ...
+                db.simulation_results.(fieldname_1{:}), ...
+                db.simulation_results.(fieldname_err{:}));
+            h_ax.XLabel.String = fieldname_1{:};
+            h_ax.YLabel.String = strrep(fieldname_err{:}, "_", " ");
+            handles.h_rotate_checkbox.Enable = "off";
+        else
+            handles.h_scatter = scatter3(h_ax, ...
+                db.simulation_results.(fieldname_1{:}), ...
+                db.simulation_results.(fieldname_2{:}), ...
+                db.simulation_results.(fieldname_err{:}));
+            h_ax.XLabel.String = fieldname_1{:};
+            h_ax.YLabel.String = fieldname_2{:};
+            h_ax.ZLabel.String = strrep(fieldname_err{:}, "_", " ");
+            handles.h_rotate_checkbox.Enable = "on";
+        end
+    else
+        if (is_2d && ~isempty(handles.h_scatter.ZData))
+            handles.h_scatter.ZData = [];          
+        end
+        handles.h_scatter.XData = db.simulation_results.(fieldname_1{:});
+        h_ax.XLabel.String = fieldname_1{:};
+        if is_2d
+            handles.h_scatter.YData = db.simulation_results.(fieldname_err{:});
+            h_ax.View = [0 90];  % 2d view (flat)
+            h_ax.YLabel.String = strrep(fieldname_err{:}, "_", " ");
+            handles.h_rotate_checkbox.Enable = "off";
+        else
+            handles.h_scatter.YData = db.simulation_results.(fieldname_2{:});
+            handles.h_scatter.ZData = db.simulation_results.(fieldname_err{:});
+            h_ax.View = [-37.5  30];  % 3d view
+            h_ax.YLabel.String = fieldname_2{:};
+            h_ax.ZLabel.String = strrep(fieldname_err{:}, "_", " ");
+            handles.h_rotate_checkbox.Enable = "on";
+        end
+    end
+    
+    enable_disable_rotation(handles);
+    guidata(handles.output, handles);
+end
+
+function enable_disable_rotation(handles)
+    if handles.h_rotate_checkbox.Value  % true when checked
+        rotate3d(handles.h_ax_err_landscape, 'on');
+    else
+        rotate3d(handles.h_ax_err_landscape, 'off');
+    end
+end
+
 % ----------------- Adjusting GUI callbacks (open/close etc) ------------%
 
 function h_err_param_slider_Callback(hObject, ~, handles)
@@ -140,25 +216,35 @@ function h_err_param_slider_Callback(hObject, ~, handles)
     disp(append("Slider ", num2str(get(hObject,'Value'))))
 end
 
-function h_err_params_list_Callback(hObject, ~, handles)
+function h_err_params_list_Callback(~, ~, handles)
 % --- Executes on selection change in h_err_params_list.
 % hObject    handle to h_err_params_list (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 
-% Hints: contents = cellstr(get(hObject,'String')) returns h_err_params_list contents as cell array
-%        contents{get(hObject,'Value')} returns selected item from h_err_params_list
-
-    options_list = cellstr(get(hObject,'String'));
-    disp(append("Param ", options_list(get(hObject,'Value'))));
+    update_plot(handles);
 end
 
-function h_errors_list_Callback(hObject, eventdata, handles)
-% hObject    handle to h_errors_list (see GCBO)
+function h_errors_list_Callback(~, ~, handles)
+    % hObject    handle to h_errors_list (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 
-% Hints: contents = cellstr(get(hObject,'String')) returns h_errors_list contents as cell array
-%        contents{get(hObject,'Value')} returns selected item from h_errors_list
+    update_plot(handles);
 end
 
+function h_err_params_2nd_list_Callback(~, ~, handles)
+    % hObject    handle to h_err_params_2nd_list (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+    update_plot(handles);
+end
+
+function h_rotate_checkbox_Callback(~, ~, handles)
+    % hObject    handle to h_rotate_checkbox (see GCBO)
+    % eventdata  reserved - to be defined in a future version of MATLAB
+    % handles    structure with handles and user data (see GUIDATA)
+
+    enable_disable_rotation(handles);
+end

@@ -13,7 +13,7 @@ from extra_function import load_ASC,load_hoc,SIGSEGV_signal_arises,create_folder
 from extra_fit_func import find_injection
 
 
-do_calculate_F_factor=False
+do_calculate_F_factor=True
 spine_type="mouse_spine"
 print(sys.argv,flush=True)
 if len(sys.argv) != 6:
@@ -30,6 +30,8 @@ else:
    folder_= sys.argv[5] #'/ems/elsc-labs/segev-i/moria.fridman/project/analysis_groger_cells/cells_outputs_data'
    if not folder_.endswith("/"):
        folder_ += "/"
+# add2start=5
+
 data_dir= "cells_initial_information/"
 save_dir ="cells_outputs_data/"
 print(folder_+save_dir+cell_name+'/data/electrophysio_records/short_pulse/mean_short_pulse_with_parameters.p')
@@ -69,8 +71,8 @@ def plot_res(RM, RA, CM, save_folder="data/fit/",save_name= "fit",print_full_gra
     npTvec = np.array(Tvec)
     npVec = np.array(Vvec)
     add_figure("fit "+save_folder.split('/')[-1]+"\nRM="+str(round(RM,1))+",RA="+str(round(RA,1))+",CM="+str(round(CM,2)),'mS','mV')
-    plt.plot(npTvec[start_fit:end_fit], npVec[start_fit:end_fit], color = 'r', linestyle ="--")
     plt.plot(T[start_fit:end_fit], V[start_fit:end_fit], color = 'green')
+    plt.plot(npTvec[start_fit:end_fit], npVec[start_fit:end_fit], color = 'r', linestyle ="--")
     plt.legend(['NEURON_sim','decay_to_fitting'])
     plt.savefig(save_folder+'/'+save_name+"_decay.png")
     # plt.savefig(save_folder+'/'+save_name+"_decay.pdf")
@@ -195,6 +197,7 @@ if __name__=='__main__':
     SPINE_START = 60
 
     start,end=find_injection(V,duration=int(200/hz))
+    # start+=add2start
     soma=cell.soma
     clamp = h.IClamp(soma(0.5)) # insert clamp(constant potentientiol) at the soma's center
     clamp.amp = I/1000 #pA

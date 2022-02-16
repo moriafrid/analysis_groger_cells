@@ -24,6 +24,8 @@ def calculate_F_factor(cell,spine_type,spines_density=1.08,spine_num=1, is_debug
     spine_area=neck_area+head_area
     spines_area=spine_area*dend_len*spines_density
     dends_area=np.sum([seg.area() for sec in cell.dend for seg in sec]) #* (1.0/0.7)
+    try:dends_area+=np.sum([seg.area() for sec in cell.apic for seg in sec]) #* (1.0/0.7)
+    except : "no apical in this cell"
     F_factor=(spines_area+dends_area)/dends_area
     return F_factor
 #
