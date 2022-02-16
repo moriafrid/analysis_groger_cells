@@ -2,12 +2,12 @@ import pandas as pd
 from math import pi,sqrt
 import numpy as np
 
-def get_n_spinese(cell_name):
-    df = pd.read_excel('/ems/elsc-labs/segev-i/moria.fridman/project/analysis_groger_cells/cells_initial_information/Data2.xlsx')
+def get_n_spinese(cell_name,folder='/ems/elsc-labs/segev-i/moria.fridman/project/analysis_groger_cells/cells_initial_information'):
+    df = pd.read_excel(folder+'/Data2.xlsx')
     return len(df[df['cell_name']==cell_name])
 
-def get_parameters(cell_name,par_list):
-    df = pd.read_excel('/ems/elsc-labs/segev-i/moria.fridman/project/analysis_groger_cells/cells_initial_information/Data2.xlsx')
+def get_parameters(cell_name,par_list,folder='/ems/elsc-labs/segev-i/moria.fridman/project/analysis_groger_cells/cells_initial_information'):
+    df = pd.read_excel(folder+'/Data2.xlsx')
     parameter_cv=df[df['cell_name']==cell_name].reset_index()
     par=[]
     for par_name in par_list:
@@ -16,8 +16,8 @@ def get_parameters(cell_name,par_list):
             print(par_name +"   is empty at Data2.xlx")
     return par
 
-def get_F_factor_params(spin_type):
-    df = pd.read_excel('/ems/elsc-labs/segev-i/moria.fridman/project/analysis_groger_cells/cells_initial_information/Data2.xlsx')
+def get_F_factor_params(spin_type,folder='/ems/elsc-labs/segev-i/moria.fridman/project/analysis_groger_cells/cells_initial_information'):
+    df = pd.read_excel(folder+'/Data2.xlsx')
     parameter_cv=df[df['cell_name']==spin_type].reset_index()
 
     if not True in list(pd.isna(parameter_cv['R_head'])):
@@ -38,16 +38,16 @@ def get_F_factor_params(spin_type):
 
     return R_head,neck_diam,neck_length
 
-def get_spine_xyz(cell_name,spine_num):
-    df = pd.read_excel('/ems/elsc-labs/segev-i/moria.fridman/project/analysis_groger_cells/cells_initial_information/Data2.xlsx')
+def get_spine_xyz(cell_name,spine_num,folder='/ems/elsc-labs/segev-i/moria.fridman/project/analysis_groger_cells/cells_initial_information'):
+    df = pd.read_excel(folder+'/Data2.xlsx')
     parameter_cv=df[df['cell_name']==cell_name].reset_index()
     x=parameter_cv['x'][spine_num]
     y=parameter_cv['y'][spine_num]
     z=parameter_cv['z'][spine_num]
     return (x,y,z)
 
-def get_spine_part(cell_name,spine_num):
-    df = pd.read_excel('/ems/elsc-labs/segev-i/moria.fridman/project/analysis_groger_cells/cells_initial_information/Data2.xlsx')
+def get_spine_part(cell_name,spine_num,folder='/ems/elsc-labs/segev-i/moria.fridman/project/analysis_groger_cells/cells_initial_information'):
+    df = pd.read_excel(folder+'/Data2.xlsx')
     parameter_cv=df[df['cell_name']==cell_name].reset_index()
     return parameter_cv['dend_type'][spine_num]
 

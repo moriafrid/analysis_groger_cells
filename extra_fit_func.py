@@ -10,7 +10,7 @@ def get_inj(T,I,V):
     inj = np.median(I[inj_start:inj_end])
     return inj, T[inj_start], T[inj_end]
 
-def find_injection(V,prominence=1,duration=200, E_PAS = -70):
+def find_injection(V,E_PAS,prominence=1,duration=200):
     peak=[]
     while len(peak)<1:
         peak,par=find_peaks(abs(V), prominence=prominence)
@@ -19,6 +19,7 @@ def find_injection(V,prominence=1,duration=200, E_PAS = -70):
     end=peak[np.argmax(par['prominences'])]
     start=end-duration
     idx_start = np.where(V[start:]<E_PAS)[0][0] + start
+    # idx_end_decay= np.where(V[start:]<E_PAS)[0][0] + start
     return idx_start ,end
 
 def initiate_simulation(self):

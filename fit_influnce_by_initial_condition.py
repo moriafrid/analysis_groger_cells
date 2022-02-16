@@ -75,21 +75,19 @@ def plot_res(RM, RA, CM, save_folder="data/fit/",save_name= "fit",print_full_gra
     plt.plot(npTvec[start_fit:end_fit], npVec[start_fit:end_fit], color = 'r', linestyle ="--")
     plt.legend(['NEURON_sim','decay_to_fitting'])
     plt.savefig(save_folder+'/'+save_name+"_decay.png")
-    # plt.savefig(save_folder+'/'+save_name+"_decay.pdf")
     plt.close()
     exp_V = V
     npVec = npVec
     npVec = npVec[:len(exp_V)]
-    error_1 = np.sqrt(np.sum(np.power(np.mean(exp_V[:start_fit-10]) - np.mean(npVec[:start_fit-10]), 2)))  # error from mean rest
+    error_1 = np.sqrt(np.sum(np.power(np.mean(exp_V[:start]) - np.mean(npVec[:start]), 2)))  # error from mean rest
     error_2 = np.sqrt(np.sum(np.power(exp_V[start_fit:end_fit] - npVec[start_fit:end_fit], 2))/(end_fit-start_fit))  #  error for the decay
     error_3 = np.sqrt(np.sum(np.power(np.mean(exp_V[end_fit-800:end_fit]) - np.mean(npVec[end_fit-800:end_fit]), 2)))  # error for maximal voltage
     error_tot = np.sqrt(np.sum(np.power(exp_V - npVec, 2))/len(exp_V)) # mean square error
-
     print('error_total=',round(error_tot,3))
     print('error_decay=', round(error_2,3))
     print('error_mean_max_voltage=', round(error_3,3))
     print('error_from_rest=', round(error_1,3))
-    return error_2, (error_2 + error_3*10)/960
+    return error_2, (error_2 + error_3*10)/11
 
 def efun(vals):
    #check the fitting
@@ -194,16 +192,16 @@ if __name__=='__main__':
     V = np.array(short_pulse['mean'][0])
     T = np.array(short_pulse['mean'][1].rescale('ms'))
     T = T-T[0]
+    E_PAS=short_pulse['E_pas']#np.mean(V[:start]) #or read it from the pickle
     SPINE_START = 60
 
-    start,end=find_injection(V,duration=int(200/hz))
+    start,end=find_injection(V,E_PAS,duration=int(200/hz))
     # start+=add2start
     soma=cell.soma
     clamp = h.IClamp(soma(0.5)) # insert clamp(constant potentientiol) at the soma's center
     clamp.amp = I/1000 #pA
     clamp.delay = T[start]#296
     clamp.dur =T[end]-T[start]# 200 #end-start
-    E_PAS=short_pulse['E_pas']#np.mean(V[:start]) #or read it from the pickle
     start_fit= start#2000   #moria
     end_fit=end-100#4900#3960  #moria
     h.tstop = (T[-1]-T[0])

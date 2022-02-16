@@ -218,7 +218,7 @@ clamp.amp = I/1000#-0.05 ## supopsed to be 0.05nA
 from extra_fit_func import find_injection
 hz=0.1 #moria
 E_PAS=short_pulse_dict['E_pas'] #np.mean(V[:start]) #or read it from the pickle
-start,end=find_injection(V, duration=int(200/hz), E_PAS=E_PAS)
+start,end=find_injection(V, E_PAS,duration=int(200/hz))
 start_fit= start+add2start2#2000   #moria
 start+=add2start
 end_fit=end-1500#4900#3960  #moria

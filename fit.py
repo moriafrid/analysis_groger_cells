@@ -211,7 +211,7 @@ clamp = h.IClamp(soma(0.5)) # insert clamp(constant potentientiol) at the soma's
 clamp.amp = I/1000#-0.05 ## supopsed to be 0.05nA
 from extra_fit_func import find_injection
 hz=0.1 #moria
-start,end=find_injection(V,duration=int(200/hz))
+start,end=find_injection(V,E_pas,duration=int(200/hz))
 # start+=add2start
 start_fit= start-100#2000   #moria
 end_fit=end-1500#4900#3960  #moria
