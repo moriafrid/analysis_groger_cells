@@ -17,7 +17,7 @@ do_calculate_F_factor=True
 spine_type="mouse_spine"
 
 if len(sys.argv) != 6:
-   cell_name= '2017_05_08_A_4-5'
+   cell_name= '2017_03_04_A_6-7'
    file_type='hoc'
    resize_diam_by=1.0
    shrinkage_factor=1.0
@@ -69,10 +69,10 @@ def plot_res(RM, RA, CM, save_folder="data/fit/",save_name= "fit"):
     npTvec = np.array(Tvec)
     npVec = np.array(Vvec)
     add_figure("fit "+save_folder.split('/')[-1]+"\nRM="+str(round(RM,1))+",RA="+str(round(RA,1))+",CM="+str(round(CM,2)),'mS','mV')
-    plt.plot(T, V, color = 'black',alpha=0.3,lanel='data',lw=2)
+    plt.plot(T, V, color = 'black',alpha=0.3,label='data',lw=2)
     plt.plot(T[start_fit:end_fit], V[start_fit:end_fit], color = 'b',alpha=0.3,label='part to fit')
-    plt.plot(npTvec, npVec, color = 'r', linestyle ="--",alpha=0.3)
-    plt.legend(['NEURON_sim','decay_to_fitting'])
+    plt.plot(npTvec, npVec, color = 'r', linestyle ="--",alpha=0.3,label='NEURON simulation')
+    plt.legend()
     plt.savefig(save_folder+'/'+save_name+"_decay.png")
     # plt.savefig(save_folder+'/'+save_name+"_decay.pdf")
     plt.close()
@@ -136,6 +136,15 @@ if __name__=='__main__':
        cell =load_ASC(cell_file)
     elif file_type=='hoc':
        cell =load_hoc(cell_file)
+    sp = h.PlotShape()
+    sp.show(0)  # show diameters
+
+    # ## delete all the axons
+    # for sec in cell.axon:
+    #     h.delete_section(sec=sec)
+    for sec in cell.all_sec():
+        sec.insert('pas') # insert passive property
+        sec.nseg = int(sec.L/10)+1  #decide that the number of segment will be 21 with the same distances
 
     for sec in cell.all_sec():
         sec.diam = sec.diam*resize_diam_by
@@ -162,19 +171,16 @@ if __name__=='__main__':
     clamp.amp = I/1000 #pA
     clamp.delay = T[start]#296
     clamp.dur =T[end]-T[start]# 200 #end-start
-    E_PAS=short_pulse['E_pas']#np.mean(V[:start]) #or read it from the pickle
     start_fit= start#2000   #moria
     end_fit=end-100#4900#3960  #moria
+
     h.dt=hz
-
-
     h.tstop = (T[-1]-T[0])
     h.v_init=E_PAS
-    h.dt = hz
     h.steps_per_ms = h.dt
     imp = h.Impedance(sec=soma)
     imp.loc(soma(0.5))
-    RA=np.arange(200, 300, 2)
+    RA=list(np.arange(1,150,1))+list(np.arange(150, 302, 2))
     if read_tau_m(cell_name)==[]:
         os.system('calculate_tau_m.py')
         print('tau_m for cell',cell_name, ' needs to be calculate')
@@ -229,7 +235,7 @@ if __name__=='__main__':
     add_figure('RA_errors','RA','errors')
     plt.plot(RA,ra_error)
     plt.savefig(initial_folder + '/Ra_const_errors1.png')
-    plt.add_figure('RA_errors','RA','ra_next_eror')
+    add_figure('RA_errors','RA','ra_next_eror')
     plt.plot(RA,ra_error_next)
     plt.savefig(initial_folder + '/Ra_const_errors2.png')
 

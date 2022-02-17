@@ -1,7 +1,6 @@
 from open_pickle import read_from_pickle
 import numpy as np
 from neuron import h,gui
-import os
 import  matplotlib.pyplot as plt
 from calculate_F_factor import calculate_F_factor
 from add_figure import add_figure
@@ -18,7 +17,7 @@ spine_type="mouse_spine"
 print(sys.argv,flush=True)
 if len(sys.argv) != 6:
     cell_name= '2017_03_04_A_6-7'
-    file_type='ASC'
+    file_type='hoc'
     resize_diam_by=1
     shrinkage_factor=1
     folder_='/ems/elsc-labs/segev-i/moria.fridman/project/analysis_groger_cells/'
@@ -169,16 +168,16 @@ if __name__=='__main__':
 
     sp = h.PlotShape()
     sp.show(0)  # show diameters
-    for sec in h.allsec():
-        sec.diam = sec.diam*resize_diam_by
-        sec.L*=shrinkage_factor
+
     # ## delete all the axons
     # for sec in cell.axon:
     #     h.delete_section(sec=sec)
-    for sec in h.allsec():
+    for sec in cell.all_sec():
         sec.insert('pas') # insert passive property
         sec.nseg = int(sec.L/10)+1  #decide that the number of segment will be 21 with the same distances
-
+    for sec in cell.all_sec():
+        sec.diam = sec.diam*resize_diam_by
+        sec.L*=shrinkage_factor
     if do_calculate_F_factor:
        F_factor=calculate_F_factor(cell,'mouse_spine')
     else:

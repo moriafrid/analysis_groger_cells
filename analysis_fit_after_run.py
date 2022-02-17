@@ -6,6 +6,8 @@ import os
 import pickle
 from glob import glob
 import sys
+from extra_function import create_folders_list
+
 spine_type="mouse_spine"
 print(sys.argv,flush=True)
 if len(sys.argv) != 6:
@@ -29,7 +31,6 @@ initial_folder=folder_+save_dir+cell_name+'/fit_short_pulse_'+file_type+'/'
 initial_locs=glob(initial_folder+'/*')
 location='/ems/elsc-labs/segev-i/moria.fridman/project/analysis_groger_cells/cells_outputs_data/2017_05_08_A_4-5/fit_short_pulse_ASC/dend*1.0&F_shrinkage=1.0/basic_fit'
 datas2=glob(location+'/*/final_result*.p')
-from extra_function import create_folders_list
 def analysis_fit(location):
     save_folder=location+'/analysis'
     create_folders_list([save_folder])

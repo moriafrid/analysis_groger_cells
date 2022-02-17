@@ -13,6 +13,7 @@ for cell_name in cells:
         send_command = " ".join([command, cell_name,file_type,resize_diam_by,shrinkage_factor,folder_])
         os.system(send_command)
         print(cell_name+ ' .'+file_type+': fit_influance_by_initial_condition.py')
-        # command="sbatch best_with_const_param.sh"
-        # send_command = " ".join([command, cell_name,file_type2read,resize_diam_by,shrinkage_factor,folder_])
-        # os.system(send_command)
+        command="sbatch execute_const_param.sh"
+        send_command = " ".join([command, cell_name,file_type,resize_diam_by,shrinkage_factor,folder_])
+        os.system(send_command)
+        print(cell_name+ ' .'+file_type+': bast_with_const_param.py')
