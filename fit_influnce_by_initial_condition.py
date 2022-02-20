@@ -73,7 +73,7 @@ def plot_res(RM, RA, CM, save_name= "fit",print_full_graph=False):
     h.run()
     npTvec = np.array(Tvec)
     npVec = np.array(Vvec)
-    add_figure(cell_name+" fit "+str(I)+"pA\nRM="+str(round(RM,1))+",RA="+str(round(RA,1))+",CM="+str(round(CM,2)),'mS','mV')
+    add_figure(cell_name+" fit "+str(I)+"pA\nRM="+str(round(RM,1))+",RA="+str(round(RA,1))+",CM="+str(round(CM,2)),'ms','mV')
     plt.plot(npTvec[start_fit:end_fit], npVec[start_fit:end_fit], color = 'r', linestyle ="--") #plot the recorded short_pulse
     plt.plot(T[start_fit:end_fit], V[start_fit:end_fit],color = 'green')
     plt.plot(npTvec[start_fit:end_fit], npVec[start_fit:end_fit], color = 'r', linestyle ="--") #plot the recorded short_pulse
@@ -95,7 +95,7 @@ def plot_res(RM, RA, CM, save_name= "fit",print_full_graph=False):
     print('error_mean_max_voltage=', round(error_3,3))
     print('error_from_rest=', round(error_1,3))
     if print_full_graph:
-        add_figure(cell_name+": RM="+str(round(RM,1))+",RA="+str(round(RA,1))+",CM="+str(round(CM,2)),short_pulse[0].units,'ms')
+        add_figure(cell_name+": RM="+str(round(RM,1))+",RA="+str(round(RA,1))+",CM="+str(round(CM,2)),'ms','mV')
         plt.plot(T, V, color = 'k',label='data') #plot short_pulse data
         plt.plot(T[start_fit:end_fit], V[start_fit:end_fit],color = 'green',label='decay_to_fit')
         # plt.plot(T[end_fit:end_fit+1500], V[end_fit:end_fit+1500],color = 'yellow',label='maxV_to_fit')
@@ -261,7 +261,7 @@ if __name__=='__main__':
 
     start,end=find_injection(V,E_PAS,duration=int(200/hz))
     start_fit= start-100#2000   #moria
-    end_fit=end-1500#4900#3960  #moria
+    end_fit=end-1200#4900#3960  #moria
     max2fit=end-10
     # start+=add2start
     soma=cell.soma

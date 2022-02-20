@@ -76,8 +76,8 @@ def plot_res(RM, RA, CM, save_folder="data/fit/",save_name= "fit"):
     plt.plot(npTvec, npVec, color = 'r', linestyle ="--",alpha=0.3,label='NEURON simulation')
 
     plt.legend()
-    plt.savefig(save_folder+'/'+save_name+"_decay.png")
-    # plt.savefig(save_folder+'/'+save_name+"_decay.pdf")
+    plt.savefig(save_folder+'/'+save_name+".png")
+    # plt.savefig(save_folder+'/'+save_name+".pdf")
     plt.close()
 
 
@@ -151,8 +151,8 @@ if __name__=='__main__':
     T = T-T[0]
     E_PAS = short_pulse['E_pas']
     start,end=find_injection(V, E_PAS,duration=int(200/hz))
-    start_fit= start-100#2000   #moria
-    end_fit=end-1500#4900#3960  #moria
+    start_fit= start-100
+    end_fit=end-1200
     max2fit=end-10
     clamp = h.IClamp(soma(0.5)) # insert clamp(constant potentientiol) at the soma's center
     clamp.amp = I/1000 #pA
@@ -211,7 +211,7 @@ if __name__=='__main__':
             error_last=error_next
             error_next=errors_Rinput(RM, ra, CM,E_PAS)
         print('Rinput for Ra='+str(ra)+' is '+str(round(Rin,2)))
-        ra_error2,precent_eror=plot_res(RM, ra, CM, save_folder=initial_folder, save_name="fit for RA=" + str(round(ra, 2)))
+        ra_error2,precent_eror=plot_res(RM, ra, CM, save_folder=initial_folder, save_name="fit RA=" + str(round(ra, 2)))
         ra_error.append(ra_error2)
         precent_erors.append(precent_eror)
         ra_error_next.append(error_next)

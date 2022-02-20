@@ -217,7 +217,7 @@ hz=0.1 #moria
 E_PAS=short_pulse_dict['E_pas'] #np.mean(V[:start]) #or read it from the pickle
 start,end=find_injection(V, E_PAS,duration=int(200/hz))
 start_fit= start-100#2000   #moria
-end_fit=end-1500#4900#3960  #moria
+end_fit=end-1200#4900#3960  #moria
 max2fit=end-10
 clamp.delay = T[start]#296
 clamp.dur =T[end]-T[start]# 200 #end-start

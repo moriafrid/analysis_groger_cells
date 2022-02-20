@@ -226,7 +226,7 @@ start_fit= start-100+add2start2#2000   #moria
 end_fit=end-1500#4900#3960  #moria
 max2fit=end-10
 start+=add2start
-end_fit=end-1500#4900#3960  #moria
+end_fit=end-1200#4900#3960  #moria
 clamp.delay = T[start]#296
 clamp.dur =T[end]-T[start]# 200 #end-start
 
