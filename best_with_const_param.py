@@ -70,46 +70,31 @@ def plot_res(RM, RA, CM, save_folder="data/fit/",save_name= "fit"):
     npVec = np.array(Vvec)
     add_figure("fit "+save_folder.split('/')[-1]+"\nRM="+str(round(RM,1))+",RA="+str(round(RA,1))+",CM="+str(round(CM,2)),'mS','mV')
     plt.plot(T, V, color = 'black',alpha=0.3,label='data',lw=2)
-    plt.plot(T[start_fit:end_fit], V[start_fit:end_fit], color = 'b',alpha=0.3,label='part to fit')
+    plt.plot(T[start_fit:end_fit], V[start_fit:end_fit], color = 'b',alpha=0.3,label='fit decay')
+    plt.plot(T[max2fit-1200:max2fit], V[max2fit-1200:max2fit],color = 'yellow',label='fit maxV')
+
     plt.plot(npTvec, npVec, color = 'r', linestyle ="--",alpha=0.3,label='NEURON simulation')
+
     plt.legend()
     plt.savefig(save_folder+'/'+save_name+"_decay.png")
     # plt.savefig(save_folder+'/'+save_name+"_decay.pdf")
     plt.close()
 
-    # add_figure("fit "+save_folder.split('/')[-1]+"\nRM="+str(round(RM,1))+",RA="+str(round(RA,1))+",CM="+str(round(CM,2)),'mS','mV')
-    # plt.plot(npTvec[start_fit:end_fit], npVec[start_fit:end_fit], color = 'r', linestyle ="--",alpha=0.3)
-    # plt.plot(npTvec[start_fit+950:end_fit-1000], npVec[start_fit+950:end_fit-1000], color = 'b',alpha=0.3)
-    # plt.plot(T[start_fit:end_fit], V[start_fit:end_fit], color = 'green',alpha=0.3)
-    # plt.legend(['NEURON_sim','decay_to_fitting'])
-    # plt.savefig(save_folder+'/'+save_name+"_decay.png")
-    # # plt.savefig(save_folder+'/'+save_name+"_decay.pdf")
-    # plt.close()
 
     exp_V = V
     npVec = npVec
     npVec = npVec[:len(exp_V)]
     error_1 = np.sqrt(np.sum(np.power(np.mean(exp_V[:start]) - np.mean(npVec[:start]), 2)))  # error from mean rest
     error_2 = np.sqrt(np.sum(np.power(exp_V[start_fit:end_fit] - npVec[start_fit:end_fit], 2))/(end_fit-start_fit))  #  error for the decay
-    error_3 = np.sqrt(np.sum(np.power(np.mean(exp_V[end_fit-800:end_fit]) - np.mean(npVec[end_fit-800:end_fit]), 2)))  # error for maximal voltage
+    # error_2 = np.sqrt(np.sum(np.power(exp_V[start_fit:end_fit] - npVec[start_fit:end_fit], 2))) #/(end_fit-start_fit)  #  error for the decay
+    error_3 = np.sqrt(np.sum(np.power(np.mean(exp_V[max2fit-1200:max2fit]) - np.mean(npVec[max2fit-1200:max2fit]), 2)))  # error for maximal voltage
     error_tot = np.sqrt(np.sum(np.power(exp_V - npVec, 2))/len(exp_V)) # mean square error
-
-    # error_1 = np.sqrt(np.sum(np.power(np.mean(exp_V[:2000]) - np.mean(npVec[:2000]), 2)))  # error from mean rest
-    # error_2 = np.sqrt(np.sum(np.power(exp_V[start_fit+950:end_fit-1000] - npVec[start_fit+950:end_fit-1000], 2)))#/((end_fit-1000) - (start_fit+950)))  #  error for the decay
-    # error_3 = np.sqrt(np.sum(np.power(np.mean(exp_V[4100:4900]) - np.mean(npVec[4100:4900]), 2)))  # error for maximal voltage
-    # error_tot = np.sqrt(np.sum(np.power(exp_V - npVec, 2))/len(exp_V)) # mean square error
-    #
-    # print('error_total=',round(error_tot,3))
-    # print('error_decay=', round(error_2,3))
-    # print('error_mean_max_voltage=', round(error_3,3))
-    # print('error_from_rest=', round(error_1,3))
-    # return error_2, (error_2 + error_3*10)/960
 
     print('error_total=',round(error_tot,3))
     print('error_decay=', round(error_2,3))
     print('error_mean_max_voltage=', round(error_3,3))
     print('error_from_rest=', round(error_1,3))
-    return error_2, (error_2 + error_3*10)/960
+    return error_2 ,error_2 + error_3
 def errors_Rinput(RM,RA,CM,E_PAS):
     change_model_pas(CM=CM, RA=RA, RM=RM, E_PAS = E_PAS)
     Vvec = h.Vector()
@@ -124,7 +109,7 @@ def errors_Rinput(RM,RA,CM,E_PAS):
     exp_V = V
     npVec = npVec
     npVec = npVec[:len(exp_V)]
-    error_3 = np.sqrt(np.sum(np.power(np.mean(exp_V[4100:4900]) - np.mean(npVec[4100:4900]), 2)))  # error for maximal voltage
+    error_3 = np.sqrt(np.sum(np.power(np.mean(exp_V[max2fit-1200:max2fit]) - np.mean(npVec[max2fit-1200:max2fit]), 2)))  # error for maximal voltage
     # print('error_mean_max_voltage=', round(error_3,3))
     return error_3
 
@@ -166,13 +151,13 @@ if __name__=='__main__':
     T = T-T[0]
     E_PAS = short_pulse['E_pas']
     start,end=find_injection(V, E_PAS,duration=int(200/hz))
-
+    start_fit= start-100#2000   #moria
+    end_fit=end-1500#4900#3960  #moria
+    max2fit=end-10
     clamp = h.IClamp(soma(0.5)) # insert clamp(constant potentientiol) at the soma's center
     clamp.amp = I/1000 #pA
     clamp.delay = T[start]#296
     clamp.dur =T[end]-T[start]# 200 #end-start
-    start_fit= start#2000   #moria
-    end_fit=end-100#4900#3960  #moria
 
     h.dt=hz
     h.tstop = (T[-1]-T[0])
@@ -231,7 +216,7 @@ if __name__=='__main__':
         precent_erors.append(precent_eror)
         ra_error_next.append(error_next)
         params_dict.append({'RM': RM, 'RA': ra, 'CM': CM})
-    pickle.dump({'RA':RA,'errors':[ra_error,precent_erors],'params':params_dict}, open(initial_folder + '/Ra_const_errors200:300.p', "wb"))
+        pickle.dump({'RA':RA,'error':{'errors_from_decay':ra_error,'total_error':precent_erors},'params':params_dict}, open(initial_folder + '/Ra_const_errors200:300.p', "wb"))
     add_figure('RA_errors','RA','errors')
     plt.plot(RA,ra_error)
     plt.savefig(initial_folder + '/Ra_const_errors1.png')

@@ -47,7 +47,7 @@ spine_type="mouse_spine"
 
 CM=1#2/2
 RM=14000#5684*2#*2
-RA=10
+RA=100
 
 print('the injection current is',I,flush=True)
 
@@ -97,7 +97,8 @@ def plot_res(RM, RA, CM, save_name= "fit",print_full_graph=False):
     npVec = npVec[:len(exp_V)]
     error_1 = np.sqrt(np.sum(np.power(np.mean(exp_V[:start]) - np.mean(npVec[:start]), 2)))  # error from mean rest
     error_2 = np.sqrt(np.sum(np.power(exp_V[start_fit:end_fit] - npVec[start_fit:end_fit], 2))/(end_fit-start_fit))  #  error for the decay
-    error_3 = np.sqrt(np.sum(np.power(np.mean(exp_V[end_fit-800:end_fit]) - np.mean(npVec[end_fit-800:end_fit]), 2)))  # error for maximal voltage
+    error_3 = np.sqrt(np.sum(np.power(np.mean(exp_V[max2fit-1200:max2fit]) - np.mean(npVec[max2fit-1200:max2fit]), 2)))  # error for maximal voltage
+    # error_3 = np.sqrt(np.sum(np.power(np.mean(exp_V[end_fit:end_fit+1500]) - np.mean(npVec[end_fit:end_fit+1500]), 2)))  # error for maximal voltage
     error_tot = np.sqrt(np.sum(np.power(exp_V - npVec, 2))/len(exp_V)) # mean square error
 
     print('error_total=',round(error_tot,3))
@@ -105,17 +106,20 @@ def plot_res(RM, RA, CM, save_name= "fit",print_full_graph=False):
     print('error_mean_max_voltage=', round(error_3,3))
     print('error_from_rest=', round(error_1,3))
     if print_full_graph:
-        add_figure('fit'+str(I)+'pA part ['+str(start_fit)+':'+str(end_fit)+']',short_pulse[0].units,short_pulse[0].units)
-        plt.plot(T, V, color = 'k') #plot short_pulse data
-        plt.plot(T[start_fit:end_fit], V[start_fit:end_fit],color = 'green')
-        plt.plot(npTvec[:len(npVec)], npVec, color = 'r', linestyle ="--") #plot the recorded short_pulse
-        plt.suptitle('error from full graph='+str(round(error_tot,3))+' and eddor from decay='+str(round(error_2,3)))
-        plt.legend(['data','NEURON_sim','decay_to_fitting'])
+        add_figure(cell_name+": RM="+str(round(RM,1))+",RA="+str(round(RA,1))+",CM="+str(round(CM,2)),short_pulse[0].units,short_pulse[1].units)
+        plt.plot(T, V, color = 'k',label='data') #plot short_pulse data
+        plt.plot(T[start_fit:end_fit], V[start_fit:end_fit],color = 'green',label='decay_to_fit')
+        # plt.plot(T[end_fit:end_fit+1500], V[end_fit:end_fit+1500],color = 'yellow',label='maxV_to_fit')
+        plt.plot(T[max2fit-1200:max2fit], V[max2fit-1200:max2fit],color = 'yellow',label='maxV_to_fit')
+
+        plt.plot(npTvec[:len(npVec)], npVec, color = 'r', linestyle ="--",label='NEURON_sim') #plot the recorded short_pulse
+        plt.suptitle('ERROR: full graph='+str(round(error_tot,3))+' decay='+str(round(error_2,3))+' maxV='+str(round(error_3,3)))
+        plt.legend()
         plt.savefig(save_folder+'/'+save_name+"_full_graph.pdf")
         plt.savefig(save_folder+'/'+save_name+"_full_graph.png")
-
+        plt.show()
         plt.close()
-    return save_folder
+    return error_2 ,error_2 + error_3
 
 def efun(vals):
     #check the fitting
@@ -159,8 +163,8 @@ def efun(vals):
 
     error_1 = np.sqrt(np.sum(np.power(np.mean(exp_V[:start_fit]) - np.mean(npVec[:start_fit]), 2)))  # error from mean rest
     error_2 = np.sqrt(np.sum(np.power(exp_V[start_fit:end_fit] - npVec[start_fit:end_fit], 2))) #/(end_fit-start_fit)  #  error for the decay
-    error_3 = np.sqrt(np.sum(np.power(np.mean(exp_V[end_fit-800:end_fit]) - np.mean(npVec[end_fit-800:end_fit]), 2)))  # error for maximal voltage
-
+    # error_3 = np.sqrt(np.sum(np.power(np.mean(exp_V[end_fit:end_fit+1500]) - np.mean(npVec[end_fit:end_fit+1500]), 2)))  # error for maximal voltage
+    error_3 = np.sqrt(np.sum(np.power(np.mean(exp_V[max2fit-1200:max2fit]) - np.mean(npVec[max2fit-1200:max2fit]), 2)))  # error for maximal voltage
     return error_2 + (end_fit-start_fit)*error_3
 
 
@@ -215,7 +219,9 @@ hz=0.1 #moria
 start,end=find_injection(V,E_PAS,duration=int(200/hz))
 # start+=add2start
 start_fit= start-100#2000   #moria
-end_fit=end-1500#4900#3960  #moria
+end_fit=end-1200#4900#3960  #moria
+max2fit=end-10
+
 clamp.delay = T[start]#296
 clamp.dur =T[end]-T[start]# 200 #end-start
 E_PAS=short_pulse_dict['E_pas'] #np.mean(V[:start]) #or read it from the pickle
@@ -286,7 +292,7 @@ for i in range(3):
     if i==2:
         plot_res(CM=CM, RM=RM, RA=RA, save_name="_fit_after_" + str(i + 1), print_full_graph=True)
     else:
-        save_folder=plot_res(CM=CM, RM=RM, RA=RA, save_name="_fit_after_" + str(i + 1))
+        plot_res(CM=CM, RM=RM, RA=RA, save_name="_fit_after_" + str(i + 1))
 
     # imp.compute(0)
     # print('the impadence is',imp.input(0))
@@ -297,7 +303,6 @@ pickle.dump({
         "error" :RMSD
     }, open(save_folder+'/' + "final_result_dend*"+str(resize_diam_by)+".p", "wb"))
 #
-
 
 
 

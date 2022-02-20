@@ -103,7 +103,7 @@ def plot_res(RM, RA, CM, save_name= "fit",print_full_graph=False):
     npVec = npVec[:len(exp_V)]
     error_1 = np.sqrt(np.sum(np.power(np.mean(exp_V[:start]) - np.mean(npVec[:start]), 2)))  # error from mean rest
     error_2 = np.sqrt(np.sum(np.power(exp_V[start_fit:end_fit] - npVec[start_fit:end_fit], 2))/(end_fit-start_fit))  #  error for the decay
-    error_3 = np.sqrt(np.sum(np.power(np.mean(exp_V[end_fit-800:end_fit]) - np.mean(npVec[end_fit-800:end_fit]), 2)))  # error for maximal voltage
+    error_3 = np.sqrt(np.sum(np.power(np.mean(exp_V[max2fit-1200:max2fit]) - np.mean(npVec[max2fit-1200:max2fit]), 2)))  # error for maximal voltage
     error_tot = np.sqrt(np.sum(np.power(exp_V - npVec, 2))/len(exp_V)) # mean square error
 
     print('error_total=',round(error_tot,3))
@@ -111,12 +111,15 @@ def plot_res(RM, RA, CM, save_name= "fit",print_full_graph=False):
     print('error_mean_max_voltage=', round(error_3,3))
     print('error_from_rest=', round(error_1,3))
     if print_full_graph:
-        add_figure('fit with delay='+str(add2start)+'_add2fit='+str(add2start2)+'\npart['+str(start_fit)+':'+str(end_fit)+']',short_pulse[0].units,short_pulse[0].units)
-        plt.plot(T, V, color = 'k') #plot short_pulse data
-        plt.plot(T[start_fit:end_fit], V[start_fit:end_fit],color = 'green')
-        plt.plot(npTvec[:len(npVec)], npVec, color = 'r', linestyle ="--") #plot the recorded short_pulse
-        plt.suptitle('error from full graph='+str(round(error_tot,3))+' and eddor from decay='+str(round(error_2,3)))
-        plt.legend(['data','NEURON_sim','decay_to_fitting'])
+        add_figure(cell_name+": RM="+str(round(RM,1))+",RA="+str(round(RA,1))+",CM="+str(round(CM,2)),short_pulse[0].units,short_pulse[1].units)
+        plt.plot(T, V, color = 'k',label='data') #plot short_pulse data
+        plt.plot(T[start_fit:end_fit], V[start_fit:end_fit],color = 'green',label='decay_to_fit')
+        # plt.plot(T[end_fit:end_fit+1500], V[end_fit:end_fit+1500],color = 'yellow',label='maxV_to_fit')
+        plt.plot(T[max2fit-1200:max2fit], V[max2fit-1200:max2fit],color = 'yellow',label='maxV_to_fit')
+        plt.plot(npTvec[:len(npVec)], npVec, color = 'r', linestyle ="--",label='NEURON_sim') #plot the recorded short_pulse
+        plt.suptitle('ERROR: full graph='+str(round(error_tot,3))+' decay='+str(round(error_2,3))+' maxV='+str(round(error_3,3)))
+        plt.legend()
+
         plt.savefig(save_folder+'/'+save_name+"_full_graph.pdf")
         plt.savefig(save_folder+'/'+save_name+"_full_graph.png")
 
@@ -165,7 +168,7 @@ def efun(vals):
 
     error_1 = np.sqrt(np.sum(np.power(np.mean(exp_V[:start_fit]) - np.mean(npVec[:start_fit]), 2)))  # error from mean rest
     error_2 = np.sqrt(np.sum(np.power(exp_V[start_fit:end_fit] - npVec[start_fit:end_fit], 2))) #/(end_fit-start_fit)  #  error for the decay
-    error_3 = np.sqrt(np.sum(np.power(np.mean(exp_V[end_fit-800:end_fit]) - np.mean(npVec[end_fit-800:end_fit]), 2)))  # error for maximal voltage
+    error_3 = np.sqrt(np.sum(np.power(np.mean(exp_V[max2fit-1200:max2fit]) - np.mean(npVec[max2fit-1200:max2fit]), 2)))  # error for maximal voltage
 
     return error_2 + (end_fit-start_fit)*error_3
 
@@ -219,7 +222,9 @@ from extra_fit_func import find_injection
 hz=0.1 #moria
 E_PAS=short_pulse_dict['E_pas'] #np.mean(V[:start]) #or read it from the pickle
 start,end=find_injection(V, E_PAS,duration=int(200/hz))
-start_fit= start+add2start2#2000   #moria
+start_fit= start-100+add2start2#2000   #moria
+end_fit=end-1500#4900#3960  #moria
+max2fit=end-10
 start+=add2start
 end_fit=end-1500#4900#3960  #moria
 clamp.delay = T[start]#296

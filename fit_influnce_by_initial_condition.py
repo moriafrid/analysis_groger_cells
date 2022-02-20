@@ -35,15 +35,16 @@ data_dir= "cells_initial_information/"
 save_dir ="cells_outputs_data/"
 print(folder_+save_dir+cell_name+'/data/electrophysio_records/short_pulse/mean_short_pulse_with_parameters.p')
 short_pulse_file=glob(folder_+save_dir+cell_name+'/data/electrophysio_records/short_pulse/mean_short_pulse_with_parameters.p')[0]
-
 print(folder_+data_dir+cell_name+'/*'+file_type)
 cell_file=glob(folder_+data_dir+cell_name+'/*'+file_type)[0]
-initial_folder=folder_+save_dir+cell_name+'/fit_short_pulse_'+file_type+'/'
+
+save_folder=folder_+save_dir+cell_name+'/fit_short_pulse_'+file_type+'/'
 # initial_folder+=spine_type
-initial_folder+="/dend*"+str(round(resize_diam_by,2))+'&F_shrinkage='+str(round(shrinkage_factor,2))
-initial_folder+="/different_initial_conditions/"
-create_folder_dirr(initial_folder)
+save_folder+="/dend*"+str(round(resize_diam_by,2))+'&F_shrinkage='+str(round(shrinkage_factor,2))
+save_folder+="/different_initial_conditions/"
+create_folder_dirr(save_folder)
 signal.signal(signal.SIGSEGV, SIGSEGV_signal_arises)
+
 
 def change_model_pas(CM=1, RA = 250, RM = 20000.0, E_PAS = -70.0):
    h.dt = 0.1
@@ -58,35 +59,98 @@ def change_model_pas(CM=1, RA = 250, RM = 20000.0, E_PAS = -70.0):
            if h.distance(seg) > SPINE_START:
                seg.cm *= F_factor
                seg.g_pas *= F_factor
-
-def plot_res(RM, RA, CM, save_folder="data/fit/",save_name= "fit",print_full_graph=False):
+def plot_res(RM, RA, CM, save_name= "fit",print_full_graph=False):
+    create_folder_dirr(save_folder)
+    # creat a clamp and record it for the chosen parameter
+    ## save_name need to incloud the folder path
     change_model_pas(CM=CM, RA=RA, RM=RM, E_PAS = E_PAS)
-    Vvec = h.Vector()
-    Tvec = h.Vector()
-    Vvec.record(soma(0.5)._ref_v)
-    Tvec.record(h._ref_t)
+    Vvec = h.Vector() #cerat vector to record on it
+    Tvec = h.Vector() #cerat vector to record on it
+    Vvec.record(soma(0.5)._ref_v) #where to recprd
+    Tvec.record(h._ref_t) #when it record
     h.cvode.store_events(Vvec)
+
     h.run()
     npTvec = np.array(Tvec)
     npVec = np.array(Vvec)
-    add_figure("fit "+save_folder.split('/')[-1]+"\nRM="+str(round(RM,1))+",RA="+str(round(RA,1))+",CM="+str(round(CM,2)),'mS','mV')
-    plt.plot(T[start_fit:end_fit], V[start_fit:end_fit], color = 'green')
-    plt.plot(npTvec[start_fit:end_fit], npVec[start_fit:end_fit], color = 'r', linestyle ="--")
+    add_figure(cell_name+" fit "+str(I)+"pA\nRM="+str(round(RM,1))+",RA="+str(round(RA,1))+",CM="+str(round(CM,2)),'mS','mV')
+    plt.plot(npTvec[start_fit:end_fit], npVec[start_fit:end_fit], color = 'r', linestyle ="--") #plot the recorded short_pulse
+    plt.plot(T[start_fit:end_fit], V[start_fit:end_fit],color = 'green')
+    plt.plot(npTvec[start_fit:end_fit], npVec[start_fit:end_fit], color = 'r', linestyle ="--") #plot the recorded short_pulse
+
     plt.legend(['NEURON_sim','decay_to_fitting'])
     plt.savefig(save_folder+'/'+save_name+"_decay.png")
     plt.close()
-    exp_V = V
-    npVec = npVec
+    exp_V = V#[int(180.0 / h.dt):int(800.0 / h.dt)]
+    npVec = npVec#[int(180.0 / h.dt):int(800.0 / h.dt)]
     npVec = npVec[:len(exp_V)]
     error_1 = np.sqrt(np.sum(np.power(np.mean(exp_V[:start]) - np.mean(npVec[:start]), 2)))  # error from mean rest
     error_2 = np.sqrt(np.sum(np.power(exp_V[start_fit:end_fit] - npVec[start_fit:end_fit], 2))/(end_fit-start_fit))  #  error for the decay
-    error_3 = np.sqrt(np.sum(np.power(np.mean(exp_V[end_fit-800:end_fit]) - np.mean(npVec[end_fit-800:end_fit]), 2)))  # error for maximal voltage
+    error_3 = np.sqrt(np.sum(np.power(np.mean(exp_V[max2fit-1200:max2fit]) - np.mean(npVec[max2fit-1200:max2fit]), 2)))  # error for maximal voltage
+    # error_3 = np.sqrt(np.sum(np.power(np.mean(exp_V[end_fit:end_fit+1500]) - np.mean(npVec[end_fit:end_fit+1500]), 2)))  # error for maximal voltage
     error_tot = np.sqrt(np.sum(np.power(exp_V - npVec, 2))/len(exp_V)) # mean square error
+
     print('error_total=',round(error_tot,3))
     print('error_decay=', round(error_2,3))
     print('error_mean_max_voltage=', round(error_3,3))
     print('error_from_rest=', round(error_1,3))
-    return error_2, (error_2 + error_3*10)/11
+    if print_full_graph:
+        add_figure(cell_name+": RM="+str(round(RM,1))+",RA="+str(round(RA,1))+",CM="+str(round(CM,2)),short_pulse[0].units,'ms')
+        plt.plot(T, V, color = 'k',label='data') #plot short_pulse data
+        plt.plot(T[start_fit:end_fit], V[start_fit:end_fit],color = 'green',label='decay_to_fit')
+        # plt.plot(T[end_fit:end_fit+1500], V[end_fit:end_fit+1500],color = 'yellow',label='maxV_to_fit')
+        plt.plot(T[max2fit-1200:max2fit], V[max2fit-1200:max2fit],color = 'yellow',label='maxV_to_fit')
+
+        plt.plot(npTvec[:len(npVec)], npVec, color = 'r', linestyle ="--",label='NEURON_sim') #plot the recorded short_pulse
+        plt.suptitle('ERROR: full graph='+str(round(error_tot,3))+' decay='+str(round(error_2,3))+' maxV='+str(round(error_3,3)))
+        plt.legend()
+        plt.savefig(save_folder+'/'+save_name+"_full_graph.pdf")
+        plt.savefig(save_folder+'/'+save_name+"_full_graph.png")
+        plt.show()
+        plt.close()
+    return error_2 ,error_2 + error_3
+# def plot_res(RM, RA, CM, save_folder="data/fit/",save_name= "fit",print_full_graph=False):
+#     change_model_pas(CM=CM, RA=RA, RM=RM, E_PAS = E_PAS)
+#     Vvec = h.Vector()
+#     Tvec = h.Vector()
+#     Vvec.record(soma(0.5)._ref_v)
+#     Tvec.record(h._ref_t)
+#     h.cvode.store_events(Vvec)
+#     h.run()
+#     npTvec = np.array(Tvec)
+#     npVec = np.array(Vvec)
+#     add_figure("fit "+save_folder.split('/')[-1]+"\nRM="+str(round(RM,1))+",RA="+str(round(RA,1))+",CM="+str(round(CM,2)),'mS','mV')
+#     plt.plot(T[start_fit:end_fit], V[start_fit:end_fit], color = 'green')
+#     plt.plot(npTvec[start_fit:end_fit], npVec[start_fit:end_fit], color = 'r', linestyle ="--")
+#     plt.legend(['NEURON_sim','decay_to_fitting'])
+#     plt.savefig(save_folder+'/'+save_name+"_decay.png")
+#     plt.close()
+#     exp_V = V
+#     npVec = npVec
+#     npVec = npVec[:len(exp_V)]
+#     error_1 = np.sqrt(np.sum(np.power(np.mean(exp_V[:start]) - np.mean(npVec[:start]), 2)))  # error from mean rest
+#     error_2 = np.sqrt(np.sum(np.power(exp_V[start_fit:end_fit] - npVec[start_fit:end_fit], 2))/(end_fit-start_fit))  #  error for the decay
+#     error_3 = np.sqrt(np.sum(np.power(np.mean(exp_V[max2fit-1200:max2fit]) - np.mean(npVec[max2fit-1200:max2fit]), 2)))  # error for maximal voltage
+#     error_tot = np.sqrt(np.sum(np.power(exp_V - npVec, 2))/len(exp_V)) # mean square error
+#     print('error_total=',round(error_tot,3))
+#     print('error_decay=', round(error_2,3))
+#     print('error_mean_max_voltage=', round(error_3,3))
+#     print('error_from_rest=', round(error_1,3))
+#     if print_full_graph:
+#         add_figure(cell_name+": RM="+str(round(RM,1))+",RA="+str(round(RA,1))+",CM="+str(round(CM,2)),short_pulse[0].units,short_pulse[1].units)
+#         plt.plot(T, V, color = 'k',label='data') #plot short_pulse data
+#         plt.plot(T[start_fit:end_fit], V[start_fit:end_fit],color = 'green',label='decay_to_fit')
+#         # plt.plot(T[end_fit:end_fit+1500], V[end_fit:end_fit+1500],color = 'yellow',label='maxV_to_fit')
+#         plt.plot(T[max2fit-1200:max2fit], V[max2fit-1200:max2fit],color = 'yellow',label='maxV_to_fit')
+#
+#         plt.plot(npTvec[:len(npVec)], npVec, color = 'r', linestyle ="--",label='NEURON_sim') #plot the recorded short_pulse
+#         plt.suptitle('ERROR: full graph='+str(round(error_tot,3))+' decay='+str(round(error_2,3))+' maxV='+str(round(error_3,3)))
+#         plt.legend()
+#         plt.savefig(save_folder+'/'+save_name+"_full_graph.pdf")
+#         plt.savefig(save_folder+'/'+save_name+"_full_graph.png")
+#         plt.show()
+#         plt.close()
+#     return error_2 ,error_2 + error_3
 
 def efun(vals):
    #check the fitting
@@ -126,12 +190,9 @@ def efun(vals):
    npVec = npVec #[int(180.0/h.dt):int(800.0/h.dt)]
    npVec = npVec[:len(exp_V)]
    error_tot = np.sqrt(np.sum(np.power(exp_V - npVec, 2)))#/len(exp_V)) # mean square error
-
-
    error_1 = np.sqrt(np.sum(np.power(np.mean(exp_V[:start_fit]) - np.mean(npVec[:start_fit]), 2)))  # error from mean rest
    error_2 = np.sqrt(np.sum(np.power(exp_V[start_fit:end_fit] - npVec[start_fit:end_fit], 2))) #/(end_fit-start_fit)  #  error for the decay
-   error_3 = np.sqrt(np.sum(np.power(np.mean(exp_V[end_fit-800:end_fit]) - np.mean(npVec[end_fit-800:end_fit]), 2)))  # error for maximal voltage
-
+   error_3 = np.sqrt(np.sum(np.power(np.mean(exp_V[max2fit-1200:max2fit]) - np.mean(npVec[max2fit-1200:max2fit]), 2)))  # error for maximal voltage
    return error_2 + (end_fit-start_fit)*error_3
 
 
@@ -141,7 +202,7 @@ def fit2short_pulse(cell,short_pulse,folder="",CM=1,RM=10000,RA=100):
     opt_vals.x[RA_IX] = RA
     opt_vals.x[CM_IX] = CM
     change_model_pas(CM=CM, RA=RA, RM=RM, E_PAS=E_PAS)
-    plot_res(CM=CM, RM=RM, RA=RA,save_folder=folder, save_name=" before")
+    plot_res(CM=CM, RM=RM, RA=RA, save_name=" before")
     for i in range(3):
         RMSD = h.fit_praxis(efun,opt_vals)   #@# take too much time if the fitting isn't found
         RM = opt_vals.x[RM_IX]
@@ -149,14 +210,18 @@ def fit2short_pulse(cell,short_pulse,folder="",CM=1,RM=10000,RA=100):
         CM = opt_vals.x[CM_IX]
 
         print("RMSD", RMSD,", RM",  RM, ", RA",  RA, ", CM",  CM)
-        error2,precent_error=plot_res(CM=CM, RM=RM, RA=RA, save_folder=folder,save_name="_fit_after_" + str(i + 1))
+    if i==2:
+        error2,precent_error=plot_res(CM=CM, RM=RM, RA=RA, save_name="_fit_after_" + str(i + 1), print_full_graph=True)
+    else:
+        plot_res(CM=CM, RM=RM, RA=RA, save_name="_fit_after_" + str(i + 1))
+
     pickle.dump({
         "RM": RM,
         "RA": RA,
         "CM": CM,
         "error":[RMSD,error2,precent_error]
     }, open(folder+"/fit_result.p", "wb"))
-    return {"CM": CM,"RM": RM,"RA": RA,"error":[error2,precent_error,RMSD]}
+    return {"CM": CM,"RM": RM,"RA": RA,"error":{'errors_from_decay':error2,'total_error':precent_error,'RMSD':RMSD} }
 if __name__=='__main__':
     I = -50 #pA
     hz=0.1
@@ -195,14 +260,15 @@ if __name__=='__main__':
     SPINE_START = 60
 
     start,end=find_injection(V,E_PAS,duration=int(200/hz))
+    start_fit= start-100#2000   #moria
+    end_fit=end-1500#4900#3960  #moria
+    max2fit=end-10
     # start+=add2start
     soma=cell.soma
     clamp = h.IClamp(soma(0.5)) # insert clamp(constant potentientiol) at the soma's center
     clamp.amp = I/1000 #pA
     clamp.delay = T[start]#296
     clamp.dur =T[end]-T[start]# 200 #end-start
-    start_fit= start#2000   #moria
-    end_fit=end-100#4900#3960  #moria
     h.tstop = (T[-1]-T[0])
     h.v_init=E_PAS
     h.dt = hz
@@ -221,7 +287,7 @@ if __name__=='__main__':
     RM = 5684*2  # *2
     RA = 100
 
-    ra_folder = initial_folder + "/RA0_50:100:0.5"
+    ra_folder = save_folder + "/RA0_50:100:0.5"
     create_folders_list([ra_folder])
     RAs = np.arange(50,100,0.5)
     solution_RA0={}
@@ -231,7 +297,7 @@ if __name__=='__main__':
         solution_RA0["RA0=" + str(ra)] = fit2short_pulse(cell, short_pulse, folder=folder, CM=CM, RM=RM, RA=ra)
         pickle.dump(solution_RA0, open(ra_folder + "/RA0_fit_results.p", "wb"))
 
-    ra_folder = initial_folder + "/RA0_100:300:2"
+    ra_folder = save_folder + "/RA0_100:300:2"
     create_folders_list([ra_folder])
     RAs = np.arange(100,300,2.)
     solution_RA0={}
@@ -240,7 +306,7 @@ if __name__=='__main__':
         create_folders_list([folder])
         solution_RA0["RA0=" + str(ra)] = fit2short_pulse(cell, short_pulse, folder=folder, CM=CM, RM=RM, RA=ra)
         pickle.dump(solution_RA0, open(ra_folder + "/RA0_fit_results.p", "wb"))
-    # cm_folder = initial_folder+"/CM0"
+    # cm_folder = save_folder+"/CM0"
     # try:os.mkdir(cm_folder)
     # except FileExistsError:pass
     # CMs=[0.5,0.8,1,1.2,1.4,1.8,2,2.5,3]
@@ -252,7 +318,7 @@ if __name__=='__main__':
     #     solution_CM0["CM0="+str(cm)]=fit2short_pulse(cell,short_pulse,folder=folder,CM=cm,RM=RM,RA=RA)
     # pickle.dump(solution_CM0 , open(cm_folder+"/CM0_fit_results.p", "wb"))
 
-    # rm_folder = initial_folder+"/RM0"
+    # rm_folder = save_folder+"/RM0"
     # try:os.mkdir(rm_folder)
     # except FileExistsError:pass
     # RMs=[5000,10000,15000,20000,25000,30000,50000,80000]
