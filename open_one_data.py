@@ -143,6 +143,12 @@ def phenomena(t1,t2,T,base,x_units='S',Y_units='mV'):
 			plt.plot(x,y)
 		plt.savefig(base + name+'.pdf')
 		plt.close()
+	for y_phen,x,name in zip([syn,short_pulse,spike],[T_syn,T_short_pulse,T_spike],['syn/syn','short_pulse/short_pulse','spike/spike']):
+		add_figure('data aftre rest correction','ms','mV')
+		for y in y_phen:
+			plt.plot(x,y)
+		plt.savefig(base + name+'-rest.pdf')
+		plt.close()
 	with open(base + '/V1/V.p', 'wb') as f:
 		pickle.dump( [V,T], f)
 	with open(base+'/syn/syn.p', 'wb') as f:

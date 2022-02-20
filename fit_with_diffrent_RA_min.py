@@ -1,4 +1,3 @@
-'3'
 import signal
 from neuron import h, gui
 import numpy as np
@@ -13,18 +12,21 @@ from extra_function import load_ASC,load_hoc,SIGSEGV_signal_arises,create_folder
 import sys
 
 signal.signal(signal.SIGSEGV, SIGSEGV_signal_arises)
-if len(sys.argv) != 6:
+if len(sys.argv) != 7:
     cell_name= '2017_05_08_A_4-5'
     file_type='hoc'
     resize_diam_by=1.0
     shrinkage_factor=1.0
+    RA_min=1
     folder_='/ems/elsc-labs/segev-i/moria.fridman/project/analysis_groger_cells/'
 else:
     cell_name = sys.argv[1]
     file_type=sys.argv[2] #hoc ar ASC
     resize_diam_by = float(sys.argv[3]) #how much the cell sweel during the electrophisiology records
     shrinkage_factor =float(sys.argv[4]) #how much srinkage the cell get between electrophysiology record and LM
-    folder_= sys.argv[5] #'/ems/elsc-labs/segev-i/moria.fridman/project/analysis_groger_cells/cells_outputs_data'
+    RA_min=int(sys.argv[5])
+    folder_= sys.argv[6] #'/ems/elsc-labs/segev-i/moria.fridman/project/analysis_groger_cells/cells_outputs_data'
+print(sys.argv,len(sys.argv),flush=True)
 # path_single_traces=glob('data/traces_img/2017_05_08_A_0006/*pA.p')
 # path=path_single_traces[0]
 # I=int(path[path.rfind('/')+1:path.rfind('pA')])
@@ -34,10 +36,11 @@ save_dir ="cells_outputs_data/"
 path_short_pulse=glob(folder_+save_dir+cell_name+'/data/electrophysio_records/short_pulse/mean_short_pulse_with_parameters.p')[0]
 cell_file=glob(folder_+data_dir+cell_name+'/*'+file_type)[0]
 save_folder=folder_+save_dir+cell_name+'/fit_short_pulse_'+file_type+'/'
-
 I=-50
 # save_folder+=str(I)+'pA/'
-save_folder+='dend*'+str(round(resize_diam_by,2))+'&F_shrinkage='+str(round(shrinkage_factor,2))+'/basic_fit'
+save_folder+='dend*'+str(round(resize_diam_by,2))+'&F_shrinkage='+str(round(shrinkage_factor,2))+'/basic_fit/Ra_min='+str(RA_min)
+create_folder_dirr(save_folder)
+
 do_calculate_F_factor=True
 
 SPINE_START = 60
@@ -47,7 +50,7 @@ spine_type="mouse_spine"
 
 CM=1#2/2
 RM=14000#5684*2#*2
-RA=10
+RA=150
 
 print('the injection current is',I,flush=True)
 
@@ -71,7 +74,7 @@ def change_model_pas(CM=1, RA = 250, RM = 20000.0, E_PAS = -70.0):
 
 ## e_pas is the equilibrium potential of the passive current
 def plot_res(RM, RA, CM, save_name= "fit",print_full_graph=False):
-    create_folder_dirr(save_folder)
+
     # creat a clamp and record it for the chosen parameter
     ## save_name need to incloud the folder path
     change_model_pas(CM=CM, RA=RA, RM=RM, E_PAS = E_PAS)
@@ -84,7 +87,7 @@ def plot_res(RM, RA, CM, save_name= "fit",print_full_graph=False):
     h.run()
     npTvec = np.array(Tvec)
     npVec = np.array(Vvec)
-    add_figure(cell_name+" fit "+str(I)+"pA\nRM="+str(round(RM,1))+",RA="+str(round(RA,1))+",CM="+str(round(CM,2)),'mS','mV')
+    add_figure(cell_name+" fit "+'RA_min='+str(RA_min)+"\nRM="+str(round(RM,1))+",RA="+str(round(RA,1))+",CM="+str(round(CM,2)),'mS','mV')
     plt.plot(npTvec[start_fit:end_fit], npVec[start_fit:end_fit], color = 'r', linestyle ="--") #plot the recorded short_pulse
     plt.plot(T[start_fit:end_fit], V[start_fit:end_fit],color = 'green')
     plt.plot(npTvec[start_fit:end_fit], npVec[start_fit:end_fit], color = 'r', linestyle ="--") #plot the recorded short_pulse
@@ -105,7 +108,7 @@ def plot_res(RM, RA, CM, save_name= "fit",print_full_graph=False):
     print('error_mean_max_voltage=', round(error_3,3))
     print('error_from_rest=', round(error_1,3))
     if print_full_graph:
-        add_figure('fit'+str(I)+'pA part ['+str(start_fit)+':'+str(end_fit)+']',short_pulse[0].units,short_pulse[0].units)
+        add_figure('fit with RA_min='+str(RA_min)+'\npart['+str(start_fit)+':'+str(end_fit)+']',short_pulse[0].units,short_pulse[0].units)
         plt.plot(T, V, color = 'k') #plot short_pulse data
         plt.plot(T[start_fit:end_fit], V[start_fit:end_fit],color = 'green')
         plt.plot(npTvec[:len(npVec)], npVec, color = 'r', linestyle ="--") #plot the recorded short_pulse
@@ -140,7 +143,7 @@ def efun(vals):
             return (1e6)
         RA = vals.x[RA_IX]
     else:RA = RA_const
-    if (CM < 0.3 or RM < 2000 or RA <1):
+    if (CM < 0.3 or RM < 2000 or RA <RA_min):
         return 1e6
     # print('RA:',RA, '   CM:',CM, '   RM:',RM)
 
@@ -203,7 +206,6 @@ short_pulse_dict = read_from_pickle(path_short_pulse)
 short_pulse=short_pulse_dict['mean']
 V = np.array(short_pulse[0])
 short_pulse[1]=short_pulse[1].rescale('ms')
-E_PAS=short_pulse_dict['E_pas']#np.mean(V[:start]) #or read it from the pickle
 T = np.array(short_pulse[1])
 T = T-T[0]
 T=T
@@ -212,13 +214,12 @@ clamp = h.IClamp(soma(0.5)) # insert clamp(constant potentientiol) at the soma's
 clamp.amp = I/1000#-0.05 ## supopsed to be 0.05nA
 from extra_fit_func import find_injection
 hz=0.1 #moria
-start,end=find_injection(V,E_PAS,duration=int(200/hz))
-# start+=add2start
+E_PAS=short_pulse_dict['E_pas'] #np.mean(V[:start]) #or read it from the pickle
+start,end=find_injection(V, E_PAS,duration=int(200/hz))
 start_fit= start-100#2000   #moria
 end_fit=end-1500#4900#3960  #moria
 clamp.delay = T[start]#296
 clamp.dur =T[end]-T[start]# 200 #end-start
-E_PAS=short_pulse_dict['E_pas'] #np.mean(V[:start]) #or read it from the pickle
 
 # if path in path_single_traces:
 #     start_inj=10500
@@ -298,7 +299,8 @@ pickle.dump({
     }, open(save_folder+'/' + "final_result_dend*"+str(resize_diam_by)+".p", "wb"))
 #
 
-
+# from analysis_fit_after_run import analysis_fit
+# anlysis_fit(save_folder)
 
 
 

@@ -9,10 +9,10 @@ resize_diam_by=str(1)
 shrinkage_factor=str(1)
 for cell_name in cells:
     for file_type in ['hoc','ASC']:
-        command="sbatch execute_initial_condition.sh"
-        send_command = " ".join([command, cell_name,file_type,resize_diam_by,shrinkage_factor,folder_])
-        os.system(send_command)
-        print(cell_name+ ' .'+file_type+': fit_influance_by_initial_condition.py')
+        # command="sbatch execute_initial_condition.sh"
+        # send_command = " ".join([command, cell_name,file_type,resize_diam_by,shrinkage_factor,folder_])
+        # os.system(send_command)
+        # print(cell_name+ ' .'+file_type+': fit_influance_by_initial_condition.py')
         command="sbatch execute_const_param.sh"
         send_command = " ".join([command, cell_name,file_type,resize_diam_by,shrinkage_factor,folder_])
         os.system(send_command)
