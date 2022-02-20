@@ -34,37 +34,44 @@ datas2=glob(location+'/*/final_result*.p')
 def analysis_fit(location):
     save_folder=location+'/analysis'
     create_folders_list([save_folder])
-    errors,RAs,RMs,CMs,name=[],[],[],[],[]
+    errors,RAs,RMs,CMs,names,diffrent_condition=[],[],[],[],[],[]
+
     for dirr in glob(location+'/*/*final*.p'):
         dict=read_from_pickle(dirr)
         errors.append(dict['error'])
         RAs.append(dict['RA'])
         RMs.append(dict['RM'])
         CMs.append(dict['CM'])
-        name.append(dirr.splite('/')[-2])
-    add_figure('diffrent RA against error\n'+loc.split('/')[-1],'RA','errors')
+        text=dirr.split('/')[-2]
+        names.append(text)
+        diffrent_condition.append(int(text.split('=')[-1]))
+    condition=text.split('=')[-2]
+    minimums_arg = np.argsort(errors)
+    dict_minimums={}
+    add_figure('diffrent RA against error\n'+dirr.split('/')[-3],'RA','errors')
     plt.plot(RAs,errors,'.')
     for mini in minimums_arg[:10]:
         plt.plot(RAs[mini], errors[mini], '*',
                  label=' RM=' + str(round(RMs[mini], 2)) + ' RA=' + str(
                      round(RAs[mini], 2)) + ' CM=' + str(
-                     round(CMs[mini], 2)) +' RA0=' + str(RA0[mini])+ ' error=' +  str(round(errors[mini]*100, 3)) )
+                     round(CMs[mini], 2)) +' '+names[mini]+ ' error=' +  str(round(errors[mini]*100, 3)) )
     plt.legend(loc='upper left')
     plt.savefig(save_folder+'/diffrent RA against error.png')
 
-    add_figure('diffrent RA0 against CM\n'+loc.split('/')[-1],'RA0','CM')
-    plt.plot(RA0,CMs)
-    plt.savefig(save_folder+'/diffrent RA0 against CM.png')
-    add_figure('diffrent RA0 against RA after fit\n'+loc.split('/')[-1],'RA0','RA')
-    plt.plot(RA0,RAs)
-    plt.savefig(save_folder+'/diffrent RA0 against RA after fit.png')
-    add_figure('diffrent RA0 against RM\n'+loc.split('/')[-1],'RA0','RM')
-    plt.plot(RA0,RMs)
-    plt.savefig(save_folder+'/diffrent RA0 against RM.png')
-    pickle.dump(dict_minimums, open(save_folder + "/RA0_10_minimums.p", "wb"))
+    add_figure('diffrent '+condition+' against CM\n'+dirr.split('/')[-1],'RA0','CM')
+    plt.plot(diffrent_condition,CMs,'.')
+    plt.savefig(save_folder+'/diffrent '+condition+' against CM.png')
+    add_figure('diffrent '+condition+' against RA after fit\n'+dirr.split('/')[-3],'RA0','RA')
+    plt.plot(diffrent_condition,RAs,'.')
+    plt.savefig(save_folder+'/diffrent '+condition+' against RA after fit.png')
+    add_figure('diffrent '+condition+' against RM\n'+dirr.split('/')[-3],'RA0','RM')
+    plt.plot(diffrent_condition,RMs,'.')
+    plt.savefig(save_folder+'/diffrent '+condition+' against RM.png')
+    pickle.dump(dict_minimums, open(save_folder + "/ "+condition+" _10_minimums.p", "wb"))
 
 if __name__ == '__main__':
     analysis_fit('/ems/elsc-labs/segev-i/moria.fridman/project/analysis_groger_cells/cells_outputs_data/2017_05_08_A_4-5/fit_short_pulse_ASC/dend*1.0&F_shrinkage=1.0/basic_fit')
+
     for loc in initial_locs:
         datas=glob(loc+'/different_initial_conditions/RA0*/RA0_fit_results.p')
         for data in datas:

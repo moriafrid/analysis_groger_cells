@@ -119,7 +119,7 @@ def plot_res(RM, RA, CM, save_name= "fit",print_full_graph=False):
         plt.savefig(save_folder+'/'+save_name+"_full_graph.pdf")
         plt.savefig(save_folder+'/'+save_name+"_full_graph.png")
         plt.close()
-    return save_folder
+    return error_2 ,error_2 + error_3
 
 def efun(vals):
     #check the fitting
@@ -286,9 +286,9 @@ for i in range(3):
 
     print("RMSD", RMSD,", RM",  RM, ", RA",  RA, ", CM",  CM)
     if i==2:
-        plot_res(CM=CM, RM=RM, RA=RA, save_name="_fit_after_" + str(i + 1), print_full_graph=True)
+        error_decay ,error_decy_and_max=plot_res(CM=CM, RM=RM, RA=RA, save_name="_fit_after_" + str(i + 1), print_full_graph=True)
     else:
-        save_folder=plot_res(CM=CM, RM=RM, RA=RA, save_name="_fit_after_" + str(i + 1))
+        plot_res(CM=CM, RM=RM, RA=RA, save_name="_fit_after_" + str(i + 1))
 
     # imp.compute(0)
     # print('the impadence is',imp.input(0))
@@ -296,7 +296,7 @@ pickle.dump({
         "RM": RM,
         "RA": RA,
         "CM": CM,
-        "error" :RMSD
+        "error" :{'decay':error_decay,'decay&max':error_decy_and_max}
     }, open(save_folder+'/' + "final_result_dend*"+str(resize_diam_by)+".p", "wb"))
 #
 

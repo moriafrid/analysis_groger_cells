@@ -211,7 +211,7 @@ def fit2short_pulse(cell,short_pulse,folder="",CM=1,RM=10000,RA=100):
 
         print("RMSD", RMSD,", RM",  RM, ", RA",  RA, ", CM",  CM)
     if i==2:
-        error2,precent_error=plot_res(CM=CM, RM=RM, RA=RA, save_name="_fit_after_" + str(i + 1), print_full_graph=True)
+        error_decay,precent_error=plot_res(CM=CM, RM=RM, RA=RA, save_name="_fit_after_" + str(i + 1), print_full_graph=True)
     else:
         plot_res(CM=CM, RM=RM, RA=RA, save_name="_fit_after_" + str(i + 1))
 
@@ -219,9 +219,9 @@ def fit2short_pulse(cell,short_pulse,folder="",CM=1,RM=10000,RA=100):
         "RM": RM,
         "RA": RA,
         "CM": CM,
-        "error":[RMSD,error2,precent_error]
+        "error":{'decay':error_decay,'decay&max':precent_error}
     }, open(folder+"/fit_result.p", "wb"))
-    return {"CM": CM,"RM": RM,"RA": RA,"error":{'errors_from_decay':error2,'total_error':precent_error,'RMSD':RMSD} }
+    return {"CM": CM,"RM": RM,"RA": RA,"error":{'errors_from_decay':error_decay,'total_error':precent_error,'RMSD':RMSD} }
 if __name__=='__main__':
     I = -50 #pA
     hz=0.1

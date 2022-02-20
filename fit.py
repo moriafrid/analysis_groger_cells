@@ -290,7 +290,7 @@ for i in range(3):
 
     print("RMSD", RMSD,", RM",  RM, ", RA",  RA, ", CM",  CM)
     if i==2:
-        plot_res(CM=CM, RM=RM, RA=RA, save_name="_fit_after_" + str(i + 1), print_full_graph=True)
+        error_decay,precent_error=plot_res(CM=CM, RM=RM, RA=RA, save_name="_fit_after_" + str(i + 1), print_full_graph=True)
     else:
         plot_res(CM=CM, RM=RM, RA=RA, save_name="_fit_after_" + str(i + 1))
 
@@ -300,7 +300,7 @@ pickle.dump({
         "RM": RM,
         "RA": RA,
         "CM": CM,
-        "error" :RMSD
+        "error" :{'decay':error_decay,'decay&max':precent_error}
     }, open(save_folder+'/' + "final_result_dend*"+str(resize_diam_by)+".p", "wb"))
 #
 

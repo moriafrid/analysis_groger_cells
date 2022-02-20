@@ -68,17 +68,11 @@ def plot_res(RM, RA, CM, save_folder="data/fit/",save_name= "fit"):
     h.run()
     npTvec = np.array(Tvec)
     npVec = np.array(Vvec)
-    add_figure("fit "+save_folder.split('/')[-1]+"\nRM="+str(round(RM,1))+",RA="+str(round(RA,1))+",CM="+str(round(CM,2)),'mS','mV')
+    add_figure(cell_name+"fit "+save_folder.split('/')[-1]+"\nRM="+str(round(RM,1))+",RA="+str(round(RA,1))+",CM="+str(round(CM,2)),'mS','mV')
     plt.plot(T, V, color = 'black',alpha=0.3,label='data',lw=2)
     plt.plot(T[start_fit:end_fit], V[start_fit:end_fit], color = 'b',alpha=0.3,label='fit decay')
     plt.plot(T[max2fit-1200:max2fit], V[max2fit-1200:max2fit],color = 'yellow',label='fit maxV')
-
     plt.plot(npTvec, npVec, color = 'r', linestyle ="--",alpha=0.3,label='NEURON simulation')
-
-    plt.legend()
-    plt.savefig(save_folder+'/'+save_name+".png")
-    # plt.savefig(save_folder+'/'+save_name+".pdf")
-    plt.close()
 
 
     exp_V = V
@@ -94,6 +88,11 @@ def plot_res(RM, RA, CM, save_folder="data/fit/",save_name= "fit"):
     print('error_decay=', round(error_2,3))
     print('error_mean_max_voltage=', round(error_3,3))
     print('error_from_rest=', round(error_1,3))
+    plt.plot(T[0],exp_V[0],label='error='+str(error_2 ,error_2 + error_3))
+    plt.legend()
+    plt.savefig(save_folder+'/'+save_name+".png")
+    # plt.savefig(save_folder+'/'+save_name+".pdf")
+    plt.close()
     return error_2 ,error_2 + error_3
 def errors_Rinput(RM,RA,CM,E_PAS):
     change_model_pas(CM=CM, RA=RA, RM=RM, E_PAS = E_PAS)
@@ -216,7 +215,7 @@ if __name__=='__main__':
         precent_erors.append(precent_eror)
         ra_error_next.append(error_next)
         params_dict.append({'RM': RM, 'RA': ra, 'CM': CM})
-        pickle.dump({'RA':RA,'error':{'errors_from_decay':ra_error,'total_error':precent_erors},'params':params_dict}, open(initial_folder + '/Ra_const_errors200:300.p', "wb"))
+        pickle.dump({'RA':RA,'error':{'decay':ra_error,'decay&max':precent_erors},'params':params_dict}, open(initial_folder + '/Ra_const_errors200:300.p', "wb"))
     add_figure('RA_errors','RA','errors')
     plt.plot(RA,ra_error)
     plt.savefig(initial_folder + '/Ra_const_errors1.png')
