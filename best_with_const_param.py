@@ -12,6 +12,7 @@ import sys
 from glob import glob
 import signal
 import os
+from analysis_fit_after_run import analysis_fit
 # initial_folder = "data/fit/"
 do_calculate_F_factor=True
 spine_type="mouse_spine"
@@ -68,7 +69,7 @@ def plot_res(RM, RA, CM, save_folder="data/fit/",save_name= "fit"):
     h.run()
     npTvec = np.array(Tvec)
     npVec = np.array(Vvec)
-    add_figure(cell_name+"fit "+save_folder.split('/')[-1]+"\nRM="+str(round(RM,1))+",RA="+str(round(RA,1))+",CM="+str(round(CM,2)),'mS','mV')
+    add_figure(cell_name+" fit "+save_folder.split('/')[-2]+"\nRM="+str(round(RM,1))+",RA="+str(round(RA,1))+",CM="+str(round(CM,2)),'mS','mV')
     plt.plot(T, V, color = 'black',alpha=0.3,label='data',lw=2)
     plt.plot(T[start_fit:end_fit], V[start_fit:end_fit], color = 'b',alpha=0.3,label='fit decay')
     plt.plot(T[max2fit-1200:max2fit], V[max2fit-1200:max2fit],color = 'yellow',label='fit maxV')
@@ -88,8 +89,8 @@ def plot_res(RM, RA, CM, save_folder="data/fit/",save_name= "fit"):
     print('error_decay=', round(error_2,3))
     print('error_mean_max_voltage=', round(error_3,3))
     print('error_from_rest=', round(error_1,3))
-    plt.plot(T[0],exp_V[0],label='error='+str(error_2 ,error_2 + error_3))
-    plt.legend()
+    plt.plot(T[0],exp_V[0],'white',label='error_decay&max='+str(error_2 + error_3))
+    plt.legend(loc='best')
     plt.savefig(save_folder+'/'+save_name+".png")
     # plt.savefig(save_folder+'/'+save_name+".pdf")
     plt.close()
@@ -215,11 +216,60 @@ if __name__=='__main__':
         precent_erors.append(precent_eror)
         ra_error_next.append(error_next)
         params_dict.append({'RM': RM, 'RA': ra, 'CM': CM})
-        pickle.dump({'RA':RA,'error':{'decay':ra_error,'decay&max':precent_erors},'params':params_dict}, open(initial_folder + '/Ra_const_errors200:300.p', "wb"))
+        pickle.dump({'RA':RA,'error':{'decay':ra_error,'decay&max':precent_erors},'params':params_dict}, open(initial_folder + '/Ra_const_errors.p', "wb"))
     add_figure('RA_errors','RA','errors')
     plt.plot(RA,ra_error)
     plt.savefig(initial_folder + '/Ra_const_errors1.png')
     add_figure('RA_errors','RA','ra_next_eror')
     plt.plot(RA,ra_error_next)
     plt.savefig(initial_folder + '/Ra_const_errors2.png')
+    print('best_with_const_param.py is complite to run')
+
+
+    # analysis_fit(initial_folder)
+    initial_locs=glob(folder_+save_dir+cell_name+'/fit_short_pulse_'+file_type+'/')
+    for loc in initial_locs:
+        data=glob(initial_folder+'/Ra_const_errors.p')[0]
+        save_folder1=data[:data.rfind('/')]+'/analysis'
+        try:os.mkdir(save_folder1)
+        except FileExistsError:pass
+        dict3=read_from_pickle(data)
+        RA0=dict3['RA']
+        RAs,RMs,CMs,errors=[],[],[],[]
+        errors=dict3['errors']['decay&max']
+        RAs=[value['RA'] for value in dict3['params']]
+        RMs=[value['RM'] for value in dict3['params']]
+        CMs=[value['CM'] for value in dict3['params']]
+        add_figure('RA const against errors\n'+loc.split('/')[-1],'RA const','error')
+        plt.plot(RA0,errors)
+        minimums_arg=np.argsort(errors)
+        dict_minimums2={}
+        for mini in minimums_arg[:10]:
+            plt.plot(RA0[mini], errors[mini], '*',label=' RM=' + str(round(RMs[mini], 2)) + ' RA=' + str(round(RAs[mini], 2)) + ' CM=' + str(
+                         round(CMs[mini], 2)) + ' error=' +  str(round(errors[mini], 3)))
+            dict_minimums2['RA_const=' + str(RA0[mini])]={'params': {'RM': RMs[mini], 'RA': RAs[mini], 'CM': CMs[mini]},'error':[err[mini] for err in errors] }
+        pickle.dump(dict_minimums2, open(save_folder1 + "/RA_const_10_minimums.p", "wb"))
+        plt.legend(loc='upper left')
+        plt.savefig(save_folder1+'/RA const against errors')
+        plt.savefig(save_folder1+'/RA const against errors.pdf')
+
+        end_plot=60
+        add_figure('RA const against errors\n'+loc.split('/')[-1],'RA const','error')
+        plt.plot(RA0[:end_plot],errors[:end_plot])
+        for mini in minimums_arg[:10]:
+            plt.plot(RA0[mini], errors[mini], '*',label=' RM=' + str(round(RMs[mini], 2)) + ' RA=' + str(round(RAs[mini], 2)) + ' CM=' + str(
+                         round(CMs[mini], 2)) + ' error=' +  str(round(errors[mini], 3)))
+        plt.legend(loc='upper left')
+        plt.savefig(save_folder1+'/RA const against errors until point '+str(end_plot))
+
+        add_figure('RA const against RMs\n'+loc.split('/')[-1],'RA const','RM')
+        plt.plot(RA0,RMs)
+        plt.savefig(save_folder1+'/RA const against RM')
+        add_figure('RA const against RA after fit\n'+loc.split('/')[-1],'RA const','RA')
+        plt.plot(RA0,RAs)
+        plt.savefig(save_folder1+'/RA const against RA after fit')
+        add_figure('RA const against CM\n'+loc.split('/')[-1],'RA const','CM')
+        plt.plot(RA0,CMs)
+        plt.savefig(save_folder1+'/RA const against CMs')
+
 

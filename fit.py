@@ -300,7 +300,7 @@ pickle.dump({
         "RM": RM,
         "RA": RA,
         "CM": CM,
-        "error" :{'decay':error_decay,'decay&max':precent_error}
+        "error" :{'decay':error_decay,'decay&max':precent_error,'RMSD':RMSD}
     }, open(save_folder+'/' + "final_result_dend*"+str(resize_diam_by)+".p", "wb"))
 #
 

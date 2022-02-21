@@ -10,6 +10,7 @@ import pickle
 from calculate_F_factor import calculate_F_factor
 from extra_function import load_ASC,load_hoc,SIGSEGV_signal_arises,create_folder_dirr
 import sys
+from analysis_fit_after_run import analysis_fit
 
 signal.signal(signal.SIGSEGV, SIGSEGV_signal_arises)
 if len(sys.argv) != 7:
@@ -296,9 +297,10 @@ pickle.dump({
         "RM": RM,
         "RA": RA,
         "CM": CM,
-        "error" :{'decay':error_decay,'decay&max':error_decy_and_max}
+        "error" :{'decay':error_decay,'decay&max':error_decy_and_max,'RMSD':RMSD}
     }, open(save_folder+'/' + "final_result_dend*"+str(resize_diam_by)+".p", "wb"))
 #
+analysis_fit(save_folder)
 
 # from analysis_fit_after_run import analysis_fit
 # anlysis_fit(save_folder)
