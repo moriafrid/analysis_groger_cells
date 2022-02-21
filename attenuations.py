@@ -4,63 +4,62 @@ import numpy as np
 import os
 import matplotlib.pyplot as plt
 import signal
-from extra_function import SIGSEGV_signal_arises,mkcell
+from extra_function import SIGSEGV_signal_arises,load_ASC,load_hoc
 from add_figure import add_figure
 from math import pi
 from calculate_F_factor import calculate_F_factor
 import sys
 freq=100
-resize_diam_by=1
-do_resize_dend=True
+do_calculate_F_factor=True
 norm_Rin=False
-
-
-if len(sys.argv) != 5:
-    cell_name= '2017_05_08_A_5-4'
-    folder_='/ems/elsc-labs/segev-i/moria.fridman/project/analysis_groger_cells/'
-    data_dir= "cells_initial_information"
-    save_dir ="cells_outputs_data"
+clamp_injection=True
+syn_injection=False
+syn_on_dend=False
+put_syn_on_spine_head=False
+if len(sys.argv) != 6:
+   cell_name= '2017_05_08_A_5-4'
+   file_type='ASC'
+   passive_val={'RA':100,'RM':10000,'CM':1}
+   resize_diam_by=1.0
+   shrinkage_factor=1.0
+   folder_='/ems/elsc-labs/segev-i/moria.fridman/project/analysis_groger_cells/'
 else:
-    cell_name = sys.argv[1]
-    folder_= sys.argv[2] #'/ems/elsc-labs/segev-i/moria.fridman/project/analysis_groger_cells/'
-    data_dir = sys.argv[3] #cells_initial_information
-    save_dir =sys.argv[4] #cells_outputs_data
-h.load_file("import3d.hoc")
-h.load_file("nrngui.hoc")
-h.load_file('stdlib.hoc')
-h.load_file("stdgui.hoc")
+   cell_name = sys.argv[1]
+   file_type=sys.argv[2] #hoc ar ASC
+   passive_val=sys.argv[3]
+   resize_diam_by = float(sys.argv[4]) #how much the cell sweel during the electrophisiology records
+   shrinkage_factor =float(sys.argv[5]) #how much srinkage the cell get between electrophysiology record and LM
+   folder_= sys.argv[6] #'/ems/elsc-labs/segev-i/moria.fridman/project/analysis_groger_cells/cells_outputs_data'
+data_dir= "cells_initial_information/"
+save_dir ="cells_outputs_data/"
+cell_file=glob(folder_+data_dir+cell_name+'/*'+file_type)[0]
+folder_save=folder_+save_dir+cell_name+"data/cell_properties/Attenuations/"
+try: os.mkdir(folder_save)
+except FileExistsError: pass
+if syn_injection:
+    try: os.mkdir(folder_save+'syn/')
+    except FileExistsError: pass
+elif clamp_injection:
+    try:os.mkdir(folder_save + 'clamp_inj/')
+    except FileExistsError:pass
+
 
 signal.signal(signal.SIGSEGV, SIGSEGV_signal_arises)
-def change_model_pas(cell, CM=1, RA = 250, RM = 20000.0, E_PAS = -77.5, F_factor = {}, SPINE_START=60):
-    #input the neuron property    h.dt = 0.1
-
-    h.distance(0,0.5, sec=cell.soma[0]) # it isn't good beacause it change the synapse distance to the soma
-    #h.distance(0, sec=soma)
-    for sec in h.allsec(): ##check if we need to insert Ra,cm,g_pas,e_pas to the dendrit or just to the soma
-        sec.Ra = RA
-        sec.cm = CM
-        sec.g_pas = 1.0 / RM
-        sec.e_pas = E_PAS
-    for sec in cell.dend:
-        for seg in sec:
-            if h.distance(seg) > SPINE_START:
-                if type(F_factor)!=float :
-                    F_factor = 2.0 # F_factor[sec]
-                seg.cm *= F_factor
-                seg.g_pas *= F_factor
+def change_model_pas(CM=1, RA = 250, RM = 20000.0, E_PAS = -70.0):
+   h.dt = 0.1
+   h.distance(0,0.5, sec=soma)
+   for sec in cell.all_sec():
+       sec.Ra = RA
+       sec.cm = CM  # *shrinkage_factor    #*(1.0/0.7)
+       sec.g_pas = (1.0 / RM)  #*shrinkage_factor  #*(1.0/0.7)
+       sec.e_pas = E_PAS
+   for sec in cell.dend:
+       for seg in sec: #count the number of segment and calclate g_factor and total dend distance,
+           if h.distance(seg) > SPINE_START:
+               seg.cm *= F_factor
+               seg.g_pas *= F_factor
 
 def plot_records(RM, RA, CM,cell, syn,spine=None,save_name= "lambda"):
-    soma = cell.soma[0]
-    folder_="data/Attenuations/"
-    try: os.mkdir(folder_)
-    except FileExistsError: pass
-    if syn_injection:
-        try: os.mkdir(folder_+'syn/')
-        except FileExistsError: pass
-    elif clamp_injection:
-        try:os.mkdir(folder_ + 'clamp_inj/')
-        except FileExistsError:pass
-
     change_model_pas(cell,CM=CM, RA=RA, RM=RM, E_PAS = E_PAS,F_factor=F_factor_result)
     Vvec_soma = h.Vector()
     Vvec_soma.record(soma(0.5)._ref_v)
@@ -168,9 +167,9 @@ def create_spine( icell, sec, pos, number=0, neck_diam=0.25, neck_length=1.35,
     for sec in [neck, head]:
         sec.insert("pas")
     if not Rneck == "normal_neck":
-        neck.g_pas = 1.0 / passive_val[cell_name]["RM"]
-        neck.cm= passive_val[cell_name]["CM"]
-        neck.Ra=passive_val[cell_name]["RA"]#int(Rneck)
+        neck.g_pas = 1.0 / passive_val["RM"]
+        neck.cm= passive_val["CM"]
+        neck.Ra=passive_val["RA"]#int(Rneck)
     return icell,[neck, head]
 
 def add_morph(cell, syn,spine_property,number=0):
@@ -190,20 +189,27 @@ def add_morph(cell, syn,spine_property,number=0):
         #                         head_diam=spine_property[str(i)]['HEAD_DIAM'])
     # return all
 # cell=instantiate_swc('/ems/elsc-labs/segev-i/moria.fridman/project/data_analysis_git/data_analysis/try1.swc')
-fname = glob(cell_name+'*.ASC')[0]
-cell =mkcell(fname)
-print (cell)
-for sec in cell.axon:
-    h.delete_section(sec=sec)
-    does_axon_inside_cell=False
-soma = cell.soma[0]
-from find_synaptic_loc import synaptic_loc
+cell=None
+if file_type=='ASC':
+   cell =load_ASC(cell_file)
+elif file_type=='hoc':
+   cell =load_hoc(cell_file)
+if do_calculate_F_factor:
+   F_factor=calculate_F_factor(cell,'mouse_spine')
+else:
+   F_factor = 1.9
+
+# for sec in cell.axon:
+#     h.delete_section(sec=sec)
+#     does_axon_inside_cell=False
+soma = cell.soma
+# from find_synaptic_loc import synaptic_loc
 
 syn_poses={}
 syn_poses['05_08_A_01062017']=[(-5.56, -325.88, -451.42)]
 syns = synaptic_loc(cell,syn_poses[cell_name],del_axon=False)['place_as_sec']
 
-for sec in h.allsec():
+for sec in cell.all_sec():
     sec.insert('pas') # insert passive property
     sec.nseg = int(sec.L/10)+1  #decide that the number of segment will be 21 with the same distances
 syn=syns[0]
@@ -224,9 +230,10 @@ syn=syns[0]
 # for i,syn in enumerate(syns):
 #     spine_parameters[str(i)]={'location':[syn],'NECK_LENGHT':0.782,'spine_head_vol':}
 passive_val = {'05_08_A_01062017': {'CM': 1.88, 'RA': 95.7, 'RM': 12371}} #?#moria change for getting correct passive val
-from spine_classes import SpinesParams,get_n_spinese
+# from spine_classes import SpinesParams,get_n_spinese
+
 number_of_spine= get_n_spinese(cell_name)
-spine=SpinesParams(cell_name,number_of_spine)
+spine=SpinesParams(cell_name,number_of_spine) #moria
 if cell_name=='05_08_A_01062017':
     NECK_LENGHT=0.782
     spine_head_vol=0.139
@@ -240,10 +247,7 @@ sp = h.PlotShape()
 sp.show(0)  # show diameters
 sp.color(2, sec=cell.dend[82] )
 pulse_size=1000
-clamp_injection=True
-syn_injection=False
-syn_on_dend=False
-put_syn_on_spine_head=False
+
 # h.celsius = 36
 
 if clamp_injection:
@@ -348,9 +352,12 @@ RM_const = 60000.0
 RA_const = 250.0
 CM_const = 1.0
 
-CM=2/2
-RM=5684*2 #20000 #5684*2
-RA=100
+CM=passive_val['CM']
+RM=passive_val['RM'] #20000 #5684*2
+RA=passive_val['RA']
+# CM=2/2
+# RM=5684*2 #20000 #5684*2
+# RA=100
 if put_syn_on_spine_head:
     plot_records(RM, RA, CM,cell,syns[0], spine=spine[1],save_name= "lambda")
 else:

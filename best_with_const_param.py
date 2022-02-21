@@ -236,7 +236,8 @@ if __name__=='__main__':
         dict3=read_from_pickle(data)
         RA0=dict3['RA']
         RAs,RMs,CMs,errors=[],[],[],[]
-        errors=dict3['errors']['decay&max']
+        errors=dict3['error']['decay&max']
+        error_all=dict3['error']
         RAs=[value['RA'] for value in dict3['params']]
         RMs=[value['RM'] for value in dict3['params']]
         CMs=[value['CM'] for value in dict3['params']]
@@ -247,7 +248,7 @@ if __name__=='__main__':
         for mini in minimums_arg[:10]:
             plt.plot(RA0[mini], errors[mini], '*',label=' RM=' + str(round(RMs[mini], 2)) + ' RA=' + str(round(RAs[mini], 2)) + ' CM=' + str(
                          round(CMs[mini], 2)) + ' error=' +  str(round(errors[mini], 3)))
-            dict_minimums2['RA_const=' + str(RA0[mini])]={'params': {'RM': RMs[mini], 'RA': RAs[mini], 'CM': CMs[mini]},'error':[err[mini] for err in errors] }
+            dict_minimums2['RA_const=' + str(RA0[mini])]={'params': {'RM': RMs[mini], 'RA': RAs[mini], 'CM': CMs[mini]},'error':{key2:error_all[key2][mini] for key2 in error_all.keys()} }
         pickle.dump(dict_minimums2, open(save_folder1 + "/RA_const_10_minimums.p", "wb"))
         plt.legend(loc='upper left')
         plt.savefig(save_folder1+'/RA const against errors')

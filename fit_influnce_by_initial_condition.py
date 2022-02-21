@@ -14,7 +14,7 @@ from analysis_fit_after_run import analysis_fit
 
 do_calculate_F_factor=True
 spine_type="mouse_spine"
-print(sys.argv,flush=True)
+print('argv len is ',len(sys.argv),' and contain ',sys.argv,flush=True)
 if len(sys.argv) != 6:
     cell_name= '2017_05_08_A_4-5'
     file_type='hoc'
@@ -109,48 +109,6 @@ def plot_res(RM, RA, CM, save_name= "fit",save_folder='',print_full_graph=False)
         plt.show()
         plt.close()
     return error_2 ,error_2 + error_3
-# def plot_res(RM, RA, CM, save_folder="data/fit/",save_name= "fit",print_full_graph=False):
-#     change_model_pas(CM=CM, RA=RA, RM=RM, E_PAS = E_PAS)
-#     Vvec = h.Vector()
-#     Tvec = h.Vector()
-#     Vvec.record(soma(0.5)._ref_v)
-#     Tvec.record(h._ref_t)
-#     h.cvode.store_events(Vvec)
-#     h.run()
-#     npTvec = np.array(Tvec)
-#     npVec = np.array(Vvec)
-#     add_figure("fit "+save_folder.split('/')[-1]+"\nRM="+str(round(RM,1))+",RA="+str(round(RA,1))+",CM="+str(round(CM,2)),'mS','mV')
-#     plt.plot(T[start_fit:end_fit], V[start_fit:end_fit], color = 'green')
-#     plt.plot(npTvec[start_fit:end_fit], npVec[start_fit:end_fit], color = 'r', linestyle ="--")
-#     plt.legend(['NEURON_sim','decay_to_fitting'])
-#     plt.savefig(save_folder+'/'+save_name+"_decay.png")
-#     plt.close()
-#     exp_V = V
-#     npVec = npVec
-#     npVec = npVec[:len(exp_V)]
-#     error_1 = np.sqrt(np.sum(np.power(np.mean(exp_V[:start]) - np.mean(npVec[:start]), 2)))  # error from mean rest
-#     error_2 = np.sqrt(np.sum(np.power(exp_V[start_fit:end_fit] - npVec[start_fit:end_fit], 2))/(end_fit-start_fit))  #  error for the decay
-#     error_3 = np.sqrt(np.sum(np.power(np.mean(exp_V[max2fit-1200:max2fit]) - np.mean(npVec[max2fit-1200:max2fit]), 2)))  # error for maximal voltage
-#     error_tot = np.sqrt(np.sum(np.power(exp_V - npVec, 2))/len(exp_V)) # mean square error
-#     print('error_total=',round(error_tot,3))
-#     print('error_decay=', round(error_2,3))
-#     print('error_mean_max_voltage=', round(error_3,3))
-#     print('error_from_rest=', round(error_1,3))
-#     if print_full_graph:
-#         add_figure(cell_name+": RM="+str(round(RM,1))+",RA="+str(round(RA,1))+",CM="+str(round(CM,2)),short_pulse[0].units,short_pulse[1].units)
-#         plt.plot(T, V, color = 'k',label='data') #plot short_pulse data
-#         plt.plot(T[start_fit:end_fit], V[start_fit:end_fit],color = 'green',label='decay_to_fit')
-#         # plt.plot(T[end_fit:end_fit+1500], V[end_fit:end_fit+1500],color = 'yellow',label='maxV_to_fit')
-#         plt.plot(T[max2fit-1200:max2fit], V[max2fit-1200:max2fit],color = 'yellow',label='maxV_to_fit')
-#
-#         plt.plot(npTvec[:len(npVec)], npVec, color = 'r', linestyle ="--",label='NEURON_sim') #plot the recorded short_pulse
-#         plt.suptitle('ERROR: full graph='+str(round(error_tot,3))+' decay='+str(round(error_2,3))+' maxV='+str(round(error_3,3)))
-#         plt.legend()
-#         plt.savefig(save_folder+'/'+save_name+"_full_graph.pdf")
-#         plt.savefig(save_folder+'/'+save_name+"_full_graph.png")
-#         plt.show()
-#         plt.close()
-#     return error_2 ,error_2 + error_3
 
 def efun(vals):
    #check the fitting
@@ -175,7 +133,7 @@ def efun(vals):
            return (1e6)
        RA = vals.x[RA_IX]
    else:RA = RA_const
-   if (CM < 0.3 or RM < 2000 or RA <50):
+   if (CM < 0.3 or RM < 2000 or RA <5):
        return 1e6
    # print('RA:',RA, '   CM:',CM, '   RM:',RM)
 
@@ -202,7 +160,7 @@ def fit2short_pulse(cell,short_pulse,folder="",CM=1,RM=10000,RA=100):
     opt_vals.x[RA_IX] = RA
     opt_vals.x[CM_IX] = CM
     change_model_pas(CM=CM, RA=RA, RM=RM, E_PAS=E_PAS)
-    plot_res(CM=CM, RM=RM, RA=RA, save_name=" before",save_folder=folder)
+    plot_res(CM=CM, RM=RM, RA=RA, save_name="before",save_folder=folder)
     for i in range(3):
         RMSD = h.fit_praxis(efun,opt_vals)   #@# take too much time if the fitting isn't found
         RM = opt_vals.x[RM_IX]
@@ -286,13 +244,27 @@ if __name__=='__main__':
     CM = 1  # 2/2
     RM = 5684*2  # *2
     RA = 100
+    # ra_folder=save_folder +'/RA0_5:50:1+RA>1'
+    # ra_folder = save_folder + "/RA0_50:100:0.5"
+    # create_folders_list([ra_folder])
+    # RAs = np.arange(5,50,1.)
+    # solution_RA0={}
+    # for ra in RAs:
+    #     folder = ra_folder + "/RA0=" + str(ra)
+    #     print(folder,flush=True)
+    #     create_folders_list([folder])
+    #     solution_RA0["RA0=" + str(ra)] = fit2short_pulse(cell, short_pulse, folder=folder, CM=CM, RM=RM, RA=ra)
+    #     pickle.dump(solution_RA0, open(ra_folder + "/RA0_fit_results.p", "wb"))
+    # analysis_fit(ra_folder)
 
     ra_folder = save_folder + "/RA0_50:100:0.5"
     create_folders_list([ra_folder])
-    RAs = np.arange(50,100,0.5)
+    RAs = list(np.arange(50,100,0.5))+list(np.arange(1,50,1.))
     solution_RA0={}
     for ra in RAs:
         folder = ra_folder + "/RA0=" + str(ra)
+        print(folder,flush=True)
+
         create_folders_list([folder])
         solution_RA0["RA0=" + str(ra)] = fit2short_pulse(cell, short_pulse, folder=folder, CM=CM, RM=RM, RA=ra)
         pickle.dump(solution_RA0, open(ra_folder + "/RA0_fit_results.p", "wb"))
@@ -304,48 +276,11 @@ if __name__=='__main__':
     solution_RA0={}
     for ra in RAs:
         folder = ra_folder + "/RA0=" + str(ra)
+        print(folder,flush=True)
         create_folders_list([folder])
         solution_RA0["RA0=" + str(ra)] = fit2short_pulse(cell, short_pulse, folder=folder, CM=CM, RM=RM, RA=ra)
         pickle.dump(solution_RA0, open(ra_folder + "/RA0_fit_results.p", "wb"))
     analysis_fit(ra_folder)
-
-    # cm_folder = save_folder+"/CM0"
-    # try:os.mkdir(cm_folder)
-    # except FileExistsError:pass
-    # CMs=[0.5,0.8,1,1.2,1.4,1.8,2,2.5,3]
-    # solution_CM0={}
-    # for cm in tqdm(CMs):
-    #     folder = cm_folder+"/CM0="+str(cm)
-    #     try:os.mkdir(folder)
-    #     except FileExistsError:pass
-    #     solution_CM0["CM0="+str(cm)]=fit2short_pulse(cell,short_pulse,folder=folder,CM=cm,RM=RM,RA=RA)
-    # pickle.dump(solution_CM0 , open(cm_folder+"/CM0_fit_results.p", "wb"))
-
-    # rm_folder = save_folder+"/RM0"
-    # try:os.mkdir(rm_folder)
-    # except FileExistsError:pass
-    # RMs=[5000,10000,15000,20000,25000,30000,50000,80000]
-    # solution_RM0={}
-    # for rm in RMs:
-    #     folder = rm_folder+"/RM0="+str(rm)
-    #     try:os.mkdir(folder)
-    #     except FileExistsError:pass
-    #     solution_RM0["RM0="+str(rm)]=fit2short_pulse(cell,short_pulse,folder=folder,CM=CM,RM=rm,RA=RA)
-    # pickle.dump(solution_RM0 , open(rm_folder+"/RM0_fit_results.p", "wb"))
-
-    # CM_RA_RM_folder = initial_folder + "/CM0_RM0_RA0"
-    # try:os.mkdir(CM_RA_RM_folder)
-    # except FileExistsError:pass
-    # solution={}
-    # for cm in CMs:
-    #     for rm in RMs:
-    #         for ra in RAs:
-    #             folder = CM_RA_RM_folder + "/CM0="+str(cm)+" RM0="+str(rm)+" RA0=" + str(ra)
-    #             try:os.mkdir(folder)
-    #             except FileExistsError:pass
-    #             solution["CM0="+str(cm)+" RM0="+str(rm)+" RA0=" + str(ra)] = fit2short_pulse(cell, short_pulse, folder=folder, CM=cm, RM=rm, RA=ra)
-    # pickle.dump(solution, open(CM_RA_RM_folder + "/CM_RM_RA_fit_results.p", "wb"))
-    print('fit_influance_by_initial_condition.py is complite to run')
 
 
     #analysis:
@@ -358,9 +293,11 @@ if __name__=='__main__':
         if '+' in data: datas.remove(data)
     print('datas', datas)
     data1,data2=datas
+
     #####change the locations
     dict1=read_from_pickle(data1)
     dict2=read_from_pickle(data2)
+
     if float(next(iter(dict1.keys())).split('=')[-1])<float(next(iter(dict2.keys())).split('=')[-1]):
         dict = dict1.copy()  # Copy the dict1 into the dict3 using copy() method
         for key, value in dict2.items():  # use for loop to iterate dict2 into the dict3 dictionary
@@ -413,3 +350,42 @@ if __name__=='__main__':
     add_figure('diffrent RA0 against RM','RA0','RM')
     plt.plot(RA0,RMs)
     plt.savefig(save_folder2+'/diffrent RA0 against RM.png')
+
+ #########
+    # cm_folder = save_folder+"/CM0"
+    # try:os.mkdir(cm_folder)
+    # except FileExistsError:pass
+    # CMs=[0.5,0.8,1,1.2,1.4,1.8,2,2.5,3]
+    # solution_CM0={}
+    # for cm in tqdm(CMs):
+    #     folder = cm_folder+"/CM0="+str(cm)
+    #     try:os.mkdir(folder)
+    #     except FileExistsError:pass
+    #     solution_CM0["CM0="+str(cm)]=fit2short_pulse(cell,short_pulse,folder=folder,CM=cm,RM=RM,RA=RA)
+    # pickle.dump(solution_CM0 , open(cm_folder+"/CM0_fit_results.p", "wb"))
+
+    # rm_folder = save_folder+"/RM0"
+    # try:os.mkdir(rm_folder)
+    # except FileExistsError:pass
+    # RMs=[5000,10000,15000,20000,25000,30000,50000,80000]
+    # solution_RM0={}
+    # for rm in RMs:
+    #     folder = rm_folder+"/RM0="+str(rm)
+    #     try:os.mkdir(folder)
+    #     except FileExistsError:pass
+    #     solution_RM0["RM0="+str(rm)]=fit2short_pulse(cell,short_pulse,folder=folder,CM=CM,RM=rm,RA=RA)
+    # pickle.dump(solution_RM0 , open(rm_folder+"/RM0_fit_results.p", "wb"))
+
+    # CM_RA_RM_folder = initial_folder + "/CM0_RM0_RA0"
+    # try:os.mkdir(CM_RA_RM_folder)
+    # except FileExistsError:pass
+    # solution={}
+    # for cm in CMs:
+    #     for rm in RMs:
+    #         for ra in RAs:
+    #             folder = CM_RA_RM_folder + "/CM0="+str(cm)+" RM0="+str(rm)+" RA0=" + str(ra)
+    #             try:os.mkdir(folder)
+    #             except FileExistsError:pass
+    #             solution["CM0="+str(cm)+" RM0="+str(rm)+" RA0=" + str(ra)] = fit2short_pulse(cell, short_pulse, folder=folder, CM=cm, RM=rm, RA=ra)
+    # pickle.dump(solution, open(CM_RA_RM_folder + "/CM_RM_RA_fit_results.p", "wb"))
+    print('fit_influance_by_initial_condition.py is complite to run')

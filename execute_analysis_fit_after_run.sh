@@ -41,4 +41,4 @@ path=$(dirname $SCRIPT_PATH)
 #conda activate project
 # put your script here - example script is sitting with this bash script
 
-python3 $path/analysis_fit_aftre_run.py $cell_name $file_type2read $resize_diam_by $shrinkage_factor $folder
+python3 $path/analysis_fit_after_run.py $cell_name $file_type2read $resize_diam_by $shrinkage_factor $folder
