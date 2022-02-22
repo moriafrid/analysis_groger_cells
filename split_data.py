@@ -18,10 +18,13 @@ def split2phenomena(cell_name,inputs_folder, outputs_folder):
 	important_outputs_folder: <repository>/cells_important_outputs_data/<cell_name>
 	all_outputs_folder: <repository>/cells_outputs_data/<cell_name>
 	"""
-	base_folder = os.path.join(outputs_folder, 'data', 'electrophysio_records/')
-	base_external_folder = os.path.join(outputs_folder, 'data/')
-	save_external_folder = base_external_folder + '/'
+	# base_folder = os.path.join(outputs_folder,'/data/',  'electrophysio_records/')
+	# base_external_folder = os.path.join(outputs_folder, '/data/')
+	# save_external_folder = base_external_folder + '/'
+	base_folder = ''.join([outputs_folder,'/data/',  'electrophysio_records/'])
+	base_external_folder = ''.join([outputs_folder, '/data/'])
 	folder_names = ['V1', 'short_pulse', 'syn', 'spike', 'noise1', 'noise2']
+	create_folder_dirr(base_external_folder)
 	create_folders_list([os.path.join(base_folder, n) for n in folder_names])
 
 	abf_files = glob(os.path.join(inputs_folder, '*.abf'))
@@ -92,8 +95,8 @@ def split2phenomena(cell_name,inputs_folder, outputs_folder):
 			with open(save_folder_IV_curve + 'max_vol_curr_inj.p', 'wb') as fr:
 				pickle.dump([maxi * short_pulse.units, I * pq.pA], fr)
 			I_V_curve(maxi, I * pq.pA, save_folder_IV_curve)
-			create_folder_dirr(base_external_folder + 'cell_properties/check_dynamic/')
-			check_dynamics(short_pulse, T_short_pulse, base_external_folder + 'cell_properties/check_dynamic/')
+			create_folder_dirr(base_external_folder + '/cell_properties/check_dynamic/')
+			check_dynamics(short_pulse, T_short_pulse, base_external_folder + '/cell_properties/check_dynamic/')
 		else:
 			print("Error. Wrong file ending for " + f)
 

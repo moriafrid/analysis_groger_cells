@@ -7,7 +7,7 @@ from split_data import split2phenomena
 if __name__ == '__main__':
     print(len(sys.argv))
     if len(sys.argv) != 5:
-        cell_name= '2017_05_08_A_4-5'
+        cell_name= '2017_03_04_A_6-7'
         folder_='/ems/elsc-labs/segev-i/moria.fridman/project/analysis_groger_cells/'
         data_dir= "cells_initial_information"
         save_dir ="cells_outputs_data"

@@ -6,41 +6,20 @@ from matplotlib import pyplot as plt
 from extra_function import load_ASC
 from glob import glob
 import pandas as pd
+import sys
+from extra_function import load_ASC,SIGSEGV_signal_arises
+from read_spine_properties import get_spine_xyz,get_n_spinese, get_spine_part
+signal.signal(signal.SIGSEGV, SIGSEGV_signal_arises)
 
-def synaptic_loc_one(cell_ASC,syn_pos):###need a lot of correction moria
-    cell=load_ASC(cell_ASC)
-    #syn_pose should be (x,y,z) coordinates
-    h.load_file("import3d.hoc")
-    h.load_file("nrngui.hoc")
-    # secs,dends,dists,dends_name=[],[],[],[]
-    # for i in range(len(syn_poses)):
-    #     secs.append(None)
-    #     dends.append(None)
-    #     dists.append(10000)
-    #     dends_name.append(None)
-    dist=10000
-    for sec in h.allsec():
-        if sec in cell.soma:continue
-        lens = []
-        initial_point = np.array([sec.x3d(0), sec.y3d(0), sec.z3d(0)])
-        for i in range(sec.n3d()):
-            lens.append(np.linalg.norm(initial_point - np.array([sec.x3d(i), sec.y3d(i), sec.z3d(i)])))
-            initial_point = np.array([sec.x3d(i), sec.y3d(i), sec.z3d(i)])
-        total_len = np.sum(lens)
-        accumalate_len = 0
-        initial_point = np.array([sec.x3d(0), sec.y3d(0), sec.z3d(0)])
-        for i in range(sec.n3d()):
-            print(i)
-            dend_pos = np.array([sec.x3d(i), sec.y3d(i), sec.z3d(i)])
-            accumalate_len += np.linalg.norm(initial_point - dend_pos)
-            initial_point = dend_pos
-
-            if np.linalg.norm(syn_pos - dend_pos) < dist:
-                dist=np.linalg.norm(syn_pos - dend_pos)
-                sec=[sec, accumalate_len / total_len]
-                dend=[sec,round(accumalate_len / total_len,3)]
-                dend_name=[str(sec)[str(sec).find('>')+2:],round(accumalate_len / total_len,3)]
-    return {'place_name':dend_name,'place_as_sec':dend}
+if len(sys.argv) != 3:
+    calculate_one_syn=False
+    folder_='/ems/elsc-labs/segev-i/moria.fridman/project/analysis_groger_cells/'
+else:
+    calculate_one_syn = eval(sys.argv[1])
+    folder_=sys.argv[2]
+print('calculate_one_syn=',calculate_one_syn)
+folder_data=folder_+'/cells_initial_information/'
+folder_save=folder_+'/cells_outputs_data/'
 
 def synaptic_loc(cell_dir,syn_poses_list,return_more_than_one=False, part='all', save_place=''):
     cell=None
@@ -102,7 +81,7 @@ def synaptic_loc(cell_dir,syn_poses_list,return_more_than_one=False, part='all',
                     dends_name[j]=[str(sec)[str(sec).find('>')+2:],round(accumalate_len / total_len,3)]
     plt.figure()
     for p in all_points:
-        plt.scatter(p[0], p[1], color='k',s=0.5)
+        plt.scatter(p[0], p[1], color='black',s=0.5)
 
     sec=eval('cell.'+dends_name[0][0])
     initial_point = np.array([sec.x3d(0), sec.y3d(0), sec.z3d(0)])
@@ -121,6 +100,8 @@ def synaptic_loc(cell_dir,syn_poses_list,return_more_than_one=False, part='all',
         plt.scatter(p[0], p[1], color='g',s=0.5)
 
     for j, syn_pos in enumerate(syn_poses_list):
+        if type(syn_pos)!=list:
+            syn_pos=[syn_pos]
         dis_from_soma[j]=syn_dis_from_soma(cell,dends_name[j])
         plt.scatter(syn_pos[j][0], syn_pos[j][1],s=0.7, color='cyan')
         plt.text(-50,-50,str(syn_pos)+'dis from soma='+str(dis_from_soma[j]))
@@ -143,9 +124,9 @@ def synaptic_loc(cell_dir,syn_poses_list,return_more_than_one=False, part='all',
     with open(save_place + '_neuron_morphology.p', 'wb') as f:
         pickle.dump({"all_point":all_points,"syn_pos":xyz,"syn_sec_pos":dends_name}, f)
     if return_more_than_one:
-        return {'place_name':dends_name,'place_as_sec':dends,'dist_from_soma':dis_from_soma,'dist':dists, 'part':part}
+        return {'place_name':dends_name,'dist_from_soma':dis_from_soma,'dist':dists, 'part':part}
     else:
-        return {'place_name':dends_name[0],'place_as_sec':dends[0],'dist_from_soma':dis_from_soma,'dist':dists[0], 'part':part}
+        return {'place_name':dends_name[0],'dist_from_soma':dis_from_soma,'dist':dists[0], 'part':part}
 
 def syn_dis_from_soma(cell,syn_loc):
     h.distance(0, 0.5, sec=cell.soma)
@@ -153,28 +134,43 @@ def syn_dis_from_soma(cell,syn_loc):
     return synapses_dis_from_soma
 
 if __name__=='__main__':
-    from extra_function import load_ASC,SIGSEGV_signal_arises
-    signal.signal(signal.SIGSEGV, SIGSEGV_signal_arises)
-    from read_spine_properties import get_spine_xyz,get_n_spinese, get_spine_part
-    folder_data='/ems/elsc-labs/segev-i/moria.fridman/project/analysis_groger_cells/cells_initial_information/'
-    folder_save='/ems/elsc-labs/segev-i/moria.fridman/project/analysis_groger_cells/cells_outputs_data/'
+    dict={}
+    name2save=''
     for cell_name in ['2017_05_08_A_4-5','2017_05_08_A_5-4','2017_03_04_A_6-7']:
-        dict={}
         xyz,dend_part=[],[]
     # for cell_name in ['2017_05_08_A_5-4']:
         dir=glob(folder_data+cell_name+'/*ASC')[0]
         for i in range(get_n_spinese(cell_name)):
+            if calculate_one_syn==True:
+                dict[cell_name+'_'+str(i)]=synaptic_loc(dir,[get_spine_xyz(cell_name,i)], part=get_spine_part(cell_name,i),save_place=folder_save+cell_name+'/synapses_'+str(i),return_more_than_one=False)
+                name2save=2
+            print('one syn dict:',dict)
             xyz.append(get_spine_xyz(cell_name,i))
             dend_part.append(get_spine_part(cell_name,i))
-            print(cell_name,[xyz])
-        dict[cell_name]=synaptic_loc(dir,[xyz], part='all', save_place=folder_save+cell_name+'/synapses',return_more_than_one=True),xyz
-            # dict[cell_name+'_'+str(i)]=synaptic_loc(dir,[xyz], part=dend_part),xyz
+        print('more then one syn dict',cell_name,[xyz])
+        if calculate_one_syn==False:
+            dict[cell_name]=synaptic_loc(dir,[xyz], part='all', save_place=folder_save+cell_name+'/synapses',return_more_than_one=True)
+        #     #
+    print(dict)
+    try:
+        with open(folder_save + 'synaptic_location'+name2save+'.p', 'wb') as f:
+            pickle.dump(dict, f)
+    except Exception as e:
+        print("Error trying to save pickle: " + str(e))
+        pass
 
-    with open(folder_save + 'synaptic_location.p', 'wb') as f:
-        pickle.dump( dict, f)
-    with open(folder_save+'synaptic_location.txt', 'w') as f:
-        f.write('synaptic_location')
-        f.write(dict)
-    df1 = pd.DataFrame(dict)
-    df1.to_excel(folder_save+"tau_m_cells.xlsx")
-    a=1
+    with open(folder_save+'synaptic_location'+name2save+'.txt', 'w') as f:
+        try:
+            f.write('synaptic_location')
+            f.write(dict)
+        except Exception as e:
+            print("Error trying to save txt: " + str(e))
+            pass
+    try:
+        df1 = pd.DataFrame(dict)
+        df1.to_excel(folder_save+"synaptic_location.xlsx")
+    except Exception as e:
+        print("Error trying to save xlsx: " + str(e))
+        pass
+
+    print('dict of syn location is saving in '+folder_save+'synaptic_location'+name2save)

@@ -211,11 +211,14 @@ def phenomena(t1,t2,T,base,x_units='S',Y_units='mV'):
 	with open(base +names2+'/mean_'+names2+'_with_parameters.p', 'wb') as f:
 			pickle.dump({'mean':[mean * t1.units, eval('T_' + names2)],'E_pas':REST,'points2calsulate_E_pas':point2calculate_E_pas }, f)
 		# pickle.dump({'mean':[mean * t1.units, eval('T_' + names2)],'E_pas':E_pas_short_pulse+REST,'points2calsulate_E_pas':point2calculate_E_pas }, f)
+	with open(base +'/short_pulse_parameters.p', 'wb') as f:
+			pickle.dump({'units':{'y':t1.units,'x': T[0].units},'E_pas':REST,'points2calsulate_E_pas':point2calculate_E_pas }, f)
+
 	#add to the other currents for I-V curve
 	add_figure('I_V curve_together', 'points', t1.units)
 	plt.plot(new_short_pulse2)
 	plt.savefig(base + '/-50pA.png')
 	with open(base + '/-50pA.p', 'wb') as f:
-		pickle.dump({'mean': [np.mean(new_short_pulse2,axis=0) * t1.units, T_short_pulse], 'E_pas': E_pases+REST,}, f)
+		pickle.dump({'mean': [np.mean(new_short_pulse2,axis=0) * t1.units, T_short_pulse], 'E_pas': REST,}, f)
 	return REST,np.mean(new_short_pulse2,axis=0)* t1.units,T_short_pulse
 

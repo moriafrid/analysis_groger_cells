@@ -15,11 +15,7 @@ def get_parameters(cell_name,par_list,folder='/ems/elsc-labs/segev-i/moria.fridm
         if par==[parameter_cv[par_name][1]]:
             print(par_name +"   is empty at Data2.xlx")
     return par
-
-def get_F_factor_params(spin_type,folder='/ems/elsc-labs/segev-i/moria.fridman/project/analysis_groger_cells/cells_initial_information'):
-    df = pd.read_excel(folder+'/Data2.xlsx')
-    parameter_cv=df[df['cell_name']==spin_type].reset_index()
-
+def get_R_head(parameter_cv):
     if not True in list(pd.isna(parameter_cv['R_head'])):
         R_head=np.mean(parameter_cv['R_head'])
     elif not True in list(pd.isna(parameter_cv['head_diam'])):
@@ -30,12 +26,16 @@ def get_F_factor_params(spin_type,folder='/ems/elsc-labs/segev-i/moria.fridman/p
     elif not True in list(pd.isna(parameter_cv['head_area'])):
         head_area=np.mean(parameter_cv['head_area'])
         R_head=sqrt(head_area/(4*pi))
+    return R_head
+def get_F_factor_params(spin_type,folder='/ems/elsc-labs/segev-i/moria.fridman/project/analysis_groger_cells/cells_initial_information'):
+    df = pd.read_excel(folder+'/Data2.xlsx')
+    parameter_cv=df[df['cell_name']==spin_type].reset_index()
+    R_head=get_R_head(parameter_cv)
     neck_diam=np.mean(parameter_cv['neck_diam'])
     neck_length=np.mean(parameter_cv['neck_diam'])
     spine_density=np.mean(parameter_cv['spine_density'])
+    # if spine_density!=None:
     return R_head,neck_diam,neck_length,spine_density
-
-
     return R_head,neck_diam,neck_length
 
 def get_spine_xyz(cell_name,spine_num,folder='/ems/elsc-labs/segev-i/moria.fridman/project/analysis_groger_cells/cells_initial_information'):
@@ -50,7 +50,10 @@ def get_spine_part(cell_name,spine_num,folder='/ems/elsc-labs/segev-i/moria.frid
     df = pd.read_excel(folder+'/Data2.xlsx')
     parameter_cv=df[df['cell_name']==cell_name].reset_index()
     return parameter_cv['dend_type'][spine_num]
-
+def get_building_spine(cell_name,spine_num,folder='/ems/elsc-labs/segev-i/moria.fridman/project/analysis_groger_cells/cells_initial_information'):
+    df = pd.read_excel(folder+'/Data2.xlsx')
+    parameter_cv=df[df['cell_name']==cell_name].reset_index()
+    return {'NECK_LENGHT':parameter_cv['neck_length'][spine_num],'NECK_DIAM':parameter_cv['neck_diam'][spine_num],'HEAD_DIAM':get_R_head(parameter_cv)*2}
 
 
 if __name__ == '__main__':

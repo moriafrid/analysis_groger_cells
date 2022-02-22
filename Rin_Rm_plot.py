@@ -8,39 +8,39 @@ import signal
 import sys
 from extra_function import load_ASC,load_hoc,SIGSEGV_signal_arises,create_folder_dirr
 from read_spine_properties import get_n_spinese,get_spine_xyz
+from open_pickle import read_from_pickle
 from find_synaptic_loc import synaptic_loc
 # from spine_classes import SpinesParams, SpineLocatin
 from calculate_F_factor import calculate_F_factor
+import pandas as pd
 
 SPINE_START = 60
-resize_diam_by=1
-CM=2#2/2
-RM=5684*2#*2
-RA=70
 do_calculate_F_factor=True
 
-if len(sys.argv) != 6:
+if len(sys.argv) != 7:
     cell_name= '2017_03_04_A_6-7'
     file_type2read= 'ASC'
+    passive_val={'RA':100,'RM':10000,'CM':1}
+    resize_diam_by=1.0
+    shrinkage_factor=1.0
     folder_='/ems/elsc-labs/segev-i/moria.fridman/project/analysis_groger_cells/'
-    data_dir= "cells_initial_information"
-    save_dir ="cells_outputs_data"
+
 else:
     cell_name = sys.argv[1]
     file_type2read=sys.argv[2]
-    folder_= sys.argv[3] #'/ems/elsc-labs/segev-i/moria.fridman/project/analysis_groger_cells/'
-    data_dir = sys.argv[4] #cells_initial_information
-    save_dir =sys.argv[5] #cells_outputs_data
+    passive_val=sys.argv[3]
+    resize_diam_by = float(sys.argv[4]) #how much the cell sweel during the electrophisiology records
+    shrinkage_factor =float(sys.argv[5]) #how much srinkage the cell get between electrophysiology record and LM
+    folder_= sys.argv[6] #'/ems/elsc-labs/segev-i/moria.fridman/project/analysis_groger_cells/'
 print("the number of parameters that sys loaded is ",len(sys.argv))
-
-cell_file = glob(folder_+data_dir+"/"+cell_name+"/*."+file_type2read)[0]
+data_dir= "cells_initial_information/"
+save_dir ="cells_outputs_data/"
+folder_data=folder_+save_dir+cell_name
+cell_file = glob(folder_+data_dir+cell_name+"/*."+file_type2read)[0]
 print("cell file is " +cell_file)
-folder_save = folder_+save_dir+'/'+cell_name +'/cell_properties/Rin_Rm/'
+folder_save = folder_+save_dir+cell_name +'/data/cell_properties/Rin_Rm'+file_type2read+'/'
 create_folder_dirr(folder_save)
-
-
-#F_factor is the correction from the spine A(spine area)/area(without spine)
-# F_factor = {} - take the F_factor for the specific segment
+parameters=read_from_pickle(folder_data+'/data/electrophysio_records/short_pulse_parameters.p')
 def change_model_pas(CM=1, RA = 250, RM = 20000.0, E_PAS = -70.0, F_factor ={}):
     #input the neuron property
     h.dt = 0.1
@@ -69,21 +69,11 @@ if file_type2read=='ASC':
 elif file_type2read=='hoc':
     cell=load_hoc(cell_file)
 
-# spines_number=get_n_spinese(cell_name)
-# spine=SpinesParams(cell_name,1)
-# # spine_location= SpineLocatin(cell_name)
 
-# spines_sec,spines_seg=[],[]
-# for i in range(spines_number):
-#     spines_sec[i]=cell.dend[spine_location.sec]
-#     spines_seg[i]=spine_location.seg
-
-# try:
 #     for sec in cell.axon:
 #         h.delete_section(sec=sec)
 #     print("cell.axons is deleted")
-# except:
-#     print("this cell don't have axon inside")
+
 soma= cell.soma
 for sec in cell.all_sec():
     if sec == cell.soma: continue
@@ -95,11 +85,18 @@ else:
     F_factorF_factor=1.9
 #insert pas to all other section
 h.celsius = 30
-
-for sec in tqdm(cell.all_sec()):
+CM=passive_val['CM']
+RM=passive_val['RM']
+RA=passive_val['RA']
+E_pas=parameters['E_pas']
+for sec in cell.all_sec():
     sec.insert('pas') # insert passive property
     sec.nseg = int(sec.L/10)+1  #decide that the number of segment will be 21 with the same distances
-change_model_pas(CM=CM, RA = RA, RM =RM, E_PAS = -77.3,F_factor= F_factor)
+
+
+
+
+change_model_pas(CM=CM, RA = RA, RM =RM, E_PAS = E_pas,F_factor= F_factor)
 imp = h.Impedance(sec=soma)
 imp.loc(0.5, sec=soma)
 add_figure('Rin to Rm for diffrent Ra','Rm [Ohm/cm^2]','Rin [M ohm]')
@@ -107,7 +104,7 @@ Rm_arr = np.hstack([np.arange(10, 2511, 100), np.arange(2510, 20011, 1000)])
 for Ra in [1e-9, 70, 100, 150, 200]:
     res = []
     for Rm in Rm_arr:
-        change_model_pas(CM=CM, RA=Ra, RM=Rm, E_PAS=-77.3,F_factor= F_factor)
+        change_model_pas(CM=CM, RA=Ra, RM=Rm, E_PAS=E_pas,F_factor= F_factor)
         imp.compute(0)
         res.append(imp.input(0.5, sec=soma))
     plt.plot(Rm_arr, res, label='Ra='+str(Ra)+'[Ohm*cm]')
@@ -118,16 +115,25 @@ plt.ylabel('Rin (M ohm)')
 plt.legend()
 plt.savefig(folder_save+'/Rin_Rm')
 freqs=np.linspace(0,200,num=100)
+import pandas as pd
+dict_syn=pd.read_excel(folder_+save_dir+"synaptic_location2.xlsx",index_col=0)
 
 # for spine_sec,spine_seg in zip(spines_sec,spines_seg):
 for spine_num in range(get_n_spinese(cell_name)):
-
+    syns=[]
+    for sec in cell.all_sec():
+        if sec.name() in [name for (name, seg) in dict_syn[cell_name+'_'+str(spine_num)]['place_name'][0]]:
+            spine_seg = [seg for (name, seg) in dict_syn[cell_name+'_'+str(spine_num)]['place_name'][0] if sec.name() == name][0]  # get seg num - todo should be syn[1]
+            spine_sec=sec
+            # syns.append(sec)
     spine_xyz=get_spine_xyz(cell_name,spine_num=spine_num)
     cell_asc_dir= glob(folder_+data_dir+"/"+cell_name+"/*.ASC")[0]
-    spine_sec,spine_seg=synaptic_loc(cell_asc_dir,[spine_xyz])['place_as_sec']
+    # spine_sec,spine_seg=pd.read_excel(folder_+save_dir+"/synaptic_location2.xlsx",index_col=0)[cell_name+'_'+spine_num]['place_as_sec']
+    # spine_sec,spine_seg=read_form_pickle(folder_+save_dir + 'synaptic_location2.p')[call_name+'_'+spine_num]['place_as_sec']
+    # spine_sec,spine_seg=synaptic_loc(cell_asc_dir,[spine_xyz])['place_as_sec']
 
     Rin_syn=[]
-    change_model_pas(CM=1.88, RA=95, RM=12392, E_PAS=-77.3,F_factor= F_factor) #moria need to change for good passive value
+    change_model_pas(CM=CM, RA = RA, RM =RM, E_PAS = E_pas,F_factor= F_factor) #moria need to change for good passive value
     for freq in freqs:
         imp_0 = h.Impedance(sec=spine_sec)
         imp_0.loc(spine_seg, sec=spine_sec)
@@ -143,10 +149,10 @@ for spine_num in range(get_n_spinese(cell_name)):
     freq=100
     h.distance(0,0.5, sec=soma)
 
-    change_model_pas(CM=2, RA=70, RM=5684, E_PAS=-77.3,F_factor= F_factor)
+    change_model_pas(CM=CM, RA=RA, RM=RM, E_PAS=E_pas,F_factor= F_factor)
     # change_model_pas(CM=1.88, RA=98, RM=12371, E_PAS=-77.3,F_factor= F_factor)
 
-    for sec in h.allsec():
+    for sec in cell.all_sec():
         imp_0 = h.Impedance(sec=spine_sec)
         seg_len=sec.L / 15
         imp_0.loc(0.5, sec=soma)

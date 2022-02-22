@@ -36,10 +36,12 @@ data_dir= "cells_initial_information/"
 save_dir ="cells_outputs_data/"
 path_short_pulse=glob(folder_+save_dir+cell_name+'/data/electrophysio_records/short_pulse/mean_short_pulse_with_parameters.p')[0]
 cell_file=glob(folder_+data_dir+cell_name+'/*'+file_type)[0]
-save_folder=folder_+save_dir+cell_name+'/fit_short_pulse_'+file_type+'/'
+save_folder=folder_+save_dir+cell_name
+
 I=-50
 # save_folder+=str(I)+'pA/'
-save_folder+='dend*'+str(round(resize_diam_by,2))+'&F_shrinkage='+str(round(shrinkage_factor,2))+'/basic_fit/Ra_min='+str(RA_min)
+save_folder+='/dend*'+str(round(resize_diam_by,2))+'&F_shrinkage='+str(round(shrinkage_factor,2))+'/basic_fit/Ra_min='+str(RA_min)
+save_folder+='/fit_short_pulse_'+file_type+'/'
 create_folder_dirr(save_folder)
 
 do_calculate_F_factor=True

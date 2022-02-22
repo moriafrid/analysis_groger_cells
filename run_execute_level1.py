@@ -5,12 +5,20 @@ folder_data="cells_initial_information"
 folder_save="cells_outputs_data"
 cells=["2017_05_08_A_5-4", "2017_05_08_A_4-5","2017_03_04_A_6-7"]
 file_type2read=['ASC','hoc']
+for do_calculate_one_syn in ['True','False']:
+    os.system(" ".join(['sbatch execute_python_script.sh', 'find_synaptic_loc.py',do_calculate_one_syn,folder_]))
+    print('find_synaptic_loc.py with calcuate_one_syn=',do_calculate_one_syn)
 
+os.system(" ".join(['sbatch execute_python_script.sh', 'plot_neuron_3D.py']))
+print('plot_neuron_3D.py')
+# os.system(" ".join(['sbatch execute_python_script.sh', 'calculate_tau_m.py']))
 for cell_name in cells:
     for file_type in file_type2read:
-        command="sbatch execute_main.sh"
+        command="sbatch execute_level1.sh"
         send_command = " ".join([command, cell_name,file_type,folder_, folder_data , folder_save])
         os.system(send_command)
         print(cell_name+str(' :run execute_level1.sh'))
 
-print("cell_properties.py, find_synaptic_loc.py, plot_neuron_3D.py, Rin_Rm_plot.py, find_Rinput.py")
+print("execute_level1 running: cell_properties.py,  Rin_Rm_plot.py")
+print('')
+print('**remainder: calculate_tau_m.py and clear_syn.py need to be run from the computer')

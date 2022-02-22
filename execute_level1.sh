@@ -42,27 +42,11 @@ conda init
 conda activate project
 # put your script here - example script is sitting with this bash script
 
-
-#python3 $path/main_cell_data.py $cell_name $folder $data_dir $save_dir
 echo python3 $path/clear_syn.py $cell_name
 python3 $path/clear_syn.py $cell_name $folder $save_dir $save_dir
 
 echo python3 $path/cell_properties.py $cell_name $file_type2read
 python3 $path/cell_properties.py $cell_name $file_type2read $folder $data_dir $save_dir
-
-python3 $path/find_synaptic_loc.py
-
-python3 $path/plot_neuron_3D.py
-
-echo python3 $path/Rin_Rm_plot.py $cell_name $file_type2read
-python3 $path/Rin_Rm_plot.py $cell_name $file_type2read $folder $data_dir $save_dir
-
-echo python3 $path/find_Rinput.py $cell_name
-python3 $path/find_Rinput.py $cell_name $folder $save_dir $save_dir
-#echo python3 $path/dendogram.py $cell_name $file_type2read
-#python3 $path/dendogram.py $cell_name $file_type2read $folder $data_dir $save_dir
-#echo python3 $path/attenuations.py $cell_name $file_type2read $passive_val
-#python3 $path/attenuations.py $cell_name $file_type2read $folder $data_dir $save_dir $passive_val
 
 #python3 $path/SMAQ_analysis.py $cell_name
 

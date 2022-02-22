@@ -8,9 +8,9 @@ from glob import glob
 from extra_function import create_folder_dirr,SIGSEGV_signal_arises,load_ASC,load_hoc
 import sys
 
-if len(sys.argv) != 6:
-    cell_name= '2017_05_08_A_4-5'
-    file_type2read= 'ASC'
+if len(sys.argv) != 5:
+    cell_name= '2017_05_08_A_5-4'
+    file_type2read= 'hoc'
     folder_='/ems/elsc-labs/segev-i/moria.fridman/project/analysis_groger_cells/'
     data_dir= "cells_initial_information"
     save_dir ="cells_outputs_data"
@@ -25,7 +25,7 @@ print(cell_name, folder_+data_dir+"/"+cell_name+"/*."+file_type2read)
 cell_file = glob(folder_+data_dir+"/"+cell_name+"/*."+file_type2read)[0]
 
 path_short_pulse=folder_+save_dir+'/'+cell_name+'/data/electrophysio_records/short_pulse/mean_short_pulse.p'
-folder_save=folder_+save_dir+'/'+cell_name+'/cell_properties/'
+folder_save=folder_+save_dir+'/'+cell_name+'/data/cell_properties/diam_dis_'+file_type2read+'/'
 
 create_folder_dirr(folder_save)
 
@@ -33,6 +33,19 @@ signal.signal(signal.SIGSEGV, SIGSEGV_signal_arises)
 
 f=open(folder_save+'cell_propertis.txt', 'w')
 f.write('The '+cell_name+ ' cell_propertis\n')
+
+#track from the terminals to the soma
+def track_one(terminal):
+    h.distance(0, 0.5, sec=soma)
+    sec=terminal
+    dis=[]
+    diam=[]
+    while sec !=soma:
+        dis.append(h.distance(sec.parentseg()))
+        sec_ref=h.SectionRef(sec=sec)
+        diam.append(sec.diam)
+        sec=sec_ref.parent
+    return np.array(dis),np.array(diam)
 ######################################################
 # build the model
 ######################################################
@@ -51,7 +64,7 @@ except:
     print(cell_name.split('/')[-1] +' dont have axon inside')
 soma= cell.soma
 # insert pas to all other section
-for sec in tqdm(cell.all()):
+for sec in tqdm(cell.all_sec()):
     sec.insert('pas') # insert passive property
     sec.nseg = int(sec.L/10)+1  #decide that the number of segment will be 21 with the same distances
 
@@ -95,18 +108,7 @@ for dend in cell.dend:
 print("total dendritic length is ",length)
 f.write("\nThe total dendritic length is "+str(length)+ "\n")
 f.close()
-#track from the terminals to the soma
-def track_one(terminal):
-    h.distance(0, 0.5, sec=soma)
-    sec=terminal
-    dis=[]
-    diam=[]
-    while sec !=soma:
-        dis.append(h.distance(sec.parentseg()))
-        sec_ref=h.SectionRef(sec=sec)
-        diam.append(sec.diam)
-        sec=sec_ref.parent
-    return np.array(dis),np.array(diam)
+
 terminals = []
 for sec in cell.dend:
     if len(sec.children())==0:
@@ -114,9 +116,12 @@ for sec in cell.dend:
 plt.close()
 add_figure('diam-dis relation along dendrites with diffrent collors','distance from soma','diameter')
 i=0
-for terminal in terminals[:-14:2]:
+for terminal in terminals:
     i+=1
     dis,diam=track_one(terminal)
     plt.plot(dis,diam,alpha=0.5)
+    if len(diam)==1:
+        plt.plot(dis,diam,'*')
 plt.savefig(folder_save+'diam-dis.png')
 plt.savefig(folder_save+'diam-dis.pdf')
+plt.show()

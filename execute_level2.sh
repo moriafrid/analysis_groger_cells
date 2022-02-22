@@ -21,9 +21,10 @@ fi
 
 cell_name=$1
 file_type2read=$2
-resize_diam=$3
-shrinkage_factor=$4
-folder=$5
+passive_val=$3
+resize_diam=$4
+shrinkage_factor=$5
+folder=$6
 shift $#
 
 # `if [ -n $SLURM_JOB_ID ]` checks if $SLURM_JOB_ID is not an empty string
@@ -42,15 +43,19 @@ conda init
 conda activate project
 # put your script here - example script is sitting with this bash script
 
-
 echo python3 $path/analysis_fit_after_run.py $cell_name $file_type2read
 python3 $path/analysis_fit_after_run.py $cell_name $file_type2read $resize_diam $shrinkage_factor $folder
+
+echo python3 $path/Rin_Rm_plot.py $cell_name $file_type2read
+python3 $path/Rin_Rm_plot.py $cell_name $file_type2read $passive_val $folder $data_dir $save_dir
+
+echo python3 $path/attenuations.py $cell_name $file_type2read $passive_val
+python3 $path/attenuations.py $cell_name $file_type2read $folder $data_dir $save_dir $passive_val
 
 echo python3 $path/dendogram.py $cell_name $file_type2read
 python3 $path/dendogram.py $cell_name $file_type2read $folder $data_dir $save_dir
 
-echo python3 $path/attenuations.py $cell_name $file_type2read $passive_val
-python3 $path/attenuations.py $cell_name $file_type2read $folder $data_dir $save_dir $passive_val
+
 echo "execute_level2 is complite to run"
 
 
