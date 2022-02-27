@@ -15,4 +15,6 @@ for cell_name in cells:
         send_command = " ".join([command, cell_name,file_type,passive_val,resize_diam_by,shrinkage_factor,folder_])
         os.system(send_command)
         print(cell_name+ ' .'+file_type+': analysis_fit_after_run.py')
+        os.system(" ".join(['sbatch execute_python_script.sh', 'attenuations.py', cell_name,file_type,passive_val,resize_diam_by,shrinkage_factor,folder_]))
+
 

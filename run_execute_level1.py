@@ -12,12 +12,16 @@ print('calculate_synaptic_loc.py' )
 os.system(" ".join(['sbatch execute_python_script.sh', 'plot_neuron_3D.py']))
 print('plot_neuron_3D.py')
 # os.system(" ".join(['sbatch execute_python_script.sh', 'calculate_tau_m.py']))
+os.system(" ".join(['sbatch execute_python_script.sh', 'plot_neuron_3D.py']))
+print('plot_neuron_3D.py')
+# os.system(" ".join(['sbatch execute_python_script.sh', 'calculate_tau_m.py']))
+command="sbatch execute_level1.sh"
 for cell_name in cells:
     for file_type in file_type2read:
-        command="sbatch execute_level1.sh"
         send_command = " ".join([command, cell_name,file_type,folder_, folder_data , folder_save])
         os.system(send_command)
         print(cell_name+str(' :run execute_level1.sh'))
+
 
 print("execute_level1 running: cell_properties.py,  Rin_Rm_plot.py")
 print('')

@@ -3,7 +3,6 @@ from neuron import h,gui
 import signal
 import pickle
 from matplotlib import pyplot as plt
-from extra_function import load_ASC
 from glob import glob
 import pandas as pd
 import sys
@@ -15,7 +14,6 @@ if len(sys.argv) != 2:
     folder_='/ems/elsc-labs/segev-i/moria.fridman/project/analysis_groger_cells/'
 else:
     folder_=sys.argv[1]
-print('calculate_one_syn=',calculate_one_syn)
 folder_data=folder_+'/cells_initial_information/'
 folder_save=folder_+'/cells_outputs_data/'
 

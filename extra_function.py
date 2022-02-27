@@ -16,6 +16,7 @@ def create_folder_dirr(folder_dir,start_creat='project'):
             os.makedirs(new_dir)
         except FileExistsError:
             pass
+    return folder_dir+'/'
 
 def SIGSEGV_signal_arises(signalNum, stack):
     print(f"{signalNum} : SIGSEGV arises")
@@ -46,10 +47,13 @@ class Cell:
         if not len(self.soma)<=1:
             self.dend += [h.soma[i] for i in range(1, len(h.soma),1)]
         self.soma=self.soma[0]
+        self.insert_sec=[]
 
+    def add_sec(self,sec):
+        self.insert_sec.append(sec)
 
     def all_sec(self):
-        return [self.soma]+self.apic+self.dend+self.axon
+        return [self.soma]+self.apic+self.dend+self.axon+self.insert_sec
 
     def __del__(self):
         for sec in self.all_sec():
@@ -57,6 +61,7 @@ class Cell:
         self.dend = []
         self.apic = []
         self.axon =[]
+        self.insert_sec=[]
 
 def load_ASC(ASC_dir,delete_axon=True):
     h.load_file("import3d.hoc")
@@ -113,9 +118,12 @@ class hoc_cell:
         except:
             self.apic=[]
             print('no apical dendrite in this cell')
+        self.insert_sec=[]
 
+    def add_sec(self,sec):
+        self.insert_sec.append(sec)
     def all_sec(self):
-        return [self.soma]+self.apic+self.dend+self.axon
+        return [self.soma]+self.apic+self.dend+self.axon+self.insert_sec
 
     def delete_axon(self):
         for sec in self.axon:
@@ -128,6 +136,7 @@ class hoc_cell:
         self.dend = []
         self.apic = []
         self.axon =[]
+        self.insert_sec=[]
 
 def load_hoc(hoc_dir,delete_axon=True):
     cell=hoc_cell(hoc_dir)
