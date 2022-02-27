@@ -5,7 +5,7 @@ import matplotlib.pyplot as plt
 from matplotlib.lines import Line2D
 import signal
 from find_apic import find_apic
-from find_synaptic_loc import synaptic_loc
+from calculate_synaptic_loc import synaptic_loc
 from extra_function import load_ASC, SIGSEGV_signal_arises,create_folder_dirr,create_folders_list
 from spine_classes import  SpineLocatin,get_n_spinese
 from glob import glob

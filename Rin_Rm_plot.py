@@ -1,7 +1,6 @@
 from neuron import h, gui
 import numpy as np
 import matplotlib.pyplot as plt
-from tqdm import tqdm
 from add_figure import add_figure
 from glob import glob
 import signal
@@ -9,8 +8,7 @@ import sys
 from extra_function import load_ASC,load_hoc,SIGSEGV_signal_arises,create_folder_dirr
 from read_spine_properties import get_n_spinese,get_spine_xyz
 from open_pickle import read_from_pickle
-from find_synaptic_loc import synaptic_loc
-# from spine_classes import SpinesParams, SpineLocatin
+import pandas as pd
 from calculate_F_factor import calculate_F_factor
 import pandas as pd
 
@@ -93,9 +91,6 @@ for sec in cell.all_sec():
     sec.insert('pas') # insert passive property
     sec.nseg = int(sec.L/10)+1  #decide that the number of segment will be 21 with the same distances
 
-
-
-
 change_model_pas(CM=CM, RA = RA, RM =RM, E_PAS = E_pas,F_factor= F_factor)
 imp = h.Impedance(sec=soma)
 imp.loc(0.5, sec=soma)
@@ -115,23 +110,12 @@ plt.ylabel('Rin (M ohm)')
 plt.legend()
 plt.savefig(folder_save+'/Rin_Rm')
 freqs=np.linspace(0,200,num=100)
-import pandas as pd
-dict_syn=pd.read_excel(folder_+save_dir+"synaptic_location2.xlsx",index_col=0)
-
+dict_syn=pd.read_excel(folder_+save_dir+"synaptic_location_seperate.xlsx",index_col=0)
 # for spine_sec,spine_seg in zip(spines_sec,spines_seg):
 for spine_num in range(get_n_spinese(cell_name)):
-    syns=[]
-    for sec in cell.all_sec():
-        if sec.name() in [name for (name, seg) in dict_syn[cell_name+'_'+str(spine_num)]['place_name'][0]]:
-            spine_seg = [seg for (name, seg) in dict_syn[cell_name+'_'+str(spine_num)]['place_name'][0] if sec.name() == name][0]  # get seg num - todo should be syn[1]
-            spine_sec=sec
-            # syns.append(sec)
+    spine_seg=dict_syn[cell_name+str(spine_num)]['seg_num']
+    spine_sec=eval('cell.'+dict_syn[cell_name+str(spine_num)]['sec_name'])
     spine_xyz=get_spine_xyz(cell_name,spine_num=spine_num)
-    cell_asc_dir= glob(folder_+data_dir+"/"+cell_name+"/*.ASC")[0]
-    # spine_sec,spine_seg=pd.read_excel(folder_+save_dir+"/synaptic_location2.xlsx",index_col=0)[cell_name+'_'+spine_num]['place_as_sec']
-    # spine_sec,spine_seg=read_form_pickle(folder_+save_dir + 'synaptic_location2.p')[call_name+'_'+spine_num]['place_as_sec']
-    # spine_sec,spine_seg=synaptic_loc(cell_asc_dir,[spine_xyz])['place_as_sec']
-
     Rin_syn=[]
     change_model_pas(CM=CM, RA = RA, RM =RM, E_PAS = E_pas,F_factor= F_factor) #moria need to change for good passive value
     for freq in freqs:

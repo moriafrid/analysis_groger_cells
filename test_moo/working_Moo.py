@@ -159,7 +159,7 @@ def run(cell, seed=0):
         seed) + '/' + cell + "/"+'run_'+runnum+'/'
 
     # to insert syn here?
-    from find_synaptic_loc import synaptic_loc
+    from calculate_synaptic_loc import synaptic_loc
     syn_poses={}
     syn_poses['170830HuSHS2C1IN0toIN3'] = [np.array([198.04, 51.55, 11.31]),
                  np.array([87.81, -41.95, -13.15]),

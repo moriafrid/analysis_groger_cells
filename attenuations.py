@@ -7,16 +7,18 @@ import signal
 from extra_function import SIGSEGV_signal_arises,load_ASC,load_hoc
 from add_figure import add_figure
 from math import pi
+import pandas as pd
+from read_spine_properties import get_n_spinese
 from calculate_F_factor import calculate_F_factor
 import sys
 freq=100
 SPINE_START=60
 do_calculate_F_factor=True
 norm_Rin=False
-clamp_injection=True
-syn_injection=False
+clamp_injection=False
+syn_injection=True
 syn_on_dend=False
-put_syn_on_spine_head=False
+put_syn_on_spine_head=True
 do_resize_dend=True
 if len(sys.argv) != 7:
    cell_name= '2017_05_08_A_5-4'
@@ -63,7 +65,7 @@ def change_model_pas(CM=1, RA = 250, RM = 20000.0, E_PAS = -70.0):
                seg.g_pas *= F_factor
 
 def plot_records(RM, RA, CM,cell, syn,spine=None,save_name= "lambda"):
-    change_model_pas(cell,CM=CM, RA=RA, RM=RM, E_PAS = E_PAS,F_factor=F_factor_result)
+    change_model_pas(cell,CM=CM, RA=RA, RM=RM, E_PAS = E_PAS,F_factor=F_factor)
     Vvec_soma = h.Vector()
     Vvec_soma.record(soma(0.5)._ref_v)
 
@@ -118,7 +120,7 @@ def plot_records(RM, RA, CM,cell, syn,spine=None,save_name= "lambda"):
         axis[0].set_title("\n current injection of " + str(clamp.amp) + "nA to the syn for " + str(pulse_size) + 'ms')
         figure.tight_layout(pad=1.0)
 
-        if do_resize_dend:
+        if resize_diam_by!=1.0:
             plt.savefig(folder_ + 'clamp_inj freq_'+str(freq)+'/' + str(pulse_size) + "ms_dend*"+str(resize_diam_by)+'.png')
 
 
@@ -128,7 +130,7 @@ def plot_records(RM, RA, CM,cell, syn,spine=None,save_name= "lambda"):
         if not norm_Rin:
             axis[0].set_title("syn weight of " + str(syn_weight) + '\nspine head Voltage')
             axis[0].set_ylabel('mv')
-        if do_resize_dend:
+        if resize_diam_by!=1.0:
             plt.savefig(folder_+'syn'++'/'+str(syn_weight)+"_weight_dend*"+str(resize_diam_by)+".png")
         else:
             plt.savefig(folder_+'syn/'+str(syn_weight)+"_weight.png")
@@ -210,25 +212,29 @@ else:
 #     h.delete_section(sec=sec)
 #     does_axon_inside_cell=False
 soma = cell.soma
+# h.celsius = 36
+
 # from find_synaptic_loc import synaptic_loc
 # syn_poses={}
 # syn_poses['05_08_A_01062017']=[(-5.56, -325.88, -451.42)]
 # syns = synaptic_loc(cell,syn_poses[cell_name],del_axon=False)['place_as_sec']
-import pickle
 
-# dict_syn=read_form_pickle(folder_+save_dir + 'synaptic_location.p')
-import pandas as pd
-dict_syn=pd.read_excel(folder_+save_dir+"synaptic_location2.xlsx",index_col=0)
+
+dict_syn=pd.read_excel(folder_+save_dir+"synaptic_location_seperate.xlsx",index_col=0)
 syns=[]
 for sec in cell.all_sec():
     sec.insert('pas') # insert passive property
     sec.nseg = int(sec.L/10)+1  #decide that the number of segment will be 21 with the same distances
 
-    if sec.name() in [name for (name, seg) in dict_syn[cell_name]['place_name']]:
-        seg = [seg for (name, seg) in dict_syn[cell_name][0]['place_name'] if sec.name() == name][0]  # get seg num - todo should be syn[1]
-        syns.append(sec)
+    # if sec.name() in [name for (name, seg) in dict_syn[cell_name]['place_name']]:
+    #     seg = [seg for (name, seg) in dict_syn[cell_name][0]['place_name'] if sec.name() == name][0]  # get seg num - todo should be syn[1]
+    #     syns.append(sec)
+for spine_num in range(get_n_spinese(cell_name)):
+   spine_seg=dict_syn[cell_name+str(spine_num)]['seg_num']
+   spine_sec=eval('cell.'+dict_syn[cell_name+str(spine_num)]['sec_name'])
+   syns.append([spine_sec,spine_seg])
 syn=syns[0]
-# if do_resize_dend:
+# if resize_diam_by!=1.0:
 #     imp_0 = h.Impedance(sec=syn[0])
 #     imp_0.loc(0.165, sec=syn[0])
 #     imp_0.compute(0)  # check if you need at 10 Hz
@@ -246,125 +252,126 @@ from read_spine_properties import get_n_spinese,get_building_spine
 number_of_spine= get_n_spinese(cell_name)
 for j in range(number_of_spine):
     spines_property={j:get_building_spine(cell_name,j)}
-sp = h.PlotShape()
-sp.show(0)  # show diameters
-sp.color(2, sec=cell.dend[82] )
-pulse_size=1000
+    seg=dict_syn[cell_name+str(spine_num)]['seg_num']
+    sec=eval('cell.'+dict_syn[cell_name+str(spine_num)]['sec_name'])
+    syns=[sec,seg]
+    sp = h.PlotShape()
+    sp.show(0)  # show diameters
+    sp.color(2, sec=sec )
+    if clamp_injection:
+        if put_syn_on_spine_head:
+            for i,syn in enumerate(syns):
+                cell,spine=add_morph(cell, syn ,spines_property[str(i)])
+                spines.append(spine)
+        pulse_size=1000
+        clamp = h.IClamp(sec(seg)) # insert clamp(constant potentientiol) at the soma's center
+        clamp.amp = 0.05 #nA
+        clamp.delay = 200 #ms
+        clamp.dur = pulse_size  # ms
+        h.tstop = 500
 
-# h.celsius = 36
+    elif syn_injection: #@# replace in my specipic synapse
+        # create excitatory synapse at knowen head spine
+        spines=[]
+        syn_shape=[]
+        syn=syns[0]
+        if put_syn_on_spine_head:
+            for i,syn in enumerate(syns):
+                cell,spine=add_morph(cell, syn ,spines_property[str(i)])
+                spines.append(spine)
+                syn_shape = h.Exp2Syn(spine[0](1))
+        else:
+            syn_shape=h.Exp2Syn(syn[0](syn[1]))
+        syn_shape.tau1 = 0.3
+        syn_shape.tau2 = 1.8
+        syn_shape.e = 0
+        # syn_shape.i=0
+        # syn_shape.onset=200
+        # syn_shape.imax=0.5
+        syn_netstim = h.NetStim()  # the location of the NetStim does not matter
+        syn_netstim.number = 1
+        syn_netstim.start = 200
+        syn_netstim.noise = 0
+        netcon = h.NetCon(syn_netstim, syn_shape)
+        syn_weight = 0.002
+        netcon.weight[0] = syn_weight  # activate the on_path synapse
+        # create a NetStim that will activate the synapses at t=1000
+        h.tstop = 1000
 
-if clamp_injection:
-    clamp = h.IClamp(cell.dend[82](0.992)) # insert clamp(constant potentientiol) at the soma's center
-    clamp.amp = 0.05 #nA
-    clamp.delay = 200 #ms
-    clamp.dur = pulse_size  # ms
-    h.tstop = 500
+        ####### if there is more then 1 synapse
+        # syn_shape=[]
+        # for i, syn in enumerate(syns):
+        #     syn_shape.append(h.Exp2Syn(syn[0](syn[1])))
+        #     syn_shape[i].tau1 = 0.3
+        #     syn_shape[i].tau2 = 1.8
+        #     syn_shape[i].e = 0
+        #
+        #     # syn_shape.i=0
+        #     # syn_shape.onset=200
+        #     # syn_shape.imax=0.5
+        #     syn_netstim = h.NetStim()  # the location of the NetStim does not matter
+        #     syn_netstim.number = 1
+        #     syn_netstim.start = 200
+        #     syn_netstim.noise = 0
+        #     netcon = h.NetCon(syn_netstim, syn_shape[i])
+        #     syn_weight = 0.003
+        #     netcon.weight[i] = syn_weight  # activate the on_path synapse
+        #     # create a NetStim that will activate the synapses  at t=1000
+        #
+        # # syn_weight=0.003
+        # # netcon.weight = syn_weight  # activate the on_path synapse
+        # # h.tstop = 1000
+    if resize_diam_by!=1.0:
+        imp = h.Impedance(sec=spine[1])
+        imp.loc(1, sec=spine[1])
+        imp.compute(freq)  # check if you need at 10 Hz
+        Rin_syn_0 = imp.input(1, spine[1])
 
-elif syn_injection: #@# replace in my specipic synapse
-    # create excitatory synapse at knowen head spine
-    spines=[]
-    syn_shape=[]
-    syn=syns[0]
+        imp = h.Impedance(sec=syn[0])
+        imp.loc(syn[1], sec=syn[0])
+        imp.compute(freq)  # check if you need at 10 Hz
+        Rin_dend_0 = imp.input(syn[1], sec=syn[0])
+
+        imp = h.Impedance(sec=soma)
+        imp.loc(syn[1], sec=soma)
+        imp.compute(freq)  # check if you need at 10 Hz
+        Rin_soma_0 = imp.input(0.5, sec=soma)
+
+        for sec in cell.dend:
+            sec.diam = sec.diam*resize_diam_by
+    if norm_Rin:
+        syn=syns[0]
+        imp=h.Impedance(sec=spine[1])
+        imp.loc(1, sec=spine[1])
+        imp.compute(freq) #check if you need at 10 Hz
+        Rin_syn_resize_dend = imp.input(1, sec=spine[1])
+
+        imp=h.Impedance(sec=syn[0])
+        imp.loc(syn[1], sec=syn[0])
+        imp.compute(freq) #check if you need at 10 Hz
+        Rin_dend_resize_dend = imp.input(syn[1], sec=syn[0])
+
+        imp = h.Impedance(sec=soma)
+        imp.loc(syn[1], sec=soma)
+        imp.compute(freq)  # check if you need at 10 Hz
+        Rin_soma_resize_dend = imp.input(0.5, sec=soma)
+    E_PAS=-77.5
+
+    h.v_init=E_PAS
+    h.dt = 0.1 #=hz
+    h.steps_per_ms = h.dt
+
+    RM_const = 60000.0
+    RA_const = 250.0
+    CM_const = 1.0
+
+    CM=passive_val['CM']
+    RM=passive_val['RM'] #20000 #5684*2
+    RA=passive_val['RA']
     if put_syn_on_spine_head:
-        for i,syn in enumerate(syns):
-            cell,spine=add_morph(cell, syn ,spines_property[str(i)])
-            spines.append(spine)
-            syn_shape = h.Exp2Syn(spine[0](1))
+        plot_records(RM, RA, CM,cell,syns[0], spine=spine[1],save_name= "lambda for syn "+str(j))
     else:
-        syn_shape=h.Exp2Syn(syn[0](syn[1]))
-    syn_shape.tau1 = 0.3
-    syn_shape.tau2 = 1.8
-    syn_shape.e = 0
-    # syn_shape.i=0
-    # syn_shape.onset=200
-    # syn_shape.imax=0.5
-    syn_netstim = h.NetStim()  # the location of the NetStim does not matter
-    syn_netstim.number = 1
-    syn_netstim.start = 200
-    syn_netstim.noise = 0
-    netcon = h.NetCon(syn_netstim, syn_shape)
-    syn_weight = 0.002
-    netcon.weight[0] = syn_weight  # activate the on_path synapse
-    # create a NetStim that will activate the synapses at t=1000
-    h.tstop = 1000
-
-    ####### if there is more then 1 synapse
-    # syn_shape=[]
-    # for i, syn in enumerate(syns):
-    #     syn_shape.append(h.Exp2Syn(syn[0](syn[1])))
-    #     syn_shape[i].tau1 = 0.3
-    #     syn_shape[i].tau2 = 1.8
-    #     syn_shape[i].e = 0
-    #
-    #     # syn_shape.i=0
-    #     # syn_shape.onset=200
-    #     # syn_shape.imax=0.5
-    #     syn_netstim = h.NetStim()  # the location of the NetStim does not matter
-    #     syn_netstim.number = 1
-    #     syn_netstim.start = 200
-    #     syn_netstim.noise = 0
-    #     netcon = h.NetCon(syn_netstim, syn_shape[i])
-    #     syn_weight = 0.003
-    #     netcon.weight[i] = syn_weight  # activate the on_path synapse
-    #     # create a NetStim that will activate the synapses  at t=1000
-    #
-    # # syn_weight=0.003
-    # # netcon.weight = syn_weight  # activate the on_path synapse
-    # # h.tstop = 1000
-if do_resize_dend:
-    imp = h.Impedance(sec=spine[1])
-    imp.loc(1, sec=spine[1])
-    imp.compute(freq)  # check if you need at 10 Hz
-    Rin_syn_0 = imp.input(1, spine[1])
-
-    imp = h.Impedance(sec=syn[0])
-    imp.loc(syn[1], sec=syn[0])
-    imp.compute(freq)  # check if you need at 10 Hz
-    Rin_dend_0 = imp.input(syn[1], sec=syn[0])
-
-    imp = h.Impedance(sec=soma)
-    imp.loc(syn[1], sec=soma)
-    imp.compute(freq)  # check if you need at 10 Hz
-    Rin_soma_0 = imp.input(0.5, sec=soma)
-
-    for sec in cell.dend:
-        sec.diam = sec.diam*resize_diam_by
-if norm_Rin:
-    syn=syns[0]
-    imp=h.Impedance(sec=spine[1])
-    imp.loc(1, sec=spine[1])
-    imp.compute(freq) #check if you need at 10 Hz
-    Rin_syn_resize_dend = imp.input(1, sec=spine[1])
-
-    imp=h.Impedance(sec=syn[0])
-    imp.loc(syn[1], sec=syn[0])
-    imp.compute(freq) #check if you need at 10 Hz
-    Rin_dend_resize_dend = imp.input(syn[1], sec=syn[0])
-
-    imp = h.Impedance(sec=soma)
-    imp.loc(syn[1], sec=soma)
-    imp.compute(freq)  # check if you need at 10 Hz
-    Rin_soma_resize_dend = imp.input(0.5, sec=soma)
-E_PAS=-77.5
-
-h.v_init=E_PAS
-h.dt = 0.1 #=hz
-h.steps_per_ms = h.dt
-
-RM_const = 60000.0
-RA_const = 250.0
-CM_const = 1.0
-
-CM=passive_val['CM']
-RM=passive_val['RM'] #20000 #5684*2
-RA=passive_val['RA']
-# CM=2/2
-# RM=5684*2 #20000 #5684*2
-# RA=100
-if put_syn_on_spine_head:
-    plot_records(RM, RA, CM,cell,syns[0], spine=spine[1],save_name= "lambda")
-else:
-    plot_records(RM, RA, CM,cell,syns[0],save_name= "lambda")
+        plot_records(RM, RA, CM,cell,syns[0],save_name= "lambda for syn "+str(j))
 
 
 a=1

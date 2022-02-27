@@ -63,7 +63,7 @@ echo "execute_level2 is complite to run"
 ##echo python3 $path/cell_properties.py $cell_name $file_type2read
 #python3 $path/cell_properties.py $cell_name $file_type2read $folder $data_dir $save_dir
 #
-#python3 $path/find_synaptic_loc.py
+#python3 $path/calculate_synaptic_loc.py
 #
 #python3 $path/plot_neuron_3D.py
 #

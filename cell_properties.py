@@ -8,7 +8,7 @@ from glob import glob
 from extra_function import create_folder_dirr,SIGSEGV_signal_arises,load_ASC,load_hoc
 import sys
 
-if len(sys.argv) != 5:
+if len(sys.argv) != 6:
     cell_name= '2017_05_08_A_5-4'
     file_type2read= 'hoc'
     folder_='/ems/elsc-labs/segev-i/moria.fridman/project/analysis_groger_cells/'

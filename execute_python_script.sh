@@ -1,5 +1,5 @@
 #!/bin/bash
-# run with: sbatch ./execute_python_script.sh find_synaptic_loc.py 1 2 3 hi 3
+# run with: sbatch ./execute_python_script.sh calculate_synaptic_loc.py 1 2 3 hi 3
 
 # Write output as following (%j is JOB_ID)
 #SBATCH -o logs/%j.out

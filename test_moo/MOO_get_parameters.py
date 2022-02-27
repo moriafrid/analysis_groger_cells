@@ -221,7 +221,7 @@ def run(cell, seed=0):
     elif "initial" in passive_val_name:
         base_save_folder=base2 + second_folder + '/' + cell + '_'+passive_val_name+'/RA_after_fit='+str(round(RA,2))+'/'
     print('base_save_folder:',base_save_folder)
-    from find_synaptic_loc import synaptic_loc
+    from calculate_synaptic_loc import synaptic_loc
     syn_poses={}
     syn_poses['170830HuSHS2C1IN0toIN3'] = [np.array([198.04, 51.55, 11.31]),
                  np.array([87.81, -41.95, -13.15]),
