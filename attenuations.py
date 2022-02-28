@@ -5,9 +5,10 @@ import matplotlib.pyplot as plt
 import signal
 from extra_function import SIGSEGV_signal_arises,load_ASC,load_hoc,create_folder_dirr
 import pandas as pd
-from read_spine_properties import get_n_spinese
 from calculate_F_factor import calculate_F_factor
 import sys
+from read_spine_properties import get_n_spinese,get_building_spine
+import json
 freq=100
 SPINE_START=60
 do_calculate_F_factor=True
@@ -17,12 +18,12 @@ syn_injection=True
 clamp_injection=False
 if not syn_injection:
     clamp_injection=True
-
+print(sys.argv)
 do_resize_dend=True
-if len(sys.argv) != 7:
+if len(sys.argv) != 10:
     cell_name= '2017_05_08_A_5-4'
     file_type='hoc'
-    passive_val={'RA':100,'RM':10000,'CM':1}
+    passive_val={'RA':100,'CM':1,'RM':10000}
     syn_injection=True
     resize_diam_by=1.0
     shrinkage_factor=1.0
@@ -30,16 +31,18 @@ if len(sys.argv) != 7:
 else:
     cell_name = sys.argv[1]
     file_type=sys.argv[2] #hoc ar ASC
-    passive_val=sys.argv[3]
-    syn_injection=bool(sys.argv[4])
-    resize_diam_by = float(sys.argv[5]) #how much the cell sweel during the electrophisiology records
-    shrinkage_factor =float(sys.argv[6]) #how much srinkage the cell get between electrophysiology record and LM
-    folder_= sys.argv[7] #'/ems/elsc-labs/segev-i/moria.fridman/project/analysis_groger_cells/cells_outputs_data'
+    passive_val={"RA":float(sys.argv[3]),"CM":float(sys.argv[4]),'RM':float(sys.argv[5])}
+    print(passive_val)
+    syn_injection=bool(sys.argv[6])
+    resize_diam_by = float(sys.argv[7]) #how much the cell sweel during the electrophisiology records
+    shrinkage_factor =float(sys.argv[8]) #how much srinkage the cell get between electrophysiology record and LM
+    folder_= sys.argv[9] #'/ems/elsc-labs/segev-i/moria.fridman/project/analysis_groger_cells/cells_outputs_data'
 data_dir= "cells_initial_information/"
 save_dir ="cells_outputs_data/"
 cell_file=glob(folder_+data_dir+cell_name+'/*'+file_type)[0]
-folder_save=folder_+save_dir+cell_name+"/data/cell_properties/attenuations/"
-
+folder_save=folder_+save_dir+cell_name+"/data/cell_properties."+file_type+"/"
+folder_save+=json.dumps(passive_val)+'/'
+folder_save+="attenuations/"
 
 
 signal.signal(signal.SIGSEGV, SIGSEGV_signal_arises)
@@ -94,7 +97,7 @@ def plot_records(RM, RA, CM,cell, syn,spine=None,save_name= "lambda"):
         # npVec_dend=npVec_dend*(Rin_dend_0/Rin_dend_resize_dend)#/=Rin_dend_resize_dend #npVec_dend*(Rin_dend_0/Rin_dend_resize_dend)
         # npVec_soma=npVec_soma*(Rin_soma_0/Rin_soma_resize_dend)#/=Rin_soma_resize_dend#npVec_soma*(Rin_soma_0/Rin_soma_resize_dend)
     figure, axis = plt.subplots(3, 1)
-    plt.suptitle(cell_name+'\nsyn'+str(i))
+    plt.suptitle(cell_name+' syn'+str(i)+'\npassiv value is '+str(passive_val)+'\ndend*'+str(resize_diam_by)+' shrinkage_factor='+str(shrinkage_factor))
     axis[0].plot(npTvec,npIvec)
     # axis[0].set_title("spine voltage")
     axis[0].set_xlabel('mS')
@@ -113,8 +116,8 @@ def plot_records(RM, RA, CM,cell, syn,spine=None,save_name= "lambda"):
 
         axis[0].set_title("\n current injection of " + str(clamp.amp) + "nA to the syn for " + str(pulse_size) + 'ms')
         figure.tight_layout(pad=1.0)
-        folder_save2=create_folder_dirr(folder_save+'/syn'+str(i)+'/clamp_inj_freq_'+str(freq)+'/')
-        plt.savefig(folder_save2+'/' + str(pulse_size) + "ms_dend*"+str(resize_diam_by)+'.png')
+        folder_save2=create_folder_dirr(folder_save+'/clamp_inj_freq_'+str(freq)+'/')
+        plt.savefig(folder_save2+'/' + str(pulse_size) + "ms_dend*"+str(resize_diam_by)+'_syn'+str(i)+'.png')
 
     elif syn_injection:
         axis[0].set_title("syn weight=" + str(syn_weight) + '\nspine head Volt/Rinput')
@@ -122,8 +125,8 @@ def plot_records(RM, RA, CM,cell, syn,spine=None,save_name= "lambda"):
         if not norm_Rin:
             axis[0].set_title("syn weight=" + str(syn_weight) + '\nspine head Voltage')
             axis[0].set_ylabel('mv')
-        folder_save2=create_folder_dirr(folder_save+'/syn'+str(i)+'/syn_injection')
-        plt.savefig(folder_save2+'/weight='+str(syn_weight)+"_dend*"+str(resize_diam_by)+".png")
+        folder_save2=create_folder_dirr(folder_save+'/syn_injection')
+        plt.savefig(folder_save2+'/weight='+str(syn_weight)+"_dend*"+str(resize_diam_by)+'_syn'+str(i)+".png")
     plt.show()
 
 
@@ -182,7 +185,6 @@ def add_morph(cell, syn,spine_property,number=0):
         # all.append(create_spine(cell, sec, syn[0],syn[1] ,number=i, neck_diam=spine_property[str(i)]['NECK_DIAM']), neck_length=spine_property[str(i)]['NECK_LENGHT'],
         #                         head_diam=spine_property[str(i)]['HEAD_DIAM'])
     # return all
-# cell=instantiate_swc('/ems/elsc-labs/segev-i/moria.fridman/project/data_analysis_git/data_analysis/try1.swc')
 cell=None
 if file_type=='ASC':
    cell =load_ASC(cell_file)
@@ -199,41 +201,16 @@ else:
 soma = cell.soma
 # h.celsius = 36
 
-# from find_synaptic_loc import synaptic_loc
-# syn_poses={}
-# syn_poses['05_08_A_01062017']=[(-5.56, -325.88, -451.42)]
-# syns = synaptic_loc(cell,syn_poses[cell_name],del_axon=False)['place_as_sec']
-
-
 dict_syn=pd.read_excel(folder_+save_dir+"synaptic_location_seperate.xlsx",index_col=0)
 syns=[]
 for sec in cell.all_sec():
     sec.insert('pas') # insert passive property
     sec.nseg = int(sec.L/10)+1  #decide that the number of segment will be 21 with the same distances
-
-    # if sec.name() in [name for (name, seg) in dict_syn[cell_name]['place_name']]:
-    #     seg = [seg for (name, seg) in dict_syn[cell_name][0]['place_name'] if sec.name() == name][0]  # get seg num - todo should be syn[1]
-    #     syns.append(sec)
 for spine_num in range(get_n_spinese(cell_name)):
    spine_seg=dict_syn[cell_name+str(spine_num)]['seg_num']
    spine_sec=eval('cell.'+dict_syn[cell_name+str(spine_num)]['sec_name'])
    syns.append([spine_sec,spine_seg])
 
-# if resize_diam_by!=1.0:
-#     imp_0 = h.Impedance(sec=syn[0])
-#     imp_0.loc(0.165, sec=syn[0])
-#     imp_0.compute(0)  # check if you need at 10 Hz
-#     Rin_syn_0 = imp_0.input(syn[1], sec=syn[0])
-# # for sec in cell.dend:
-# #     sec.diam = sec.diam*resize_diam_by
-# if norm_Rin:
-#     imp=h.Impedance(sec=syn[0])
-#     imp.loc(syn[1], sec=syn[0])
-#     imp.compute(0) #check if you need at 10 Hz
-#     Rin_syn_resize_dend = imp.input(syn[1], sec=syn[0])
-#@# I need to think on a way to do it more clever
-
-from read_spine_properties import get_n_spinese,get_building_spine
 number_of_spine= get_n_spinese(cell_name)
 spines=[]
 for i in range(number_of_spine):
@@ -352,6 +329,6 @@ for i in range(number_of_spine):
         plot_records(RM, RA, CM,cell,[spine_sec,spine_seg], spine=spine_head,save_name= "lambda for syn "+str(i))
     else:
         plot_records(RM, RA, CM,cell,[spine_sec,spine_seg],save_name= "lambda for syn "+str(i))
-
+print( 'attenuation is run in diraction'+folder_save)
 
 a=1

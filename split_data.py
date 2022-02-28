@@ -95,8 +95,7 @@ def split2phenomena(cell_name,inputs_folder, outputs_folder):
 			with open(save_folder_IV_curve + 'max_vol_curr_inj.p', 'wb') as fr:
 				pickle.dump([maxi * short_pulse.units, I * pq.pA], fr)
 			I_V_curve(maxi, I * pq.pA, save_folder_IV_curve)
-			create_folder_dirr(base_external_folder + '/cell_properties/check_dynamic/')
-			check_dynamics(short_pulse, T_short_pulse, base_external_folder + '/cell_properties/check_dynamic/')
+			check_dynamics(short_pulse, T_short_pulse, create_folder_dirr(base_external_folder + '/check_dynamic/'))
 		else:
 			print("Error. Wrong file ending for " + f)
 

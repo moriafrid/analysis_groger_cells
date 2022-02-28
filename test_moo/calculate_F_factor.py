@@ -1,40 +1,9 @@
-import signal
 from neuron import h, gui
 import numpy as np
-import matplotlib.pyplot as plt
-from open_pickle import read_from_pickle
-from add_figure import add_figure
-import pickle
 from glob import glob
 h.load_file("import3d.hoc")
 from math import pi
-
-class Cell: pass
-def mkcell(fname):
-    #def to read ACS file
-    h('objref cell, tobj')
-    loader = h.Import3d_GUI(None)
-    loader.box.unmap()
-    loader.readfile(fname)
-    c = Cell()
-    loader.instantiate(c)
-    return c
-
-def instantiate_swc(filename):
-    h('objref cell, tobj')
-    h.load_file('allen_model.hoc')
-    h.execute('cell = new allen_model()')
-    h.load_file(filename)
-    nl = h.Import3d_SWC_read()
-    nl.quiet = 1
-    nl.input(filename)
-    i3d = h.Import3d_GUI(nl, 0)
-    i3d.instantiate(h.cell)
-    return h.cell
-def SIGSEGV_signal_arises(signalNum, stack):
-    print(f"{signalNum} : SIGSEGV arises")
-    # Your code
-signal.signal(signal.SIGSEGV, SIGSEGV_signal_arises)
+from
 
 ######################################################
 # build the model
@@ -60,3 +29,24 @@ def calculate_F_factor(cell_name,r_head,spine_neck_L,spine_neck_diam,spine_densi
     F_factor=(spines_area+dends_area)/dends_area
     return F_factor
 
+def calculate_F_factor(cell,spine_type,spines_density=1.08,spine_num=1, is_debug_print=False):
+    #spine type can be the cell_name or "mouse_spine", "human_spine" or "shaft_spine"
+    if is_debug_print:
+        print("the spine_type for calculate the F_factor is "+spine_type)
+    R_head,neck_diam,neck_length,spines_density_temp=get_F_factor_params(spine_type)
+    if not np.isnan(spines_density_temp):
+        spines_density=spines_density_temp
+    dend_len=np.sum([sec.L for sec in cell.dend])
+    try: dend_len+=np.sum([sec.L for sec in cell.apic])
+    except : "no apical in this cell"
+    # try: dend_len+=np.sum([sec.L for sec in cell.basal])
+    # except : "no basal in this cell"
+    head_area=4*pi*R_head**2
+    neck_area=2*pi*(neck_diam/2)*neck_length
+    spine_area=neck_area+head_area
+    spines_area=spine_area*dend_len*spines_density
+    dends_area=np.sum([seg.area() for sec in cell.dend for seg in sec]) #* (1.0/0.7)
+    try:dends_area+=np.sum([seg.area() for sec in cell.apic for seg in sec]) #* (1.0/0.7)
+    except : "no apical in this cell"
+    F_factor=(spines_area+dends_area)/dends_area
+    return F_factor

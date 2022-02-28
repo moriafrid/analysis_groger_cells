@@ -14,19 +14,20 @@
 
 echo $#
 
-if [[ $# -ne 5 ]] ; then
+if [[ $# -ne 8 ]] ; then
     echo "Wrong usage. not have enought parameters"
     exit 1
 fi
 
 cell_name=$1
 file_type2read=$2
-passive_val=$3
-resize_diam=$4
-shrinkage_factor=$5
-folder=$6
+RA=$3
+CM=$4
+RM=$5
+resize_diam=$6
+shrinkage_factor=$7
+folder=$8
 shift $#
-
 # `if [ -n $SLURM_JOB_ID ]` checks if $SLURM_JOB_ID is not an empty string
 if [ -n $SLURM_JOB_ID ]; then
 # check the original location through scontrol and $SLURM_JOB_ID
@@ -43,32 +44,17 @@ conda init
 conda activate project
 # put your script here - example script is sitting with this bash script
 
-echo python3 $path/analysis_fit_after_run.py $cell_name $file_type2read
-python3 $path/analysis_fit_after_run.py $cell_name $file_type2read $resize_diam $shrinkage_factor $folder
+#echo python3 $path/analysis_fit_after_run.py $cell_name $file_type2read
+#python3 $path/analysis_fit_after_run.py $cell_name $file_type2read $resize_diam $shrinkage_factor $folder
 
 echo python3 $path/Rin_Rm_plot.py $cell_name $file_type2read
-python3 $path/Rin_Rm_plot.py $cell_name $file_type2read $passive_val $folder $data_dir $save_dir
+python3 $path/Rin_Rm_plot.py $cell_name $file_type2read $RA $CM $RM $resize_diam_by $shrinkage_factor $folder
 
-echo python3 $path/attenuations.py $cell_name $file_type2read $passive_val
-python3 $path/attenuations.py $cell_name $file_type2read $folder $data_dir $save_dir $passive_val
+#echo python3 $path/attenuations.py $cell_name $file_type2read $passive_val
+#python3 $path/attenuations.py  $cell_name $file_type2read $RA $CM $RM $resize_diam_by $shrinkage_factor $folder
 
 echo python3 $path/dendogram.py $cell_name $file_type2read
-python3 $path/dendogram.py $cell_name $file_type2read $folder $data_dir $save_dir
+python3 $path/dendogram.py $cell_name $file_type2read $RA $CM $RM $resize_diam_by $shrinkage_factor $folder
 
 
-echo "execute_level2 is complite to run"
-
-
-#
-##echo python3 $path/cell_properties.py $cell_name $file_type2read
-#python3 $path/cell_properties.py $cell_name $file_type2read $folder $data_dir $save_dir
-#
-#python3 $path/calculate_synaptic_loc.py
-#
-#python3 $path/plot_neuron_3D.py
-#
-#echo python3 $path/Rin_Rm_plot.py $cell_name $file_type2read
-#python3 $path/Rin_Rm_plot.py $cell_name $file_type2read $folder $data_dir $save_dir
-#
-#echo python3 $path/find_Rinput.py $cell_name
-#python3 $path/find_Rinput.py $cell_name $folder $save_dir $save_dir
+#echo "execute_level2 is complite to run"

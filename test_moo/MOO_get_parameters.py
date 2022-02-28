@@ -57,6 +57,7 @@ frozen_NMDA_weigth=False
 runnum2compare = '13'
 spine_type="mouse_spine" #"groger_spine"
 
+
 model_description='the file to fit is '+RDSM_objective_file+\
             '\ngeneration size is '+str(generation_size)+' and num of generation is '+str(num_of_genarations)
 model_description=model_description+' the profile to run is '+profile
@@ -72,9 +73,8 @@ else:
     resize_dend_by = 1
 if do_compare2result:
     model_description=model_description+'\nwe compare to another running:'+runnum2compare
-
 if do_calculate_F_factor:
-    model_description=model_description+'\ncalculated F_factor and change it to be 2.03'
+    model_description=model_description+'\ncalculated F_factor to be '+str(F_factor)
 if frozen_NMDA_weigth:
     model_description=model_description+'\nthere is no NMDA in the experiment '
 model_description=model_description+'\n'
@@ -95,9 +95,7 @@ import logging
 logger = logging.getLogger(__name__)
 #######################################
 import signal
-def SIGSEGV_signal_arises(signalNum, stack):
-    print(f"{signalNum} : SIGSEGV arises")
-    # Your code
+from extra_function import SIGSEGV_signal_arises
 signal.signal(signal.SIGSEGV, SIGSEGV_signal_arises)
 ##########################################################
 #

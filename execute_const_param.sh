@@ -31,9 +31,4 @@ fi
 
 path=$(dirname $SCRIPT_PATH) # get script's path to allow running from any folder without errors
 
-# If necessary, activate anaconda installed on your user (Default: /ems/..../<lab>/<user>/anaconda3
-# source anaconda3/bin/activate
-# put your script here - example script is sitting with this bash script
-#python3 $path/find_Rinput.py
-
 python3 $path/best_with_const_param.py $cell_name $file_type2read $resize_diam_by $shrinkage_factor $folder

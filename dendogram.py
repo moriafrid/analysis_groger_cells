@@ -5,29 +5,33 @@ import matplotlib.pyplot as plt
 from matplotlib.lines import Line2D
 import signal
 from find_apic import find_apic
-from calculate_synaptic_loc import synaptic_loc
 from extra_function import load_ASC, SIGSEGV_signal_arises,create_folder_dirr,create_folders_list
 from spine_classes import  SpineLocatin,get_n_spinese
 from glob import glob
-
-if len(sys.argv) != 5:
+print(sys.argv)
+SPINE_START=60
+if len(sys.argv) != 9:
     cell_name= '2017_05_08_A_5-4'
+    file_type2read='hoc'
+    passive_val={'RA':100,'CM':1,'RM':10000}
+    resize_diam_by=1.0
+    shrinkage_factor=1.0
     folder_='/ems/elsc-labs/segev-i/moria.fridman/project/analysis_groger_cells/'
-    data_dir= "cells_initial_information"
-    save_dir ="cells_outputs_data"
 else:
     cell_name = sys.argv[1]
-    folder_= sys.argv[2] #'/ems/elsc-labs/segev-i/moria.fridman/project/analysis_groger_cells/'
-    data_dir = sys.argv[3] #cells_initial_information
-    save_dir =sys.argv[4] #cells_outputs_data
-
-folder_save = folder_+save_dir+'/'+cell_name +'/cell_properties/'
+    file_type2read=sys.argv[2] #hoc ar ASC
+    passive_val={"RA":float(sys.argv[3]),"CM":float(sys.argv[4]),'RM':float(sys.argv[5])}
+    print(passive_val)
+    resize_diam_by = float(sys.argv[6]) #how much the cell sweel during the electrophisiology records
+    shrinkage_factor =float(sys.argv[7]) #how much srinkage the cell get between electrophysiology record and LM
+    folder_= sys.argv[8] #'/ems/elsc-labs/segev-i/moria.fridman/project/analysis_groger_cells/cells_outputs_data'
+data_dir= "cells_initial_information/"
+save_dir ="cells_outputs_data/"
+cell_file=glob(folder_+data_dir+cell_name+'/*'+file_type2read)[0]
+folder_save=folder_+save_dir+cell_name+"/data/cell_properties."+file_type2read+"/"
+folder_save+=str(passive_val)+'/'
 create_folder_dirr(folder_save)
 
-h.load_file("import3d.hoc")
-h.load_file("nrngui.hoc")
-h.load_file('stdlib.hoc')
-h.load_file("stdgui.hoc")
 colors_dict = {"soma":"k",
                "apical": "blue",
                "oblique":"cyan",
@@ -89,21 +93,19 @@ def get_spine_area():
     return head_area +neck_area
 
 
-def change_model_pas(cell, CM=1, RA = 250, RM = 20000.0, E_PAS = -70.0, F_factor = {}):
-    #input the neuron property    h.dt = 0.1
-    h.distance(0,0.5, sec=cell.soma) # it isn't good beacause it change the synapse distance to the soma
-    for sec in h.allsec(): ##check if we need to insert Ra,cm,g_pas,e_pas to the dendrit or just to the soma
-        sec.Ra = RA
-        sec.cm = CM
-        sec.g_pas = 1.0 / RM
-        sec.e_pas = E_PAS
+def change_model_pas(cell,CM=1, RA = 250, RM = 20000.0, E_PAS = -70.0,F_factor=1.9):
+    h.dt = 0.1
+    h.distance(0,0.5, sec=cell.soma)
+    for sec in cell.all_sec():
+      sec.Ra = RA
+      sec.cm = CM  # *shrinkage_factor    #*(1.0/0.7)
+      sec.g_pas = (1.0 / RM)  #*shrinkage_factor  #*(1.0/0.7)
+      sec.e_pas = E_PAS
     for sec in cell.dend:
-        for seg in sec: #count the number of segment and calclate g_factor and total dend distance,
-            # how many segment have diffrent space larger then SPINE_START that decided
-            if h.distance(seg) > 60:
-                F_factor = F_factor#2.03 # F_factor[sec]
-                seg.cm *= F_factor
-                seg.g_pas *= F_factor
+      for seg in sec: #count the number of segment and calclate g_factor and total dend distance,
+          if h.distance(seg) > SPINE_START:
+              seg.cm *= F_factor
+              seg.g_pas *= F_factor
     return cell
 # def run_find_apic(apics,last_apic):
 #     for child in last_apic.children():
@@ -323,4 +325,4 @@ for i in range(get_n_spinese(cell_name)):
     dendogram.cumpute_distances(dendogram.cell.soma)
     max_y = dendogram.plot(save_folder_E,title=save_folder_E.split('/')[-2],ylabel="distance from soma (lamda)")
 
-
+print('dendogram.py is complte to run for '+cell_name)

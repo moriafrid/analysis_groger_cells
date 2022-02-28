@@ -43,3 +43,5 @@ path=$(dirname $SCRIPT_PATH)
 
 python3 $path/fit_influnce_by_initial_condition.py $cell_name $file_type2read $resize_diam_by $shrinkage_factor $folder
 echo fit_influnce_by_initial_condition is complite to run
+
+python3 $path/analysis_fit_after_run.py $cell_name $file_type2read $resize_diam_by $shrinkage_factor $folder

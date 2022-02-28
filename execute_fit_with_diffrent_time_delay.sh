@@ -38,3 +38,5 @@ shift $#
 # put your script here - example script is sitting with this bash script
 
 python3 $path/fit_with_diffrent_time_delay.py $cell_name $file_type2read $resize_diam_by $shrinkage_factor $add2delay $add2fit $folder
+
+#python3 $path/analysis_fit_after_run.py $cell_name $file_type2read $resize_diam_by $shrinkage_factor $folder

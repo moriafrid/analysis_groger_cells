@@ -26,7 +26,8 @@ class NrnSegmentSomaDistanceScaler_(ParameterScaler, DictMixin):
             dist_param_names=None,
             dist_thresh_apical=60,
             dist_thresh_basal=60,
-            F_factor = 1.9):
+            F_factor = 1.9,
+            shrinckage_factor = 1.0/0.7):
 
         """Constructor
 
@@ -59,6 +60,7 @@ class NrnSegmentSomaDistanceScaler_(ParameterScaler, DictMixin):
         self.dist_thresh_apical = dist_thresh_apical
         self.dist_thresh_basal = dist_thresh_basal
         self.F_factor = F_factor
+        self.shrinckage_factor=shrinckage_factor
 
 
     def scale(self, value, sec, sim=None):
@@ -73,7 +75,7 @@ class NrnSegmentSomaDistanceScaler_(ParameterScaler, DictMixin):
             if sec.name().find("spine") > -1:
                 spine_factor = 1
             elif sec in sec.cell().apical:
-                if  distance > self.dist_thresh_apical:
+                if distance > self.dist_thresh_apical:
                     spine_factor = self.F_factor
                 else:
                     spine_factor = 1  # no change
@@ -89,9 +91,9 @@ class NrnSegmentSomaDistanceScaler_(ParameterScaler, DictMixin):
             sim.neuron.h.pop_section()
             # print(sec.name(), distance, value, value*spine_factor)
 
-            return value * spine_factor
+            return value * spine_factor# * self.shrinckage_factor
         except:
-            return value
+            return value #* self.shrinckage_factor
         # if self.name.find('cm') > -1: return value * spine_factor
         # if self.name.find('g_pas') > -1: return value * spine_factor
         #
@@ -134,7 +136,7 @@ class EFeatureRDSM(EFeature):
         T = T[seatell:]
         V = V[seatell:]
         temp =numpy.sqrt(numpy.sum((self.V_objective - V[:len(self.V_objective)]) ** 2))
-        print(temp)
+        # print(temp)
         if temp < 30:
             a=1
         return numpy.sqrt(numpy.sum((self.V_objective - V[:len(self.V_objective)]) ** 2))
@@ -228,7 +230,7 @@ class EFeaturePeakTime(EFeature):
 
 
 class EFeaturePeak(EFeature):
-    def __init__(self, T, V):
+    def __init__(self, T, V, exp_std=1):
         """
 
         :param T: the time objective
@@ -240,6 +242,7 @@ class EFeaturePeak(EFeature):
         # self.fit_times = fit_times
         self.T_objective = T
         self.V_objective = V
+        self.exp_std=exp_std
 
     def calculate_feature(self, responses, raise_warnings=False):
         """Calculate feature value"""
@@ -254,7 +257,7 @@ class EFeaturePeak(EFeature):
 
 
     def calculate_score(self, responses, trace_check=False):
-        return self.calculate_feature(responses, raise_warnings=trace_check)
+        return self.calculate_feature(responses, raise_warnings=trace_check)/self.exp_std
 
 class EFeatureImpadance(EFeature):
     def __init__(self, Rin, injEnd, injCur, extra_rec="Rin1"):
@@ -389,7 +392,8 @@ class NrnNetstimWeightParameter(NrnParameter, DictMixin):
             frozen=False,
             bounds=None,
             locations=None,
-            param_name=None):
+            param_name=None,
+            reletive_strength = None):
         """Constructor
 
         Args:
@@ -413,6 +417,8 @@ class NrnNetstimWeightParameter(NrnParameter, DictMixin):
         self.locations = locations
         self.param_name = param_name
         self.total_duration=0 # this is a dummy variable
+        self.reletive_strength = reletive_strength
+
 
     def instantiate(self, sim=None, icell=None):
         """Instantiate"""
@@ -421,17 +427,21 @@ class NrnNetstimWeightParameter(NrnParameter, DictMixin):
                 'NrnSectionParameter: impossible to instantiate parameter "%s"'
                 ' without value' %
                 self.name)
-
+        i=0
         for location in self.locations:
             all = location.instantiate(sim=sim, icell=icell)
             for pprocess in location.connections:
+                if self.reletive_strength is None:
                     location.connections[pprocess][0][0].weight[0] = self.value
-
-                    logger.debug(
+                else:
+                    location.connections[pprocess][0][0].weight[0] = self.value * self.reletive_strength[i]
+                i+=1
+                logger.debug(
                         'Set %s to %s for point process',
                         self.param_name,
                         self.value)
-
+        if not i == len(self.reletive_strength):
+            print('error in reletive_strength, the length of reletive_strengths is too long')
 
     def __str__(self):
         """String representation"""
