@@ -54,8 +54,14 @@ def get_building_spine(cell_name,spine_num,folder='/ems/elsc-labs/segev-i/moria.
     df = pd.read_excel(folder+'/Data2.xlsx')
     parameter_cv=df[df['cell_name']==cell_name].reset_index()
     return {'NECK_LENGHT':parameter_cv['neck_length'][spine_num],'NECK_DIAM':parameter_cv['neck_diam'][spine_num],'HEAD_DIAM':get_R_head(parameter_cv)*2}
-
-
+def get_spine_params(spine_type,cell_name='',folder='/ems/elsc-labs/segev-i/moria.fridman/project/analysis_groger_cells/cells_initial_information'):
+    # 'groger_spine' 'mouse_spine','human_spine','shaft_spine'
+    if spine_type=='groger_spine':
+        return get_building_spine(cell_name)['NECK_LENGHT'],get_building_spine(cell_name)['NECK_DIAM'],get_building_spine(cell_name)['HEAD_DIAM']
+    else:
+        df = pd.read_excel(folder+'/Data2.xlsx')
+        parameter_cv=df[df['cell_name']==spine_type].reset_index()
+        return parameter_cv['neck_length'],parameter_cv['neck_diam'],get_R_head(parameter_cv)*2
 if __name__ == '__main__':
     cell_name='2017_03_04_A_6-7'
     get_parameters(cell_name,['PSD','neck_length'])
