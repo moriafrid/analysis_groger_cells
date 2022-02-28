@@ -15,12 +15,13 @@ from open_pickle import read_from_pickle
 from calculate_F_factor import calculate_F_factor
 import sys
 import pandas as pd
-from read_spine_properties import get_building_spine,get_n_spinese
+from read_spine_properties import get_building_spine,get_n_spinese,get_spine_params
 from bluepyopt.ephys.parameters import NrnParameter, NrnRangeParameter
 from bluepyopt.ephys.parameterscalers import *
 import logging
 import signal
-from extra_function import SIGSEGV_signal_arises
+from extra_function import SIGSEGV_signal_arises, load_hoc,load_ASC
+
 signal.signal(signal.SIGSEGV, SIGSEGV_signal_arises)
 logger = logging.getLogger(__name__)
 from glob import glob
@@ -38,7 +39,7 @@ runnum2compare = '13'
 spine_type="mouse_spine" #"groger_spine"
 
 if len(sys.argv) != 12:
-    cell_name= '2017_05_08_A_5-4'
+    cell_name= '2017_05_08_A_4-5'
     file_type='hoc'
     passive_val={'RA':100,'CM':1,'RM':10000}
     passive_val_name='const_ra'
@@ -47,6 +48,7 @@ if len(sys.argv) != 12:
     cpu_node = 30
     folder_='/ems/elsc-labs/segev-i/moria.fridman/project/analysis_groger_cells/'
     profile = '_'
+    RA=100
 else:
     cell_name = sys.argv[1]
     file_type=sys.argv[2] #hoc ar ASC
@@ -62,7 +64,7 @@ else:
     RA=float(sys.argv[3])
 data_dir= "cells_initial_information/"
 save_dir ="cells_outputs_data/"
-RDSM_objective_file = folder_+data_dir+cell_name+"/data//electrophysio_records/clear_syn/mean_syn.p"
+RDSM_objective_file = folder_+save_dir+cell_name+"/data//electrophysio_records/clear_syn/mean_syn.p"
 morphology_dirr = '/ems/elsc-labs/segev-i/moria.fridman/project/data_analysis_git/data_analysis/try1.swc'
 morphology_dirr = cell_file=glob(folder_+data_dir+cell_name+'/*'+file_type)[0]
 
@@ -224,12 +226,17 @@ def run(cell, seed=0):
     elif "initial" in passive_val_name:
         base_save_folder=base2 + second_folder + '/' + cell + '_'+passive_val_name+'/RA_after_fit='+str(round(RA,2))+'/'
     print('base_save_folder:',base_save_folder)
-    synapses_locations=pd.read_excel(folder_+save_dir+"synaptic_location.xlsx",index_col=0)[cell_name]['place_name']
+    synapses_dict=pd.read_excel(folder_+save_dir+"synaptic_location_seperate.xlsx",index_col=0)
+    synapses_locations=[]
     spine_properties={}
     for i in range(get_n_spinese(cell_name)):
-        spine_properties[i]=get_building_spine(cell_name)
+        sec=synapses_dict[cell_name+str(i)]['sec_name']
+        seg=synapses_dict[cell_name+str(i)]['seg_num']
+        synapses_locations.append([sec,seg])
+        spine_properties[i]=get_building_spine(cell_name,i)
 
-    morphology = ephys.morphologies.NrnFileMorphology(morphology_dirr,load_cell_function=load_cell_function, do_replace_axon=True,
+
+    morphology = ephys.morphologies.NrnFileMorphology(morphology_dirr, load_cell_function=load_cell_function,do_replace_axon=True,
                                                       extra_func=True, extra_func_run=add_morph, spine_poses=synapses_locations,
                                                       do_resize_dend=do_resize_dend,resize_dend_by=resize_dend_by,
                                                       do_shrinkage=True,shrinkage_by=shrinkage_by,
@@ -237,7 +244,7 @@ def run(cell, seed=0):
     # morphology = ephys.morphologies.NrnFileMorphology(morphology_dirr, do_replace_axon=True,
     #                                                   extra_func=True, extra_func_run=add_morph, spine_poses=synapses_locations[cell],
     #                                                   do_resize_dend=do_resize_dend,resize_dend_by=resize_dend_by,nseg_frequency=40)  # change axon to AIS and add spine locations
-    morphology1 = ephys.morphologies.NrnFileMorphology(morphology_dirr, do_replace_axon=True,
+    morphology1 = ephys.morphologies.NrnFileMorphology(morphology_dirr, load_cell_function=load_cell_function,do_replace_axon=True,
                                                       extra_func=True, extra_func_run=add_morph,
                                                       spine_poses=synapses_locations,
                                                       do_resize_dend=True,resize_dend_by=another_morphology_resize_dend_by,
@@ -321,7 +328,7 @@ def run(cell, seed=0):
         seclist_name='somatic',
         sec_index=0,
         comp_x=0.5)
-    for i, syn in enumerate(synapses_locations[cell]):
+    for i, syn in enumerate(synapses_locations):
         syn_locations.append(ephys.locations.NrnSectionCompLocation(
             name='syn' + str(i),
             sec_name="spineHead" + str(i),#@#??
@@ -582,7 +589,7 @@ def run(cell, seed=0):
 
     data_bef = open(base_save_folder + 'befor_simulation.txt', 'w')
     data_bef.write('model description:\n'+model_description+'\n')
-    data_bef.write('neck resistance is '+str(round(result_R_neck_m_ohm,3))+'\n')
+    data_bef.write('neck resistance is '+str(result_R_neck_m_ohm)+'\n')
     data_bef.write(model.__str__())
     data_bef.close()
     stim_befor=True
@@ -824,19 +831,33 @@ AMPA_DECAY_FIX = False
 
 ####################spine parameters######################
 NECK_LENGHT,NECK_DIAM,HEAD_DIAM=get_spine_params(spine_type)
+if file_type=='hoc':
+    load_cell_function=load_hoc
+elif file_type=='ASC':
+    load_cell_function=load_ASC
 
 Rneck = passive_val["RA"]
 if do_calculate_F_factor:
-   F_factor=calculate_F_factor(cell,'mouse_spine')
+    temp_cell=None
+    temp_cell=load_cell_function(morphology_dirr)
+    # if file_type=='hoc':
+    #     temp_cell=load_hoc(morphology_dirr)
+    # elif file_type=='ASC':
+    #     temp_cell=load_ASC(morphology_dirr)
+    for sec in temp_cell.dend+temp_cell.apic:
+        sec.diam=sec.diam*resize_dend_by
+        sec.L=sec.L*shrinkage_by
+    F_factor=calculate_F_factor(temp_cell,'mouse_spine')
 else:
-   F_factor = 1.9
+    F_factor = 1.9
+temp_cell=None
 model_description=model_description+'\nF_factor is equal to '+str(F_factor)
 
 spine_properties={}
 result_R_neck_m_ohm=[]
 for i in range(get_n_spinese(cell_name)):
-    spine_properties[i]=get_building_spine(cell_name)
-    result_R_neck_m_ohm.append((spine_properties[i]['NECK_LENGHT'] * 4.0 * passive_val['RA'])/(np.pi*(spine_properties[i]['NECK_DIAM']/2)**2)) *100.0 *1e-6# 0.25 is neck_diam
+    spine_properties[i]=get_building_spine(cell_name,i)
+    result_R_neck_m_ohm.append((spine_properties[i]['NECK_LENGHT'] * 4.0 * passive_val['RA'])/(np.pi*(spine_properties[i]['NECK_DIAM']/2)**2) *100.0 *1e-6)# 0.25 is neck_diam
 
 spine_properties['F_factor']=F_factor
 
