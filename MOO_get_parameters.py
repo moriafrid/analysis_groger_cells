@@ -126,14 +126,14 @@ def create_spine(sim, icell, sec, seg, number=0, neck_diam=0.25, neck_length=1.3
     sim.neuron.h("access " + str(neck.hoc_internal_name()))
     icell.add_sec(neck)
     if sec.name().find('dend') > -1:
-        icell.basal.append(neck)
+        icell.dend.append(neck)
     else:
         icell.apical.append(neck)
     sim.neuron.h.pop_section()
     sim.neuron.h("access " + str(head.hoc_internal_name()))
     icell.add_sec(head)
     if sec.name().find('dend') > -1:
-        icell.basal.append(head)
+        icell.dend.append(head)
     else:
         icell.apical.append(head)
     sim.neuron.h.pop_section()
@@ -158,8 +158,8 @@ def add_morph(sim, icell, syns, spine_properties):#,spine_property=self.spine_pr
             sec = icell.apic[num]
         else:
             sec = icell.soma
-        all.append(create_spine(sim, icell, sec, syn[1], i, neck_diam=spine_properties[i]['neck_diam'], neck_length=spine_properties[i]['neck_length'],
-                            head_diam=spine_properties[i]['head_diam']))
+        all.append(create_spine(sim, icell, sec, syn[1], i, neck_diam=spine_properties[i]['NECK_DIAM'], neck_length=spine_properties[i]['NECK_LENGHT'],
+                            head_diam=spine_properties[i]['HEAD_DIAM']))
     return all
 
 

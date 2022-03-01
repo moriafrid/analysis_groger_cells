@@ -51,7 +51,8 @@ class Cell:
 
     def add_sec(self,sec):
         self.insert_sec.append(sec)
-
+    # def add_axon(self,new_axon):
+    #     self.axon.append(new_axon)
     def all_sec(self):
         return [self.soma]+self.apic+self.dend+self.axon+self.insert_sec
 
@@ -122,6 +123,8 @@ class hoc_cell:
 
     def add_sec(self,sec):
         self.insert_sec.append(sec)
+    def add_axon(self,new_axon):
+        self.axon.append(new_axon)
     def all_sec(self):
         return [self.soma]+self.apic+self.dend+self.axon+self.insert_sec
 
