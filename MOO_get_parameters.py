@@ -231,7 +231,7 @@ def run(cell, seed=0):
     spine_properties={}
     for i in range(get_n_spinese(cell_name)):
         sec=synapses_dict[cell_name+str(i)]['sec_name']
-        seg=synapses_dict[cell_name+str(i)]['seg_num']
+        seg=float(synapses_dict[cell_name+str(i)]['seg_num'])
         synapses_locations.append([sec,seg])
         spine_properties[i]=get_building_spine(cell_name,i)
 
