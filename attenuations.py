@@ -17,15 +17,14 @@ put_syn_on_spine_head=True
 norm_Rin=False
 syn_injection=True
 clamp_injection=False
-if not syn_injection:
-    clamp_injection=True
+
 print(sys.argv)
 do_resize_dend=True
 if len(sys.argv) != 10:
     cell_name= '2017_05_08_A_5-4'
     file_type='ASC'
     passive_val={'RA':100,'CM':1,'RM':10000}
-    syn_injection=True
+    syn_injection=False
     resize_diam_by=1.0
     shrinkage_factor=1.0
     folder_='/ems/elsc-labs/segev-i/moria.fridman/project/analysis_groger_cells/'
@@ -38,6 +37,8 @@ else:
     resize_diam_by = float(sys.argv[7]) #how much the cell sweel during the electrophisiology records
     shrinkage_factor =float(sys.argv[8]) #how much srinkage the cell get between electrophysiology record and LM
     folder_= sys.argv[9] #'/ems/elsc-labs/segev-i/moria.fridman/project/analysis_groger_cells/cells_outputs_data'
+if not syn_injection:
+    clamp_injection=True
 print("the number of parameters that sys loaded in attenuation.py is ",len(sys.argv),flush=True)
 print(sys.argv)
 print(passive_val)
@@ -79,8 +80,8 @@ def plot_records(RM, RA, CM,cell, syns,spines=None,save_name= "lambda"):
     for i,spine in enumerate(spines):
         Vvec_spine.append(h.Vector())
         if clamp_injection:
-            Ivec=h.Vector()
-            Ivec.record(clamp._ref_i)
+            Ivec.append(h.Vector())
+            Ivec[i].record(clamp[i]._ref_i)
             if spines!=None:
                 Vvec_spine[i].record(spine(1)._ref_v)
 
@@ -109,7 +110,7 @@ def plot_records(RM, RA, CM,cell, syns,spines=None,save_name= "lambda"):
         axis[0,i].set_xlabel('mS')
         axis[0,i].set_ylabel('ms')
         if clamp_injection:
-            axis[0,i].set_title("\n current injection of " + str(clamp.amp) + "nA to the syn"+str(i)+" for " + str(pulse_size) + 'ms')
+            axis[0,i].set_title("\n current injection of " + str(clamp[i].amp) + "nA to the syn"+str(i)+" for " + str(pulse_size) + 'ms')
             figure.tight_layout(pad=1.0)
         elif syn_injection:
             axis[0,i].set_title("syn"+str(i)+" weight=" + str(syn_weight) + '\nspine head Volt/Rinput')
