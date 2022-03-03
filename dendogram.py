@@ -1,22 +1,21 @@
 import numpy as np
 from neuron import h, gui
-import sys,os
+import sys
 import matplotlib.pyplot as plt
 from matplotlib.lines import Line2D
 import signal
 from find_apic import find_apic
 from extra_function import load_hoc,load_ASC, SIGSEGV_signal_arises,create_folder_dirr,create_folders_list
-from spine_classes import  SpineLocatin,get_n_spinese
 from glob import glob
 import pandas as pd
 from open_pickle import read_from_pickle
 from calculate_F_factor import calculate_F_factor
-print(sys.argv)
+from read_spine_properties import get_n_spinese
 SPINE_START=60
 do_calculate_F_factor=True
 if len(sys.argv) != 9:
     cell_name= '2017_05_08_A_5-4'
-    file_type2read='hoc'
+    file_type2read='ASC'
     passive_val={'RA':100,'CM':1,'RM':10000}
     resize_diam_by=1.0
     shrinkage_factor=1.0
@@ -29,6 +28,10 @@ else:
     resize_diam_by = float(sys.argv[6]) #how much the cell sweel during the electrophisiology records
     shrinkage_factor =float(sys.argv[7]) #how much srinkage the cell get between electrophysiology record and LM
     folder_= sys.argv[8] #'/ems/elsc-labs/segev-i/moria.fridman/project/analysis_groger_cells/cells_outputs_data'
+print("the number of parameters that sys loaded in dendogram.py is ",len(sys.argv),flush=True)
+print(sys.argv)
+print(passive_val)
+
 data_dir= "cells_initial_information/"
 save_dir ="cells_outputs_data/"
 cell_file=glob(folder_+data_dir+cell_name+'/*'+file_type2read)[0]
@@ -36,11 +39,11 @@ folder_save=folder_+save_dir+cell_name+"/data/cell_properties."+file_type2read+"
 folder_save+=str(passive_val)+'/'
 create_folder_dirr(folder_save)
 
-colors_dict = {"soma":"k",
+colors_dict = {"soma":"black",
                "apical": "blue",
                "oblique":"cyan",
                "trunk":"purple",
-               "basal": "r",
+               "basal": "red",
                "axon": "green",
                "else": "gold",
                "synapse": "grey"}
@@ -317,20 +320,24 @@ morph_path=glob(folder_+data_dir+"/"+cell_name+'/*'+file_type2read)[0]
 cell=load_func(morph_path)
 # dendogram = Dendogram('dend_only', p, add_sec2)#@#
 # dendogram.cumpute_distances(dendogram.cell.soma)#@#
+dendogram=None
 dendogram = Dendogram('dend_only', morph_path, add_sec2,load_func=load_func)
 dendogram.cumpute_distances(dendogram.cell.soma)
 max_y=dendogram.plot(save_folder_M,title=save_folder_M.split('/')[-2],ylabel="distance from soma (um)")
 
+dendogram=None
 dendogram = Dendogram('all', morph_path, add_sec2, load_func=load_func,del_axon=False)
 dendogram.cumpute_distances(dendogram.cell.soma)
 max_y = dendogram.plot(save_folder_M,title=save_folder_M.split('/')[-2],ylabel="distance from soma (um)")
 
+dendogram=None
 dendogram = Dendogram('dend_only_with_syn', morph_path, add_sec,load_func=load_func, del_axon=False)
 dendogram.cumpute_distances(dendogram.cell.soma)
 max_y = dendogram.plot(save_folder_E,title=save_folder_E.split('/')[-2],ylabel="distance from soma (lamda)")
 
+dendogram=None
 dendogram = Dendogram('all_with_syn', morph_path, add_sec,load_func=load_func)
 dendogram.cumpute_distances(dendogram.cell.soma)
 max_y = dendogram.plot(save_folder_E,title=save_folder_E.split('/')[-2],ylabel="distance from soma (lamda)")
-
+dendogram=None
 print('dendogram.py is complte to run for '+cell_name)

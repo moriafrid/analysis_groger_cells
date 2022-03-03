@@ -9,6 +9,7 @@ from calculate_F_factor import calculate_F_factor
 import sys
 from read_spine_properties import get_n_spinese,get_building_spine
 import json
+from open_pickle import read_from_pickle
 freq=100
 SPINE_START=60
 do_calculate_F_factor=True
@@ -22,7 +23,7 @@ print(sys.argv)
 do_resize_dend=True
 if len(sys.argv) != 10:
     cell_name= '2017_05_08_A_5-4'
-    file_type='hoc'
+    file_type='ASC'
     passive_val={'RA':100,'CM':1,'RM':10000}
     syn_injection=True
     resize_diam_by=1.0
@@ -33,10 +34,13 @@ else:
     file_type=sys.argv[2] #hoc ar ASC
     passive_val={"RA":float(sys.argv[3]),"CM":float(sys.argv[4]),'RM':float(sys.argv[5])}
     print(passive_val)
-    syn_injection=bool(sys.argv[6])
+    syn_injection=eval(sys.argv[6])
     resize_diam_by = float(sys.argv[7]) #how much the cell sweel during the electrophisiology records
     shrinkage_factor =float(sys.argv[8]) #how much srinkage the cell get between electrophysiology record and LM
     folder_= sys.argv[9] #'/ems/elsc-labs/segev-i/moria.fridman/project/analysis_groger_cells/cells_outputs_data'
+print("the number of parameters that sys loaded in attenuation.py is ",len(sys.argv),flush=True)
+print(sys.argv)
+print(passive_val)
 data_dir= "cells_initial_information/"
 save_dir ="cells_outputs_data/"
 cell_file=glob(folder_+data_dir+cell_name+'/*'+file_type)[0]
@@ -60,71 +64,74 @@ def change_model_pas(cell,CM = 1, RA = 250, RM = 20000.0, E_PAS = -70.0,F_factor
                seg.cm *= F_factor
                seg.g_pas *= F_factor
 
-def plot_records(RM, RA, CM,cell, syn,spine=None,save_name= "lambda"):
+def plot_records(RM, RA, CM,cell, syns,spines=None,save_name= "lambda"):
     change_model_pas(cell ,CM=CM, RA=RA, RM=RM, E_PAS = E_PAS,F_factor=F_factor)
     Vvec_soma = h.Vector()
     Vvec_soma.record(soma(0.5)._ref_v)
-
-    Vvec_dend = h.Vector()
-    Vvec_dend.record(syn[0](syn[1])._ref_v)
-    Vvec_spine = h.Vector()
-
     Tvec = h.Vector()
     Tvec.record(h._ref_t)
 
-    if clamp_injection:
-        Ivec = h.Vector()
-        Ivec.record(clamp._ref_i)
-        if spine!=None:
-            Vvec_spine.record(spine(1)._ref_v)
+    Vvec_dend,Vvec_spine,Ivec=[],[],[]
+    for i,syn in enumerate(syns):
+        Vvec_dend.append(h.Vector())
+        Vvec_dend[i].record(syn[0](syn[1])._ref_v)
 
+    for i,spine in enumerate(spines):
+        Vvec_spine.append(h.Vector())
+        if clamp_injection:
+            Ivec=h.Vector()
+            Ivec.record(clamp._ref_i)
+            if spines!=None:
+                Vvec_spine[i].record(spine(1)._ref_v)
 
-    if syn_injection:
-        if spine!=None:
-            Vvec_spine.record(spine(1)._ref_v)
-            Ivec=Vvec_spine
-        else:
-            h.run()
-            Ivec=range(len(Tvec))
-        # Ivec.record(netcon._ref_i)
+        if syn_injection:
+            if spines!=None:
+                Vvec_spine[i].record(spine(1)._ref_v)
+                Ivec=Vvec_spine
+            else:
+                h.run()
+                Ivec=range(len(Tvec))
+            # Ivec.record(netcon._ref_i)
     h.run()
     npTvec = np.array(Tvec)
     npIvec = np.array(Ivec)
     npVec_soma = np.array(Vvec_soma)
     npVec_dend = np.array(Vvec_dend)
-    if norm_Rin:
+    if norm_Rin: ##check for the rigth norming
         npIvec/=Rin_syn_resize_dend #npIvec*(Rin_syn_0/Rin_syn_resize_dend)
         # npVec_dend=npVec_dend*(Rin_dend_0/Rin_dend_resize_dend)#/=Rin_dend_resize_dend #npVec_dend*(Rin_dend_0/Rin_dend_resize_dend)
         # npVec_soma=npVec_soma*(Rin_soma_0/Rin_soma_resize_dend)#/=Rin_soma_resize_dend#npVec_soma*(Rin_soma_0/Rin_soma_resize_dend)
-    figure, axis = plt.subplots(3, 1)
-    plt.suptitle(cell_name+' syn'+str(i)+'\npassiv value is '+str(passive_val)+'\ndend*'+str(resize_diam_by)+' shrinkage_factor='+str(shrinkage_factor))
-    axis[0].plot(npTvec,npIvec)
-    # axis[0].set_title("spine voltage")
-    axis[0].set_xlabel('mS')
-    axis[0].set_ylabel('ms')
+    figure, axis = plt.subplots(3, len(spines))
+    plt.suptitle(cell_name+'\npassive value is '+str(passive_val)+'\ndend*'+str(resize_diam_by)+' shrinkage_factor='+str(shrinkage_factor))
+    for i in range(len(spines)):
+        axis[0,i].plot(npTvec,npIvec[i])
+        # axis[0,i].set_title("spine voltage")
+        axis[0,i].set_xlabel('mS')
+        axis[0,i].set_ylabel('ms')
+        if clamp_injection:
+            axis[0,i].set_title("\n current injection of " + str(clamp.amp) + "nA to the syn"+str(i)+" for " + str(pulse_size) + 'ms')
+            figure.tight_layout(pad=1.0)
+        elif syn_injection:
+            axis[0,i].set_title("syn"+str(i)+" weight=" + str(syn_weight) + '\nspine head Volt/Rinput')
+            figure.tight_layout(pad=1.0)
+            if not norm_Rin:
+                axis[0,i].set_title("syn"+str(i)+" weight=" + str(syn_weight) + '\nspine head Voltage')
+                axis[0,i].set_ylabel('mv')
 
-    axis[1].plot(npTvec, npVec_dend)
-    axis[1].set_title("dend parent spine voltage")
-    axis[1].set_xlabel('mS')
-    axis[1].set_ylabel('mV')
+        axis[1,i].plot(npTvec, npVec_dend[i])
+        axis[1,i].set_title(sec.name().split('.')[-1]+str(spines_seg[i])+" parent spine voltage")
+        axis[1,i].set_xlabel('mS')
+        axis[1,i].set_ylabel('mV')
 
-    axis[2].plot(npTvec, npVec_soma)
-    axis[2].set_title("soma Voltage")
-    axis[2].set_xlabel('mS')
-    axis[2].set_ylabel('mv')
+        axis[2,0].plot(npTvec, npVec_soma)
+        axis[2,0].set_title("soma Voltage")
+        axis[2,0].set_xlabel('mS')
+        axis[2,0].set_ylabel('mv')
     if clamp_injection:
-
-        axis[0].set_title("\n current injection of " + str(clamp.amp) + "nA to the syn for " + str(pulse_size) + 'ms')
-        figure.tight_layout(pad=1.0)
         folder_save2=create_folder_dirr(folder_save+'/clamp_inj_freq_'+str(freq)+'/')
         plt.savefig(folder_save2+'/' + str(pulse_size) + "ms_dend*"+str(resize_diam_by)+'_syn'+str(i)+'.png')
 
     elif syn_injection:
-        axis[0].set_title("syn weight=" + str(syn_weight) + '\nspine head Volt/Rinput')
-        figure.tight_layout(pad=1.0)
-        if not norm_Rin:
-            axis[0].set_title("syn weight=" + str(syn_weight) + '\nspine head Voltage')
-            axis[0].set_ylabel('mv')
         folder_save2=create_folder_dirr(folder_save+'/syn_injection')
         plt.savefig(folder_save2+'/weight='+str(syn_weight)+"_dend*"+str(resize_diam_by)+'_syn'+str(i)+".png")
     plt.show()
@@ -200,48 +207,51 @@ else:
 #     does_axon_inside_cell=False
 soma = cell.soma
 # h.celsius = 36
+sp = h.PlotShape()
 
+#get spines prameters and creat spine:
 dict_syn=pd.read_excel(folder_+save_dir+"synaptic_location_seperate.xlsx",index_col=0)
-syns=[]
+syns,spines,spines_sec,spines_seg,spines_head=[],[],[],[],[]
+number_of_spine= get_n_spinese(cell_name)
+for spine_num in range(number_of_spine):
+    spine_seg=dict_syn[cell_name+str(spine_num)]['seg_num']
+    spine_sec=eval('cell.'+dict_syn[cell_name+str(spine_num)]['sec_name'])
+    syns.append([spine_sec,spine_seg])
+    spines_sec.append(spine_sec)
+    spines_seg.append(spine_seg)
+    spines_property=get_building_spine(cell_name,spine_num)
+    cell,[spine_neck, spine_head]=add_morph(cell, [spine_sec,spine_seg] ,get_building_spine(cell_name,spine_num),number=spine_num)
+    spines.append([spine_neck, spine_head])
+    spines_head.append(spine_head)
+    sp.show(0)  # show diameters
+    sp.color(2, sec=spine_sec )
 for sec in cell.all_sec():
     sec.insert('pas') # insert passive property
     sec.nseg = int(sec.L/10)+1  #decide that the number of segment will be 21 with the same distances
-for spine_num in range(get_n_spinese(cell_name)):
-   spine_seg=dict_syn[cell_name+str(spine_num)]['seg_num']
-   spine_sec=eval('cell.'+dict_syn[cell_name+str(spine_num)]['sec_name'])
-   syns.append([spine_sec,spine_seg])
-
-number_of_spine= get_n_spinese(cell_name)
-spines=[]
-for i in range(number_of_spine):
-    spines_property={i:get_building_spine(cell_name,i)}
-    spine_seg=dict_syn[cell_name+str(spine_num)]['seg_num']
-    spine_sec=eval('cell.'+dict_syn[cell_name+str(spine_num)]['sec_name'])
-    cell,[spine_neck, spine_head]=add_morph(cell, [spine_sec,spine_seg] ,spines_property[i],number=i)
-    if put_syn_on_spine_head:
-        spines.append([spine_neck, spine_head])
-    sp = h.PlotShape()
-    sp.show(0)  # show diameters
-    sp.color(2, sec=spine_sec )
+sp = h.PlotShape()
+#creat stimulus
+clamp=[]
+syn_shape=[]
+Rin_dend,Rin_syn=[],[]
+netcon=[]
+for i,spine_head in enumerate(spines_head):
     if clamp_injection:
         pulse_size=1000
-        clamp = h.IClamp(spine_head(1)) # insert clamp(constant potentientiol) at the soma's center
-        clamp.amp = 0.05 #nA
-        clamp.delay = 200 #ms
-        clamp.dur = pulse_size  # ms
+        clamp.append(h.IClamp(spine_head(1))) # insert clamp(constant potentientiol) at the soma's center
+        clamp[i].amp = 0.05 #nA
+        clamp[i].delay = 200 #ms
+        clamp[i].dur = pulse_size  # ms
         h.tstop = 500
 
     elif syn_injection: #@# replace in my specipic synapse
-        # create excitatory synapse at knowen head spine
-        spines=[]
-        syn_shape=[]
-        if put_syn_on_spine_head:
-            syn_shape = h.Exp2Syn(spine_head(1))
-        else:
-            syn_shape=h.Exp2Syn(spine_sec(spine_seg))
-        syn_shape.tau1 = 0.3
-        syn_shape.tau2 = 1.8
-        syn_shape.e = 0
+        syn_shape.append(h.Exp2Syn(spine_head(1)))
+        # if put_syn_on_spine_head:
+        #     syn_shape.append(h.Exp2Syn(spine_head(1)))
+        # else:
+        #     syn_shape.append(h.Exp2Syn(spine_sec(spine_seg))
+        syn_shape[i].tau1 = 0.3
+        syn_shape[i].tau2 = 1.8
+        syn_shape[i].e = 0
         # syn_shape.i=0
         # syn_shape.onset=200
         # syn_shape.imax=0.5
@@ -249,86 +259,62 @@ for i in range(number_of_spine):
         syn_netstim.number = 1
         syn_netstim.start = 200
         syn_netstim.noise = 0
-        netcon = h.NetCon(syn_netstim, syn_shape)
+        netcon.append(h.NetCon(syn_netstim, syn_shape[i]))
         syn_weight = 0.002
-        netcon.weight[0] = syn_weight  # activate the on_path synapse
-        # create a NetStim that will activate the synapses at t=1000
+        netcon[i].weight[0] = syn_weight  # activate the on_path synapse
         h.tstop = 1000
 
-        ####### if there is more then 1 synapse
-        # syn_shape=[]
-        # for i, syn in enumerate(syns):
-        #     syn_shape.append(h.Exp2Syn(syn[0](syn[1])))
-        #     syn_shape[i].tau1 = 0.3
-        #     syn_shape[i].tau2 = 1.8
-        #     syn_shape[i].e = 0
-        #
-        #     # syn_shape.i=0
-        #     # syn_shape.onset=200
-        #     # syn_shape.imax=0.5
-        #     syn_netstim = h.NetStim()  # the location of the NetStim does not matter
-        #     syn_netstim.number = 1
-        #     syn_netstim.start = 200
-        #     syn_netstim.noise = 0
-        #     netcon = h.NetCon(syn_netstim, syn_shape[i])
-        #     syn_weight = 0.003
-        #     netcon.weight[i] = syn_weight  # activate the on_path synapse
-        #     # create a NetStim that will activate the synapses  at t=1000
-        #
-        # # syn_weight=0.003
-        # # netcon.weight = syn_weight  # activate the on_path synapse
-        # # h.tstop = 1000
-    if resize_diam_by!=1.0:
-        imp = h.Impedance(sec=spine_head)
-        imp.loc(1, sec=spine_head)
-        imp.compute(freq)  # check if you need at 10 Hz
-        Rin_syn_0 = imp.input(1, spine_head)
+    imp=h.Impedance(sec=spine_head)
+    imp.loc(1, sec=spine_head)
+    imp.compute(freq)  # check if you need at 10 Hz
+    Rin_syn.append(imp.input(1, spine_head))
 
-        imp = h.Impedance(sec=spine_sec)
-        imp.loc(spine_seg, sec=spine_sec)
-        imp.compute(freq)  # check if you need at 10 Hz
-        Rin_dend_0 = imp.input(sec, sec=spine_seg)
+    imp=h.Impedance(sec=spines_sec[i])
+    imp.loc(spines_seg[i], sec=spines_sec[i])
+    imp.compute(freq)  # check if you need at 10 Hz
+    Rin_dend.append(imp.input(spines_seg[i], sec=spines_sec[i]))
 
-        imp = h.Impedance(sec=soma)
-        imp.loc(0.5, sec=soma)
-        imp.compute(freq)  # check if you need at 10 Hz
-        Rin_soma_0 = imp.input(0.5, sec=soma)
+imp = h.Impedance(sec=soma)
+imp.loc(0.5, sec=soma)
+imp.compute(freq)  # check if you need at 10 Hz
+Rin_soma_0 = imp.input(0.5, sec=soma)
 
-        for sec in cell.dend:
-            sec.diam = sec.diam*resize_diam_by
-    if norm_Rin:
-        syn=syns[0]
+for sec in cell.dend:
+    sec.diam = sec.diam*resize_diam_by
+if norm_Rin:
+    Rin_syn_resize_dend,Rin_dend_resize_dend=[],[]
+    for i,spine_head in enumerate(spines_head):
         imp=h.Impedance(sec=spine_head)
         imp.loc(1, sec=spine_head)
-        imp.compute(freq) #check if you need at 10 Hz
-        Rin_syn_resize_dend = imp.input(1, sec=spine_head)
-
-        imp=h.Impedance(sec=spine_sec)
-        imp.loc(spine_seg, sec=spine_sec)
-        imp.compute(freq) #check if you need at 10 Hz
-        Rin_dend_resize_dend = imp.input(spine_seg, sec=spine_sec)
-
-        imp = h.Impedance(sec=soma)
-        imp.loc(0.5, sec=soma)
         imp.compute(freq)  # check if you need at 10 Hz
-        Rin_soma_resize_dend = imp.input(0.5, sec=soma)
-    E_PAS=-77.5
+        Rin_syn_resize_dend.append( imp.input(1, spine_head))
 
-    h.v_init=E_PAS
-    h.dt = 0.1 #=hz
-    h.steps_per_ms = h.dt
+        imp=h.Impedance(sec=spines_sec[i])
+        imp.loc(spines_seg[i], sec=spines_sec[i])
+        imp.compute(freq)  # check if you need at 10 Hz
+        Rin_dend_resize_dend.append(imp.input(spines_seg[i], sec=spines_sec[i]))
 
-    RM_const = 60000.0
-    RA_const = 250.0
-    CM_const = 1.0
+    imp = h.Impedance(sec=soma)
+    imp.loc(0.5, sec=soma)
+    imp.compute(freq)  # check if you need at 10 Hz
+    Rin_soma_resize_dend = imp.input(0.5, sec=soma)
+E_PAS=read_from_pickle(folder_+save_dir+cell_name+'/data/electrophysio_records/short_pulse_parameters.p')['E_pas']
+h.v_init=E_PAS
+h.dt = 0.1 #=hz
+h.steps_per_ms = h.dt
 
-    CM=passive_val['CM']
-    RM=passive_val['RM'] #20000 #5684*2
-    RA=passive_val['RA']
-    if put_syn_on_spine_head:
-        plot_records(RM, RA, CM,cell,[spine_sec,spine_seg], spine=spine_head,save_name= "lambda for syn "+str(i))
-    else:
-        plot_records(RM, RA, CM,cell,[spine_sec,spine_seg],save_name= "lambda for syn "+str(i))
+RM_const = 60000.0
+RA_const = 250.0
+CM_const = 1.0
+
+CM=passive_val['CM']
+RM=passive_val['RM'] #20000 #5684*2
+RA=passive_val['RA']
+if put_syn_on_spine_head:
+
+    plot_records(RM, RA, CM,cell,syns, spines=spines_head,save_name= "lambda for syn "+str(i))
+else:
+    plot_records(RM, RA, CM,cell,syns,save_name= "lambda for syn "+str(i))
 print( 'attenuation is run in diraction'+folder_save)
 
 a=1
