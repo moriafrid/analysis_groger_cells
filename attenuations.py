@@ -23,7 +23,7 @@ do_resize_dend=True
 if len(sys.argv) != 10:
     cell_name= '2017_05_08_A_5-4'
     file_type='ASC'
-    passive_val={'RA':100,'CM':1,'RM':10000}
+    passive_val={'RA':100.0,'CM':1.0,'RM':10000.0}
     syn_injection=False
     resize_diam_by=1.0
     shrinkage_factor=1.0
@@ -110,7 +110,7 @@ def plot_records(RM, RA, CM,cell, syns,spines=None,save_name= "lambda"):
         axis[0,i].set_xlabel('mS')
         axis[0,i].set_ylabel('ms')
         if clamp_injection:
-            axis[0,i].set_title("\n current injection of " + str(clamp[i].amp) + "nA to the syn"+str(i)+" for " + str(pulse_size) + 'ms')
+            axis[0,i].set_title("\n current injection of " + str(clamp[i].amp) + "nA\nsyn"+str(i)+" for " + str(pulse_size) + 'ms')
             figure.tight_layout(pad=1.0)
         elif syn_injection:
             axis[0,i].set_title("syn"+str(i)+" weight=" + str(syn_weight) + '\nspine head Volt/Rinput')
@@ -120,7 +120,7 @@ def plot_records(RM, RA, CM,cell, syns,spines=None,save_name= "lambda"):
                 axis[0,i].set_ylabel('mv')
 
         axis[1,i].plot(npTvec, npVec_dend[i])
-        axis[1,i].set_title(sec.name().split('.')[-1]+str(spines_seg[i])+" parent spine voltage")
+        axis[1,i].set_title(sec.name().split('.')[-1]+str(spines_seg[i])+" voltage")
         axis[1,i].set_xlabel('mS')
         axis[1,i].set_ylabel('mV')
 
@@ -130,11 +130,14 @@ def plot_records(RM, RA, CM,cell, syns,spines=None,save_name= "lambda"):
         axis[2,0].set_ylabel('mv')
     if clamp_injection:
         folder_save2=create_folder_dirr(folder_save+'/clamp_inj_freq_'+str(freq)+'/')
-        plt.savefig(folder_save2+'/' + str(pulse_size) + "ms_dend*"+str(resize_diam_by)+'_syn'+str(i)+'.png')
+        plt.savefig(folder_save+'/clamp_inj_freq_'+str(freq)+'_for_' + str(pulse_size) + "ms_dend*"+str(resize_diam_by)+'.png')
+        plt.savefig(folder_save+'/' + str(pulse_size) + "ms_dend*"+str(resize_diam_by)+'.pdf')
 
     elif syn_injection:
         folder_save2=create_folder_dirr(folder_save+'/syn_injection')
-        plt.savefig(folder_save2+'/weight='+str(syn_weight)+"_dend*"+str(resize_diam_by)+'_syn'+str(i)+".png")
+        plt.savefig(folder_save+'/syn_injection_weight='+str(syn_weight)+"_dend*"+str(resize_diam_by)+".png")
+        plt.savefig(folder_save+'/syn_injection_weight='+str(syn_weight)+"_dend*"+str(resize_diam_by)+".pdf")
+
     plt.show()
 
 

@@ -15,10 +15,10 @@ import pandas as pd
 SPINE_START = 60
 do_calculate_F_factor=True
 
-if len(sys.argv) != 9:
+if len(sys.argv) != 8:
     cell_name= '2017_03_04_A_6-7'
     file_type2read= 'hoc'
-    passive_val={'RA':100,'RM':10000,'CM':2}
+    passive_val={'RA':100.0,'CM':1.0,'RM':10000.0}
     resize_diam_by=1.0
     shrinkage_factor=1.0
     folder_='/ems/elsc-labs/segev-i/moria.fridman/project/analysis_groger_cells/'
