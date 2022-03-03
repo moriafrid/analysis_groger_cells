@@ -129,12 +129,12 @@ def plot_records(RM, RA, CM,cell, syns,spines=None,save_name= "lambda"):
         axis[2,0].set_xlabel('mS')
         axis[2,0].set_ylabel('mv')
     if clamp_injection:
-        folder_save2=create_folder_dirr(folder_save+'/clamp_inj_freq_'+str(freq)+'/')
+        # folder_save2=create_folder_dirr(folder_save+'/clamp_inj_freq_'+str(freq)+'/')
         plt.savefig(folder_save+'/clamp_inj_freq_'+str(freq)+'_for_' + str(pulse_size) + "ms_dend*"+str(resize_diam_by)+'.png')
-        plt.savefig(folder_save+'/' + str(pulse_size) + "ms_dend*"+str(resize_diam_by)+'.pdf')
+        plt.savefig(folder_save+'/clamp_inj_freq_'+str(freq)+'_for_' + str(pulse_size) + "ms_dend*"+str(resize_diam_by)+'.pdf')
 
     elif syn_injection:
-        folder_save2=create_folder_dirr(folder_save+'/syn_injection')
+        # folder_save2=create_folder_dirr(folder_save+'/syn_injection')
         plt.savefig(folder_save+'/syn_injection_weight='+str(syn_weight)+"_dend*"+str(resize_diam_by)+".png")
         plt.savefig(folder_save+'/syn_injection_weight='+str(syn_weight)+"_dend*"+str(resize_diam_by)+".pdf")
 
