@@ -6,14 +6,13 @@ folder_save="cells_outputs_data"
 cells=["2017_05_08_A_5-4", "2017_05_08_A_4-5","2017_03_04_A_6-7"]
 file_type2read=['ASC','hoc']
 
-os.system(" ".join(['sbatch execute_python_script.sh', 'calculate_synaptic_loc.py',folder_,'True']))
-print('calculate_synaptic_loc.py' )
-
-os.system(" ".join(['sbatch execute_python_script.sh', 'plot_neuron_3D.py']))
-print('plot_neuron_3D.py')
-# os.system(" ".join(['sbatch execute_python_script.sh', 'calculate_tau_m.py']))
-os.system(" ".join(['sbatch execute_python_script.sh', 'plot_neuron_3D.py']))
-print('plot_neuron_3D.py')
+for cell_name in cells:
+    os.system(" ".join(['sbatch execute_python_script.sh', 'calculate_synaptic_loc.py',cell_name,folder_,'True']))
+    print('calculate_synaptic_loc.py',cell_name )
+    os.system(" ".join(['sbatch execute_python_script.sh', 'plot_neuron_3D.py',cell_name,folder_]))
+    print('plot_neuron_3D.py',cell_name)
+# os.system(" ".join(['sbatch execute_python_script.sh', 'calculate_tau_m.py',"2017_05_08_A_5-4", "2017_05_08_A_4-5","2017_03_04_A_6-7",folder_]))
+# print('calculate_tau_m.py')
 # os.system(" ".join(['sbatch execute_python_script.sh', 'calculate_tau_m.py']))
 for cell_name in cells:
     for file_type in file_type2read:
@@ -25,4 +24,4 @@ for cell_name in cells:
 
 print("execute_level1 running: cell_properties.py,  Rin_Rm_plot.py")
 print('')
-print('**remainder: calculate_tau_m.py and clear_syn.py need to be run from the computer')
+print('**remainder: calculate_tau_m.py and choose_peelingg.py need to be run from the computer')

@@ -4,7 +4,14 @@ import matplotlib.pyplot as plt
 import pandas as pd
 from scipy.optimize import curve_fit
 from add_figure import add_figure
-
+from extra_function import create_folders_list
+import sys
+if len(sys.argv)!=5:
+    cells= ['2017_05_08_A_4-5','2017_05_08_A_5-4','2017_03_04_A_6-7']
+    folder_='/ems/elsc-labs/segev-i/moria.fridman/project/analysis_groger_cells/cells_outputs_data/'
+else:
+    cells = [sys.argv[1],sys.argv[2],sys.argv[3]]
+    folder_=sys.argv[4]+'/cells_outputs_data/'
 def linear(x, m,c):
     return m*x+c
 def calculate_tau_m(short_pulse_path,folder_save):
@@ -41,9 +48,7 @@ def calculate_tau_m(short_pulse_path,folder_save):
 if __name__=='__main__':
     hz=0.1
     tau_m={}
-    from extra_function import create_folders_list
-    folder_='/ems/elsc-labs/segev-i/moria.fridman/project/analysis_groger_cells/cells_outputs_data/'
-    for cell_name in ['2017_05_08_A_4-5','2017_05_08_A_5-4','2017_03_04_A_6-7']:
+    for cell_name in cells:
         folder_data=folder_+cell_name+'/data/electrophysio_records/short_pulse/mean_short_pulse_with_parameters.p'
         folder_save=folder_+cell_name+'/fit/'
         create_folders_list([folder_save])

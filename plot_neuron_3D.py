@@ -2,10 +2,22 @@ import numpy as np
 from neuron import h
 import matplotlib.pyplot as plt
 from extra_function import load_ASC,SIGSEGV_signal_arises
+from read_spine_properties import get_spine_xyz,get_n_spinese
 import signal
 signal.signal(signal.SIGSEGV, SIGSEGV_signal_arises)
 from glob import glob
 from open_pickle import read_from_pickle
+import sys
+if len(sys.argv) != 5:
+    cells= ['2017_05_08_A_4-5','2017_05_08_A_5-4','2017_03_04_A_6-7']
+    folder_='/ems/elsc-labs/segev-i/moria.fridman/project/analysis_groger_cells'
+else:
+    cells = [sys.argv[1],sys.argv[2],sys.argv[3]]
+    folder_=sys.argv[4]
+print(len(sys.argv),sys.argv,flush=True)
+folder_data=folder_+'/cells_initial_information/'
+folder_save=folder_+'/cells_outputs_data/'
+
 def plot_morphology(cell_dir,dots_dir,syn_pose_list,with_axon=False, save_place=''):
     #syn_pose should be (x,y,z) coordinates
     cell=None
@@ -67,12 +79,7 @@ def plot_morphology(cell_dir,dots_dir,syn_pose_list,with_axon=False, save_place=
 
 
 if __name__=='__main__':
-    from read_spine_properties import get_spine_xyz,get_n_spinese
-    folder_data='/ems/elsc-labs/segev-i/moria.fridman/project/analysis_groger_cells/cells_initial_information/'
-    folder_save='/ems/elsc-labs/segev-i/moria.fridman/project/analysis_groger_cells/cells_outputs_data/'
-    xyz=[]
-
-    for cell_name in ['2017_05_08_A_4-5','2017_05_08_A_5-4','2017_03_04_A_6-7']:
+    for cell_name in cells:
         xyz=[]
         for i in range(get_n_spinese(cell_name)):
             xyz.append(get_spine_xyz(cell_name,i))

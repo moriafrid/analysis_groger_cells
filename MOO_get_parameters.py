@@ -64,7 +64,7 @@ else:
     RA=float(sys.argv[3])
 data_dir= "cells_initial_information/"
 save_dir ="cells_outputs_data/"
-RDSM_objective_file = folder_+save_dir+cell_name+"/data//electrophysio_records/clear_syn/mean_syn.p"
+RDSM_objective_file = folder_+save_dir+cell_name+"/data//electrophysio_records/syn/mean_syn.p"
 morphology_dirr = '/ems/elsc-labs/segev-i/moria.fridman/project/data_analysis_git/data_analysis/try1.swc'
 morphology_dirr = cell_file=glob(folder_+data_dir+cell_name+'/*'+file_type)[0]
 

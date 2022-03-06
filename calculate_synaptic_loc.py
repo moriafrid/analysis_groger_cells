@@ -10,12 +10,14 @@ from extra_function import load_ASC,SIGSEGV_signal_arises
 from read_spine_properties import get_spine_xyz,get_n_spinese, get_spine_part
 signal.signal(signal.SIGSEGV, SIGSEGV_signal_arises)
 
-if len(sys.argv) != 3:
+if len(sys.argv) != 6:
+    cells= ['2017_05_08_A_4-5','2017_05_08_A_5-4','2017_03_04_A_6-7']
     folder_='/ems/elsc-labs/segev-i/moria.fridman/project/analysis_groger_cells'
-    with_plot=False
+    with_plot=True
 else:
-    folder_=sys.argv[1]
-    with_plot=eval(sys.argv[2])
+    cells = [sys.argv[1],sys.argv[2],sys.argv[3]]
+    folder_=sys.argv[4]
+    with_plot=eval(sys.argv[5])
 folder_data=folder_+'/cells_initial_information/'
 folder_save=folder_+'/cells_outputs_data/'
 
@@ -120,10 +122,10 @@ def synaptic_loc(cell_dir,syn_poses_list,with_plot=False, part='all', save_place
             plt.scatter(cell.soma.x3d(i), cell.soma.y3d(i),lw=cell.soma.diam3d(i), color=color_code['soma'])
 
         legend_elements = [
-        plt.scatter(syn_pos[0][0], syn_pos[0][1], color='black', s=0.5, label="all_point"),
-        plt.scatter(syn_pos[0][0], syn_pos[0][1], color='green',s=0.5, label="syn_trunk"),
-        plt.scatter(syn_pos[0][0], syn_pos[0][1], color=color_code['soma'],s=0.5, label="soma"),
-        plt.scatter(syn_pos[0][0], syn_pos[0][1], color='cyan', s=0.5, label="synapse")
+        plt.scatter(syn_pos[0], syn_pos[1], color='black', s=0.5, label="all_point"),
+        plt.scatter(syn_pos[0], syn_pos[1], color='green',s=0.5, label="syn_trunk"),
+        plt.scatter(syn_pos[0], syn_pos[1], color=color_code['soma'],s=0.5, label="soma"),
+        plt.scatter(syn_pos[0], syn_pos[1], color='cyan', s=0.5, label="synapse")
             ]
         plt.legend(handles=legend_elements, loc="best")
         plt.savefig(save_place+'.pdf')
@@ -172,7 +174,7 @@ if __name__=='__main__':
     dict2={}
     dict3,dict4={},{}
     name2save=''
-    for cell_name in ['2017_05_08_A_4-5','2017_05_08_A_5-4','2017_03_04_A_6-7']:
+    for cell_name in cells:
         xyz,dend_part=[],[]
     # for cell_name in ['2017_05_08_A_5-4']:
         dir=glob(folder_data+cell_name+'/*ASC')[0]

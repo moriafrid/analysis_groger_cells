@@ -2,7 +2,6 @@ from neuron import h, gui
 import numpy as np
 import sys
 from glob import glob
-from extra_function import load_ASC
 if len(sys.argv) != 2:
     cell_name="2017_05_08_A_5-4"
     folder_="/ems/elsc-labs/segev-i/moria.fridman/project/analysis_groger_cells/cells_initial_information/"
@@ -54,18 +53,19 @@ swc_file.write('1 1 '+
                ' '+str(round(cell.soma[0].diam/2.0, 4))+' -1\n')
 
 id=2
+try:cell.axon
+except: cell.axon=[]
+try:cell.apic
+except: cell.apic=[]
 for child in cell.soma[0].children():
-    try:
-        if child in cell.dend:
-            type=3 #2 for dend
-        elif child in cell.axon:
-            type=2
-        elif child in cell.apic:
-            type=4
-        else:
-            raise Exception('no type chosen')
-    except: "no axon in this cell"
-
+    if child in cell.dend:
+        type=3 #2 for dend
+    elif child in cell.axon:
+        type=2
+    elif child in cell.apic:
+        type=4
+    else:
+        raise Exception('no type chosen')
     id=run(id,1,child,type, print_=type==2)
 
 def instantiate_swc(filename):

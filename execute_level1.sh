@@ -42,8 +42,8 @@ conda init
 conda activate project
 # put your script here - example script is sitting with this bash script
 
-echo python3 $path/clear_syn.py $cell_name
-python3 $path/clear_syn.py $cell_name $folder $save_dir $save_dir
+#echo python3 $path/clear_syn.py $cell_name
+#python3 $path/clear_syn.py $cell_name $folder $save_dir $save_dir
 
 echo python3 $path/cell_properties.py $cell_name $file_type2read
 python3 $path/cell_properties.py $cell_name $file_type2read $folder $data_dir $save_dir
