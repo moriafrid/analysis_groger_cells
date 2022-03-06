@@ -10,16 +10,18 @@ from extra_function import load_ASC,SIGSEGV_signal_arises
 from read_spine_properties import get_spine_xyz,get_n_spinese, get_spine_part
 signal.signal(signal.SIGSEGV, SIGSEGV_signal_arises)
 
-if len(sys.argv) != 2:
-    folder_='/ems/elsc-labs/segev-i/moria.fridman/project/analysis_groger_cells/'
+if len(sys.argv) != 3:
+    folder_='/ems/elsc-labs/segev-i/moria.fridman/project/analysis_groger_cells'
+    with_plot=False
 else:
     folder_=sys.argv[1]
+    with_plot=eval(sys.argv[2])
 folder_data=folder_+'/cells_initial_information/'
 folder_save=folder_+'/cells_outputs_data/'
 
 def synaptic_loc(cell_dir,syn_poses_list,with_plot=False, part='all', save_place=''):
     dict2={}
-    ell=None
+    cell=None
     cell=load_ASC(cell_dir)
     #syn_pose should be (x,y,z) coordinates
     # h.load_file("import3d.hoc")
@@ -86,30 +88,32 @@ def synaptic_loc(cell_dir,syn_poses_list,with_plot=False, part='all', save_place
         plt.figure()
         for p in all_points:
             plt.scatter(p[0], p[1], color='black',s=0.5)
-
-    sec=eval('cell.'+dends_name[0][0])
-    initial_point = np.array([sec.x3d(0), sec.y3d(0), sec.z3d(0)])
-    points_dend = [initial_point]
-    for i in range(1,sec.n3d()):
-        dend_pos = np.array([sec.x3d(i), sec.y3d(i), sec.z3d(i)])
-        # points_diffrance = dend_pos-initial_point
-        # distance = np.linalg.norm(initial_point - dend_pos)
-        # number_of_steps =int(np.ceil(distance))
-        # for step_number in range(1, number_of_steps, 1):
-        #     intermideate_point = initial_point.copy() + points_diffrance*step_number/number_of_steps
-        #     points_dend.append(intermideate_point)
-        points_dend.append(dend_pos)
-        # initial_point = dend_pos
-        if with_plot:
-            plt.scatter(dend_pos[0], dend_pos[1], color='g',s=0.5)
-    # for p in points_dend:
-    #     plt.scatter(p[0], p[1], color='g',s=0.5)
+    dend_pos_dict={}
+    for j,dend in enumerate(dends_name):
+        sec=eval('cell.'+dend[0])
+        initial_point = np.array([sec.x3d(0), sec.y3d(0), sec.z3d(0)])
+        points_dend = [initial_point]
+        for i in range(1,sec.n3d()):
+            dend_pos = np.array([sec.x3d(i), sec.y3d(i), sec.z3d(i)])
+            # points_diffrance = dend_pos-initial_point
+            # distance = np.linalg.norm(initial_point - dend_pos)
+            # number_of_steps =int(np.ceil(distance))
+            # for step_number in range(1, number_of_steps, 1):
+            #     intermideate_point = initial_point.copy() + points_diffrance*step_number/number_of_steps
+            #     points_dend.append(intermideate_point)
+            points_dend.append(dend_pos)
+            dend_pos_dict[j]=points_dend
+            # initial_point = dend_pos
+            if with_plot:
+                plt.scatter(dend_pos[0], dend_pos[1], color='g',s=0.5)
+        # for p in points_dend:
+        #     plt.scatter(p[0], p[1], color='g',s=0.5)
     if with_plot:
         for j, syn_pos in enumerate(syn_poses_list):
             # if type(syn_pos)!=list:
             #     syn_pos=[syn_pos]
             dis_from_soma[j]=syn_dis_from_soma(cell,dends_name[j])
-            plt.scatter(syn_pos[j][0], syn_pos[j][1],s=0.7, color='cyan')
+            plt.scatter(syn_pos[0], syn_pos[1],s=0.7, color='cyan')
             plt.text(-50,-50,str(syn_pos)+'dis from soma='+str(dis_from_soma[j]))
         color_code={'basal':'blue','apical':'red','axon':'green','soma':'purple','synapse':'cyan','syn_trunk':'green'}
         for i in range(cell.soma.n3d()):
@@ -126,7 +130,7 @@ def synaptic_loc(cell_dir,syn_poses_list,with_plot=False, part='all', save_place
         plt.savefig(save_place)
         plt.close()
     with open(save_place + '_neuron_morphology.p', 'wb') as f:
-        pickle.dump({"all_point":all_points,"syn_pos":xyz,"syn_sec_pos":dends_name}, f)
+        pickle.dump({"all_point":all_points,"synaptic_dend":dend_pos_dict,"syn_pos":xyz,"syn_sec_pos":dends_name}, f)
 
     dict =  { 'sec_name':sec_name,'sec_num':sec_num,'seg_num':seg_num,'place_name':dends_name,'dist_from_soma':dis_from_soma,'dist':dists, 'part':part}
     print(dict)
@@ -174,9 +178,9 @@ if __name__=='__main__':
         dir=glob(folder_data+cell_name+'/*ASC')[0]
         for i in range(get_n_spinese(cell_name)):
             print('one syn dict:',dict)
-            xyz.append(get_spine_xyz(cell_name,i))
+            xyz.append(list(get_spine_xyz(cell_name,i)))
             dend_part.append(get_spine_part(cell_name,i))
-        dict1,dict2=synaptic_loc(dir,xyz, part='all', save_place=folder_save+cell_name+'/synapses',with_plot=True)
+        dict1,dict2=synaptic_loc(dir,xyz, part='all', save_place=folder_save+cell_name+'/synapses',with_plot=with_plot)
         dict3[cell_name]=dict1
         for key in dict2.keys():
             dict4[cell_name+key]=dict2[key]

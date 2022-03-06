@@ -6,7 +6,7 @@ folder_save="cells_outputs_data"
 cells=["2017_05_08_A_5-4", "2017_05_08_A_4-5","2017_03_04_A_6-7"]
 file_type2read=['ASC','hoc']
 
-os.system(" ".join(['sbatch execute_python_script.sh', 'calculate_synaptic_loc.py',folder_]))
+os.system(" ".join(['sbatch execute_python_script.sh', 'calculate_synaptic_loc.py',folder_,'True']))
 print('calculate_synaptic_loc.py' )
 
 os.system(" ".join(['sbatch execute_python_script.sh', 'plot_neuron_3D.py']))

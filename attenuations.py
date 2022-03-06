@@ -48,7 +48,7 @@ cell_file=glob(folder_+data_dir+cell_name+'/*'+file_type)[0]
 folder_save=folder_+save_dir+cell_name+"/data/cell_properties."+file_type+"/"
 folder_save+=json.dumps(passive_val)+'/'
 folder_save+="attenuations/"
-
+create_folder_dirr(folder_save)
 
 signal.signal(signal.SIGSEGV, SIGSEGV_signal_arises)
 def change_model_pas(cell,CM = 1, RA = 250, RM = 20000.0, E_PAS = -70.0,F_factor=1.9):
