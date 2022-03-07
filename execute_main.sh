@@ -46,8 +46,8 @@ python3 $path/main_cell_data.py $cell_name $folder $data_dir $save_dir
 echo python3 $path/file_convert_to_swc.py $cell_name
 python3 $path/file_convert_to_swc.py $cell_name $folder $data_dir
 
-echo python3 $path/clear_syn.py $cell_name
-echo "before run the execute_level1 remaind to choose the correct syn from the diraction" $folder $save_dir
-python3 $path/clear_syn.py $cell_name $folder $save_dir $save_dir
+#echo python3 $path/clear_syn.py $cell_name
+#echo "before run the execute_level1 remaind to choose the correct syn from the diraction" $folder $save_dir
+#python3 $path/clear_syn.py $cell_name $folder $save_dir $save_dir
 echo "execute_main is complite to run"
 

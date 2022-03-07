@@ -12,6 +12,27 @@ h.load_file("import3d.hoc")
 h.load_file("nrngui.hoc")
 h.load_file('stdlib.hoc')
 h.load_file("stdgui.hoc")
+class Cell: pass
+def mkcell(fname):
+    #def to read ACS file
+  loader = h.Import3d_GUI(None)
+  loader.box.unmap()
+  loader.readfile(fname)
+  c = Cell()
+  loader.instantiate(c)
+  return c
+def instantiate_swc(filename):
+    h.load_file('import3d.hoc')
+    h('objref cell, tobj')
+    h.load_file('allen_model.hoc')
+    h.execute('cell = new allen_model()')
+    h.load_file(filename)
+    nl = h.Import3d_SWC_read()
+    nl.quiet = 1
+    nl.input(filename)
+    i3d = h.Import3d_GUI(nl, 0)
+    i3d.instantiate(h.cell)
+    return h.cell
 def run(id, prev_id,sec,type, print_=True):
     sec_points = np.array([list(i) for i in sec.psection()['morphology']['pts3d']])
     if print_:
@@ -25,15 +46,7 @@ def run(id, prev_id,sec,type, print_=True):
     for child in sec.children():
         id=run(id,prev_id,child, type, print_=print_)
     return id
-class Cell: pass
-def mkcell(fname):
-    #def to read ACS file
-  loader = h.Import3d_GUI(None)
-  loader.box.unmap()
-  loader.readfile(fname)
-  c = Cell()
-  loader.instantiate(c)
-  return c
+
 ######################################################
 # build the model
 ######################################################
@@ -68,18 +81,7 @@ for child in cell.soma[0].children():
         raise Exception('no type chosen')
     id=run(id,1,child,type, print_=type==2)
 
-def instantiate_swc(filename):
-    h.load_file('import3d.hoc')
-    h('objref cell, tobj')
-    h.load_file('allen_model.hoc')
-    h.execute('cell = new allen_model()')
-    h.load_file(filename)
-    nl = h.Import3d_SWC_read()
-    nl.quiet = 1
-    nl.input(filename)
-    i3d = h.Import3d_GUI(nl, 0)
-    i3d.instantiate(h.cell)
-    return h.cell
+
 
 cell=instantiate_swc(folder_+cell_name+'/morphology.swc')
 print (cell)

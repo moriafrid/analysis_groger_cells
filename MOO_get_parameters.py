@@ -40,7 +40,7 @@ spine_type="mouse_spine" #"groger_spine"
 
 if len(sys.argv) != 12:
     cell_name= '2017_05_08_A_4-5'
-    file_type='hoc'
+    file_type='ASC'
     passive_val={'RA':100,'CM':1,'RM':10000}
     passive_val_name='const_ra'
     resize_dend_by=1.0
@@ -64,9 +64,10 @@ else:
     RA=float(sys.argv[3])
 data_dir= "cells_initial_information/"
 save_dir ="cells_outputs_data/"
-RDSM_objective_file = folder_+save_dir+cell_name+"/data//electrophysio_records/syn/mean_syn.p"
-morphology_dirr = '/ems/elsc-labs/segev-i/moria.fridman/project/data_analysis_git/data_analysis/try1.swc'
-morphology_dirr = cell_file=glob(folder_+data_dir+cell_name+'/*'+file_type)[0]
+RDSM_objective_file = folder_+save_dir+cell_name+"/data/electrophysio_records/syn/mean_syn.p"
+morphology_dirr =glob(folder_+data_dir+cell_name+'/*'+file_type)[0]
+morphology_dirr =glob( folder_+data_dir+cell_name+'/*swc')[0]
+
 
 # cpu_node = float(sys.argv[1])
 # print('cpu node=',cpu_node, flush=True)
@@ -187,7 +188,7 @@ def run(cell, seed=0):
     #############################################################################################################
 
     syn_pickle = read_from_pickle(RDSM_objective_file)
-    M=syn_pickle['mean']
+    M=syn_pickle#['mean']
 
     T_with_units=M[1]
     T_with_units=T_with_units-T_with_units[0]

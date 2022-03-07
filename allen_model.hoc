@@ -1,4 +1,4 @@
-begintemplate allen_model1
+begintemplate allen_model
 
 /*
 *
@@ -96,4 +96,4 @@ proc delete_axon(){
 }
 
 
-endtemplate allen_model1
+endtemplate allen_model
