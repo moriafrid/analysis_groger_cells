@@ -1,20 +1,20 @@
 import dash
-import dash
 import numpy as np
 import plotly.graph_objects as go
 from dash import dcc
 from dash import html
 import pandas as pd
-from get_neuron_modle import get_L5PC
-
+from extra_function import load_hoc, load_ASC
+from glob import glob
 class TreeViewer():
-    def __init__(self,n_steps=2,show_synapse=True):
+    def __init__(self,cell_file,n_steps=2,show_synapse=True):
+        self.cell_file = cell_file
         self.fig = go.Figure()
-        self.n_steps=n_steps
-        self.show_synapse=show_synapse
-        self.model_dots=[]
+        self.n_steps = n_steps
+        self.show_synapse = show_synapse
+        self.model_dots = []
         self.data = []
-        self.synapses=[]
+        self.synapses = []
     def display(self):
         app = dash.Dash()
 
@@ -126,8 +126,12 @@ class TreeViewer():
             self.synapses.append([x[i] - basline[0], y[i] - basline[1], z[i] - basline[2]])
 
     def plot_L5PC_model(self):
-        model = get_L5PC()
-        soma = model.soma[0]
+        if self.cell_file.split('.')[-1]=='ASC':
+            model=load_ASC(self.cell_file)
+        elif self.cell_file.split('.')[-1]=='hoc':
+            model=load_hoc(self.cell_file)
+        # model = get_L5PC()
+        soma = model.soma
         basline = soma.psection()['morphology']['pts3d']
         basline = basline[len(basline) // 2][:3]
         self.draw_section(soma.psection()['morphology']['pts3d'],'yellow',basline)
@@ -146,10 +150,9 @@ class TreeViewer():
         self.fig.update_layout(showlegend=False)
         return self.fig
 
-
-
-
-
 if __name__ == '__main__':
-    a=TreeViewer()
+    folder='/ems/elsc-labs/segev-i/moria.fridman/project/analysis_groger_cells/cells_initial_information/'
+    cell_name=[ '2017_03_04_A_6-7','2017_05_08_A_5-4','2017_05_08_A_4-5']
+    filename=glob(folder+cell_name[0]+'/*.ASC')[0]
+    a=TreeViewer(filename)
     a.display()
