@@ -65,6 +65,7 @@ else:
 data_dir= "cells_initial_information/"
 save_dir ="cells_outputs_data/"
 RDSM_objective_file = folder_+save_dir+cell_name+"/data/electrophysio_records/syn/mean_syn.p"
+short_pulse_parameters_file=folder_+save_dir+cell_name+'/data/electrophysio_records/short_pulse_parameters.p'
 morphology_dirr =glob(folder_+data_dir+cell_name+'/*'+file_type)[0]
 morphology_dirr =glob( folder_+data_dir+cell_name+'/*swc')[0]
 
@@ -190,10 +191,10 @@ def run(cell, seed=0):
     syn_pickle = read_from_pickle(RDSM_objective_file)
     M=syn_pickle#['mean']
 
-    T_with_units=M[1]
+    T_with_units=M[0]
     T_with_units=T_with_units-T_with_units[0]
     T_with_units=T_with_units.rescale('ms')
-    V_with_units=M[0]
+    V_with_units=M[1]
     T_base = np.array(T_with_units)
     V_base = np.array(V_with_units)
     # syn_place=np.argmax(np.array(V_base))
@@ -202,7 +203,9 @@ def run(cell, seed=0):
 
     spike_timeing=T_base[np.argmax(np.array(V_base))-65]
     # syn_place=np.argmax(np.array(V_base))
-    E_PAS=syn_pickle['E_pas']
+    E_PAS=read_from_pickle(short_pulse_parameters_file)['E_pas']
+    V_base=V_base+E_PAS
+    # E_PAS=syn_pickle['E_pas']
     # E_PAS=np.mean(V_base[:syn_place-10])
     try: os.mkdir(base2)
     except: pass

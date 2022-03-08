@@ -3,44 +3,69 @@ import numpy as np
 import plotly.graph_objects as go
 from dash import dcc
 from dash import html
+from glob import glob
 import pandas as pd
 from extra_function import load_hoc, load_ASC
-from glob import glob
+from read_spine_properties import get_spine_xyz,get_n_spinese
 class TreeViewer():
-    def __init__(self,cell_file,n_steps=2,show_synapse=True):
-        self.cell_file = cell_file
+    def __init__(self,cell_name,cell_type,n_steps=2,show_synapse=True,show_axon=False):
+        self.cell_name=cell_name
+        self.cell_file = glob(folder+cell_name+'/*'+cell_type)[0]
+        self.model=None
         self.fig = go.Figure()
         self.n_steps = n_steps
         self.show_synapse = show_synapse
+        self.show_axon=show_axon
         self.model_dots = []
         self.data = []
         self.synapses = []
-    def display(self):
+        self.synapses_from_dend=[]
+        if cell_type=='ASC':
+            self.model=load_ASC(self.cell_file)
+        elif cell_type=='hoc':
+            self.model=load_hoc(self.cell_file)
+        dict_syn=pd.read_excel("cells_outputs_data/synaptic_location_seperate.xlsx",index_col=0)
+        self.syn_section=[]
+        for i in range(get_n_spinese(self.cell_name)):
+            spine_seg=dict_syn[self.cell_name+str(i)]['seg_num']
+            section=eval('self.model.'+dict_syn[self.cell_name+str(i)]['sec_name'])
+            self.syn_section.append(section)
+
+    def display(self,port=7080):
         app = dash.Dash()
 
         app.layout = html.Div([
 
             html.Div([dcc.Graph(id='model-tree', figure=self.plot_L5PC_model(),
-                                style={'height': '120vh'})],
+                                style={'height': '100vh'})],
                      )
         ])
 
-        app.run_server(debug=True, use_reloader=False)
+        app.run_server(debug=True,port=port)
 
 
     def plot_sub_tree(self,current_section,basline,connected_to_soma=False):
         pts3d = current_section.psection()['morphology']['pts3d']
+        if current_section in self.syn_section:
+            self.draw_section(pts3d,'green',basline)
+        else:
+            if 'dend' in current_section.name():
+                self.draw_section(pts3d,'blue',basline)
+            elif 'epic' in current_section.name():
+                self.draw_section(pts3d,'black',basline)
+            elif 'axon' in current_section.name():
+                self.draw_section(pts3d,'purple',basline)
         if len(current_section.children()) >0:
-            self.draw_section(pts3d,'red',basline)
-            self.add_synapses(current_section,basline)
+            # self.draw_section(pts3d,'red',basline)
+            # self.add_synapses(current_section,basline)
             # if not connected_to_soma:
             self.model_dots.append([pts3d[-1][0]-basline[0],pts3d[-1][1]-basline[1],pts3d[-1][2]-basline[2]])
             for i in current_section.children():
                 self.plot_sub_tree(i,basline)
+        # else:
+        #     self.draw_section(pts3d,'blue',basline)
+            # self.add_synapses(current_section,basline)
 
-        else:
-            self.draw_section(pts3d,'blue',basline)
-            self.add_synapses(current_section,basline)
 
     def draw_cone_line(self, x1, y1, z1, w1, x2, y2, z2, w2, color,n_steps):
         steps = np.linspace(0, 1, n_steps)
@@ -120,39 +145,52 @@ class TreeViewer():
         j=np.arange(x.shape[0])
         k=np.arange(y.shape[0])
         self.data.append(go.Mesh3d(x=x,y=y,z=z,i=i,j=j,k=k,alphahull=1,color=color))
-    def add_synapses(self,section,basline):
-        x,y,z = self.get_segments_coordinates(section)
-        for i in range(x.shape[0]):
-            self.synapses.append([x[i] - basline[0], y[i] - basline[1], z[i] - basline[2]])
+    def add_synapses_from_section(self,basline):
+        for section in self.syn_section:
+            x,y,z = self.get_segments_coordinates(section)
+            self.synapses_from_dend.append([x - basline[0], y - basline[1], z - basline[2]])
+
+    def add_synapses(self,basline):
+        for i in range(get_n_spinese(self.cell_name)):
+            x,y,z=get_spine_xyz(self.cell_name,i)
+            self.synapses.append([x- basline[0], y- basline[1], z- basline[2]])
 
     def plot_L5PC_model(self):
-        if self.cell_file.split('.')[-1]=='ASC':
-            model=load_ASC(self.cell_file)
-        elif self.cell_file.split('.')[-1]=='hoc':
-            model=load_hoc(self.cell_file)
+        # if self.cell_type=='ASC':
+        #     self.model=load_ASC(self.cell_file)
+        # elif self.cell_type=='hoc':
+        #     self.model=load_hoc(self.cell_file)
         # model = get_L5PC()
-        soma = model.soma
+        soma = self.model.soma
         basline = soma.psection()['morphology']['pts3d']
         basline = basline[len(basline) // 2][:3]
         self.draw_section(soma.psection()['morphology']['pts3d'],'yellow',basline)
         # return self.fig
         for i in soma.children():
-            if "axon" in i.name():
-                continue
+            if self.show_axon:
+                if "axon" in i.name():
+                    continue
             self.plot_sub_tree(i,basline,True)
-        # self.data.append()
+
+        # for section in self.syn_section:
+        #     self.plot_sub_tree(section,basline,True)
+
         self.fig=go.Figure(self.data)
         self.model_dots=np.array(self.model_dots)
-        self.fig.add_trace(go.Scatter3d(x=self.model_dots[:,0],z=self.model_dots[:,1],y=self.model_dots[:,2], marker=dict(color='green',size=8),mode='markers'))
+        # self.fig.add_trace(go.Scatter3d(x=self.model_dots[:,0],z=self.model_dots[:,1],y=self.model_dots[:,2], marker=dict(color='green',size=2),mode='markers'))
         if self.show_synapse:
+            self.add_synapses(basline)
             self.synapses=np.array(self.synapses)
-            self.fig.add_trace(go.Scatter3d(x=self.synapses[:,0],z=self.synapses[:,1],y=self.synapses[:,2], marker=dict(color='black',size=1.4),mode='markers'))
+            self.fig.add_trace(go.Scatter3d(x=self.synapses[:,0],z=self.synapses[:,1],y=self.synapses[:,2], marker=dict(color='cyan',size=2),mode='markers'))
+            self.add_synapses_from_section(basline)
+            self.synapses_from_dend=np.array(self.synapses_from_dend)
+            self.fig.add_trace(go.Scatter3d(x=self.synapses_from_dend[:,0],z=self.synapses_from_dend[:,1],y=self.synapses_from_dend[:,2], marker=dict(color='green',size=4),mode='markers'))
+
         self.fig.update_layout(showlegend=False)
         return self.fig
 
 if __name__ == '__main__':
     folder='/ems/elsc-labs/segev-i/moria.fridman/project/analysis_groger_cells/cells_initial_information/'
     cell_name=[ '2017_03_04_A_6-7','2017_05_08_A_5-4','2017_05_08_A_4-5']
-    filename=glob(folder+cell_name[0]+'/*.ASC')[0]
-    a=TreeViewer(filename)
+    a=TreeViewer(cell_name[0],'ASC')
     a.display()

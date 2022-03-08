@@ -1,16 +1,16 @@
 model description:
-the file to fit is /ems/elsc-labs/segev-i/moria.fridman/project/analysis_groger_cells/cells_outputs_data/2017_05_08_A_4-5/data//electrophysio_records/clear_syn/mean_syn.p
+the file to fit is /ems/elsc-labs/segev-i/moria.fridman/project/analysis_groger_cells/cells_outputs_data/2017_05_08_A_4-5/data/electrophysio_records/syn/mean_syn.p
 generation size is 10 and num of generation is 10 the profile to run is _
 Running with  cell:const_ra that had the paremeters:
 {'RA': 100, 'CM': 1, 'RM': 10000}
 The shrinking factor is 1.0
 the dendrite isn't resize
 
-F_factor is equal to 1.3100434217230525
+F_factor is equal to 1.309923465241949
 neck resistance is [1.4807753182375032]
 Model:
   morphology:
-    /ems/elsc-labs/segev-i/moria.fridman/project/analysis_groger_cells/cells_initial_information/2017_05_08_A_4-5/morphology_correctedZ.hoc
+    /ems/elsc-labs/segev-i/moria.fridman/project/analysis_groger_cells/cells_initial_information/2017_05_08_A_4-5/morphology.swc
   mechanisms:
     pas: pas at ['somatic', 'basal', 'apical', 'axonal']
     exp2syn_0: Exp2Syn at ['spineHead0(1)']
@@ -19,7 +19,7 @@ Model:
     Ra: ['somatic', 'basal', 'apical', 'axonal'] Ra = 100
     g_pas: ['somatic', 'basal', 'apical', 'axonal'] g_pas = 0.0001
     cm: ['somatic', 'basal', 'apical', 'axonal'] cm = 1
-    e_pas: ['somatic', 'basal', 'apical', 'axonal'] e_pas = -0.122337826
+    e_pas: ['somatic', 'basal', 'apical', 'axonal'] e_pas = -77.65687
     weight_AMPA: weight[0] = [0.0, 0.01]
     weight_NMDA: weight[0] = [0.0, 0.005]
     exp2syn_tau1: tau1 = [0.001, 2.1]
