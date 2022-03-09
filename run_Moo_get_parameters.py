@@ -4,21 +4,12 @@ import sys
 dataset_jobs_folder='/running'
 spine_type='mouse_spine'
 in_parallel=False
-
-shrinkage_by=1.2#round(1.0/0.7,4)
-resize_diam_by=1
 # in_parallel = sys.argv[1]
-for resize_diam_by in [1,1.2,round(1.0/0.7,4)]:
-    for shrinkage_by in [1,1.2, round(1.0/0.7,4)]:
-        if shrinkage_by!=1 and resize_diam_by!=1:
-            name2run='dend*'+str(round(resize_diam_by,2))+' &shrinkage by '+str(round(shrinkage_by,2))
-        elif shrinkage_by!=1:
-            name2run='F_shrinkage='+str(round(shrinkage_by,2))
-        elif resize_diam_by!=1:
-            name2run='dend*'+str(round(resize_diam_by,2))+' &shrinkage by '+str(round(shrinkage_by,2))
-        else:
-            name2run='no change'
-
+# for resize_diam_by in [1,1.2,round(1.0/0.7,4)]:
+#     for shrinkage_by in [1,1.2, round(1.0/0.7,4)]:
+file_type='ASC'
+for resize_diam_by ,shrinkage_by in zip([1],[1]):
+        name2run='F_shrinkage='+str(round(shrinkage_by,2))+'_dend*'+str(round(resize_diam_by,2))
         passive_val_name='RA_initial' #or RA_const
         try:dict_1=read_from_pickle('../data/fit/'+spine_type+'/'+name2run+'/different_initial_conditions/RA0_100:300:2_RA0_50:100:0.5/RA0_10_minimums.p')
         except:continue

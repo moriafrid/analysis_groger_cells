@@ -20,15 +20,15 @@ from bluepyopt.ephys.parameters import NrnParameter, NrnRangeParameter
 from bluepyopt.ephys.parameterscalers import *
 import logging
 import signal
-from extra_function import SIGSEGV_signal_arises, load_hoc,load_ASC,create_folder_dirr
-from glob import glob
+from extra_function import SIGSEGV_signal_arises, load_hoc,load_ASC
 
 signal.signal(signal.SIGSEGV, SIGSEGV_signal_arises)
 logger = logging.getLogger(__name__)
+from glob import glob
 matplotlib.use('agg')
 
 generation_size = 10
-num_of_genarations = 2
+num_of_genarations = 10
 do_calculate_F_factor=True
 do_resize_dend=True
 do_run_another_morphology=False
@@ -36,11 +36,11 @@ another_morphology_resize_dend_by=1
 do_compare2result = False
 frozen_NMDA_weigth=False
 runnum2compare = '13'
-# spine_type="mouse_spine" #"groger_spine"
+spine_type="mouse_spine" #"groger_spine"
 
 if len(sys.argv) != 12:
-    cell_name= '2017_03_04_A_6-7'
-    file_type='ASC'  #file type is just used to calculate F_factor
+    cell_name= '2017_05_08_A_4-5'
+    file_type='ASC'
     passive_val={'RA':100,'CM':1,'RM':10000}
     passive_val_name='const_ra'
     resize_dend_by=1.0
@@ -64,18 +64,11 @@ else:
     RA=float(sys.argv[3])
 data_dir= "cells_initial_information/"
 save_dir ="cells_outputs_data/"
-base2 = folder_+save_dir+cell_name+'/MOO_results_'+'swc'+"/"  # folder name  _RA_free
-base2+='F_shrinkage='+str(round(shrinkage_by,2))+'_dend*'+str(round(resize_dend_by,2))
-if "const" in passive_val_name:
-    base_save_folder=base2+ '/'+passive_val_name+'/' +passive_val_name+'='+str(round(RA,2))+'/'
-elif "initial" in passive_val_name:
-    base_save_folder=base2 + '/'+passive_val_name+'/RA_after_fit='+str(round(RA,2))+'/'
-print('base_save_folder:',base_save_folder)
-create_folder_dirr(base_save_folder)
 RDSM_objective_file = folder_+save_dir+cell_name+"/data/electrophysio_records/syn/mean_syn.p"
 short_pulse_parameters_file=folder_+save_dir+cell_name+'/data/electrophysio_records/short_pulse_parameters.p'
 morphology_dirr =glob(folder_+data_dir+cell_name+'/*'+file_type)[0]
 morphology_dirr =glob( folder_+data_dir+cell_name+'/*swc')[0]
+
 
 # cpu_node = float(sys.argv[1])
 # print('cpu node=',cpu_node, flush=True)
@@ -135,18 +128,18 @@ def create_spine(sim, icell, sec, seg, number=0, neck_diam=0.25, neck_length=1.3
     sim.neuron.h("access " + str(neck.hoc_internal_name()))
     try:icell.add_sec(neck)
     except: icell.all.append(neck)
-    # if sec.name().find('dend') > -1: #?# moria- need to be sure it is ok to remove the neck and head from the dend list
-    #     icell.dend.append(neck)
-    # else:
-    #     icell.apical.append(neck)
+    if sec.name().find('dend') > -1: #?# moria- need to be sure it is ok to remove the neck and head from the dend list
+        icell.dend.append(neck)
+    else:
+        icell.apical.append(neck)
     sim.neuron.h.pop_section()
     sim.neuron.h("access " + str(head.hoc_internal_name()))
     try:icell.add_sec(head) #if using in hoc or ASC file (load_hoc,load_ASC
     except:icell.all.append(head) #if using in swc
-    # if sec.name().find('dend') > -1: #?# moria- need to be sure it is ok to remove the neck and head from the dend list
-    #     icell.dend.append(head)
-    # else:
-    #     icell.apical.append(head)
+    if sec.name().find('dend') > -1: #?# moria- need to be sure it is ok to remove the neck and head from the dend list
+        icell.dend.append(head)
+    else:
+        icell.apical.append(head)
     sim.neuron.h.pop_section()
     for sec in [neck, head]:
         sec.insert("pas")
@@ -185,6 +178,9 @@ def add_morph(sim, icell, syns, spine_properties):#,spine_property=self.spine_pr
 #
 ##########################################################
 
+import glob
+
+base = "../"
 
 
 def run(cell, seed=0):
@@ -213,11 +209,29 @@ def run(cell, seed=0):
     V_base=V_base+E_PAS
     # E_PAS=syn_pickle['E_pas']
     # E_PAS=np.mean(V_base[:syn_place-10])
+    try: os.mkdir(base2)
+    except: pass
+    second_folder='MOO_opt_folder_F_shrinkage='+str(round(shrinkage_by,2))+'_dend*'+str(round(resize_dend_by,2))
+    # second_folder='MOO_opt_folder_same_w_peel_syn_spines_featues_cm_g_pas_first_seed_' + str(seed)
+    try:  os.mkdir(base2 + second_folder)
+    except: pass
+    try: os.mkdir(base2 + second_folder + '/' + cell + '_'+passive_val_name)
+    except: pass
+    if "const" in passive_val_name:
+        try: os.mkdir(base2 + second_folder + '/' + cell + '_'+passive_val_name+'/' +passive_val_name+'='+str(round(RA,2)))
+        except: pass
+    elif "initial" in passive_val_name:
+        try: os.mkdir(base2 + second_folder + '/' + cell + '_'+passive_val_name+'/RA_after_fit='+str(round(RA,2)))
+        except: pass
 
     ###################################################################################
     # make morphology png fig and load morphology to opt
     ###################################################################################
-
+    if "const" in passive_val_name:
+        base_save_folder=base2 + second_folder + '/' + cell + '_'+passive_val_name+'/' +passive_val_name+'='+str(round(RA,2))+'/'
+    elif "initial" in passive_val_name:
+        base_save_folder=base2 + second_folder + '/' + cell + '_'+passive_val_name+'/RA_after_fit='+str(round(RA,2))+'/'
+    print('base_save_folder:',base_save_folder)
     synapses_dict=pd.read_excel(folder_+save_dir+"synaptic_location_seperate.xlsx",index_col=0)
     synapses_locations=[]
     spine_properties={}
@@ -531,8 +545,7 @@ def run(cell, seed=0):
         logger = logging.getLogger()
 
         rc[:].push(dict(add_morph=add_morph, create_spine=create_spine,
-                        NECK_LENGHT = [spine_properties[i]['NECK_LENGHT'] for i in range(get_n_spinese(cell_name))],
-                        HEAD_DIAM = [spine_properties[i]['HEAD_DIAM'] for i in range(get_n_spinese(cell_name))],
+                        NECK_LENGHT = NECK_LENGHT, HEAD_DIAM = HEAD_DIAM,
                         passive_val = passive_val, Rneck=Rneck, cell=cell))
         print('Using ipyparallel with %d engines', len(rc),flush=True)
 
@@ -823,8 +836,7 @@ AMPA_RISE_FIX = False
 AMPA_DECAY_FIX = False
 
 ####################spine parameters######################
-# NECK_LENGHT,NECK_DIAM,HEAD_DIAM=get_spine_params(spine_type)
-
+NECK_LENGHT,NECK_DIAM,HEAD_DIAM=get_spine_params(spine_type)
 if file_type=='hoc':
     load_cell_function=load_hoc
 elif file_type=='ASC':
@@ -833,7 +845,7 @@ elif file_type=='ASC':
 Rneck = passive_val["RA"]
 if do_calculate_F_factor:
     temp_cell=None
-    temp_cell=load_cell_function(glob(morphology_dirr[:morphology_dirr.rfind('/')]+'/*'+file_type)[0])
+    temp_cell=load_cell_function(morphology_dirr)
     # if file_type=='hoc':
     #     temp_cell=load_hoc(morphology_dirr)
     # elif file_type=='ASC':
@@ -861,6 +873,7 @@ CM_startValue = passive_val["CM"]
 # result_R_neck_m_ohm = ((NECK_LENGHT * 4.0 * float(Rneck))/(np.pi*(spine_neck_diam/2)**2)) *100.0 *1e-6# 0.25 is neck_diam
 
 in_parallel = profile != "_"
+base2 = spine_type+"/"  # folder name  _RA_free
 # base2 = passive_val_name +"__"+spine_type+"_"+str(round(result_R_neck_m_ohm,2))+"/"  # folder name  _RA_free
 print("profile ", profile)
 run(cell, seed=seed)
