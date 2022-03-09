@@ -20,10 +20,11 @@ clamp_injection=False
 
 print(sys.argv)
 do_resize_dend=True
-if len(sys.argv) != 10:
+if len(sys.argv) != 11:
     cell_name= '2017_05_08_A_5-4'
     file_type='ASC'
     passive_val={'RA':100.0,'CM':1.0,'RM':10000.0}
+    name='RA=120'
     syn_injection=False
     resize_diam_by=1.0
     shrinkage_factor=1.0
@@ -32,16 +33,17 @@ else:
     cell_name = sys.argv[1]
     file_type=sys.argv[2] #hoc ar ASC
     passive_val={"RA":float(sys.argv[3]),"CM":float(sys.argv[4]),'RM':float(sys.argv[5])}
-    print(passive_val)
-    syn_injection=eval(sys.argv[6])
-    resize_diam_by = float(sys.argv[7]) #how much the cell sweel during the electrophisiology records
-    shrinkage_factor =float(sys.argv[8]) #how much srinkage the cell get between electrophysiology record and LM
-    folder_= sys.argv[9] #'/ems/elsc-labs/segev-i/moria.fridman/project/analysis_groger_cells/cells_outputs_data'
+    name=sys.argv[6]
+    syn_injection=eval(sys.argv[7])
+    resize_diam_by = float(sys.argv[8]) #how much the cell sweel during the electrophisiology records
+    shrinkage_factor =float(sys.argv[9]) #how much srinkage the cell get between electrophysiology record and LM
+    folder_= sys.argv[10] #'/ems/elsc-labs/segev-i/moria.fridman/project/analysis_groger_cells/cells_outputs_data'
 if not syn_injection:
     clamp_injection=True
 print("the number of parameters that sys loaded in attenuation.py is ",len(sys.argv),flush=True)
-print(sys.argv)
-print(passive_val)
+print(len(sys.argv), sys.argv)
+print(name, passive_val)
+
 data_dir= "cells_initial_information/"
 save_dir ="cells_outputs_data/"
 cell_file=glob(folder_+data_dir+cell_name+'/*'+file_type)[0]

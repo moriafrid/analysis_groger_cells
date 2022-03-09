@@ -14,7 +14,7 @@
 
 echo $#
 
-if [[ $# -ne 8 ]] ; then
+if [[ $# -ne 9 ]] ; then
     echo "Wrong usage. not have enought parameters"
     exit 1
 fi
@@ -24,9 +24,10 @@ file_type2read=$2
 RA=$3
 CM=$4
 RM=$5
-resize_diam=$6
-shrinkage_factor=$7
-folder=$8
+name=$6
+resize_diam=$7
+shrinkage_factor=$8
+folder=$9
 shift $#
 # `if [ -n $SLURM_JOB_ID ]` checks if $SLURM_JOB_ID is not an empty string
 if [ -n $SLURM_JOB_ID ]; then
@@ -48,13 +49,13 @@ conda activate project
 #python3 $path/analysis_fit_after_run.py $cell_name $file_type2read $resize_diam $shrinkage_factor $folder
 
 echo python3 $path/Rin_Rm_plot.py $cell_name $file_type2read
-python3 $path/Rin_Rm_plot.py $cell_name $file_type2read $RA $CM $RM $resize_diam_by $shrinkage_factor $folder
+python3 $path/Rin_Rm_plot.py $cell_name $file_type2read $RA $CM $RM $name $resize_diam_by $shrinkage_factor $folder
 
 #echo python3 $path/attenuations.py $cell_name $file_type2read $passive_val
 #python3 $path/attenuations.py  $cell_name $file_type2read $RA $CM $RM $resize_diam_by $shrinkage_factor $folder
 
 echo python3 $path/dendogram.py $cell_name $file_type2read
-python3 $path/dendogram.py $cell_name $file_type2read $RA $CM $RM $resize_diam_by $shrinkage_factor $folder
+python3 $path/dendogram.py $cell_name $file_type2read $RA $CM $RM $name $resize_diam_by $shrinkage_factor $folder
 
 
 #echo "execute_level2 is complite to run"
