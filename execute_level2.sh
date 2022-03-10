@@ -45,8 +45,8 @@ conda init
 conda activate project
 # put your script here - example script is sitting with this bash script
 
-#echo python3 $path/analysis_fit_after_run.py $cell_name $file_type2read
-#python3 $path/analysis_fit_after_run.py $cell_name $file_type2read $resize_diam $shrinkage_factor $folder
+echo python3 $path/analysis_fit_after_run.py $cell_name $file_type2read
+python3 $path/analysis_fit_after_run.py $cell_name $file_type2read $resize_diam $shrinkage_factor $folder
 
 echo python3 $path/Rin_Rm_plot.py $cell_name $file_type2read
 python3 $path/Rin_Rm_plot.py $cell_name $file_type2read $RA $CM $RM $name $resize_diam_by $shrinkage_factor $folder
@@ -58,4 +58,3 @@ echo python3 $path/dendogram.py $cell_name $file_type2read
 python3 $path/dendogram.py $cell_name $file_type2read $RA $CM $RM $name $resize_diam_by $shrinkage_factor $folder
 
 
-#echo "execute_level2 is complite to run"

@@ -6,7 +6,7 @@ import os
 import pickle
 from glob import glob
 import sys
-from extra_function import create_folders_list
+from extra_function import create_folder_dirr
 
 spine_type="mouse_spine"
 print(sys.argv,flush=True)
@@ -33,7 +33,7 @@ initial_folder+="/dend*"+str(round(resize_diam_by,2))+'&F_shrinkage='+str(round(
 # datas2=glob(location+'/*/final_result*.p')
 def analysis_fit(location):
     save_folder=location+'/analysis'
-    create_folders_list([save_folder])
+    create_folder_dirr(save_folder)
     errors,RAs,RMs,CMs,names,diffrent_condition=[],[],[],[],[],[]
     for dirr in glob(location+'/*/*result*.p'):
         dict=read_from_pickle(dirr)
@@ -46,6 +46,10 @@ def analysis_fit(location):
         diffrent_condition.append(float(text.split('=')[-1]))
     condition=text.split('=')[-2]
     minimums_arg = np.argsort(errors)
+    dict_minimums_total=[]
+    for mini in minimums_arg:
+        dict_minimums_total.append({'RM': RMs[mini], 'RA': RAs[mini], 'CM': CMs[mini],'error':errors[mini]})
+    pickle.dump(dict_minimums_total, open(save_folder + "/RA_total_errors_minimums.p", "wb"))
     dict_minimums={}
     add_figure('diffrent RA against error\n'+dirr.split('/')[-3],'RA','errors')
     plt.plot(RAs,errors,'.')
@@ -89,12 +93,18 @@ if __name__ == '__main__':
         add_figure('RA const against errors\n'+loc.split('/')[-1],'RA const','error')
         plt.plot(RA0,errors)
         minimums_arg=np.argsort(errors)
+        dict_minimums_total=[]
+        for mini in minimums_arg:
+            dict_minimums_total.append({'RM': RMs[mini], 'RA': RAs[mini], 'CM': CMs[mini],'error':errors[mini]})
+        pickle.dump(dict_minimums_total, open(save_folder1 + "/RA_total_errors_minimums.p", "wb"))
         dict_minimums2={}
         for mini in minimums_arg[:10]:
             plt.plot(RA0[mini], errors[mini], '*',label=' RM=' + str(round(RMs[mini], 2)) + ' RA=' + str(round(RAs[mini], 2)) + ' CM=' + str(
                          round(CMs[mini], 2)) + ' error=' +  str(round(errors[mini], 3)))
             dict_minimums2['RA_const=' + str(RA0[mini])]={'params': {'RM': RMs[mini], 'RA': RAs[mini], 'CM': CMs[mini]},'error':{key2:error_all[key2][mini] for key2 in error_all.keys()} }
         pickle.dump(dict_minimums2, open(save_folder1 + "/RA_const_10_minimums.p", "wb"))
+
+
         plt.legend(loc='upper left')
         plt.savefig(save_folder1+'/RA const against errors')
         plt.savefig(save_folder1+'/RA const against errors.pdf')
@@ -119,9 +129,11 @@ if __name__ == '__main__':
         plt.savefig(save_folder1+'/RA const against CMs')
 
 
-        datas=glob(loc+'/different_initial_conditions/RA0*/RA0_fit_results.p')
-        for data in datas:
-            if '+' in data: datas.remove(data)
+        datas_temp=glob(loc+'/different_initial_conditions/RA0*/RA0_fit_results.p')
+        datas=[]
+        for data in datas_temp:
+            if not '+' in data:
+                datas.append(data)
         print(loc)
         print('datas', datas)
         data1,data2=datas
@@ -141,16 +153,27 @@ if __name__ == '__main__':
             # RAs=[value[i]['RA'] for i in range(len(value))]
             # RMs=[value[i]['RM'] for i in range(len(value))]
             # CMs=[value[i]['CM'] for i in range(len(value))]
+        # errors.append(dict['error']['decay&max'])
+        # RAs.append(dict['RA'])
+        # RMs.append(dict['RM'])
+        # CMs.append(dict['CM'])
+        # text=dirr.split('/')[-2]
+        # names.append(text)
+
             RAs,RMs,CMs,errors=[],[],[],[]
             for key in dict.keys():
                 RAs.append(dict[key]['RA'])
                 RMs.append(dict[key]['RM'])
                 CMs.append(dict[key]['CM'])
-                errors.append(dict[key]['error']['total_error'])
+                errors.append(dict[key]['error']['decay&max'])
                 # errors.append(dict[key]['error']['decay&max'])
             add_figure('diffrent RA0 against error\n'+loc.split('/')[-1],'RA0','errors')
             plt.plot(RA0,errors)
             minimums_arg = np.argsort(errors)
+            dict_minimums_total=[]
+            for mini in minimums_arg:
+                dict_minimums_total.append({'RM': RMs[mini], 'RA': RAs[mini], 'CM': CMs[mini],'error':errors[mini]})
+            pickle.dump(dict_minimums_total, open(save_folder + "/RA_total_errors_minimums.p", "wb"))
             dict_minimums={}
             for mini in minimums_arg[:10]:
                 plt.plot(RA0[mini], errors[mini], '*',
@@ -202,10 +225,14 @@ if __name__ == '__main__':
             RAs.append(dict[key]['RA'])
             RMs.append(dict[key]['RM'])
             CMs.append(dict[key]['CM'])
-            errors.append(dict[key]['error']['total_error'])
+            errors.append(dict[key]['error']['decay&max'])
         add_figure('diffrent RA0 against error\n'+loc.split('/')[-1],'RA0','errors')
         plt.plot(RA0,errors)
         minimums_arg=np.argsort(errors)
+        dict_minimums_total=[]
+        for mini in minimums_arg:
+            dict_minimums_total.append({'RM': RMs[mini], 'RA': RAs[mini], 'CM': CMs[mini],'error':errors[mini]})
+        pickle.dump(dict_minimums_total, open(save_folder + "/RA_total_errors_minimums.p", "wb"))
         # mini = np.argmin(errors)
         dict_minimums={}
         # print(loc)

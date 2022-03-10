@@ -37,7 +37,7 @@ data_dir= "cells_initial_information/"
 save_dir ="cells_outputs_data/"
 cell_file=glob(folder_+data_dir+cell_name+'/*'+file_type2read)[0]
 folder_save=folder_+save_dir+cell_name+"/data/cell_properties."+file_type2read+"/"
-folder_save+=str(passive_val)+'/'
+folder_save+=name+'_'+str(passive_val)+'/'
 create_folder_dirr(folder_save)
 
 colors_dict = {"soma":"black",
@@ -258,7 +258,7 @@ class Dendogram():
 
     def plot(self, save_folder, max_y=None,title='Dendogram',ylabel='distance from soma'):
         plt.figure(figsize=(10, 10))
-        plt.title(title,fontsize=24)
+        plt.title(title+'\n'+name+' '+str(passive_val),fontsize=24)
         plt.ylabel(ylabel,fontsize=16)
         x_pos = 0.0
         start_pos=0.0

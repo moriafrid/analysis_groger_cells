@@ -48,7 +48,7 @@ data_dir= "cells_initial_information/"
 save_dir ="cells_outputs_data/"
 cell_file=glob(folder_+data_dir+cell_name+'/*'+file_type)[0]
 folder_save=folder_+save_dir+cell_name+"/data/cell_properties."+file_type+"/"
-folder_save+=json.dumps(passive_val)+'/'
+folder_save+=name+'_'+json.dumps(passive_val)+'/'
 folder_save+="attenuations/"
 create_folder_dirr(folder_save)
 
@@ -105,7 +105,7 @@ def plot_records(RM, RA, CM,cell, syns,spines=None,save_name= "lambda"):
         # npVec_dend=npVec_dend*(Rin_dend_0/Rin_dend_resize_dend)#/=Rin_dend_resize_dend #npVec_dend*(Rin_dend_0/Rin_dend_resize_dend)
         # npVec_soma=npVec_soma*(Rin_soma_0/Rin_soma_resize_dend)#/=Rin_soma_resize_dend#npVec_soma*(Rin_soma_0/Rin_soma_resize_dend)
     figure, axis = plt.subplots(3, len(spines))
-    plt.suptitle(cell_name+'\npassive value is '+str(passive_val)+'\ndend*'+str(resize_diam_by)+' shrinkage_factor='+str(shrinkage_factor))
+    plt.suptitle(cell_name+'\n'+name+' '+str(passive_val)+'\ndend*'+str(resize_diam_by)+' shrinkage_factor='+str(shrinkage_factor))
     for i in range(len(spines)):
         axis[0,i].plot(npTvec,npIvec[i])
         # axis[0,i].set_title("spine voltage")

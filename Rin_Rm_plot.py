@@ -39,7 +39,7 @@ save_dir ="cells_outputs_data/"
 folder_data=folder_+save_dir+cell_name
 cell_file = glob(folder_+data_dir+cell_name+"/*."+file_type2read)[0]
 print("cell file is " +cell_file)
-folder_save = folder_+save_dir+cell_name +'/data/cell_properties.'+file_type2read+'/'+str(passive_val)+'/Rin_Rm/'
+folder_save = folder_+save_dir+cell_name +'/data/cell_properties.'+file_type2read+'/'+name+'_'+str(passive_val)+'/Rin_Rm/'
 create_folder_dirr(folder_save)
 parameters=read_from_pickle(folder_data+'/data/electrophysio_records/short_pulse_parameters.p')
 def change_model_pas(CM=1, RA = 250, RM = 20000.0, E_PAS = -70.0, F_factor ={}):
@@ -97,7 +97,7 @@ for sec in cell.all_sec():
 change_model_pas(CM=CM, RA = RA, RM =RM, E_PAS = E_pas,F_factor= F_factor)
 imp = h.Impedance(sec=soma)
 imp.loc(0.5, sec=soma)
-add_figure('Rin to Rm for diffrent Ra','Rm [Ohm/cm^2]','Rin [M ohm]')
+add_figure('Rin to Rm for diffrent Ra'+'\n'+name+' '+str(passive_val),'Rm [Ohm/cm^2]','Rin [M ohm]')
 Rm_arr = np.hstack([np.arange(10, 2511, 100), np.arange(2510, 20011, 1000)])
 for Ra in [1e-9, 70, 100, 150, 200]:
     res = []
@@ -126,7 +126,7 @@ for spine_num in range(get_n_spinese(cell_name)):
         imp_0.loc(spine_seg, sec=spine_sec)
         imp_0.compute(freq)  # check if you need at 10 Hz
         Rin_syn.append( imp_0.input(spine_seg, sec=spine_sec))
-    add_figure('Rin to freq','freq [hz]','Rinput [M ohm]')
+    add_figure('Rin to freq'+'\n'+name+' '+str(passive_val),'freq [hz]','Rinput [M ohm]')
     plt.plot(freqs,Rin_syn)
     imp_0.compute(100)
     plt.plot(100,   imp_0.input(spine_seg, sec=spine_sec)  ,'*')
@@ -149,7 +149,7 @@ for spine_num in range(get_n_spinese(cell_name)):
             # imp_0.input(seg, sec=sec)
             Rin.append( imp_0.transfer(spine_sec(spine_seg)))
             dis.append(h.distance(spine_sec(spine_seg)))
-    add_figure('transfer impadence at freq '+str(freq)+'Hz','ditance form soma [micron]','transfer_resistance[ohm]' )
+    add_figure('transfer impadence at freq '+str(freq)+'Hz'+'\n'+name+' '+str(passive_val),'ditance form soma [micron]','transfer_resistance[ohm]' )
     plt.plot(dis,Rin,'.')
     dis_syn=h.distance(spine_sec(spine_seg))
     Rin_syn=imp_0.transfer(spine_sec(spine_seg))
