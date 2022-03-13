@@ -39,7 +39,7 @@ runnum2compare = '13'
 # spine_type="mouse_spine" #"groger_spine"
 
 if len(sys.argv) != 12:
-    cell_name= '2017_03_04_A_6-7'
+    cell_name= '2017_05_08_A_5-4'
     file_type='ASC'  #file type is just used to calculate F_factor
     passive_val={'RA':100,'CM':1,'RM':10000}
     passive_val_name='const_ra'
