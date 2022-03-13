@@ -6,7 +6,7 @@ folder_="/ems/elsc-labs/segev-i/moria.fridman/project/analysis_groger_cells/"
 folder_data="cells_initial_information/"
 folder_save="cells_outputs_data/"
 cells=["2017_05_08_A_5-4", "2017_05_08_A_4-5","2017_03_04_A_6-7"]
-file_type2read=['hoc','ASC']
+file_type2read=['z_correct.swc','morphology.swc','hoc','ASC']
 resize_diam_by=str(1.0)
 shrinkage_factor=str(1.0)
 
@@ -17,7 +17,7 @@ for cell_name in [cells[2]]:
         for file_type in ['ASC','hoc']:
             passive_vals_dict= {}
             if fit_condition=='const_param':
-                passive_val_total=read_from_pickle(glob(folder_+folder_save+cell_name+'/2017_03_04_A_6-7/fit_short_pulse'+file_type+'/dend*'+resize_diam_by+'&F_shrinkage='+shrinkage_factor+'/'+fit_condition+'/RA/analysis/RA_total_errors_minimums.p')[0])
+                passive_val_total=read_from_pickle(glob(folder_+folder_save+cell_name+'/fit_short_pulse'+file_type+'/dend*'+resize_diam_by+'&F_shrinkage='+shrinkage_factor+'/'+fit_condition+'/RA/analysis/RA_total_errors_minimums.p')[0])
             if fit_condition=='different_initial_conditions':
                 passive_val_total=read_from_pickle(glob(folder_+folder_save+cell_name+'/fit_short_pulse_'+file_type+'/dend*'+resize_diam_by+'&F_shrinkage='+shrinkage_factor+'/'+fit_condition+'/RA0_100:300:2+RA0_50:100:0.5/RA_total_errors_minimums.p')[0])
             passive_vals_dict['RA=120']=found(passive_val_total,120)
