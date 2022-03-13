@@ -10,7 +10,7 @@
 #SBATCH -c 1
 #SBATCH -t 1-0
 
-echo "the number parameters the function get is "$#
+echo "the number parameters the sbatch get is "$#
 
 args=""
 if [[ $# -lt 1 ]] ; then

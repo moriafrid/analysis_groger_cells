@@ -14,8 +14,10 @@ import pandas as pd
 
 SPINE_START = 60
 do_calculate_F_factor=True
-
+print("the number of parameters that sys loaded in Rin_Rm_plot.py is ",len(sys.argv),flush=True)
+print(len(sys.argv), sys.argv)
 if len(sys.argv) != 9:
+    print("the function doesn't run with sys.argv",flush=True)
     cell_name= '2017_03_04_A_6-7'
     file_type2read= 'hoc'
     passive_val={'RA':100.0,'CM':1.0,'RM':10000.0}
@@ -24,6 +26,7 @@ if len(sys.argv) != 9:
     shrinkage_factor=1.0
     folder_='/ems/elsc-labs/segev-i/moria.fridman/project/analysis_groger_cells/'
 else:
+    print("the sys.argv len is correct",flush=True)
     cell_name = sys.argv[1]
     file_type2read=sys.argv[2]
     passive_val={"RA":float(sys.argv[3]),"CM":float(sys.argv[4]),'RM':float(sys.argv[5])}
@@ -31,8 +34,6 @@ else:
     resize_diam_by = float(sys.argv[7]) #how much the cell sweel during the electrophisiology records
     shrinkage_factor =float(sys.argv[8]) #how much srinkage the cell get between electrophysiology record and LM
     folder_= sys.argv[9] #'/ems/elsc-labs/segev-i/moria.fridman/project/analysis_groger_cells/'
-print("the number of parameters that sys loaded in Rin_Rm_plot.py is ",len(sys.argv),flush=True)
-print(len(sys.argv), sys.argv)
 print(name,passive_val)
 data_dir= "cells_initial_information/"
 save_dir ="cells_outputs_data/"

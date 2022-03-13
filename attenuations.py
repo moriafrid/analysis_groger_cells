@@ -18,9 +18,11 @@ norm_Rin=False
 syn_injection=True
 clamp_injection=False
 
-print(sys.argv)
+print("the number of parameters that sys loaded in attenuation.py is ",len(sys.argv),flush=True)
+print(len(sys.argv), sys.argv)
 do_resize_dend=True
 if len(sys.argv) != 11:
+    print("the function doesn't run with sys.argv",flush=True)
     cell_name= '2017_05_08_A_5-4'
     file_type='ASC'
     passive_val={'RA':100.0,'CM':1.0,'RM':10000.0}
@@ -30,6 +32,7 @@ if len(sys.argv) != 11:
     shrinkage_factor=1.0
     folder_='/ems/elsc-labs/segev-i/moria.fridman/project/analysis_groger_cells/'
 else:
+    print("the sys.argv len is correct",flush=True)
     cell_name = sys.argv[1]
     file_type=sys.argv[2] #hoc ar ASC
     passive_val={"RA":float(sys.argv[3]),"CM":float(sys.argv[4]),'RM':float(sys.argv[5])}
@@ -40,8 +43,7 @@ else:
     folder_= sys.argv[10] #'/ems/elsc-labs/segev-i/moria.fridman/project/analysis_groger_cells/cells_outputs_data'
 if not syn_injection:
     clamp_injection=True
-print("the number of parameters that sys loaded in attenuation.py is ",len(sys.argv),flush=True)
-print(len(sys.argv), sys.argv)
+
 print(name, passive_val)
 
 data_dir= "cells_initial_information/"
