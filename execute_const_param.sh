@@ -9,7 +9,7 @@
 #SBATCH -t 1-0
 echo $#
 
-if [[ $# -ne 5 ]] ; then
+if [[ $# -ne 6 ]] ; then
     echo "Wrong usage. not have enought parameters"
     exit 1
 fi
@@ -18,7 +18,8 @@ cell_name=$1
 file_type2read=$2
 resize_diam_by=$3
 shrinkage_factor=$4
-folder=$5
+SPINE_START=$5
+folder=$6
 
 shift $#
 if [ -n $SLURM_JOB_ID ]; then
@@ -31,4 +32,4 @@ fi
 
 path=$(dirname $SCRIPT_PATH) # get script's path to allow running from any folder without errors
 
-python3 $path/best_with_const_param.py $cell_name $file_type2read $resize_diam_by $shrinkage_factor $folder
+python3 $path/best_with_const_param.py $cell_name $file_type2read $resize_diam_by $shrinkage_factor $SPINE_START $folder

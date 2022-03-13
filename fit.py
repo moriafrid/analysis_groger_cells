@@ -13,18 +13,20 @@ from extra_function import load_ASC,load_hoc,SIGSEGV_signal_arises,create_folder
 import sys
 
 signal.signal(signal.SIGSEGV, SIGSEGV_signal_arises)
-if len(sys.argv) != 6:
+if len(sys.argv) != 7:
     cell_name= '2017_05_08_A_4-5'
     file_type='hoc'
     resize_diam_by=1.0
     shrinkage_factor=1.0
+    SPINE_START = 20
     folder_='/ems/elsc-labs/segev-i/moria.fridman/project/analysis_groger_cells/'
 else:
     cell_name = sys.argv[1]
     file_type=sys.argv[2] #hoc ar ASC
     resize_diam_by = float(sys.argv[3]) #how much the cell sweel during the electrophisiology records
     shrinkage_factor =float(sys.argv[4]) #how much srinkage the cell get between electrophysiology record and LM
-    folder_= sys.argv[5] #'/ems/elsc-labs/segev-i/moria.fridman/project/analysis_groger_cells/cells_outputs_data'
+    SPINE_START = int(sys.argv[5])
+    folder_= sys.argv[6] #'/ems/elsc-labs/segev-i/moria.fridman/project/analysis_groger_cells/cells_outputs_data'
 # path_single_traces=glob('data/traces_img/2017_05_08_A_0006/*pA.p')
 # path=path_single_traces[0]
 # I=int(path[path.rfind('/')+1:path.rfind('pA')])
@@ -33,20 +35,21 @@ data_dir= "cells_initial_information/"
 save_dir ="cells_outputs_data/"
 path_short_pulse=glob(folder_+save_dir+cell_name+'/data/electrophysio_records/short_pulse/mean_short_pulse_with_parameters.p')[0]
 cell_file=glob(folder_+data_dir+cell_name+'/*'+file_type)[0]
-save_folder=folder_+save_dir+cell_name+'/fit_short_pulse_'+file_type+'/'
-
+save_folder=folder_+save_dir+cell_name+'/fit_short_pulse/'+file_type+'_SPINE_START='+str(SPINE_START)+'/'
+# initial_folder+=spine_type
+save_folder+="/dend*"+str(round(resize_diam_by,2))+'&F_shrinkage='+str(round(shrinkage_factor,2))
+save_folder+="/basic_fit/"
 I=-50
 # save_folder+=str(I)+'pA/'
 save_folder+='dend*'+str(round(resize_diam_by,2))+'&F_shrinkage='+str(round(shrinkage_factor,2))+'/basic_fit'
 do_calculate_F_factor=True
 
-SPINE_START = 60
 shrinkage_factor=1#1.0/0.7
 resize_diam_by=1
 spine_type="mouse_spine"
 
 CM=1#2/2
-RM=14000#5684*2#*2
+RM=5000#5684*2#*2
 RA=100
 
 print('the injection current is',I,flush=True)
@@ -144,7 +147,7 @@ def efun(vals):
             return (1e6)
         RA = vals.x[RA_IX]
     else:RA = RA_const
-    if (CM < 0.3 or RM < 2000 or RA <1):
+    if (CM < 0.3 or RM < 2000 or RA <100):
         return 1e6
     # print('RA:',RA, '   CM:',CM, '   RM:',RM)
 
@@ -302,6 +305,7 @@ pickle.dump({
         "CM": CM,
         "error" :{'decay':error_decay,'decay&max':precent_error,'RMSD':RMSD}
     }, open(save_folder+'/' + "final_result_dend*"+str(resize_diam_by)+".p", "wb"))
+plt.show()
 #
 
 

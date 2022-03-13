@@ -13,7 +13,7 @@ import sys
 from analysis_fit_after_run import analysis_fit
 
 signal.signal(signal.SIGSEGV, SIGSEGV_signal_arises)
-if len(sys.argv) != 7:
+if len(sys.argv) != 8:
     cell_name= '2017_05_08_A_4-5'
     file_type='hoc'
     resize_diam_by=1.0
@@ -27,6 +27,7 @@ else:
     shrinkage_factor =float(sys.argv[4]) #how much srinkage the cell get between electrophysiology record and LM
     RA_min=int(sys.argv[5])
     folder_= sys.argv[6] #'/ems/elsc-labs/segev-i/moria.fridman/project/analysis_groger_cells/cells_outputs_data'
+SPINE_START = 20
 print(sys.argv,len(sys.argv),flush=True)
 # path_single_traces=glob('data/traces_img/2017_05_08_A_0006/*pA.p')
 # path=path_single_traces[0]
@@ -40,16 +41,15 @@ save_folder=folder_+save_dir+cell_name
 
 I=-50
 # save_folder+=str(I)+'pA/'
-save_folder+='/dend*'+str(round(resize_diam_by,2))+'&F_shrinkage='+str(round(shrinkage_factor,2))+'/basic_fit/Ra_min='+str(RA_min)
-save_folder+='/fit_short_pulse_'+file_type+'/'
+save_folder=folder_+save_dir+cell_name+'/fit_short_pulse/'+file_type+'_SPINE_START='+str(SPINE_START)+'/'
+# initial_folder+=spine_type
+save_folder+="/dend*"+str(round(resize_diam_by,2))+'&F_shrinkage='+str(round(shrinkage_factor,2))
+save_folder+="/different_RA_min/"
+
+
 create_folder_dirr(save_folder)
 
 do_calculate_F_factor=True
-
-SPINE_START = 60
-shrinkage_factor=1#1.0/0.7
-resize_diam_by=1
-spine_type="mouse_spine"
 
 CM=1#2/2
 RM=14000#5684*2#*2

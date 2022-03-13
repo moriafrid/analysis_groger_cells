@@ -13,7 +13,7 @@
 
 echo $#
 
-if [[ $# -ne 5 ]] ; then
+if [[ $# -ne 6 ]] ; then
     echo "Wrong usage. not have enought parameters"
     exit 1
 fi
@@ -22,7 +22,8 @@ cell_name=$1
 file_type2read=$2
 resize_diam_by=$3
 shrinkage_factor=$4
-folder=$5
+SPINE_START=$5
+folder=$6
 
 shift $#
 
@@ -41,7 +42,7 @@ path=$(dirname $SCRIPT_PATH)
 #conda activate project
 # put your script here - example script is sitting with this bash script
 
-python3 $path/fit_influnce_by_initial_condition.py $cell_name $file_type2read $resize_diam_by $shrinkage_factor $folder
+python3 $path/fit_influnce_by_initial_condition.py $cell_name $file_type2read $resize_diam_by $shrinkage_factor $SPINE_START $folder
 echo fit_influnce_by_initial_condition is complite to run
 
-python3 $path/analysis_fit_after_run.py $cell_name $file_type2read $resize_diam_by $shrinkage_factor $folder
+python3 $path/analysis_fit_after_run.py $cell_name $file_type2read $resize_diam_by $shrinkage_factor $SPINE_START $folder

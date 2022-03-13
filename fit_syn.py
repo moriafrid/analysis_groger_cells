@@ -40,8 +40,6 @@ if do_calculate_F_factor:
     spine_neck_diam=0.164
     spine_neck_L=0.782
 
-
-
 # useto open the ASc file, for now isn't working
 class MyCell:
     def __init__(self):

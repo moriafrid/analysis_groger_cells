@@ -20,7 +20,6 @@ if len(sys.argv) != 8:
     shrinkage_factor=1.0
     add2start=5
     add2start2=1
-
     folder_='/ems/elsc-labs/segev-i/moria.fridman/project/analysis_groger_cells/'
 else:
     cell_name = sys.argv[1]
@@ -31,6 +30,8 @@ else:
     add2start2=int(sys.argv[6])
     folder_= sys.argv[7] #'/ems/elsc-labs/segev-i/moria.fridman/project/analysis_groger_cells/cells_outputs_data'
 print(sys.argv,len(sys.argv),flush=True)
+SPINE_START = 20
+
 # path_single_traces=glob('data/traces_img/2017_05_08_A_0006/*pA.p')
 # path=path_single_traces[0]
 # I=int(path[path.rfind('/')+1:path.rfind('pA')])
@@ -39,21 +40,17 @@ data_dir= "cells_initial_information/"
 save_dir ="cells_outputs_data/"
 path_short_pulse=glob(folder_+save_dir+cell_name+'/data/electrophysio_records/short_pulse/mean_short_pulse_with_parameters.p')[0]
 cell_file=glob(folder_+data_dir+cell_name+'/*'+file_type)[0]
-save_folder=folder_+save_dir+cell_name+'/fit_short_pulse_'+file_type+'/'
+save_folder=folder_+save_dir+cell_name+'/fit_short_pulse/'+file_type+'_SPINE_START='+str(SPINE_START)+'/'
+save_folder+="/dend*"+str(round(resize_diam_by,2))+'&F_shrinkage='+str(round(shrinkage_factor,2))
+save_folder+="/different_with_diffrent_time_delay/"
 I=-50
 # save_folder+=str(I)+'pA/'
 save_folder+='dend*'+str(round(resize_diam_by,2))+'&F_shrinkage='+str(round(shrinkage_factor,2))+'/basic_fit/delay='+str(add2start)+'_add fit start='+str(add2start2)
 create_folder_dirr(save_folder)
 
 do_calculate_F_factor=True
-
-SPINE_START = 60
-shrinkage_factor=1#1.0/0.7
-resize_diam_by=1
-spine_type="mouse_spine"
-
 CM=1#2/2
-RM=30000#5684*2#*2
+RM=20000#5684*2#*2
 RA=150
 
 print('the injection current is',I,flush=True)

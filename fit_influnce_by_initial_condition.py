@@ -15,21 +15,20 @@ from analysis_fit_after_run import analysis_fit
 do_calculate_F_factor=True
 spine_type="mouse_spine"
 print('argv len is ',len(sys.argv),' and contain ',sys.argv,flush=True)
-if len(sys.argv) != 6:
+if len(sys.argv) != 7:
     cell_name= '2017_05_08_A_4-5'
     file_type='hoc'
     resize_diam_by=1.0
     shrinkage_factor=1.0
+    SPINE_START = 20
     folder_='/ems/elsc-labs/segev-i/moria.fridman/project/analysis_groger_cells/'
 else:
-   cell_name = sys.argv[1]
-   file_type=sys.argv[2] #hoc ar ASC
-   resize_diam_by = float(sys.argv[3]) #how much the cell sweel during the electrophisiology records
-   shrinkage_factor =float(sys.argv[4]) #how much srinkage the cell get between electrophysiology record and LM
-   folder_= sys.argv[5] #'/ems/elsc-labs/segev-i/moria.fridman/project/analysis_groger_cells/cells_outputs_data'
-   if not folder_.endswith("/"):
-       folder_ += "/"
-# add2start=5
+    cell_name = sys.argv[1]
+    file_type=sys.argv[2] #hoc ar ASC
+    resize_diam_by = float(sys.argv[3]) #how much the cell sweel during the electrophisiology records
+    shrinkage_factor =float(sys.argv[4]) #how much srinkage the cell get between electrophysiology record and LM
+    SPINE_START = int(sys.argv[5])
+    folder_= sys.argv[6] #'/ems/elsc-labs/segev-i/moria.fridman/project/analysis_groger_cells/cells_outputs_data'
 
 data_dir= "cells_initial_information/"
 save_dir ="cells_outputs_data/"
@@ -37,8 +36,7 @@ print(folder_+save_dir+cell_name+'/data/electrophysio_records/short_pulse/mean_s
 short_pulse_file=glob(folder_+save_dir+cell_name+'/data/electrophysio_records/short_pulse/mean_short_pulse_with_parameters.p')[0]
 print(folder_+data_dir+cell_name+'/*'+file_type)
 cell_file=glob(folder_+data_dir+cell_name+'/*'+file_type)[0]
-
-save_folder=folder_+save_dir+cell_name+'/fit_short_pulse_'+file_type+'/'
+save_folder=folder_+save_dir+cell_name+'/fit_short_pulse/'+file_type+'_SPINE_START='+str(SPINE_START)+'/'
 # initial_folder+=spine_type
 save_folder+="/dend*"+str(round(resize_diam_by,2))+'&F_shrinkage='+str(round(shrinkage_factor,2))
 save_folder+="/different_initial_conditions/"
@@ -215,8 +213,6 @@ if __name__=='__main__':
     T = np.array(short_pulse['mean'][1].rescale('ms'))
     T = T-T[0]
     E_PAS=short_pulse['E_pas']#np.mean(V[:start]) #or read it from the pickle
-    SPINE_START = 60
-
     start,end=find_injection(V,E_PAS,duration=int(200/hz))
     start_fit= start-100#2000   #moria
     end_fit=end-1200#4900#3960  #moria

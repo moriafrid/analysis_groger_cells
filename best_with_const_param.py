@@ -17,23 +17,26 @@ from analysis_fit_after_run import analysis_fit
 do_calculate_F_factor=True
 spine_type="mouse_spine"
 
-if len(sys.argv) != 6:
+if len(sys.argv) != 7:
    cell_name= '2017_03_04_A_6-7'
    file_type='hoc'
    resize_diam_by=1.0
    shrinkage_factor=1.0
+   SPINE_START=20
    folder_='/ems/elsc-labs/segev-i/moria.fridman/project/analysis_groger_cells/'
 else:
    cell_name = sys.argv[1]
    file_type=sys.argv[2] #hoc ar ASC
    resize_diam_by = float(sys.argv[3]) #how much the cell sweel during the electrophisiology records
    shrinkage_factor =float(sys.argv[4]) #how much srinkage the cell get between electrophysiology record and LM
-   folder_= sys.argv[5] #'/ems/elsc-labs/segev-i/moria.fridman/project/analysis_groger_cells/cells_outputs_data'
+   SPINE_START=int(sys.argv[5])
+   folder_= sys.argv[6] #'/ems/elsc-labs/segev-i/moria.fridman/project/analysis_groger_cells/cells_outputs_data'
 data_dir= "cells_initial_information/"
 save_dir ="cells_outputs_data/"
 path_short_pulse=glob(folder_+save_dir+cell_name+'/data/electrophysio_records/short_pulse/mean_short_pulse_with_parameters.p')[0]
 cell_file=glob(folder_+data_dir+cell_name+'/*'+file_type)[0]
-initial_folder=folder_+save_dir+cell_name+'/fit_short_pulse_'+file_type+'/'
+
+initial_folder=folder_+save_dir+cell_name+'/fit_short_pulse/'+file_type+'_SPINE_START='+str(SPINE_START)+'/'
 initial_folder+="/dend*"+str(round(resize_diam_by,2))+'&F_shrinkage='+str(round(shrinkage_factor,2))
 initial_folder +="/const_param/RA"
 create_folder_dirr(initial_folder)

@@ -5,12 +5,13 @@ import matplotlib.pyplot as plt
 from tqdm import tqdm
 from add_figure import add_figure
 from glob import glob
-from extra_function import create_folder_dirr,SIGSEGV_signal_arises,load_ASC,load_hoc
+from extra_function import create_folder_dirr,SIGSEGV_signal_arises,load_ASC,load_hoc,load_swc
 import sys
 
 if len(sys.argv) != 6:
-    cell_name= '2017_05_08_A_5-4'
-    file_type2read= 'hoc'
+    # cell_name= '2017_05_08_A_5-4'
+    cell_name= '2017_03_04_A_6-7'
+    file_type2read= 'z_correct.swc'
     folder_='/ems/elsc-labs/segev-i/moria.fridman/project/analysis_groger_cells/'
     data_dir= "cells_initial_information"
     save_dir ="cells_outputs_data"
@@ -22,7 +23,7 @@ else:
     save_dir =sys.argv[5] #cells_outputs_data
 print(len(sys.argv))
 print(cell_name, folder_+data_dir+"/"+cell_name+"/*."+file_type2read)
-cell_file = glob(folder_+data_dir+"/"+cell_name+"/*."+file_type2read)[0]
+cell_file = glob(folder_+data_dir+"/"+cell_name+"/*"+file_type2read)[0]
 
 path_short_pulse=folder_+save_dir+'/'+cell_name+'/data/electrophysio_records/short_pulse/mean_short_pulse.p'
 folder_save=folder_+save_dir+'/'+cell_name+'/data/cell_properties/diam_dis_'+file_type2read+'/'
@@ -54,6 +55,8 @@ if file_type2read=='ASC':
     cell=load_ASC(cell_file)
 elif file_type2read=='hoc':
     cell=load_hoc(cell_file)
+elif 'swc' in file_type2read:
+    cell=load_swc(cell_file)
 print (cell)
 sp = h.PlotShape()
 sp.show(0)  # show diameters
@@ -114,7 +117,7 @@ for sec in cell.dend:
     if len(sec.children())==0:
         terminals.append(sec)
 plt.close()
-add_figure('diam-dis relation along dendrites with diffrent collors','distance from soma','diameter')
+add_figure('diam-dis relation along dendrites with diffrent collors\n'+cell_name+' '+file_type2read,'distance from soma','diameter')
 i=0
 for terminal in terminals:
     i+=1
