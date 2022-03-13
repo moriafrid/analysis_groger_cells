@@ -19,6 +19,7 @@ if len(sys.argv) != 8:
     resize_diam_by=1.0
     shrinkage_factor=1.0
     RA_min=1
+    SPINE_START=20
     folder_='/ems/elsc-labs/segev-i/moria.fridman/project/analysis_groger_cells/'
 else:
     cell_name = sys.argv[1]
@@ -26,8 +27,8 @@ else:
     resize_diam_by = float(sys.argv[3]) #how much the cell sweel during the electrophisiology records
     shrinkage_factor =float(sys.argv[4]) #how much srinkage the cell get between electrophysiology record and LM
     RA_min=int(sys.argv[5])
-    folder_= sys.argv[6] #'/ems/elsc-labs/segev-i/moria.fridman/project/analysis_groger_cells/cells_outputs_data'
-SPINE_START = 20
+    SPINE_START=int(sys.argv[6])
+    folder_= sys.argv[7] #'/ems/elsc-labs/segev-i/moria.fridman/project/analysis_groger_cells/cells_outputs_data'
 print(sys.argv,len(sys.argv),flush=True)
 # path_single_traces=glob('data/traces_img/2017_05_08_A_0006/*pA.p')
 # path=path_single_traces[0]

@@ -20,10 +20,24 @@ for cell_name in cells:
         os.system(send_command)
         print(cell_name+ ' .'+file_type+': fit_influance_by_initial_condition.py')
         command="sbatch execute_const_param.sh"
-        send_command = " ".join([command, cell_name,file_type,resize_diam_by,shrinkage_factor,SPINE_START,folder_])
+        send_command = " ".join([command, cell_name,file_type,resize_diam_by,shrinkage_factor,str(SPINE_START),folder_])
         os.system(send_command)
         print(cell_name+ ' .'+file_type+': best_with_const_param.py')
         command="sbatch execute_fit_with_diffrent_time_delay.sh"
-        send_command = " ".join([command, cell_name,file_type,resize_diam_by,shrinkage_factor,SPINE_START,folder_])
+        send_command = " ".join([command, cell_name,file_type,resize_diam_by,shrinkage_factor,str(SPINE_START),folder_])
         os.system(send_command)
         print(cell_name+ ' .'+file_type+': execute_fi_with_diffrent_time_delay.py')
+
+        for RA_min in [0,50,100,150,200]:
+            command="sbatch execute_fit_with_diffrent_RA_min.sh"
+            send_command = " ".join([command, cell_name,file_type2read,resize_diam_by,shrinkage_factor,str(RA_min),str(SPINE_START),folder_])
+            os.system(send_command)
+            print(cell_name+':fit_with_diffrent_RA_min.py RA_min='+str(RA_min))
+
+
+        for add2delay  in [0,1,2,3,4,5,6,7,8]:
+            for add2fit  in range(0,20,2):
+                command="sbatch execute_fit_with_diffrent_time_delay.sh"
+                send_command = " ".join([command, cell_name,'ASC',resize_diam_by,shrinkage_factor,str(add2delay),str(add2fit),str(SPINE_START),folder_])
+                os.system(send_command)
+                print(':fit_with_diffrent_time_delay.py delay='+str(add2delay)+' add fit='+str(add2fit))

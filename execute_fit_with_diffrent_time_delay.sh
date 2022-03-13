@@ -19,7 +19,7 @@ fi
 path=$(dirname $SCRIPT_PATH) # get script's path to allow running from any folder without errors
 echo $#
 
-if [[ $# -ne 7 ]] ; then
+if [[ $# -ne 8 ]] ; then
     echo "Wrong usage. not have enought parameters"
     exit 1
 fi
@@ -30,13 +30,14 @@ resize_diam_by=$3
 shrinkage_factor=$4
 add2delay=$5
 add2fit=$6
-folder=$7
+SPINE_START=$7
+folder=$8
 
 shift $#
 # If necessary, activate anaconda installed on your user (Default: /ems/..../<lab>/<user>/anaconda3
 # source anaconda3/bin/activate
 # put your script here - example script is sitting with this bash script
 
-python3 $path/fit_with_diffrent_time_delay.py $cell_name $file_type2read $resize_diam_by $shrinkage_factor $add2delay $add2fit $folder
+python3 $path/fit_with_diffrent_time_delay.py $cell_name $file_type2read $resize_diam_by $shrinkage_factor $add2delay $add2fit $SPINE_START $folder
 
 #python3 $path/analysis_fit_after_run.py $cell_name $file_type2read $resize_diam_by $shrinkage_factor $folder

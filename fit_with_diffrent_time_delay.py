@@ -13,7 +13,7 @@ import sys
 from analysis_fit_after_run import analysis_fit
 
 signal.signal(signal.SIGSEGV, SIGSEGV_signal_arises)
-if len(sys.argv) != 8:
+if len(sys.argv) != 9:
     cell_name= '2017_05_08_A_4-5'
     file_type='hoc'
     resize_diam_by=1.0
@@ -28,9 +28,9 @@ else:
     shrinkage_factor =float(sys.argv[4]) #how much srinkage the cell get between electrophysiology record and LM
     add2start=int(sys.argv[5])
     add2start2=int(sys.argv[6])
-    folder_= sys.argv[7] #'/ems/elsc-labs/segev-i/moria.fridman/project/analysis_groger_cells/cells_outputs_data'
+    SPINE_START=int(sys.argv[7])
+    folder_= sys.argv[8] #'/ems/elsc-labs/segev-i/moria.fridman/project/analysis_groger_cells/cells_outputs_data'
 print(sys.argv,len(sys.argv),flush=True)
-SPINE_START = 20
 
 # path_single_traces=glob('data/traces_img/2017_05_08_A_0006/*pA.p')
 # path=path_single_traces[0]
