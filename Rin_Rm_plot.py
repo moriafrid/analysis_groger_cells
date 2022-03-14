@@ -23,8 +23,7 @@ if len(sys.argv) != 10:
     name='RA=120'
     resize_diam_by=1.0
     shrinkage_factor=1.0
-    SPINE_START = 60
-
+    SPINE_START = 20
     folder_='/ems/elsc-labs/segev-i/moria.fridman/project/analysis_groger_cells/'
 else:
     print("the sys.argv len is correct",flush=True)

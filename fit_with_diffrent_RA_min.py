@@ -8,7 +8,7 @@ from add_figure import add_figure
 from glob import glob
 import pickle
 from calculate_F_factor import calculate_F_factor
-from extra_function import load_ASC,load_hoc,SIGSEGV_signal_arises,create_folder_dirr
+from extra_function import load_ASC,load_hoc,load_swc,SIGSEGV_signal_arises,create_folder_dirr
 import sys
 from analysis_fit_after_run import analysis_fit
 
@@ -179,9 +179,11 @@ def efun(vals):
 # cell=instantiate_swc('/ems/elsc-labs/segev-i/moria.fridman/project/data_analysis_git/data_analysis/try1.swc')
 cell=None
 if file_type=='ASC':
-    cell =load_ASC(cell_file)
+   cell =load_ASC(cell_file)
 elif file_type=='hoc':
-    cell =load_hoc(cell_file)
+   cell =load_hoc(cell_file)
+elif 'swc' in file_type:
+    cell =load_swc(cell_file)
 
 print (cell)
 sp = h.PlotShape()

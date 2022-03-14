@@ -5,7 +5,7 @@ import  matplotlib.pyplot as plt
 from calculate_F_factor import calculate_F_factor
 from add_figure import add_figure
 import pickle
-from extra_function import load_ASC,load_hoc,SIGSEGV_signal_arises,create_folder_dirr
+from extra_function import load_ASC,load_hoc,load_swc,SIGSEGV_signal_arises,create_folder_dirr
 from extra_fit_func import find_injection
 import pandas as pd
 import sys
@@ -15,8 +15,6 @@ import os
 from analysis_fit_after_run import analysis_fit
 # initial_folder = "data/fit/"
 do_calculate_F_factor=True
-spine_type="mouse_spine"
-
 if len(sys.argv) != 7:
    cell_name= '2017_03_04_A_6-7'
    file_type='hoc'
@@ -124,6 +122,8 @@ if __name__=='__main__':
        cell =load_ASC(cell_file)
     elif file_type=='hoc':
        cell =load_hoc(cell_file)
+    elif 'swc' in file_type:
+        cell =load_swc(cell_file)
     sp = h.PlotShape()
     sp.show(0)  # show diameters
 
@@ -226,7 +226,7 @@ if __name__=='__main__':
     add_figure('RA_errors','RA','ra_next_eror')
     plt.plot(RA,ra_error_next)
     plt.savefig(initial_folder + '/Ra_const_errors2.png')
-    print('best_with_const_param.py is complite to run')
+    print('fit_best_with_const_param.py is complite to run')
 
 
     # analysis_fit(initial_folder)

@@ -3,7 +3,7 @@ from glob import glob
 import numpy as np
 import matplotlib.pyplot as plt
 import signal
-from extra_function import SIGSEGV_signal_arises,load_ASC,load_hoc,create_folder_dirr
+from extra_function import SIGSEGV_signal_arises,load_ASC,load_hoc,load_swc,create_folder_dirr
 import pandas as pd
 from calculate_F_factor import calculate_F_factor
 import sys
@@ -11,7 +11,6 @@ from read_spine_properties import get_n_spinese,get_building_spine
 import json
 from open_pickle import read_from_pickle
 freq=100
-SPINE_START=60
 do_calculate_F_factor=True
 put_syn_on_spine_head=True
 norm_Rin=False
@@ -21,7 +20,7 @@ clamp_injection=False
 print("the number of parameters that sys loaded in attenuation.py is ",len(sys.argv),flush=True)
 print(len(sys.argv), sys.argv)
 do_resize_dend=True
-if len(sys.argv) != 11:
+if len(sys.argv) != 12:
     print("the function doesn't run with sys.argv",flush=True)
     cell_name= '2017_05_08_A_5-4'
     file_type='ASC'
@@ -30,6 +29,7 @@ if len(sys.argv) != 11:
     syn_injection=False
     resize_diam_by=1.0
     shrinkage_factor=1.0
+    SPINE_START=20
     folder_='/ems/elsc-labs/segev-i/moria.fridman/project/analysis_groger_cells/'
 else:
     print("the sys.argv len is correct",flush=True)
@@ -40,7 +40,8 @@ else:
     syn_injection=eval(sys.argv[7])
     resize_diam_by = float(sys.argv[8]) #how much the cell sweel during the electrophisiology records
     shrinkage_factor =float(sys.argv[9]) #how much srinkage the cell get between electrophysiology record and LM
-    folder_= sys.argv[10] #'/ems/elsc-labs/segev-i/moria.fridman/project/analysis_groger_cells/cells_outputs_data'
+    SPINE_START=int(sys.argv[10])
+    folder_= sys.argv[11] #'/ems/elsc-labs/segev-i/moria.fridman/project/analysis_groger_cells/cells_outputs_data'
 if not syn_injection:
     clamp_injection=True
 
@@ -49,8 +50,9 @@ print(name, passive_val)
 data_dir= "cells_initial_information/"
 save_dir ="cells_outputs_data/"
 cell_file=glob(folder_+data_dir+cell_name+'/*'+file_type)[0]
-folder_save=folder_+save_dir+cell_name+"/data/cell_properties."+file_type+"/"
-folder_save+=name+'_'+json.dumps(passive_val)+'/'
+folder_save=folder_+save_dir+cell_name+"/data/cell_properties/"+file_type+'_SPINE_START='+str(SPINE_START)+'/'
+folder_save+="/dend*"+str(round(resize_diam_by,2))+'&F_shrinkage='+str(round(shrinkage_factor,2))
+folder_save+=name+'_'+str(passive_val)+'/'
 folder_save+="attenuations/"
 create_folder_dirr(folder_save)
 

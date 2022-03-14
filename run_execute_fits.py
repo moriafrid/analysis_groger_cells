@@ -16,7 +16,7 @@ for cell_name in cells:
         command="sbatch execute_const_param.sh"
         send_command = " ".join([command, cell_name,file_type,resize_diam_by,shrinkage_factor,str(SPINE_START),folder_])
         os.system(send_command)
-        print(cell_name+ ' .'+file_type+': best_with_const_param.py')
+        print(cell_name+ ' .'+file_type+': fit_best_with_const_param.py')
 
         # for RA_min in [0,50,100,150,200]:
         #     command="sbatch execute_fit_with_diffrent_RA_min.sh"

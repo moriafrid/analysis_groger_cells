@@ -20,7 +20,7 @@ from bluepyopt.ephys.parameters import NrnParameter, NrnRangeParameter
 from bluepyopt.ephys.parameterscalers import *
 import logging
 import signal
-from extra_function import SIGSEGV_signal_arises, load_hoc,load_ASC,create_folder_dirr
+from extra_function import SIGSEGV_signal_arises, load_hoc,load_ASC,load_swc,create_folder_dirr
 from glob import glob
 
 signal.signal(signal.SIGSEGV, SIGSEGV_signal_arises)
@@ -75,7 +75,7 @@ create_folder_dirr(base_save_folder)
 RDSM_objective_file = folder_+save_dir+cell_name+"/data/electrophysio_records/syn/mean_syn.p"
 short_pulse_parameters_file=folder_+save_dir+cell_name+'/data/electrophysio_records/short_pulse_parameters.p'
 morphology_dirr =glob(folder_+data_dir+cell_name+'/*'+file_type)[0]
-morphology_dirr =glob( folder_+data_dir+cell_name+'/*swc')[0]
+morphology_dirr =glob( folder_+data_dir+cell_name+'/*z_correct.swc')[0]
 
 # cpu_node = float(sys.argv[1])
 # print('cpu node=',cpu_node, flush=True)
@@ -829,7 +829,8 @@ if file_type=='hoc':
     load_cell_function=load_hoc
 elif file_type=='ASC':
     load_cell_function=load_ASC
-
+elif 'swc' in file_type:
+    load_cell_function=load_swc
 Rneck = passive_val["RA"]
 if do_calculate_F_factor:
     temp_cell=None

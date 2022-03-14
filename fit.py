@@ -9,7 +9,7 @@ from add_figure import add_figure
 from glob import glob
 import pickle
 from calculate_F_factor import calculate_F_factor
-from extra_function import load_ASC,load_hoc,SIGSEGV_signal_arises,create_folder_dirr
+from extra_function import load_ASC,load_hoc,load_swc,SIGSEGV_signal_arises,create_folder_dirr
 import sys
 
 signal.signal(signal.SIGSEGV, SIGSEGV_signal_arises)
@@ -178,11 +178,13 @@ def efun(vals):
 # fname =glob(folder_+cell_name+ "/05_08_A_01062017_Splice_shrink_FINISHED_LABEL_Bluecell_spinec91.ASC"
 # cell=instantiate_swc('/ems/elsc-labs/segev-i/moria.fridman/project/data_analysis_git/data_analysis/try1.swc')
 cell=None
-if file_type=='ASC':
-    cell =load_ASC(cell_file)
-elif file_type=='hoc':
-    cell =load_hoc(cell_file)
 
+if file_type=='ASC':
+   cell =load_ASC(cell_file)
+elif file_type=='hoc':
+   cell =load_hoc(cell_file)
+elif 'swc' in file_type:
+    cell =load_swc(cell_file)
 print (cell)
 sp = h.PlotShape()
 sp.show(0)  # show diameters

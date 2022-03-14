@@ -8,7 +8,7 @@ import pickle
 import signal
 from glob import glob
 import sys
-from extra_function import load_ASC,load_hoc,SIGSEGV_signal_arises,create_folder_dirr,create_folders_list
+from extra_function import load_ASC,load_hoc,load_swc,SIGSEGV_signal_arises,create_folder_dirr,create_folders_list
 from extra_fit_func import find_injection
 from analysis_fit_after_run import analysis_fit
 
@@ -186,7 +186,8 @@ if __name__=='__main__':
        cell =load_ASC(cell_file)
     elif file_type=='hoc':
        cell =load_hoc(cell_file)
-
+    elif 'swc' in file_type:
+        cell =load_swc(cell_file)
     sp = h.PlotShape()
     sp.show(0)  # show diameters
 

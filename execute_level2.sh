@@ -14,7 +14,7 @@
 
 echo $#
 
-if [[ $# -ne 9 ]] ; then
+if [[ $# -ne 10 ]] ; then
     echo "Wrong usage. not have enought parameters"
     exit 1
 fi
@@ -27,7 +27,8 @@ RM=$5
 name=$6
 resize_diam=$7
 shrinkage_factor=$8
-folder=$9
+SPINE_START=$9
+folder= $10
 shift $#
 # `if [ -n $SLURM_JOB_ID ]` checks if $SLURM_JOB_ID is not an empty string
 if [ -n $SLURM_JOB_ID ]; then
@@ -46,15 +47,15 @@ conda activate project
 # put your script here - example script is sitting with this bash script
 
 echo python3 $path/analysis_fit_after_run.py $cell_name $file_type2read
-python3 $path/analysis_fit_after_run.py $cell_name $file_type2read $resize_diam $shrinkage_factor $folder
+python3 $path/analysis_fit_after_run.py $cell_name $file_type2read $resize_diam $shrinkage_factor $SPINE_START $folder
 
 echo python3 $path/Rin_Rm_plot.py $cell_name $file_type2read
-python3 $path/Rin_Rm_plot.py $cell_name $file_type2read $RA $CM $RM $name $resize_diam_by $shrinkage_factor $folder
+python3 $path/Rin_Rm_plot.py $cell_name $file_type2read $RA $CM $RM $name $resize_diam_by $shrinkage_factor $SPINE_START $folder
 
 #echo python3 $path/attenuations.py $cell_name $file_type2read $passive_val
 #python3 $path/attenuations.py  $cell_name $file_type2read $RA $CM $RM $resize_diam_by $shrinkage_factor $folder
 
 echo python3 $path/dendogram.py $cell_name $file_type2read
-python3 $path/dendogram.py $cell_name $file_type2read $RA $CM $RM $name $resize_diam_by $shrinkage_factor $folder
+python3 $path/dendogram.py $cell_name $file_type2read $RA $CM $RM $name $resize_diam_by $shrinkage_factor $SPINE_START $folder
 
 

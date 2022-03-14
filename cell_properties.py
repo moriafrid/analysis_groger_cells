@@ -22,7 +22,7 @@ else:
     data_dir = sys.argv[4] #cells_initial_information
     save_dir =sys.argv[5] #cells_outputs_data
 print(len(sys.argv))
-print(cell_name, folder_+data_dir+"/"+cell_name+"/*."+file_type2read)
+print(cell_name, folder_+data_dir+"/"+cell_name+"/*"+file_type2read)
 cell_file = glob(folder_+data_dir+"/"+cell_name+"/*"+file_type2read)[0]
 
 path_short_pulse=folder_+save_dir+'/'+cell_name+'/data/electrophysio_records/short_pulse/mean_short_pulse.p'
