@@ -17,7 +17,7 @@ from analysis_fit_after_run import analysis_fit
 do_calculate_F_factor=True
 if len(sys.argv) != 7:
    cell_name= '2017_03_04_A_6-7'
-   file_type='hoc'
+   file_type='z_correct.swc'
    resize_diam_by=1.0
    shrinkage_factor=1.0
    SPINE_START=20

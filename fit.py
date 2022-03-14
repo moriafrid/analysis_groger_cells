@@ -15,7 +15,7 @@ import sys
 signal.signal(signal.SIGSEGV, SIGSEGV_signal_arises)
 if len(sys.argv) != 7:
     cell_name= '2017_05_08_A_4-5'
-    file_type='hoc'
+    file_type='z_correct.swc'
     resize_diam_by=1.0
     shrinkage_factor=1.0
     SPINE_START = 20

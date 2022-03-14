@@ -12,7 +12,7 @@ for cell_name in [cells[1]]:
     for add2delay  in [0,1,2,3,4,5,6,7,8]:
         for add2fit  in range(0,20,2):
             command="sbatch execute_fit_with_diffrent_time_delay.sh"
-            send_command = " ".join([command, cell_name,'ASC',resize_diam_by,shrinkage_factor,str(add2delay),str(add2fit),str(SPINE_START)folder_])
+            send_command = " ".join([command, cell_name,'ASC',resize_diam_by,shrinkage_factor,str(add2delay),str(add2fit),str(SPINE_START),folder_])
             os.system(send_command)
             print(':fit_with_diffrent_time_delay.py delay='+str(add2delay)+' add fit='+str(add2fit))
 
