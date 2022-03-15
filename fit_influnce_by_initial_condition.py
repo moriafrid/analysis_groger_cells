@@ -15,9 +15,10 @@ from analysis_fit_after_run import analysis_fit
 do_calculate_F_factor=True
 spine_type="mouse_spine"
 print('argv len is ',len(sys.argv),' and contain ',sys.argv,flush=True)
-if len(sys.argv) != 7:
+if len(sys.argv) != 8:
     cell_name= '2017_05_08_A_4-5'
     file_type='hoc'
+    RA_min=70
     resize_diam_by=1.0
     shrinkage_factor=1.0
     SPINE_START = 20
@@ -25,10 +26,11 @@ if len(sys.argv) != 7:
 else:
     cell_name = sys.argv[1]
     file_type=sys.argv[2] #hoc ar ASC
-    resize_diam_by = float(sys.argv[3]) #how much the cell sweel during the electrophisiology records
-    shrinkage_factor =float(sys.argv[4]) #how much srinkage the cell get between electrophysiology record and LM
-    SPINE_START = int(sys.argv[5])
-    folder_= sys.argv[6] #'/ems/elsc-labs/segev-i/moria.fridman/project/analysis_groger_cells/cells_outputs_data'
+    RA_min=int(sys.argv[3])
+    resize_diam_by = float(sys.argv[4]) #how much the cell sweel during the electrophisiology records
+    shrinkage_factor =float(sys.argv[5]) #how much srinkage the cell get between electrophysiology record and LM
+    SPINE_START = int(sys.argv[6])
+    folder_= sys.argv[7] #'/ems/elsc-labs/segev-i/moria.fridman/project/analysis_groger_cells/cells_outputs_data'
 
 data_dir= "cells_initial_information/"
 save_dir ="cells_outputs_data/"
@@ -39,7 +41,7 @@ cell_file=glob(folder_+data_dir+cell_name+'/*'+file_type)[0]
 save_folder=folder_+save_dir+cell_name+'/fit_short_pulse/'+file_type+'_SPINE_START='+str(SPINE_START)+'/'
 # initial_folder+=spine_type
 save_folder+="/dend*"+str(round(resize_diam_by,2))+'&F_shrinkage='+str(round(shrinkage_factor,2))
-save_folder+="/different_initial_conditions/"
+save_folder+="/different_initial_conditions/RA_min"+str(RA_min)
 create_folder_dirr(save_folder)
 signal.signal(signal.SIGSEGV, SIGSEGV_signal_arises)
 
@@ -131,7 +133,7 @@ def efun(vals):
            return (1e6)
        RA = vals.x[RA_IX]
    else:RA = RA_const
-   if (CM < 0.3 or RM < 2000 or RA <5):
+   if (CM < 0.3 or RM < 2000 or RA <RA_min):
        return 1e6
    # print('RA:',RA, '   CM:',CM, '   RM:',RM)
 
