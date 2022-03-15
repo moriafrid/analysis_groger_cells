@@ -258,7 +258,7 @@ if __name__=='__main__':
 
     ra_folder = save_folder + "/RA0_50:100:0.5"
     create_folders_list([ra_folder])
-    RAs = list(np.arange(50,100,0.5))+list(np.arange(1,50,1.))
+    RAs = list(np.arange(RA_min,100,0.5))+list(np.arange(100,180,1.))+list(np.arange(180,300,2.))#+list(np.arange(1,50,1.))
     solution_RA0={}
     for ra in RAs:
         folder = ra_folder + "/RA0=" + str(ra)
@@ -269,18 +269,18 @@ if __name__=='__main__':
         pickle.dump(solution_RA0, open(ra_folder + "/RA0_fit_results.p", "wb"))
     analysis_fit(ra_folder)
 
-    ra_folder = save_folder + "/RA0_100:300:2"
-    create_folders_list([ra_folder])
-    RAs = np.arange(100,300,2.)
-    solution_RA0={}
-    for ra in RAs:
-        folder = ra_folder + "/RA0=" + str(ra)
-        print(folder,flush=True)
-        create_folders_list([folder])
-        solution_RA0["RA0=" + str(ra)] = fit2short_pulse(cell, short_pulse, folder=folder, CM=CM, RM=RM, RA=ra)
-        pickle.dump(solution_RA0, open(ra_folder + "/RA0_fit_results.p", "wb"))
-    analysis_fit(ra_folder)
-
+    # ra_folder = save_folder + "/RA0_100:300:2"
+    # create_folders_list([ra_folder])
+    # RAs = np.arange(100,300,2.)
+    # solution_RA0={}
+    # for ra in RAs:
+    #     folder = ra_folder + "/RA0=" + str(ra)
+    #     print(folder,flush=True)
+    #     create_folders_list([folder])
+    #     solution_RA0["RA0=" + str(ra)] = fit2short_pulse(cell, short_pulse, folder=folder, CM=CM, RM=RM, RA=ra)
+    #     pickle.dump(solution_RA0, open(ra_folder + "/RA0_fit_results.p", "wb"))
+    # analysis_fit(ra_folder)
+    #
 
     #analysis:
     # for dirr in glob(save_folder+'/RA0*'):
@@ -288,26 +288,26 @@ if __name__=='__main__':
     #     analysis_fit(dirr)
 
     datas=glob(save_folder+'/RA0*/RA0_fit_results.p')
-    for data in datas:
-        if '+' in data: datas.remove(data)
-    print('datas', datas)
-    data1,data2=datas
-
-    #####change the locations
-    dict1=read_from_pickle(data1)
-    dict2=read_from_pickle(data2)
-
-    if float(next(iter(dict1.keys())).split('=')[-1])<float(next(iter(dict2.keys())).split('=')[-1]):
-        dict = dict1.copy()  # Copy the dict1 into the dict3 using copy() method
-        for key, value in dict2.items():  # use for loop to iterate dict2 into the dict3 dictionary
-            dict[key] = value
-    else:
-        dict = dict2.copy()  # Copy the dict1 into the dict3 using copy() method
-        for key, value in dict1.items():  # use for loop to iterate dict2 into the dict3 dictionary
-            dict[key] = value
-
-    save_folder2=save_folder+'/'+data1.split('/')[-2]+'_'+data2.split('/')[-2]
-    create_folders_list([save_folder2])
+    # for data in datas:
+    #     if '+' in data: datas.remove(data)
+    # print('datas', datas)
+    # data1,data2=datas
+    #
+    # #####change the locations
+    # dict1=read_from_pickle(data1)
+    # dict2=read_from_pickle(data2)
+    #
+    # if float(next(iter(dict1.keys())).split('=')[-1])<float(next(iter(dict2.keys())).split('=')[-1]):
+    #     dict = dict1.copy()  # Copy the dict1 into the dict3 using copy() method
+    #     for key, value in dict2.items():  # use for loop to iterate dict2 into the dict3 dictionary
+    #         dict[key] = value
+    # else:
+    #     dict = dict2.copy()  # Copy the dict1 into the dict3 using copy() method
+    #     for key, value in dict1.items():  # use for loop to iterate dict2 into the dict3 dictionary
+    #         dict[key] = value
+    #
+    # save_folder2=save_folder+'/'+data1.split('/')[-2]+'_'+data2.split('/')[-2]
+    # create_folders_list([save_folder2])
     RA0=[float(key.split('=')[-1]) for key in dict.keys()]
     value=[dict[key] for key in dict.keys()]
     RAs,RMs,CMs,errors=[],[],[],[]
