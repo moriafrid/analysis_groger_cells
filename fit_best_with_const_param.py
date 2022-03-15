@@ -12,8 +12,6 @@ import sys
 from glob import glob
 import signal
 import os
-from analysis_fit_after_run import analysis_fit
-# initial_folder = "data/fit/"
 do_calculate_F_factor=True
 if len(sys.argv) != 7:
    cell_name= '2017_03_04_A_6-7'

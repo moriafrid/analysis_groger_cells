@@ -7,20 +7,24 @@ folder_data="cells_initial_information/"
 folder_save="cells_outputs_data/"
 cells=["2017_05_08_A_5-4", "2017_05_08_A_4-5","2017_03_04_A_6-7"]
 file_type2read=['z_correct.swc','morphology.swc','hoc','ASC']
-resize_diam_by=str(1.0)
-shrinkage_factor=str(1.0)
+resize_diam_by=1.0
+shrinkage_factor=1.0
 os.system('python run_analysis_fit_after_run.py')
 SPINE_START=str(20)
-for cell_name in [cells[2]]:
+i=0
+for cell_name in cells[0:1]:
     print(cell_name)
     for fit_condition in ['const_param','different_initial_conditions']:
         print(fit_condition)
-        for file_type in ['ASC','hoc']:
+        for file_type in ['ASC','hoc','swc','z_correct.swc']:
             passive_vals_dict= {}
+            initial_folder=folder_+folder_save+cell_name+'/fit_short_pulse/'+file_type+'_SPINE_START='+str(SPINE_START)+'/'
+            initial_folder+="/dend*"+str(round(resize_diam_by,2))+'&F_shrinkage='+str(round(shrinkage_factor,2))
+            initial_folder+='/'+fit_condition
             if fit_condition=='const_param':
-                passive_val_total=read_from_pickle(glob(folder_+folder_save+cell_name+'/fit_short_pulse_'+file_type+'/dend*'+resize_diam_by+'&F_shrinkage='+shrinkage_factor+'/'+fit_condition+'/RA/analysis/RA_total_errors_minimums.p')[0])
+                passive_val_total=read_from_pickle(glob(initial_folder+'/RA/analysis/RA_total_errors_minimums.p')[0])
             if fit_condition=='different_initial_conditions':
-                passive_val_total=read_from_pickle(glob(folder_+folder_save+cell_name+'/fit_short_pulse_'+file_type+'/dend*'+resize_diam_by+'&F_shrinkage='+shrinkage_factor+'/'+fit_condition+'/RA0_100:300:2+RA0_50:100:0.5/RA_total_errors_minimums.p')[0])
+                passive_val_total=read_from_pickle(glob(initial_folder+'/RA0_100:300:2+RA0_50:100:0.5/RA_total_errors_minimums.p')[0])
             passive_vals_dict['RA=120']=found(passive_val_total,120)
             passive_vals_dict['RA=150']=found(passive_val_total,150)
             passive_vals_dict['RA_min_error']=passive_val_total[0]
@@ -29,6 +33,8 @@ for cell_name in [cells[2]]:
             passive_vals_dict['mean_best_10']=mean_best_n(passive_val_total,10)
 
             for name in passive_vals_dict.keys():
+                if i>0: continue
+                i+=1
                 if passive_vals_dict[name] is None:
                     print(name +"+-20 isn't found")
                     continue

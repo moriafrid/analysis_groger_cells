@@ -9,22 +9,23 @@ import sys
 from extra_function import create_folder_dirr
 
 spine_type="mouse_spine"
-print(sys.argv,flush=True)
+print(len(sys.argv),sys.argv,flush=True)
 if len(sys.argv) != 7:
     cell_name= '2017_03_04_A_6-7'
-    file_type='hoc'
+    file_type='morphology.swc'
     resize_diam_by=1.0
     shrinkage_factor=1.0
     SPINE_START=20
     folder_='/ems/elsc-labs/segev-i/moria.fridman/project/analysis_groger_cells/'
+    print('sys.argv not running')
 else:
-   cell_name = sys.argv[1]
-   file_type=sys.argv[2] #hoc ar ASC
-   resize_diam_by = float(sys.argv[3]) #how much the cell sweel during the electrophisiology records
-   shrinkage_factor =float(sys.argv[4]) #how much srinkage the cell get between electrophysiology record and LM
-   SPINE_START=int(sys.argv[5])
-   folder_= sys.argv[6] #'/ems/elsc-labs/segev-i/moria.fridman/project/analysis_groger_cells/'
-
+    cell_name = sys.argv[1]
+    file_type=sys.argv[2] #hoc ar ASC
+    resize_diam_by = float(sys.argv[3]) #how much the cell sweel during the electrophisiology records
+    shrinkage_factor =float(sys.argv[4]) #how much srinkage the cell get between electrophysiology record and LM
+    SPINE_START=int(sys.argv[5])
+    folder_= sys.argv[6] #'/ems/elsc-labs/segev-i/moria.fridman/project/analysis_groger_cells/'
+    print('the len of sys.argv is correct and running')
 save_dir ="cells_outputs_data/"
 
 initial_folder=folder_+save_dir+cell_name+'/fit_short_pulse/'+file_type+'_SPINE_START='+str(SPINE_START)+'/'
@@ -74,7 +75,8 @@ def analysis_fit(location):
     pickle.dump(dict_minimums, open(save_folder + "/ "+condition+" _10_minimums.p", "wb"))
 
 if __name__ == '__main__':
-    analysis_fit(initial_folder+'/basic_fit')
+    if len(glob(initial_folder+'/basic_fit/analysis/*'))>0:
+        analysis_fit(initial_folder+'/basic_fit')
     # analysis_fit(initial_folder+'/const_param')
 
     initial_locs=glob(initial_folder)
@@ -265,4 +267,4 @@ if __name__ == '__main__':
         plt.plot(RA0,RMs)
         plt.savefig(save_folder+'/diffrent RA0 against RM.png')
 
-
+    print('analysis_fit_after_re.py complite to run')

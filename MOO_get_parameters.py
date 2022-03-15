@@ -9,7 +9,7 @@ import pprint
 import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib
-import os, pickle
+import pickle
 from add_figure import add_figure
 from open_pickle import read_from_pickle
 from calculate_F_factor import calculate_F_factor
@@ -40,7 +40,7 @@ runnum2compare = '13'
 
 if len(sys.argv) != 12:
     cell_name= '2017_05_08_A_5-4'
-    file_type='ASC'  #file type is just used to calculate F_factor
+    file_type='z_correct.swc'  #file type is just used to calculate F_factor
     passive_val={'RA':100,'CM':1,'RM':10000}
     passive_val_name='const_ra'
     resize_dend_by=1.0
@@ -64,7 +64,7 @@ else:
     RA=float(sys.argv[3])
 data_dir= "cells_initial_information/"
 save_dir ="cells_outputs_data/"
-base2 = folder_+save_dir+cell_name+'/MOO_results_'+'swc'+"/"  # folder name  _RA_free
+base2 = folder_+save_dir+cell_name+'/MOO_results_'+file_type+"/"  # folder name  _RA_free
 base2+='F_shrinkage='+str(round(shrinkage_by,2))+'_dend*'+str(round(resize_dend_by,2))
 if "const" in passive_val_name:
     base_save_folder=base2+ '/'+passive_val_name+'/' +passive_val_name+'='+str(round(RA,2))+'/'

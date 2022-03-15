@@ -4,8 +4,8 @@
 #pass 2 argument = RM
 #pass 3 argument = RA
 #pass 4 argument = CM
-#pass 5 argument = shrinkage_by
-#pass 6 argumant = resize_dend_by
+#pass 5 argumant = resize_dend_by
+#pass 6 argument = shrinkage_by
 #pass 7 argument = passive_vel_name
 
 
