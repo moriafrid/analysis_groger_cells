@@ -9,7 +9,7 @@ cells=["2017_05_08_A_5-4", "2017_05_08_A_4-5","2017_03_04_A_6-7"]
 file_type2read=['z_correct.swc','morphology.swc','hoc','ASC']
 resize_diam_by=str(1.0)
 shrinkage_factor=str(1.0)
-os.system('python run_analysis_after_run.py')
+os.system('python run_analysis_fit_after_run.py')
 SPINE_START=str(20)
 for cell_name in [cells[2]]:
     print(cell_name)

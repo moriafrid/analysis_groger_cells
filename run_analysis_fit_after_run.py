@@ -6,7 +6,8 @@ shrinkage_factor =str(1.0) #how much srinkage the cell get between electrophysio
 folder_= '/ems/elsc-labs/segev-i/moria.fridman/project/analysis_groger_cells/cells_outputs_data'
 file_type2read=['z_corretc.swc','morphology.swc','ASC','hoc']
 cells=read_from_pickle('cells_name.p')
-SPINE_START=str(20)
+SPINE_STARTs=[str(20),str(60),str(10)]
 for cell_name in cells:
     for file_type in file_type2read:
-        os.system(" ".join(['sbatch execute_python_script.sh', 'analysis_after_run.py',cell_name,file_type,resize_diam_by,shrinkage_factor,SPINE_START,folder_]))
+        for SPINE_START in [str(20)]: #SPINE_STARTs
+            os.system(" ".join(['sbatch execute_python_script.sh', 'analysis_after_run.py',cell_name,file_type,resize_diam_by,shrinkage_factor,SPINE_START,folder_]))

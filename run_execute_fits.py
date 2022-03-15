@@ -6,11 +6,11 @@ cells=["2017_05_08_A_5-4", "2017_05_08_A_4-5","2017_03_04_A_6-7"]
 file_type2read=['hoc','ASC']
 resize_diam_by=str(1)
 shrinkage_factor=str(1)
-SPINE_START=20
+SPINE_START=10
 base_command='sbatch execute_python_script.sh'
 for cell_name in cells:
-    for file_type in ['z_correct.swc','morphology.swc']:#,'hoc','ASC']:
-        command="base_command+" "fit_influnce_by_initial_condition.py"
+    for file_type in ['z_correct.swc','morphology.swc','hoc','ASC']:
+        command="fit_influnce_by_initial_condition.py"
         send_command = " ".join([base_command,command, cell_name,file_type,resize_diam_by,shrinkage_factor,str(SPINE_START),folder_])
         os.system(send_command)
         print(cell_name+ ' .'+file_type+': fit_influance_by_initial_condition.py')
