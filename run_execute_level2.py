@@ -11,20 +11,23 @@ resize_diam_by=1.0
 shrinkage_factor=1.0
 os.system('python run_analysis_fit_after_run.py')
 SPINE_START=str(20)
+RA_mins=[5,50,80,100]
 i=0
 for cell_name in cells:
     print(cell_name)
     for fit_condition in ['const_param','different_initial_conditions']:
         print(fit_condition)
         for file_type in file_type2read:
+            # for Ra_min in RA_mins:
             passive_vals_dict= {}
-            initial_folder=folder_+folder_save+cell_name+'/fit_short_pulse/'+file_type+'_SPINE_START='+str(SPINE_START)+'/'
+            initial_folder='fit_short_pulse_temp/'+folder_save+cell_name+'/fit_short_pulse/'+file_type+'_SPINE_START='+str(SPINE_START)+'/'
+            # initial_folder=folder_+folder_save+cell_name+'/fit_short_pulse/'+file_type+'_SPINE_START='+str(SPINE_START)+'/'
             initial_folder+="/dend*"+str(round(resize_diam_by,2))+'&F_shrinkage='+str(round(shrinkage_factor,2))
             initial_folder+='/'+fit_condition
             if fit_condition=='const_param':
                 passive_val_total=read_from_pickle(glob(initial_folder+'/RA/analysis/RA_total_errors_minimums.p')[0])
             if fit_condition=='different_initial_conditions':
-                passive_val_total=read_from_pickle(glob(initial_folder+'/RA0_100:300:2+RA0_50:100:0.5/RA_total_errors_minimums.p')[0])
+                passive_val_total=read_from_pickle(glob(initial_folder+'/RA_min'+str(80)+'/RA0_100:300:2+RA0_50:100:0.5/RA_total_errors_minimums.p')[0])
             passive_vals_dict['RA=120']=found(passive_val_total,120)
             passive_vals_dict['RA=150']=found(passive_val_total,150)
             passive_vals_dict['RA_min_error']=passive_val_total[0]
