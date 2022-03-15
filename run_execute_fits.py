@@ -18,7 +18,7 @@ for cell_name in cells:
                 print(cell_name+ ' .'+file_type+': fit_influance_by_initial_condition.py with ra_min='+str(Ra_min))
             command="fit_best_with_const_param.py"
             send_command = " ".join([base_command,command, cell_name,file_type,resize_diam_by,shrinkage_factor,str(SPINE_START),folder_])
-            # os.system(send_command)
+            os.system(send_command)
             print(cell_name+ ' .'+file_type+': fit_best_with_const_param.py')
 
             # for RA_min in [0,50,100,150,200]:

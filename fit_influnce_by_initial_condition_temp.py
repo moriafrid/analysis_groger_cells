@@ -243,12 +243,24 @@ if __name__=='__main__':
     CM = 1  # 2/2
     RM = 5684*2  # *2
     RA = 100
+    # ra_folder=save_folder +'/RA0_5:50:1+RA>1'
+    # ra_folder = save_folder + "/RA0_50:100:0.5"
+    # create_folders_list([ra_folder])
+    # RAs = np.arange(5,50,1.)
+    # solution_RA0={}
+    # for ra in RAs:
+    #     folder = ra_folder + "/RA0=" + str(ra)
+    #     print(folder,flush=True)
+    #     create_folders_list([folder])
+    #     solution_RA0["RA0=" + str(ra)] = fit2short_pulse(cell, short_pulse, folder=folder, CM=CM, RM=RM, RA=ra)
+    #     pickle.dump(solution_RA0, open(ra_folder + "/RA0_fit_results.p", "wb"))
+    # analysis_fit(ra_folder)
 
     ra_folder = save_folder #+ "/RA0_50:100:0.5"
     create_folders_list([ra_folder])
     RAs = list(np.arange(RA_min,100,0.5))+list(np.arange(100,180,1.))+list(np.arange(180,300,2.))#+list(np.arange(1,50,1.))
     solution_RA0={}
-    for ra in RAs:
+    for ra in RAs[0:1]:
         folder = ra_folder + "/RA0=" + str(ra)
         print(folder,flush=True)
 
@@ -256,6 +268,90 @@ if __name__=='__main__':
         solution_RA0["RA0=" + str(ra)] = fit2short_pulse(cell, short_pulse, folder=folder, CM=CM, RM=RM, RA=ra)
         pickle.dump(solution_RA0, open(ra_folder + "/RA0_fit_results.p", "wb"))
     analysis_fit(ra_folder)
+
+    # ra_folder = save_folder + "/RA0_100:300:2"
+    # create_folders_list([ra_folder])
+    # RAs = np.arange(100,300,2.)
+    # solution_RA0={}
+    # for ra in RAs:
+    #     folder = ra_folder + "/RA0=" + str(ra)
+    #     print(folder,flush=True)
+    #     create_folders_list([folder])
+    #     solution_RA0["RA0=" + str(ra)] = fit2short_pulse(cell, short_pulse, folder=folder, CM=CM, RM=RM, RA=ra)
+    #     pickle.dump(solution_RA0, open(ra_folder + "/RA0_fit_results.p", "wb"))
+    # analysis_fit(ra_folder)
+    #
+
+    #analysis:
+    # for dirr in glob(save_folder+'/RA0*'):
+    #     if '+' in dirr: continue
+    #     analysis_fit(dirr)
+
+    data=glob(save_folder+'/RA0_fit_results.p')[0]
+    # for data in datas:
+    #     if '+' in data: datas.remove(data)
+    # print('datas', datas)
+    # data1,data2=datas
+    #
+    # #####change the locations
+    # dict1=read_from_pickle(data1)
+    # dict2=read_from_pickle(data2)
+    #
+    # if float(next(iter(dict1.keys())).split('=')[-1])<float(next(iter(dict2.keys())).split('=')[-1]):
+    #     dict = dict1.copy()  # Copy the dict1 into the dict3 using copy() method
+    #     for key, value in dict2.items():  # use for loop to iterate dict2 into the dict3 dictionary
+    #         dict[key] = value
+    # else:
+    #     dict = dict2.copy()  # Copy the dict1 into the dict3 using copy() method
+    #     for key, value in dict1.items():  # use for loop to iterate dict2 into the dict3 dictionary
+    #         dict[key] = value
+    #
+    # save_folder2=save_folder+'/'+data1.split('/')[-2]+'_'+data2.split('/')[-2]
+    # create_folders_list([save_folder2])
+    save_folder2=save_folder+'/analysis'
+    create_folders_list([save_folder2])
+    dict=read_from_pickle(data)
+    RA0=[float(key.split('=')[-1]) for key in dict.keys()]
+    value=[dict[key] for key in dict.keys()]
+    RAs,RMs,CMs,errors=[],[],[],[]
+    for key in dict.keys():
+        RAs.append(dict[key]['RA'])
+        RMs.append(dict[key]['RM'])
+        CMs.append(dict[key]['CM'])
+        errors.append(dict[key]['error']['decay&max'])
+    add_figure('diffrent RA0 against error','RA0','errors')
+    plt.plot(RA0,errors)
+    minimums_arg=np.argsort(errors)
+    # mini = np.argmin(errors)
+    dict_minimums={}
+    # print(loc)
+    for mini in minimums_arg[:10]:
+        plt.plot(RA0[mini], errors[mini], '*',label='RA0=' + str(RA0[mini]) + ' RM=' + str(round(RMs[mini], 2)) + ' RA=' + str(round(RAs[mini], 2)) + ' CM=' + str(
+                     round(CMs[mini], 2)) + ' error=' + str(round(errors[mini], 3)))
+        dict_minimums['RA0=' + str(RA0[mini])]=dict.get('RA0=' + str(RA0[mini]), dict.get('RA0=' + str(int(RA0[mini])), None))
+        if dict_minimums['RA0=' + str(RA0[mini])] is None:
+            raise TypeError("dict_minimums get None")
+    pickle.dump(dict_minimums, open(save_folder2 + "/RA0_10_minimums.p", "wb"))
+    plt.legend(loc='upper left')
+    plt.savefig(save_folder2+'/diffrent RA0 against error.png')
+
+    add_figure('diffrent RA against error','RA','errors')
+    plt.plot(RAs,errors,'.')
+    for mini in minimums_arg[:10]:
+        plt.plot(RAs[mini], errors[mini], '*',label= 'RM=' + str(round(RMs[mini], 2)) + ' RA=' + str(round(RAs[mini], 2)) + ' CM=' + str(
+                     round(CMs[mini], 2)) + ' error=' + str(round(errors[mini], 3)) )
+    plt.legend(loc='upper left')
+    plt.savefig(save_folder2+'/diffrent RA against error.png')
+
+    add_figure('diffrent RA0 against CM','RA0','CM')
+    plt.plot(RA0,CMs)
+    plt.savefig(save_folder2+'/diffrent RA0 against CM.png')
+    add_figure('diffrent RA0 against ֵֻֻRA after fit','RA0','RA')
+    plt.plot(RA0,RAs)
+    plt.savefig(save_folder2+'/diffrent RA0 against RA after fit.png')
+    add_figure('diffrent RA0 against RM','RA0','RM')
+    plt.plot(RA0,RMs)
+    plt.savefig(save_folder2+'/diffrent RA0 against RM.png')
 
  #########
     # cm_folder = save_folder+"/CM0"
