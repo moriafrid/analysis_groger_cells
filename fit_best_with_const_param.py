@@ -18,7 +18,7 @@ if len(sys.argv) != 7:
    file_type='z_correct.swc'
    resize_diam_by=1.0
    shrinkage_factor=1.0
-   SPINE_START=20
+   SPINE_START=30
    folder_='/ems/elsc-labs/segev-i/moria.fridman/project/analysis_groger_cells/'
 else:
    cell_name = sys.argv[1]
@@ -228,50 +228,49 @@ if __name__=='__main__':
 
 
     # analysis_fit(initial_folder)
-    initial_locs=glob(folder_+save_dir+cell_name+'/fit_short_pulse_'+file_type+'/')
-    for loc in initial_locs:
-        data=glob(initial_folder+'/Ra_const_errors.p')[0]
-        save_folder1=data[:data.rfind('/')]+'/analysis'
-        try:os.mkdir(save_folder1)
-        except FileExistsError:pass
-        dict3=read_from_pickle(data)
-        RA0=dict3['RA']
-        RAs,RMs,CMs,errors=[],[],[],[]
-        errors=dict3['error']['decay&max']
-        error_all=dict3['error']
-        RAs=[value['RA'] for value in dict3['params']]
-        RMs=[value['RM'] for value in dict3['params']]
-        CMs=[value['CM'] for value in dict3['params']]
-        add_figure('RA const against errors\n'+loc.split('/')[-1],'RA const','error')
-        plt.plot(RA0,errors)
-        minimums_arg=np.argsort(errors)
-        dict_minimums2={}
-        for mini in minimums_arg[:10]:
-            plt.plot(RA0[mini], errors[mini], '*',label=' RM=' + str(round(RMs[mini], 2)) + ' RA=' + str(round(RAs[mini], 2)) + ' CM=' + str(
-                         round(CMs[mini], 2)) + ' error=' +  str(round(errors[mini], 3)))
-            dict_minimums2['RA_const=' + str(RA0[mini])]={'params': {'RM': RMs[mini], 'RA': RAs[mini], 'CM': CMs[mini]},'error':{key2:error_all[key2][mini] for key2 in error_all.keys()} }
-        pickle.dump(dict_minimums2, open(save_folder1 + "/RA_const_10_minimums.p", "wb"))
-        plt.legend(loc='upper left')
-        plt.savefig(save_folder1+'/RA const against errors')
-        plt.savefig(save_folder1+'/RA const against errors.pdf')
+    # initial_locs=glob(folder_+save_dir+cell_name+'/fit_short_pulse_'+file_type+'/')
+    data=glob(initial_folder+'/Ra_const_errors.p')[0]
+    save_folder1=data[:data.rfind('/')]+'/analysis'
+    try:os.mkdir(save_folder1)
+    except FileExistsError:pass
+    dict3=read_from_pickle(data)
+    RA0=dict3['RA']
+    RAs,RMs,CMs,errors=[],[],[],[]
+    errors=dict3['error']['decay&max']
+    error_all=dict3['error']
+    RAs=[value['RA'] for value in dict3['params']]
+    RMs=[value['RM'] for value in dict3['params']]
+    CMs=[value['CM'] for value in dict3['params']]
+    add_figure('RA const against errors\n'+file_type,'RA const','error')
+    plt.plot(RA0,errors)
+    minimums_arg=np.argsort(errors)
+    dict_minimums2={}
+    for mini in minimums_arg[:10]:
+        plt.plot(RA0[mini], errors[mini], '*',label=' RM=' + str(round(RMs[mini], 2)) + ' RA=' + str(round(RAs[mini], 2)) + ' CM=' + str(
+                     round(CMs[mini], 2)) + ' error=' +  str(round(errors[mini], 3)))
+        dict_minimums2['RA_const=' + str(RA0[mini])]={'params': {'RM': RMs[mini], 'RA': RAs[mini], 'CM': CMs[mini]},'error':{key2:error_all[key2][mini] for key2 in error_all.keys()} }
+    pickle.dump(dict_minimums2, open(save_folder1 + "/RA_const_10_minimums.p", "wb"))
+    plt.legend(loc='upper left')
+    plt.savefig(save_folder1+'/RA const against errors')
+    plt.savefig(save_folder1+'/RA const against errors.pdf')
 
-        end_plot=60
-        add_figure('RA const against errors\n'+loc.split('/')[-1],'RA const','error')
-        plt.plot(RA0[:end_plot],errors[:end_plot])
-        for mini in minimums_arg[:10]:
-            plt.plot(RA0[mini], errors[mini], '*',label=' RM=' + str(round(RMs[mini], 2)) + ' RA=' + str(round(RAs[mini], 2)) + ' CM=' + str(
-                         round(CMs[mini], 2)) + ' error=' +  str(round(errors[mini], 3)))
-        plt.legend(loc='upper left')
-        plt.savefig(save_folder1+'/RA const against errors until point '+str(end_plot))
+    end_plot=60
+    add_figure('RA const against errors\n'+file_type,'RA const','error')
+    plt.plot(RA0[:end_plot],errors[:end_plot])
+    for mini in minimums_arg[:10]:
+        plt.plot(RA0[mini], errors[mini], '*',label=' RM=' + str(round(RMs[mini], 2)) + ' RA=' + str(round(RAs[mini], 2)) + ' CM=' + str(
+                     round(CMs[mini], 2)) + ' error=' +  str(round(errors[mini], 3)))
+    plt.legend(loc='upper left')
+    plt.savefig(save_folder1+'/RA const against errors until point '+str(end_plot))
 
-        add_figure('RA const against RMs\n'+loc.split('/')[-1],'RA const','RM')
-        plt.plot(RA0,RMs)
-        plt.savefig(save_folder1+'/RA const against RM')
-        add_figure('RA const against RA after fit\n'+loc.split('/')[-1],'RA const','RA')
-        plt.plot(RA0,RAs)
-        plt.savefig(save_folder1+'/RA const against RA after fit')
-        add_figure('RA const against CM\n'+loc.split('/')[-1],'RA const','CM')
-        plt.plot(RA0,CMs)
-        plt.savefig(save_folder1+'/RA const against CMs')
+    add_figure('RA const against RMs\n'+file_type,'RA const','RM')
+    plt.plot(RA0,RMs)
+    plt.savefig(save_folder1+'/RA const against RM')
+    add_figure('RA const against RA after fit\n'+file_type,'RA const','RA')
+    plt.plot(RA0,RAs)
+    plt.savefig(save_folder1+'/RA const against RA after fit')
+    add_figure('RA const against CM\n'+file_type,'RA const','CM')
+    plt.plot(RA0,CMs)
+    plt.savefig(save_folder1+'/RA const against CMs')
 
 

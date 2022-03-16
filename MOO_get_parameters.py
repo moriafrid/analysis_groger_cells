@@ -37,39 +37,54 @@ do_compare2result = False
 frozen_NMDA_weigth=False
 runnum2compare = '13'
 # spine_type="mouse_spine" #"groger_spine"
+#pass 1 argument = size of ipcluster
+#pass 2 argument = RA
+#pass 3 argument = CM
+#pass 4 argument = RM
+#pass 5 argumant = resize_dend_by
+#pass 6 argument = shrinkage_by
 
-if len(sys.argv) != 12:
+#pass 7 argument = passive_vel_name
+print(sys.argv,flush=True)
+if len(sys.argv) != 13:
+    cpu_node = 30
+
     cell_name= '2017_05_08_A_5-4'
     file_type='z_correct.swc'  #file type is just used to calculate F_factor
     passive_val={'RA':100,'CM':1,'RM':10000}
-    passive_val_name='const_ra'
+    passive_fit_condition='const_RA'
+    passive_val_name='RA=120'
     resize_dend_by=1.0
     shrinkage_by=1.0
-    cpu_node = 30
+    SPINE_START=20
     folder_='/ems/elsc-labs/segev-i/moria.fridman/project/analysis_groger_cells/'
     profile = '_'
     RA=100
+    print('sys.argv not running and with len of ',len(sys.argv))
 else:
-    cell_name = sys.argv[1]
-    file_type=sys.argv[2] #hoc ar ASC
-    passive_val={"RA":float(sys.argv[3]),"CM":float(sys.argv[4]),'RM':float(sys.argv[5])}
-    print(passive_val)
-    passive_val_name=sys.argv[6]
+    cpu_node = float(sys.argv[1])
+    cell_name = sys.argv[2]
+    file_type=sys.argv[3] #hoc ar ASC
+    passive_val={"RA":float(sys.argv[4]),"CM":float(sys.argv[5]),'RM':float(sys.argv[6])}
     resize_dend_by = float(sys.argv[7]) #how much the cell sweel during the electrophisiology records
     shrinkage_by =float(sys.argv[8]) #how much srinkage the cell get between electrophysiology record and LM
-    cpu_node = float(sys.argv[9])
-    print('cpu node=',cpu_node, flush=True)
-    folder_= sys.argv[10]
-    profile = sys.argv[11]
-    RA=float(sys.argv[3])
+    passive_fit_condition=sys.argv[9]
+    passive_val_name=sys.argv[9]
+    SPINE_START=int(sys.argv[10])
+    folder_= sys.argv[11]
+    profile = sys.argv[12]
+    print('sys.argv runing correctly with parameters',sys.argv )
+    RA=float(sys.argv[4])
+
 data_dir= "cells_initial_information/"
 save_dir ="cells_outputs_data/"
 base2 = folder_+save_dir+cell_name+'/MOO_results_'+file_type+"/"  # folder name  _RA_free
 base2+='F_shrinkage='+str(round(shrinkage_by,2))+'_dend*'+str(round(resize_dend_by,2))
-if "const" in passive_val_name:
-    base_save_folder=base2+ '/'+passive_val_name+'/' +passive_val_name+'='+str(round(RA,2))+'/'
-elif "initial" in passive_val_name:
-    base_save_folder=base2 + '/'+passive_val_name+'/RA_after_fit='+str(round(RA,2))+'/'
+# if "const" in passive_fit_condition:
+#     base_save_folder=base2+ '/'+passive_fit_condition+'/' +passive_fit_condition+'='+str(round(RA,2))+'/'
+# elif "initial" in passive_fit_condition:
+#     base_save_folder=base2 + '/'+passive_fit_condition+'/RA_after_fit='+str(round(RA,2))+'/'
+base_save_folder=base2 + '/'+passive_fit_condition+'/'+passive_val_name+'/'
 print('base_save_folder:',base_save_folder)
 create_folder_dirr(base_save_folder)
 RDSM_objective_file = folder_+save_dir+cell_name+"/data/electrophysio_records/syn/mean_syn.p"
@@ -77,24 +92,13 @@ short_pulse_parameters_file=folder_+save_dir+cell_name+'/data/electrophysio_reco
 morphology_dirr =glob(folder_+data_dir+cell_name+'/*'+file_type)[0]
 morphology_dirr =glob( folder_+data_dir+cell_name+'/*z_correct.swc')[0]
 
-# cpu_node = float(sys.argv[1])
-# print('cpu node=',cpu_node, flush=True)
-# RM = float(sys.argv[2])
-# print('RM=',RM, flush=True)
-# RA = float(sys.argv[3])
-# CM = float(sys.argv[4])
-# shrinkage_by=float(sys.argv[5])
-# resize_dend_by=float(sys.argv[6])
-# passive_val_name=sys.argv[7]
-# profile = sys.argv[8]
-
 print('profile=',profile)
 
 model_description='the file to fit is '+RDSM_objective_file+\
             '\ngeneration size is '+str(generation_size)+' and num of generation is '+str(num_of_genarations)
 model_description=model_description+' the profile to run is '+profile
 
-model_description=model_description+'\nRunning with  cell:'+passive_val_name+ ' that had the paremeters:\n'+str(passive_val)+'\nThe shrinking factor is '+str(round(shrinkage_by,2))
+model_description=model_description+'\nRunning with  cell:'+passive_fit_condition+ ' that had the paremeters:\n'+str(passive_val)+'\nThe shrinking factor is '+str(round(shrinkage_by,2))
 # passive_val = {'05_08_A_01062017':{'RM':RM*1.0/shrinkage_by,'RA':RA,'CM':CM*shrinkage_by}}
 
 if resize_dend_by!=1.0:
@@ -279,8 +283,8 @@ def run(cell, seed=0):
     sec_list = location_dict["all"]
 
     F_FACTOR_DISTANCE = NrnSegmentSomaDistanceScaler_(name='spine_factor',
-                                                      dist_thresh_apical=60,
-                                                      dist_thresh_basal=60,
+                                                      dist_thresh_apical=SPINE_START,
+                                                      dist_thresh_basal=SPINE_START,
                                                       F_factor=F_factor,
                                                       shrinckage_factor=shrinkage_by)
     parameters_list.append(
@@ -790,15 +794,6 @@ def run(cell, seed=0):
     print("when done h.dt = ", sim.neuron.h.dt)
 
 
-# seed = int(sys.argv[1])
-# generation_size = int(sys.argv[2])
-# num_of_genarations = int(sys.argv[3])
-# cell_num = int(sys.argv[4])
-# cell = cells[cell_num]
-# profile = sys.argv[5]
-# passive_val_name = sys.argv[6]
-# spine_type = sys.argv[7]
-# Rneck = sys.argv[8]
 
 # generation_size = 100
 # num_of_genarations = 5000
@@ -862,7 +857,6 @@ CM_startValue = passive_val["CM"]
 # result_R_neck_m_ohm = ((NECK_LENGHT * 4.0 * float(Rneck))/(np.pi*(spine_neck_diam/2)**2)) *100.0 *1e-6# 0.25 is neck_diam
 
 in_parallel = profile != "_"
-# base2 = passive_val_name +"__"+spine_type+"_"+str(round(result_R_neck_m_ohm,2))+"/"  # folder name  _RA_free
 print("profile ", profile)
 run(cell, seed=seed)
 print('the MOO running is completed')

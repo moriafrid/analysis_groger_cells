@@ -1,12 +1,13 @@
 #!/bin/bash
-
 #pass 1 argument = size of ipcluster
-#pass 2 argument = RM
+#pass 2 argument = cell_name
 #pass 3 argument = RA
 #pass 4 argument = CM
-#pass 5 argumant = resize_dend_by
-#pass 6 argument = shrinkage_by
-#pass 7 argument = passive_vel_name
+#pass 5 argument = RM
+#pass 6 argumant = resize_dend_by
+#pass 7 argument = shrinkage_by
+#pass 8 argument = passive_vel_name
+#pass 9 argument = folder
 
 # Write output as following (%j is JOB_ID)
 #SBATCH -o outputs/output-%j.out
@@ -32,5 +33,5 @@ ipython profile create --parallel --profile=${profile}
 echo "Launching job"
 conda init
 conda activate project
-python MOO_get_parameters.py $1 $2 $3 $4 $5 $6 $7 ${profile}
+python MOO_get_parameters.py $1 $2 $3 $4 $5 $6 $7 $8 $9 ${profile}
 #conda deactivate

@@ -11,10 +11,10 @@ base_command='sbatch execute_python_script.sh'
 for cell_name in cells:
     for file_type in ['z_correct.swc','morphology.swc','hoc','ASC']:
         for SPINE_START in SPINE_STARTs:
-            for Ra_min in [5,50,80,100]:
+            for Ra_min in [5,100]:
                 command="fit_influnce_by_initial_condition.py"
                 send_command = " ".join([base_command,command, cell_name,file_type,str(Ra_min),resize_diam_by,shrinkage_factor,str(SPINE_START),folder_])
-                os.system(send_command)
+                # os.system(send_command)
                 print(cell_name+ ' .'+file_type+': fit_influance_by_initial_condition.py with ra_min='+str(Ra_min))
             command="fit_best_with_const_param.py"
             send_command = " ".join([base_command,command, cell_name,file_type,resize_diam_by,shrinkage_factor,str(SPINE_START),folder_])

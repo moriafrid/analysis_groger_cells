@@ -2,6 +2,8 @@ from open_pickle import read_from_pickle
 import os
 from glob import glob
 from passive_val_function import *
+import pandas as pd
+
 folder_="/ems/elsc-labs/segev-i/moria.fridman/project/analysis_groger_cells/"
 folder_data="cells_initial_information/"
 folder_save="cells_outputs_data/"
@@ -11,43 +13,34 @@ in_parallel=False
 # in_parallel = sys.argv[1]
 # for resize_diam_by in [1,1.2,round(1.0/0.7,4)]:
 #     for shrinkage_by in [1,1.2, round(1.0/0.7,4)]:
-file_type=['z_correct.swc','morphology.swc']
+file_type=['z_correct.swc','morphology.swc'][0]
+SPINE_STARTs=[10,20,60]
 for cell_name in read_from_pickle('cells_name.p'):
     for resize_diam_by ,shrinkage_by in zip([1],[1]):
         for fit_condition in ['const_param','different_initial_conditions']:
-            name2run='F_shrinkage='+str(round(shrinkage_by,2))+'_dend*'+str(round(resize_diam_by,2))
-            passive_val_name='RA_initial'
-
+            # for Ra_min in RA_mins:
             passive_vals_dict= {}
-            if fit_condition=='const_param':
-                passive_val_total=read_from_pickle(glob(folder_+folder_save+cell_name+'/fit_short_pulse_'+file_type+'/dend*'+resize_diam_by+'&F_shrinkage='+shrinkage_factor+'/'+fit_condition+'/RA/analysis/RA_total_errors_minimums.p')[0])
-            if fit_condition=='different_initial_conditions':
-                passive_val_total=read_from_pickle(glob(folder_+folder_save+cell_name+'/fit_short_pulse_'+file_type+'/dend*'+resize_diam_by+'&F_shrinkage='+shrinkage_factor+'/'+fit_condition+'/RA0_100:300:2+RA0_50:100:0.5/RA_total_errors_minimums.p')[0])
-            passive_vals_dict['RA=120']=found(passive_val_total,120)
-            passive_vals_dict['RA=150']=found(passive_val_total,150)
-            passive_vals_dict['RA_min_error']=passive_val_total[0]
-            passive_vals_dict['min_CM']=found_min_parameter(passive_val_total,parameter='CM')
-            passive_vals_dict['RA_best_fit']=found_best_RA(passive_val_total)
-            passive_vals_dict['mean_best_10']=mean_best_n(passive_val_total,10)
+            p='/ems/elsc-labs/segev-i/moria.fridman/project/analysis_groger_cells/cells_initial_information/2017_05_08_A_4-5/results_passive_fits.csv'
+            df = pd.read_csv(p)
+            df.loc[(df["fit_condition"] == fit_condition) & (df["file_type"] == file_type), :].to_dict('records')
+            curr = df.loc[(df["fit_condition"] == fit_condition) & (df["file_type"] == file_type), :]
+            passive_vals_dict={}
+            for name in curr.parameter_type:
+                passive_vals_dict[name]= curr.loc[df.parameter_type == name,].to_dict('records')[0]
+            for i, name in enumerate(passive_vals_dict.keys()):
+                if passive_vals_dict[name] is None:
+                    print(name +"+-20 isn't found")
+                    continue
+                RA,CM,RM=get_passive_val(passive_vals_dict[name])
 
-            for i,key in enumerate(dict_1.keys()):
-                if i !=1: continue
                 if in_parallel:
                     command="sbatch -p ss.q runs_change_passive_val_parallel.sh"
-                    send_command = " ".join([command, '30',str(dict_1[key]['RM']),str(round(dict_1[key]['RA'],4)),str(dict_1[key]['CM']),str(resize_diam_by),str(shrinkage_by),passive_val_name])
+                    send_command = " ".join([command, '30',cell_name,RA,CM,RM,str(resize_diam_by),str(shrinkage_by),fit_condition,passive_val_name,folder_])
                 else:
                     command="sbatch -p ss.q runs_change_passive_val.sh"
-                    send_command = " ".join([command,"1",str(dict_1[key]['RM']),str(round(dict_1[key]['RA'],4)),str(dict_1[key]['CM']),str(shrinkage_by),str(resize_diam_by),passive_val_name])
+                    send_command = " ".join([command,"1",cell_name,RA,CM,RM,str(shrinkage_by),str(resize_diam_by),fit_condition,passive_val_name,folder_])
                 print(send_command)
                 os.system(send_command)
-            ##pass 1 argument = size of ipcluster
-    #pass 2 argument = RM
-    #pass 3 argument = RA
-    #pass 4 argument = CM
-    #pass 5 argument = shrinkage_by
-    #pass 6 argumant = resize_dend_by
-    #pass 7 argument = passive_vel_name
-
 
             passive_val_name='RA_const'
             dict_1=read_from_pickle('../data/fit/'+spine_type+'/'+name2run+'/const_param/RA/analysis/RA_const_10_minimums.p')
@@ -55,10 +48,10 @@ for cell_name in read_from_pickle('cells_name.p'):
                 if i !=1: continue
                 if in_parallel:
                     command="sbatch -p ss.q runs_change_passive_val_parallel.sh"
-                    send_command = " ".join([command, '30',str(dict_1[key]['params']['RM']),str(round(dict_1[key]['params']['RA'],4)),str(dict_1[key]['params']['CM']),str(shrinkage_by),str(resize_diam_by),passive_val_name])
+                    send_command = " ".join([command, '30',cell_name,RA,CM,RM,str(shrinkage_by),str(resize_diam_by),passive_val_name,folder_])
                 else:
                     command="sbatch -p ss.q runs_change_passive_val.sh"
-                    send_command = " ".join([command,"1",str(dict_1[key]['params']['RM']),str(round(dict_1[key]['params']['RA'],4)),str(dict_1[key]['params']['CM']),str(shrinkage_by),str(resize_diam_by),passive_val_name])
+                    send_command = " ".join([command,"1",cell_name,RA,CM,RM,str(shrinkage_by),str(resize_diam_by),passive_val_name,folder_])
 
                 print(send_command)
                 os.system(send_command)
