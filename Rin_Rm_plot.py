@@ -15,7 +15,7 @@ import pandas as pd
 do_calculate_F_factor=True
 print("the number of parameters that sys loaded in Rin_Rm_plot.py is ",len(sys.argv),flush=True)
 print(len(sys.argv), sys.argv)
-if len(sys.argv) != 10:
+if len(sys.argv) != 11:
     print("the function doesn't run with sys.argv",flush=True)
     cell_name= '2017_03_04_A_6-7'
     file_type2read= 'hoc'
