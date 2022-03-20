@@ -1,6 +1,8 @@
 import numpy as np
 from neuron import h, gui
 import sys
+import matplotlib
+matplotlib.use('agg')
 import matplotlib.pyplot as plt
 from matplotlib.lines import Line2D
 import signal

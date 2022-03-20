@@ -27,16 +27,12 @@ if [[ $# -lt 1 ]] ; then
     echo "Wrong usage. not have enought parameters (must receive script)"
     exit 1
 fi
-
-script=$1
-shift 1
-
-args=$@
-shift $#
-
 cell_name=$2
 RA=$3
 set -x
+#script=$1
+#shift 1
+
 
 PWD=$(pwd)
 LOGS=$PWD/logs
@@ -48,12 +44,13 @@ mkdir -p $LOGS
 export profile=moria$cell_name$RA  #Note the profile name, you will need to use it in the python script
 ipython profile create --parallel --profile=${profile}
 
-
-
 # ipcluster stop --profile=${profile} &
-sleep 50
+#sleep 50
 ipcluster start --profile=${profile} --n=$1 &
 sleep 60
+
+args=$@
+shift $#
 
 echo "Launching job"
 conda init

@@ -1,6 +1,5 @@
 #
 #!/ems/elsc-labs/segev-i/moria.fridman/anaconda3/envs/project/bin/python
-
 # from __future__ import print_function
 import binstar_client.utils
 import bluepyopt as bpopt
@@ -27,8 +26,8 @@ signal.signal(signal.SIGSEGV, SIGSEGV_signal_arises)
 logger = logging.getLogger(__name__)
 matplotlib.use('agg')
 
-generation_size = 100
-num_of_genarations = 1000
+generation_size = 1
+num_of_genarations = 2
 do_calculate_F_factor=True
 do_resize_dend=True
 do_run_another_morphology=False
@@ -40,11 +39,11 @@ runnum2compare = '13'
 
 print(sys.argv,flush=True)
 if len(sys.argv) != 14:
-    print("the function doesn't run with sys.argv",flush=True)
+    print("the function doesn't run with sys.argv",len(sys.argv),flush=True)
     cpu_node = 1
     cell_name= '2017_05_08_A_5-4'
     file_type='z_correct.swc'  #file type is just used to calculate F_factor
-    passive_val={'RA':100,'CM':1,'RM':10000}
+    passive_val={'RA':float(100),'CM':1,'RM':10000}
     passive_fit_condition='const_param'
     passive_val_name='RA=120'
     resize_dend_by=1.0
@@ -52,10 +51,10 @@ if len(sys.argv) != 14:
     SPINE_START=20
     folder_='/ems/elsc-labs/segev-i/moria.fridman/project/analysis_groger_cells/'
     profile = '_'
-    RA=100
-
+    RA=float(100)
+else:
     print("the sys.argv len is correct",flush=True)
-    cpu_node = float(sys.argv[1])
+    cpu_node = int(sys.argv[1])
     cell_name = sys.argv[2]
     file_type=sys.argv[3] #hoc ar ASC
     passive_val={"RA":float(sys.argv[4]),"CM":float(sys.argv[5]),'RM':float(sys.argv[6])}
@@ -125,7 +124,7 @@ def create_spine(sim, icell, sec, seg, number=0, neck_diam=0.25, neck_length=1.3
     head.connect(neck(1))
     neck.connect(sec(seg))
     sim.neuron.h("access " + str(neck.hoc_internal_name()))
-    try:icell.add_sec(neck)
+    try: icell.add_sec(neck)
     except: icell.all.append(neck)
     # if sec.name().find('dend') > -1: #?# moria- need to be sure it is ok to remove the neck and head from the dend list
     #     icell.dend.append(neck)
@@ -228,11 +227,11 @@ def run(cell, seed=0):
     # morphology = ephys.morphologies.NrnFileMorphology(morphology_dirr, do_replace_axon=True,
     #                                                   extra_func=True, extra_func_run=add_morph, spine_poses=synapses_locations[cell],
     #                                                   do_resize_dend=do_resize_dend,resize_dend_by=resize_dend_by,nseg_frequency=40)  # change axon to AIS and add spine locations
-    morphology1 = ephys.morphologies.NrnFileMorphology(morphology_dirr, load_cell_function=load_cell_function,do_replace_axon=True,
-                                                      extra_func=True, extra_func_run=add_morph,
-                                                      spine_poses=synapses_locations,
-                                                      do_resize_dend=True,resize_dend_by=another_morphology_resize_dend_by,
-                                                      nseg_frequency=40)  # change axon to AIS and add spine locations
+    # morphology1 = ephys.morphologies.NrnFileMorphology(morphology_dirr, load_cell_function=load_cell_function,do_replace_axon=True,
+    #                                                   extra_func=True, extra_func_run=add_morph,
+    #                                                   spine_poses=synapses_locations,
+    #                                                   do_resize_dend=True,resize_dend_by=another_morphology_resize_dend_by,
+    #                                                   nseg_frequency=40)  # change axon to AIS and add spine locations
     somatic_loc = ephys.locations.NrnSeclistLocation('somatic', seclist_name='somatic')
     basal_loc = ephys.locations.NrnSeclistLocation('basal', seclist_name='basal')
     apical_loc = ephys.locations.NrnSeclistLocation('apical', seclist_name='apical')
@@ -367,7 +366,7 @@ def run(cell, seed=0):
             value=0.002,
             bounds=[0.000000, 0.01],
             locations=[netstims[i]],
-            reletive_strength = [1]))#[1, 0.1,0.01]))
+            reletive_strength = [1, 0.1]))#[1, 0.1,0.01]))
 
     # this  need to add the weight to optimization
         syn_params.append(NrnNetstimWeightParameter(
@@ -450,10 +449,10 @@ def run(cell, seed=0):
                                    params=parameters_list + syn_params,
                                    # seclist_names=['dendritic']
                                    )
-    model1 = ephys.models.CellModel('Model', morph=morphology1, mechs=mechanism_list + syn_mec,
-                                   params=parameters_list + syn_params,
-                                   # seclist_names=['dendritic']
-                                   )
+    # model1 = ephys.models.CellModel('Model', morph=morphology1, mechs=mechanism_list + syn_mec,
+    #                                params=parameters_list + syn_params,
+    #                                # seclist_names=['dendritic']
+    #                                )
     param_names = [param.name for param in model.params.values() if not param.frozen]  # parameters for oprimization
 
     ##################################################################################
@@ -527,7 +526,7 @@ def run(cell, seed=0):
                         HEAD_DIAM = [spine_properties[i]['HEAD_DIAM'] for i in range(get_n_spinese(cell_name))],
                         passive_val = passive_val, Rneck=Rneck, cell=cell))
         print('Using ipyparallel with %d engines', len(rc),flush=True)
-
+        print(rc[:].apply_sync(lambda: print(add_morph)))
         lview = rc.load_balanced_view()
 
         def mapper(func, it):
@@ -587,10 +586,10 @@ def run(cell, seed=0):
                 continue
             start_values[param] = model.params[param].value
         start_values1 = {}
-        for param in model1.params:
-            if model1.params[param].frozen:
-                continue
-            start_values1[param] = model1.params[param].value
+        # for param in model1.params:
+        #     if model1.params[param].frozen:
+        #         continue
+        #     start_values1[param] = model1.params[param].value
         add_figure('befure fit',T_with_units.units,V_with_units.units)
         responses = protocol.run(cell_model=model, param_values=start_values, sim=sim)
         temp = np.array(responses['soma.v']['time'])
@@ -605,16 +604,16 @@ def run(cell, seed=0):
         plt.plot(T_base, V_base, color='black',alpha=0.2,label='data',lw=5)
 
 
-        if do_run_another_morphology:
-            responses1 = protocol.run(cell_model=model1, param_values=start_values1, sim=sim)
-            temp = np.array(responses1['soma.v']['time'])
-            temp2 = np.array(responses1['soma.v']['voltage'])
-            start = np.where(temp > neuron_start_time)[0][0]
-            temp = temp - temp[start]
-            temp = temp[start:]
-            temp2 = temp2[start:]
-            plt.plot(temp, temp2, color='red', alpha=0.3, linewidth=5,label='dend*'+str(another_morphology_resize_dend_by)+' another morphology')
-            plt.text(100,-76.5,'max_vol_other_morph='+str(round(np.amax(temp2),2)))
+        # if do_run_another_morphology:
+        #     responses1 = protocol.run(cell_model=model1, param_values=start_values1, sim=sim)
+        #     temp = np.array(responses1['soma.v']['time'])
+        #     temp2 = np.array(responses1['soma.v']['voltage'])
+        #     start = np.where(temp > neuron_start_time)[0][0]
+        #     temp = temp - temp[start]
+        #     temp = temp[start:]
+        #     temp2 = temp2[start:]
+        #     plt.plot(temp, temp2, color='red', alpha=0.3, linewidth=5,label='dend*'+str(another_morphology_resize_dend_by)+' another morphology')
+        #     plt.text(100,-76.5,'max_vol_other_morph='+str(round(np.amax(temp2),2)))
         plt.legend()
         plt.savefig(base_save_folder + 'before_fit_transient_RDSM.png')
         plt.close()
@@ -755,24 +754,24 @@ def run(cell, seed=0):
 
     plt.xlabel('time(ms)')
     plt.ylabel('V(mV)')
-    if do_compare2result:
-        path_result2compare = '/ems/elsc-labs/segev-i/moria.fridman/project/data_analysis_git/data_analysis/test_moo/opt_Human_L23_synapse_Ra_100_Rneckmouse_spine_100_14.87/MOO_opt_folder_same_w_peel_syn_spines_featues_cm_g_pas_first_seed_123456/05_08_A_01062017/run_' + runnum2compare + '/final_pop.p'
-        with open(path_result2compare, 'rb') as file:
-            try:
-                while True: object_file = pickle.load(file)
-            except EOFError:
-                pass
-        param2compare_dict = {object_file['parameters'][i]: np.array(object_file['final_pop']).mean(axis=0)[i] for i in
-                              range(len(object_file['parameters']))}
-        responses1 = protocol.run(cell_model=model1, param_values=best_ind_dict, sim=sim)
-
-        temp = np.array(responses1['soma.v']['time'])
-        temp2 = np.array(responses1['soma.v']['voltage'])
-        start = np.where(temp > neuron_start_time)[0][0]
-        temp = temp - temp[start]
-        temp = temp[start:]
-        temp2 = temp2[start:]
-        plt.plot(temp, temp2, color='green', alpha=0.4, linewidth=5,label='compare to dend*'+str(another_morphology_resize_dend_by)+' another morphology')
+    # if do_compare2result:
+    #     path_result2compare = '/ems/elsc-labs/segev-i/moria.fridman/project/data_analysis_git/data_analysis/test_moo/opt_Human_L23_synapse_Ra_100_Rneckmouse_spine_100_14.87/MOO_opt_folder_same_w_peel_syn_spines_featues_cm_g_pas_first_seed_123456/05_08_A_01062017/run_' + runnum2compare + '/final_pop.p'
+    #     with open(path_result2compare, 'rb') as file:
+    #         try:
+    #             while True: object_file = pickle.load(file)
+    #         except EOFError:
+    #             pass
+    #     param2compare_dict = {object_file['parameters'][i]: np.array(object_file['final_pop']).mean(axis=0)[i] for i in
+    #                           range(len(object_file['parameters']))}
+    #     responses1 = protocol.run(cell_model=model1, param_values=best_ind_dict, sim=sim)
+    #
+    #     temp = np.array(responses1['soma.v']['time'])
+    #     temp2 = np.array(responses1['soma.v']['voltage'])
+    #     start = np.where(temp > neuron_start_time)[0][0]
+    #     temp = temp - temp[start]
+    #     temp = temp[start:]
+    #     temp2 = temp2[start:]
+    #     plt.plot(temp, temp2, color='green', alpha=0.4, linewidth=5,label='compare to dend*'+str(another_morphology_resize_dend_by)+' another morphology')
     plt.plot([], [], ' ', label='gmax_AMPA='+str(round(best[0]*1000,3))+' [nS] \ngmax_NMDA=' +str(round(best[1]*1000,3))+' [nS]')
     plt.legend(fontsize=12)
     plt.savefig(base_save_folder + 'fit_transient_RDSM.png')

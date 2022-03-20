@@ -46,12 +46,12 @@ def get_spine_xyz(cell_name,spine_num,folder='/ems/elsc-labs/segev-i/moria.fridm
     z=parameter_cv['z'][spine_num]
     return (x,y,z)
 
-def get_spine_part(cell_name,spine_num,folder='/ems/elsc-labs/segev-i/moria.fridman/project/analysis_groger_cells/cells_initial_information'):
-    df = pd.read_excel(folder+'/Data2.xlsx')
+def get_spine_part(cell_name,spine_num):
+    df = pd.read_excel('/cells_initial_information/Data2.xlsx')
     parameter_cv=df[df['cell_name']==cell_name].reset_index()
     return parameter_cv['dend_type'][spine_num]
-def get_building_spine(cell_name,spine_num,folder='/ems/elsc-labs/segev-i/moria.fridman/project/analysis_groger_cells/cells_initial_information'):
-    df = pd.read_excel(folder+'/Data2.xlsx')
+def get_building_spine(cell_name,spine_num):
+    df = pd.read_excel('/cells_initial_information/Data2.xlsx')
     parameter_cv=df[df['cell_name']==cell_name].reset_index()
     return {'NECK_LENGHT':parameter_cv['neck_length'][spine_num],'NECK_DIAM':parameter_cv['neck_diam'][spine_num],'HEAD_DIAM':get_R_head(parameter_cv)*2}
 def get_spine_params(spine_type,cell_name='',folder='/ems/elsc-labs/segev-i/moria.fridman/project/analysis_groger_cells/cells_initial_information'):
@@ -62,6 +62,11 @@ def get_spine_params(spine_type,cell_name='',folder='/ems/elsc-labs/segev-i/mori
         df = pd.read_excel(folder+'/Data2.xlsx')
         parameter_cv=df[df['cell_name']==spine_type].reset_index()
         return parameter_cv['neck_length'],parameter_cv['neck_diam'],get_R_head(parameter_cv)*2
+def get_psd(cell_name):
+    a=[]
+    for i in get_n_spinese(cell_name):
+        a.append(get_parameters(cell_name,['PSD'])
+    return a
 if __name__ == '__main__':
     cell_name='2017_03_04_A_6-7'
     get_parameters(cell_name,['PSD','neck_length'])

@@ -1,7 +1,5 @@
 import os
-
 import pandas as pd
-
 from open_pickle import read_from_pickle
 from glob import glob
 from passive_val_function import *
@@ -10,7 +8,8 @@ folder_="/ems/elsc-labs/segev-i/moria.fridman/project/analysis_groger_cells/"
 folder_data="cells_initial_information/"
 folder_save="cells_outputs_data/"
 cells=["2017_05_08_A_5-4", "2017_05_08_A_4-5","2017_03_04_A_6-7"]
-file_type2read=['z_correct.swc','morphology.swc','hoc','ASC']
+# file_type2read=['hoc','ASC']
+file_type2read=['z_correct.swc','morphology.swc']
 resize_diam_by=1.0
 shrinkage_factor=1.0
 SPINE_STARTs=[str(10),str(20),str(60)]
