@@ -6,7 +6,7 @@
 #SBATCH -e logs/%j.err
 # Ask for one CPU, one GPU, enter the GPU queue, and limit run to 1 days
 #SBATCH -p ss.q
-#SBATCH --mem 10GB
+#SBATCH --mem 4GB
 #SBATCH -c 1
 #SBATCH -t 1-0
 
