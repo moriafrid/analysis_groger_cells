@@ -13,6 +13,7 @@ cells=["2017_05_08_A_5-4", "2017_05_08_A_4-5","2017_03_04_A_6-7"]
 file_type2read=['z_correct.swc','morphology.swc','hoc','ASC']
 resize_diam_by=1.0
 shrinkage_factor=1.0
+SPINE_STARTs=[str(10),str(20),str(60)]
 SPINE_START=str(20)
 RA_mins=[5,50,80,100]
 i=0

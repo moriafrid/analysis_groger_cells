@@ -27,8 +27,8 @@ signal.signal(signal.SIGSEGV, SIGSEGV_signal_arises)
 logger = logging.getLogger(__name__)
 matplotlib.use('agg')
 
-generation_size = 10
-num_of_genarations = 2
+generation_size = 100
+num_of_genarations = 1000
 do_calculate_F_factor=True
 do_resize_dend=True
 do_run_another_morphology=False
@@ -37,22 +37,15 @@ do_compare2result = False
 frozen_NMDA_weigth=False
 runnum2compare = '13'
 # spine_type="mouse_spine" #"groger_spine"
-#pass 1 argument = size of ipcluster
-#pass 2 argument = RA
-#pass 3 argument = CM
-#pass 4 argument = RM
-#pass 5 argumant = resize_dend_by
-#pass 6 argument = shrinkage_by
 
-#pass 7 argument = passive_vel_name
 print(sys.argv,flush=True)
-if len(sys.argv) != 13:
-    cpu_node = 30
-
+if len(sys.argv) != 14:
+    print("the function doesn't run with sys.argv",flush=True)
+    cpu_node = 1
     cell_name= '2017_05_08_A_5-4'
     file_type='z_correct.swc'  #file type is just used to calculate F_factor
     passive_val={'RA':100,'CM':1,'RM':10000}
-    passive_fit_condition='const_RA'
+    passive_fit_condition='const_param'
     passive_val_name='RA=120'
     resize_dend_by=1.0
     shrinkage_by=1.0
@@ -60,37 +53,32 @@ if len(sys.argv) != 13:
     folder_='/ems/elsc-labs/segev-i/moria.fridman/project/analysis_groger_cells/'
     profile = '_'
     RA=100
-    print('sys.argv not running and with len of ',len(sys.argv))
-else:
+
+    print("the sys.argv len is correct",flush=True)
     cpu_node = float(sys.argv[1])
     cell_name = sys.argv[2]
     file_type=sys.argv[3] #hoc ar ASC
     passive_val={"RA":float(sys.argv[4]),"CM":float(sys.argv[5]),'RM':float(sys.argv[6])}
-    resize_dend_by = float(sys.argv[7]) #how much the cell sweel during the electrophisiology records
-    shrinkage_by =float(sys.argv[8]) #how much srinkage the cell get between electrophysiology record and LM
-    passive_fit_condition=sys.argv[9]
-    passive_val_name=sys.argv[9]
-    SPINE_START=int(sys.argv[10])
-    folder_= sys.argv[11]
-    profile = sys.argv[12]
-    print('sys.argv runing correctly with parameters',sys.argv )
+    passive_fit_condition=sys.argv[7]
+    passive_val_name=sys.argv[8]
+    resize_dend_by = float(sys.argv[9]) #how much the cell sweel during the electrophisiology records
+    shrinkage_by =float(sys.argv[10]) #how much srinkage the cell get between electrophysiology record and LM
+    SPINE_START=int(sys.argv[11])
+    folder_= sys.argv[12]
+    profile = sys.argv[13]
     RA=float(sys.argv[4])
 
 data_dir= "cells_initial_information/"
 save_dir ="cells_outputs_data/"
 base2 = folder_+save_dir+cell_name+'/MOO_results_'+file_type+"/"  # folder name  _RA_free
 base2+='F_shrinkage='+str(round(shrinkage_by,2))+'_dend*'+str(round(resize_dend_by,2))
-# if "const" in passive_fit_condition:
-#     base_save_folder=base2+ '/'+passive_fit_condition+'/' +passive_fit_condition+'='+str(round(RA,2))+'/'
-# elif "initial" in passive_fit_condition:
-#     base_save_folder=base2 + '/'+passive_fit_condition+'/RA_after_fit='+str(round(RA,2))+'/'
 base_save_folder=base2 + '/'+passive_fit_condition+'/'+passive_val_name+'/'
 print('base_save_folder:',base_save_folder)
 create_folder_dirr(base_save_folder)
 RDSM_objective_file = folder_+save_dir+cell_name+"/data/electrophysio_records/syn/mean_syn.p"
 short_pulse_parameters_file=folder_+save_dir+cell_name+'/data/electrophysio_records/short_pulse_parameters.p'
 morphology_dirr =glob(folder_+data_dir+cell_name+'/*'+file_type)[0]
-morphology_dirr =glob( folder_+data_dir+cell_name+'/*z_correct.swc')[0]
+# morphology_dirr =glob( folder_+data_dir+cell_name+'/*z_correct.swc')[0]
 
 print('profile=',profile)
 
