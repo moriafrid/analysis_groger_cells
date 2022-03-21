@@ -1,11 +1,9 @@
-
 #!/ems/elsc-labs/segev-i/moria.fridman/anaconda3/envs/project/bin/python
 # from __future__ import print_function
 import binstar_client.utils
 import bluepyopt as bpopt
 import bluepyopt.ephys as ephys
 import pprint
-import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib
 import pickle
@@ -13,8 +11,7 @@ from add_figure import add_figure
 from open_pickle import read_from_pickle
 from calculate_F_factor import calculate_F_factor
 import sys
-import pandas as pd
-from read_spine_properties import get_building_spine,get_n_spinese,get_spine_params
+from read_spine_properties import *
 from bluepyopt.ephys.parameters import NrnParameter, NrnRangeParameter
 from bluepyopt.ephys.parameterscalers import *
 import logging
@@ -368,7 +365,7 @@ def run(cell, seed=0):
             value=0.002,
             bounds=[0.000000, 0.01],
             locations=[netstims[i]],
-            reletive_strength = [1, 0.1]))#[1, 0.1,0.01]))
+            reletive_strength = get_parameter(cell_name,'PSD')))#  [1, 0.1]))#[1, 0.1,0.01]))
 
     # this  need to add the weight to optimization
         syn_params.append(NrnNetstimWeightParameter(
@@ -378,7 +375,7 @@ def run(cell, seed=0):
             value=0.0012,
             bounds=[0.000, 0.005],
             locations=[netstims_NMDA[i]],
-            reletive_strength = [1]))#[1, 0.1,0.01]))
+            reletive_strength = [1])) #[1, 0.1,0.01]))
 
 
     rec.append(ephys.recordings.CompRecording(
