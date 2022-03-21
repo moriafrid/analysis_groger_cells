@@ -2,9 +2,10 @@
 # Write output as following (%j is JOB_ID)
 #SBATCH -o logs/%j.out
 #SBATCH -e logs/%j.err
-#SBATCH --mem 60000
-#SBATCH -t 2-0
-#SBATCH -n 30
+#SBATCH --mem 30GB
+#SBATCH --exclude=ielsc-48,ielsc-49
+##SBATCH -t 2-0
+##SBATCH -n 30
 
 #pass 1 argument = size of ipcluster ##%%
 #pass 2 argument = cell_name
@@ -50,8 +51,6 @@ args=$@
 shift $#
 
 echo "Launching job"
-conda init
-conda activate project
 echo $PATH
 #python MOO_get_parameters.py $1 $2 $3 $4 $5 $6 $7 $8 $9 $10 $11 $12 ${profile}
 echo $@ ${profile}

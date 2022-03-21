@@ -5,10 +5,11 @@
 #SBATCH -o logs/%j.out
 #SBATCH -e logs/%j.err
 # Ask for one CPU, one GPU, enter the GPU queue, and limit run to 1 days
-#SBATCH -p ss.q
+#SBATCH -p ss.q,elsc.q
 #SBATCH --mem 4GB
-#SBATCH -c 1
-#SBATCH -t 1-0
+##SBATCH -c 1
+##SBATCH -t 1-0
+#SBATCH --exclude=ielsc-48,ielsc-49
 
 echo "the number parameters the sbatch get is "$#
 
@@ -36,7 +37,6 @@ else
 fi
 
 path=$(dirname $SCRIPT_PATH)
-conda init
-conda activate project
 echo "Running: python3 $path/$script $args"
 python3 $path/$script $args
+echo "done script :)"
