@@ -9,17 +9,15 @@ import sys
 from extra_function import create_folder_dirr
 import matplotlib
 matplotlib.use('agg')
-
-spine_type="mouse_spine"
 print(len(sys.argv),sys.argv,flush=True)
 if len(sys.argv) != 7:
-    cell_name= '2017_03_04_A_6-7'
-    file_type='morphology.swc'
+    cell_name= '2017_05_08_A_4-5'
+    file_type='z_correct.swc'
     resize_diam_by=1.0
     shrinkage_factor=1.0
-    SPINE_START=20
+    SPINE_START=10
     folder_='/ems/elsc-labs/segev-i/moria.fridman/project/analysis_groger_cells/'
-    print('sys.argv not running')
+    print("the function doesn't run with sys.argv",flush=True)
 else:
     cell_name = sys.argv[1]
     file_type=sys.argv[2] #hoc ar ASC
@@ -27,7 +25,7 @@ else:
     shrinkage_factor =float(sys.argv[4]) #how much srinkage the cell get between electrophysiology record and LM
     SPINE_START=int(sys.argv[5])
     folder_= sys.argv[6] #'/ems/elsc-labs/segev-i/moria.fridman/project/analysis_groger_cells/'
-    print('the len of sys.argv is correct and running')
+    print('the len of sys.argv is correct and running',flush=True)
 save_dir ="cells_outputs_data/"
 
 initial_folder=folder_+save_dir+cell_name+'/fit_short_pulse/'+file_type+'_SPINE_START='+str(SPINE_START)+'/'
@@ -76,7 +74,9 @@ def analysis_fit(location):
     plt.savefig(save_folder+'/diffrent '+condition+' against RM.png')
     pickle.dump(dict_minimums, open(save_folder + "/ "+condition+" _10_minimums.p", "wb"))
 
+
 if __name__ == '__main__':
+    print("Do analysis fit:", flush=True)
     if len(glob(initial_folder+'/basic_fit/analysis/*'))>0:
         analysis_fit(initial_folder+'/basic_fit')
 
@@ -84,6 +84,7 @@ if __name__ == '__main__':
         analysis_fit(loc)
 
     initial_locs=glob(initial_folder)
+    print("Done analysis fit. Loop over ", initial_locs, flush=True)
     for loc in initial_locs:
         data=glob(loc+'/const_param/RA/Ra_const_errors.p')[0]
         save_folder1=data[:data.rfind('/')]+'/analysis'
@@ -93,6 +94,8 @@ if __name__ == '__main__':
         RA0=dict3['RA']
         RAs,RMs,CMs,errors=[],[],[],[]
         errors=dict3['error']['decay&max']
+        errors=[value for value in dict3['error']['decay&max']]
+
         error_all=dict3['error']
         RAs=[value['RA'] for value in dict3['params']]
         RMs=[value['RM'] for value in dict3['params']]
@@ -111,6 +114,7 @@ if __name__ == '__main__':
             dict_minimums2['RA_const=' + str(RA0[mini])]={'params': {'RM': RMs[mini], 'RA': RAs[mini], 'CM': CMs[mini]},'error':{key2:error_all[key2][mini] for key2 in error_all.keys()} }
         pickle.dump(dict_minimums2, open(save_folder1 + "/RA_const_10_minimums.p", "wb"))
 
+        print("Done saving ", "RA_const_10_minimums.p for ", loc,flush=True)
 
         plt.legend(loc='upper left')
         plt.savefig(save_folder1+'/RA const against errors')
@@ -134,131 +138,5 @@ if __name__ == '__main__':
         add_figure('RA const against CM\n'+loc.split('/')[-1],'RA const','CM')
         plt.plot(RA0,CMs)
         plt.savefig(save_folder1+'/RA const against CMs')
-
-        # for datas_temp0 in glob(loc+'/different_initial_conditions/RA_min*'):
-        #     datas_temp=glob(datas_temp0+'/RA0*/RA0_fit_results.p')
-        #     datas=[]
-        #     for data in datas_temp:
-        #         if not '+' in data:
-        #             datas.append(data)
-        #     print(loc)
-        #     print('datas', datas)
-        #     data1,data2=datas
-        #     #####change the locations
-        #     for data in [data1,data2]:
-        #         save_folder=data[:data.rfind('/')]+'/analysis'
-        #         try:os.mkdir(save_folder)
-        #         except FileExistsError: pass
-        #
-        #         dict=read_from_pickle(data)
-        #         dict1=read_from_pickle(data1)
-        #         dict2=read_from_pickle(data2)
-        #
-        #         RA0=np.sort([float(key.split('=')[-1]) for key in dict.keys()])
-        #         value=[dict[key] for key in dict.keys()]
-        #
-        #         RAs,RMs,CMs,errors=[],[],[],[]
-        #         for key in dict.keys():
-        #             RAs.append(dict[key]['RA'])
-        #             RMs.append(dict[key]['RM'])
-        #             CMs.append(dict[key]['CM'])
-        #             errors.append(dict[key]['error']['decay&max'])
-        #             # errors.append(dict[key]['error']['decay&max'])
-        #         add_figure('diffrent RA0 against error\n'+loc.split('/')[-1],'RA0','errors')
-        #         plt.plot(RA0,errors)
-        #         minimums_arg = np.argsort(errors)
-        #         dict_minimums_total=[]
-        #         for mini in minimums_arg:
-        #             dict_minimums_total.append({'RM': RMs[mini], 'RA': RAs[mini], 'CM': CMs[mini],'error':errors[mini]})
-        #         pickle.dump(dict_minimums_total, open(save_folder + "/RA_total_errors_minimums.p", "wb"))
-        #         dict_minimums={}
-        #         for mini in minimums_arg[:10]:
-        #             plt.plot(RA0[mini], errors[mini], '*',
-        #                      label='RA0=' + str(RA0[mini]) + ' RM=' + str(round(RMs[mini], 2)) + ' RA=' + str(
-        #                          round(RAs[mini], 2)) + ' CM=' + str(
-        #                          round(CMs[mini], 2)) + ' error=' +  str(round(errors[mini], 3)))
-        #             del value[mini]['error']
-        #             dict_minimums['RA0=' + str(RA0[mini])]=value[mini]
-        #         plt.legend(loc='upper left')
-        #         plt.savefig(save_folder+'/diffrent RA0 against error.png')
-        #
-        #         add_figure('diffrent RA against error\n'+loc.split('/')[-1],'RA','errors')
-        #         plt.plot(RAs,errors,'.')
-        #         for mini in minimums_arg[:10]:
-        #             plt.plot(RAs[mini], errors[mini], '*',
-        #                      label=' RM=' + str(round(RMs[mini], 2)) + ' RA=' + str(
-        #                          round(RAs[mini], 2)) + ' CM=' + str(
-        #                          round(CMs[mini], 2)) +' RA0=' + str(RA0[mini])+ ' error=' +  str(round(errors[mini], 3)) )
-        #         plt.legend(loc='upper left')
-        #         plt.savefig(save_folder+'/diffrent RA against error.png')
-        #
-        #         add_figure('diffrent RA0 against CM\n'+loc.split('/')[-1],'RA0','CM')
-        #         plt.plot(RA0,CMs)
-        #         plt.savefig(save_folder+'/diffrent RA0 against CM.png')
-        #         add_figure('diffrent RA0 against RA after fit\n'+loc.split('/')[-1],'RA0','RA')
-        #         plt.plot(RA0,RAs)
-        #         plt.savefig(save_folder+'/diffrent RA0 against RA after fit.png')
-        #         add_figure('diffrent RA0 against RM\n'+loc.split('/')[-1],'RA0','RM')
-        #         plt.plot(RA0,RMs)
-        #         plt.savefig(save_folder+'/diffrent RA0 against RM.png')
-        #         pickle.dump(dict_minimums, open(save_folder + "/RA0_10_minimums.p", "wb"))
-        #     if float(next(iter(dict1.keys())).split('=')[-1])<float(next(iter(dict2.keys())).split('=')[-1]):
-        #         dict = dict1.copy()  # Copy the dict1 into the dict3 using copy() method
-        #         for key, value in dict2.items():  # use for loop to iterate dict2 into the dict3 dictionary
-        #             dict[key] = value
-        #     else:
-        #         dict = dict2.copy()  # Copy the dict1 into the dict3 using copy() method
-        #         for key, value in dict1.items():  # use for loop to iterate dict2 into the dict3 dictionary
-        #             dict[key] = value
-
-            # save_folder=loc+'/different_initial_conditions/'+data1.split('/')[-2]+'+'+data2.split('/')[-2]
-            # try:os.mkdir(save_folder)
-            # except FileExistsError: pass
-            #
-            # RA0=[float(key.split('=')[-1]) for key in dict.keys()]
-            # value=[dict[key] for key in dict.keys()]
-            # RAs,RMs,CMs,errors=[],[],[],[]
-            # for key in dict.keys():
-            #     RAs.append(dict[key]['RA'])
-            #     RMs.append(dict[key]['RM'])
-            #     CMs.append(dict[key]['CM'])
-            #     errors.append(dict[key]['error']['decay&max'])
-            # add_figure('diffrent RA0 against error\n'+loc.split('/')[-1],'RA0','errors')
-            # plt.plot(RA0,errors)
-            # minimums_arg=np.argsort(errors)
-            # dict_minimums_total=[]
-            # for mini in minimums_arg:
-            #     dict_minimums_total.append({'RM': RMs[mini], 'RA': RAs[mini], 'CM': CMs[mini],'error':errors[mini]})
-            # pickle.dump(dict_minimums_total, open(save_folder + "/RA_total_errors_minimums.p", "wb"))
-            # # mini = np.argmin(errors)
-            # dict_minimums={}
-            # # print(loc)
-            # for mini in minimums_arg[:10]:
-            #     plt.plot(RA0[mini], errors[mini], '*',label='RA0=' + str(RA0[mini]) + ' RM=' + str(round(RMs[mini], 2)) + ' RA=' + str(round(RAs[mini], 2)) + ' CM=' + str(
-            #                  round(CMs[mini], 2)) + ' error=' + str(round(errors[mini], 3)))
-            #     dict_minimums['RA0=' + str(RA0[mini])]=dict.get('RA0=' + str(RA0[mini]), dict.get('RA0=' + str(int(RA0[mini])), None))
-            #     if dict_minimums['RA0=' + str(RA0[mini])] is None:
-            #         raise TypeError("dict_minimums get None")
-            # pickle.dump(dict_minimums, open(save_folder + "/RA0_10_minimums.p", "wb"))
-            # plt.legend(loc='upper left')
-            # plt.savefig(save_folder+'/diffrent RA0 against error.png')
-            #
-            # add_figure('diffrent RA against error\n'+loc.split('/')[-1],'RA','errors')
-            # plt.plot(RAs,errors,'.')
-            # for mini in minimums_arg[:10]:
-            #     plt.plot(RAs[mini], errors[mini], '*',label= 'RM=' + str(round(RMs[mini], 2)) + ' RA=' + str(round(RAs[mini], 2)) + ' CM=' + str(
-            #                  round(CMs[mini], 2)) + ' error=' + str(round(errors[mini], 3)) )
-            # plt.legend(loc='upper left')
-            # plt.savefig(save_folder+'/diffrent RA against error.png')
-            #
-            # add_figure('diffrent RA0 against CM\n'+loc.split('/')[-1],'RA0','CM')
-            # plt.plot(RA0,CMs)
-            # plt.savefig(save_folder+'/diffrent RA0 against CM.png')
-            # add_figure('diffrent RA0 against ֵֻֻRA after fit\n'+loc.split('/')[-1],'RA0','RA')
-            # plt.plot(RA0,RAs)
-            # plt.savefig(save_folder+'/diffrent RA0 against RA after fit.png')
-            # add_figure('diffrent RA0 against RM\n'+loc.split('/')[-1],'RA0','RM')
-            # plt.plot(RA0,RMs)
-            # plt.savefig(save_folder+'/diffrent RA0 against RM.png')
 
         print('analysis_fit_after_re.py complite to run')

@@ -3,14 +3,13 @@ folder_="/ems/elsc-labs/segev-i/moria.fridman/project/analysis_groger_cells/"
 folder_data="cells_initial_information"
 folder_save="cells_outputs_data"
 cells=["2017_05_08_A_5-4", "2017_05_08_A_4-5","2017_03_04_A_6-7"]
-file_type2read=['hoc','ASC']
 resize_diam_by=str(1)
 shrinkage_factor=str(1)
 SPINE_STARTs=[10,20,60]
 base_command='sbatch execute_python_script.sh'
-for cell_name in cells:
-    for file_type in ['z_correct.swc','morphology.swc','hoc','ASC']:
-        for SPINE_START in SPINE_STARTs:
+for cell_name in cells[0:1]:
+    for file_type in ['z_correct.swc','morphology.swc','hoc','ASC'][0:2]:
+        for SPINE_START in [10,20,60]:#SPINE_STARTs:
             for Ra_min in [5,100]:
                 command="fit_influnce_by_initial_condition.py"
                 send_command = " ".join([base_command,command, cell_name,file_type,str(Ra_min),resize_diam_by,shrinkage_factor,str(SPINE_START),folder_])
