@@ -26,8 +26,7 @@ signal.signal(signal.SIGSEGV, SIGSEGV_signal_arises)
 logger = logging.getLogger(__name__)
 matplotlib.use('agg')
 
-generation_size = 1
-num_of_genarations = 2
+
 do_calculate_F_factor=True
 do_resize_dend=True
 do_run_another_morphology=False
@@ -52,6 +51,8 @@ if len(sys.argv) != 14:
     folder_='/ems/elsc-labs/segev-i/moria.fridman/project/analysis_groger_cells/'
     profile = '_'
     RA=float(100)
+    generation_size = 5
+    num_of_genarations = 2
 else:
     print("the sys.argv len is correct",flush=True)
     cpu_node = int(sys.argv[1])
@@ -66,7 +67,8 @@ else:
     folder_= sys.argv[12]
     profile = sys.argv[13]
     RA=float(sys.argv[4])
-
+    generation_size = 100
+    num_of_genarations = 1000
 data_dir= "cells_initial_information/"
 save_dir ="cells_outputs_data/"
 base2 = folder_+save_dir+cell_name+'/MOO_results_'+file_type+"/"  # folder name  _RA_free
@@ -449,10 +451,6 @@ def run(cell, seed=0):
                                    params=parameters_list + syn_params,
                                    # seclist_names=['dendritic']
                                    )
-    # model1 = ephys.models.CellModel('Model', morph=morphology1, mechs=mechanism_list + syn_mec,
-    #                                params=parameters_list + syn_params,
-    #                                # seclist_names=['dendritic']
-    #                                )
     param_names = [param.name for param in model.params.values() if not param.frozen]  # parameters for oprimization
 
     ##################################################################################
@@ -512,7 +510,7 @@ def run(cell, seed=0):
 
                     from extraClasses import NrnSegmentSomaDistanceScaler_, NrnSectionParameterPas, neuron_start_time, \
                         EFeatureImpadance, EFeaturePeak, EFeaturePeakTime, EFeatureRDSM, NrnNetstimWeightParameter, \
-                        SweepProtocolRin2
+                        SweepProtocolRin2 # add_morph creat_spine
             except:
                 print("closing engine number", g)
                 rc.shutdown([g])
@@ -556,12 +554,6 @@ def run(cell, seed=0):
         fitness_protocols={'RDSM': protocol},  # "Rin2":protocol3
         fitness_calculator=score_calc,
         sim=sim)
-    # cell_evaluator1 = ephys.evaluators.CellEvaluator(
-    #     cell_model=model1,
-    #     param_names=param_names,
-    #     fitness_protocols={'RDSM': protocol},  # "Rin2":protocol3
-    #     fitness_calculator=score_calc,
-    #     sim=sim)
     ##################################################################################
 
     optimisation = bpopt.optimisations.DEAPOptimisation(
@@ -602,18 +594,6 @@ def run(cell, seed=0):
 
         # plt.errorbar(T_base,V_base, yerr=V2, color = 'k', ecolor="b", alpha = 0.03)
         plt.plot(T_base, V_base, color='black',alpha=0.2,label='data',lw=5)
-
-
-        # if do_run_another_morphology:
-        #     responses1 = protocol.run(cell_model=model1, param_values=start_values1, sim=sim)
-        #     temp = np.array(responses1['soma.v']['time'])
-        #     temp2 = np.array(responses1['soma.v']['voltage'])
-        #     start = np.where(temp > neuron_start_time)[0][0]
-        #     temp = temp - temp[start]
-        #     temp = temp[start:]
-        #     temp2 = temp2[start:]
-        #     plt.plot(temp, temp2, color='red', alpha=0.3, linewidth=5,label='dend*'+str(another_morphology_resize_dend_by)+' another morphology')
-        #     plt.text(100,-76.5,'max_vol_other_morph='+str(round(np.amax(temp2),2)))
         plt.legend()
         plt.savefig(base_save_folder + 'before_fit_transient_RDSM.png')
         plt.close()
@@ -754,24 +734,6 @@ def run(cell, seed=0):
 
     plt.xlabel('time(ms)')
     plt.ylabel('V(mV)')
-    # if do_compare2result:
-    #     path_result2compare = '/ems/elsc-labs/segev-i/moria.fridman/project/data_analysis_git/data_analysis/test_moo/opt_Human_L23_synapse_Ra_100_Rneckmouse_spine_100_14.87/MOO_opt_folder_same_w_peel_syn_spines_featues_cm_g_pas_first_seed_123456/05_08_A_01062017/run_' + runnum2compare + '/final_pop.p'
-    #     with open(path_result2compare, 'rb') as file:
-    #         try:
-    #             while True: object_file = pickle.load(file)
-    #         except EOFError:
-    #             pass
-    #     param2compare_dict = {object_file['parameters'][i]: np.array(object_file['final_pop']).mean(axis=0)[i] for i in
-    #                           range(len(object_file['parameters']))}
-    #     responses1 = protocol.run(cell_model=model1, param_values=best_ind_dict, sim=sim)
-    #
-    #     temp = np.array(responses1['soma.v']['time'])
-    #     temp2 = np.array(responses1['soma.v']['voltage'])
-    #     start = np.where(temp > neuron_start_time)[0][0]
-    #     temp = temp - temp[start]
-    #     temp = temp[start:]
-    #     temp2 = temp2[start:]
-    #     plt.plot(temp, temp2, color='green', alpha=0.4, linewidth=5,label='compare to dend*'+str(another_morphology_resize_dend_by)+' another morphology')
     plt.plot([], [], ' ', label='gmax_AMPA='+str(round(best[0]*1000,3))+' [nS] \ngmax_NMDA=' +str(round(best[1]*1000,3))+' [nS]')
     plt.legend(fontsize=12)
     plt.savefig(base_save_folder + 'fit_transient_RDSM.png')

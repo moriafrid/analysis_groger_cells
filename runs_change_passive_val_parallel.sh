@@ -1,6 +1,12 @@
 #!/bin/bash
+# Write output as following (%j is JOB_ID)
+#SBATCH -o logs/%j.out
+#SBATCH -e logs/%j.err
+#SBATCH --mem 60000
+#SBATCH -t 2-0
+#SBATCH -n 30
 
-#pass 1 argument = size of ipcluster
+#pass 1 argument = size of ipcluster ##%%
 #pass 2 argument = cell_name
 #pass 3 argument = file_type
 #pass 4 argument = RA
@@ -13,13 +19,6 @@
 #pass 11 argument = SPINE_START
 #pass 12 argument = folder
 
-# Write output as following (%j is JOB_ID)
-#SBATCH -o logs/%j.out
-#SBATCH -e logs/%j.err
-#SBATCH --mem 60000
-#SBATCH -t 2-0
-#SBATCH -c 30
-
 echo "the number parameters the sbatch get is "$#
 
 args=""
@@ -30,8 +29,6 @@ fi
 cell_name=$2
 RA=$3
 set -x
-#script=$1
-#shift 1
 
 
 PWD=$(pwd)
@@ -45,7 +42,7 @@ export profile=moria$cell_name$RA  #Note the profile name, you will need to use 
 ipython profile create --parallel --profile=${profile}
 
 # ipcluster stop --profile=${profile} &
-#sleep 50
+
 ipcluster start --profile=${profile} --n=$1 &
 sleep 60
 
