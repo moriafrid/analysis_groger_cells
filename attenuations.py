@@ -251,10 +251,10 @@ Rin_dend,Rin_syn=[],[]
 netcon=[]
 for i,spine_head in enumerate(spines_head):
     if clamp_injection:
-        pulse_size=1000
+        pulse_size=200
         clamp.append(h.IClamp(spine_head(1))) # insert clamp(constant potentientiol) at the soma's center
         clamp[i].amp = -0.05 #nA
-        clamp[i].delay = 200 #ms
+        clamp[i].delay = 100 #ms
         clamp[i].dur = pulse_size  # ms
         h.tstop = 500
 
@@ -277,7 +277,7 @@ for i,spine_head in enumerate(spines_head):
         netcon.append(h.NetCon(syn_netstim, syn_shape[i]))
         syn_weight = 0.002
         netcon[i].weight[0] = syn_weight  # activate the on_path synapse
-        h.tstop = 1000
+        h.tstop = 500
 
     imp=h.Impedance(sec=spine_head)
     imp.loc(1, sec=spine_head)
