@@ -42,11 +42,11 @@ for cell_name in cells:
                 command='sbatch execute_python_script.sh'
 
                 send_command = " ".join([command, 'Rin_Rm_plot.py',cell_name,file_type,RA,CM,RM,name,str(resize_diam_by),str(shrinkage_factor),SPINE_START,folder_])
-                os.system(send_command)
+                # os.system(send_command)
                 print(cell_name+ ' .'+file_type+':  Rin_Rm_plot.py')
 
                 send_command = " ".join([command, 'dendogram.py',cell_name,file_type,RA,CM,RM,name,str(resize_diam_by),str(shrinkage_factor),SPINE_START,folder_])
-                os.system(send_command)
+                # os.system(send_command)
                 print(cell_name+ ' .'+file_type+':  dendogram.py')
 
                 for syn_injection in ['True','False']:
