@@ -21,6 +21,7 @@ def get_parameter(cell_name,par_name,spine_num=None):
         if isnan(parameter_cv[par_name][spine_num]):
             print(par_name +" in "+cell_name+ "is empty at Data2.xlx")
     return par
+
 def get_R_head(parameter_cv):
     if not True in list(pd.isna(parameter_cv['R_head'])):
         R_head=np.mean(parameter_cv['R_head'])
@@ -33,6 +34,7 @@ def get_R_head(parameter_cv):
         head_area=np.mean(parameter_cv['head_area'])
         R_head=sqrt(head_area/(4*pi))
     return R_head
+
 def get_F_factor_params(spin_type):
     df = pd.read_excel('cells_initial_information/Data2.xlsx')
     parameter_cv=df[df['cell_name']==spin_type].reset_index()
@@ -56,10 +58,12 @@ def get_spine_part(cell_name,spine_num):
     df = pd.read_excel('cells_initial_information/Data2.xlsx')
     parameter_cv=df[df['cell_name']==cell_name].reset_index()
     return parameter_cv['dend_type'][spine_num]
+
 def get_building_spine(cell_name,spine_num):
     df = pd.read_excel('cells_initial_information/Data2.xlsx')
     parameter_cv=df[df['cell_name']==cell_name].reset_index()
     return {'NECK_LENGHT':parameter_cv['neck_length'][spine_num],'NECK_DIAM':parameter_cv['neck_diam'][spine_num],'HEAD_DIAM':get_R_head(parameter_cv)*2}
+
 def get_spine_params(spine_type,cell_name=''):
     # 'groger_spine' 'mouse_spine','human_spine','shaft_spine'
     if spine_type=='groger_spine':

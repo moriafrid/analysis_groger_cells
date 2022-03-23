@@ -22,12 +22,6 @@ for cell_name in ['2017_05_08_A_5-4', '2017_05_08_A_4-5', '2017_03_04_A_6-7'][2:
     for resize_diam_by ,shrinkage_by in zip([1],[1]):
         for fit_condition in ['const_param','different_initial_conditions'][:1]:
             for SPINE_START in [20]:
-                # #creat the value to run on
-                # df.loc[(df["fit_condition"] == fit_condition) & (df["file_type"] == file_type), :].to_dict('records')
-                # curr = df.loc[(df["fit_condition"] == fit_condition) & (df["file_type"] == file_type), :]
-                # passive_vals_dict={}
-                # for name in curr.parameter_type:
-                #     passive_vals_dict[name]= curr.loc[df.parameter_type == name,].to_dict('records')[0]
                 passive_vals_dict=get_passive_parameter(cell_name,fit_condition=fit_condition,spine_start=SPINE_START,file_type='z_correct.swc')
                 for i, passive_val_name in enumerate(['RA=120','RA=150','RA_min_error','RA_best_fit'][1:]):
                     # if i!=2: continue
