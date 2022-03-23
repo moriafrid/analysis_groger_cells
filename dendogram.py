@@ -7,7 +7,7 @@ import matplotlib.pyplot as plt
 from matplotlib.lines import Line2D
 import signal
 from find_apic import find_apic
-from extra_function import load_hoc,load_ASC, SIGSEGV_signal_arises,create_folder_dirr,create_folders_list
+from extra_function import load_hoc,load_ASC,load_swc, SIGSEGV_signal_arises,create_folder_dirr,create_folders_list
 from glob import glob
 import pandas as pd
 from open_pickle import read_from_pickle
@@ -20,7 +20,7 @@ print(len(sys.argv), sys.argv)
 if len(sys.argv) != 11:
     print("the function doesn't run with sys.argv",flush=True)
     cell_name= '2017_05_08_A_5-4'
-    file_type2read='ASC'
+    file_type2read='z_correct.swc'
     passive_val={'RA':100.0,'CM':1.0,'RM':10000.0}
     name='RA=120'
     resize_diam_by=1.0
@@ -61,6 +61,8 @@ if file_type2read=='hoc':
     load_func=load_hoc
 elif file_type2read=='ASC':
     load_func=load_ASC
+elif 'swc' in file_type2read:
+    load_func=load_swc
 
 def get_segment_length_lamda(seg):
     """

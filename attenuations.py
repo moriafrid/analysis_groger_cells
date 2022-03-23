@@ -22,8 +22,8 @@ print(len(sys.argv), sys.argv)
 do_resize_dend=True
 if len(sys.argv) != 12:
     print("the function doesn't run with sys.argv",flush=True)
-    cell_name= '2017_05_08_A_5-4'
-    file_type='ASC'
+    cell_name= '2017_05_08_A_4-5'
+    file_type='morphology.swc'
     passive_val={'RA':100.0,'CM':1.0,'RM':10000.0}
     name='RA=120'
     syn_injection=False
@@ -109,6 +109,9 @@ def plot_records(RM, RA, CM,cell, syns,spines=None,save_name= "lambda"):
         # npVec_dend=npVec_dend*(Rin_dend_0/Rin_dend_resize_dend)#/=Rin_dend_resize_dend #npVec_dend*(Rin_dend_0/Rin_dend_resize_dend)
         # npVec_soma=npVec_soma*(Rin_soma_0/Rin_soma_resize_dend)#/=Rin_soma_resize_dend#npVec_soma*(Rin_soma_0/Rin_soma_resize_dend)
     figure, axis = plt.subplots(3, len(spines))
+    if len(spines) == 1:
+        axis = axis[..., np.newaxis]
+    print("Before plot: ", len(spines), axis.shape)
     plt.suptitle(cell_name+'\n'+name+' '+str(passive_val)+'\ndend*'+str(resize_diam_by)+' shrinkage_factor='+str(shrinkage_factor))
     for i in range(len(spines)):
         axis[0,i].plot(npTvec,npIvec[i])
@@ -204,9 +207,11 @@ def add_morph(cell, syn,spine_property,number=0):
     # return all
 cell=None
 if file_type=='ASC':
-   cell =load_ASC(cell_file)
+    cell =load_ASC(cell_file)
 elif file_type=='hoc':
-   cell =load_hoc(cell_file)
+    cell =load_hoc(cell_file)
+elif 'swc' in file_type:
+    cell =load_swc(cell_file)
 if do_calculate_F_factor:
    F_factor=calculate_F_factor(cell,'mouse_spine')
 else:

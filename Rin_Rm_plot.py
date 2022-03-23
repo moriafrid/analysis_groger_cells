@@ -5,7 +5,7 @@ from add_figure import add_figure
 from glob import glob
 import signal
 import sys
-from extra_function import load_ASC,load_hoc,SIGSEGV_signal_arises,create_folder_dirr
+from extra_function import load_ASC,load_hoc,load_swc,SIGSEGV_signal_arises,create_folder_dirr
 from read_spine_properties import get_n_spinese,get_spine_xyz
 from open_pickle import read_from_pickle
 import pandas as pd
@@ -17,8 +17,8 @@ print("the number of parameters that sys loaded in Rin_Rm_plot.py is ",len(sys.a
 print(len(sys.argv), sys.argv)
 if len(sys.argv) != 11:
     print("the function doesn't run with sys.argv",flush=True)
-    cell_name= '2017_03_04_A_6-7'
-    file_type2read= 'hoc'
+    cell_name= '2017_05_08_A_5-4'
+    file_type2read= 'z_correct.swc'
     passive_val={'RA':100.0,'CM':1.0,'RM':10000.0}
     name='RA=120'
     resize_diam_by=1.0
@@ -39,7 +39,7 @@ print(name,passive_val)
 data_dir= "cells_initial_information/"
 save_dir ="cells_outputs_data/"
 folder_data=folder_+save_dir+cell_name
-cell_file = glob(folder_+data_dir+cell_name+"/*."+file_type2read)[0]
+cell_file = glob(folder_+data_dir+cell_name+"/*"+file_type2read)[0]
 print("cell file is " +cell_file)
 folder_save = folder_+save_dir+cell_name +'/data/cell_properties.'+file_type2read+'/'+name+'_'+str(passive_val)+'/Rin_Rm/'
 create_folder_dirr(folder_save)
@@ -71,6 +71,8 @@ if file_type2read=='ASC':
     cell=load_ASC(cell_file)
 elif file_type2read=='hoc':
     cell=load_hoc(cell_file)
+elif 'swc' in file_type2read:
+    cell=load_swc(cell_file)
 
 
 #     for sec in cell.axon:
