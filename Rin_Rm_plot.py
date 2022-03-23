@@ -20,7 +20,7 @@ if len(sys.argv) != 11:
     cell_name= '2017_05_08_A_5-4'
     file_type2read= 'z_correct.swc'
     passive_val={'RA':100.0,'CM':1.0,'RM':10000.0}
-    name='RA=120'
+    name='test'
     resize_diam_by=1.0
     shrinkage_factor=1.0
     SPINE_START = 20
@@ -41,7 +41,9 @@ save_dir ="cells_outputs_data/"
 folder_data=folder_+save_dir+cell_name
 cell_file = glob(folder_+data_dir+cell_name+"/*"+file_type2read)[0]
 print("cell file is " +cell_file)
-folder_save = folder_+save_dir+cell_name +'/data/cell_properties.'+file_type2read+'/'+name+'_'+str(passive_val)+'/Rin_Rm/'
+folder_save=folder_+save_dir+cell_name+"/data/cell_properties/"+file_type2read+'/SPINE_START='+str(SPINE_START)+'/'
+folder_save+="/dend*"+str(round(resize_diam_by,2))+'&F_shrinkage='+str(round(shrinkage_factor,2))
+folder_save+='/'+name+'/Rin_Rm/'
 create_folder_dirr(folder_save)
 parameters=read_from_pickle(folder_data+'/data/electrophysio_records/short_pulse_parameters.p')
 def change_model_pas(CM=1, RA = 250, RM = 20000.0, E_PAS = -70.0, F_factor ={}):

@@ -22,10 +22,10 @@ print(len(sys.argv), sys.argv)
 do_resize_dend=True
 if len(sys.argv) != 12:
     print("the function doesn't run with sys.argv",flush=True)
-    cell_name= '2017_05_08_A_4-5'
-    file_type='morphology.swc'
+    cell_name= '2017_05_08_A_5-4'
+    file_type='z_correct.swc'
     passive_val={'RA':100.0,'CM':1.0,'RM':10000.0}
-    name='RA=120'
+    name='test'
     syn_injection=False
     resize_diam_by=1.0
     shrinkage_factor=1.0
@@ -50,9 +50,9 @@ print(name, passive_val)
 data_dir= "cells_initial_information/"
 save_dir ="cells_outputs_data/"
 cell_file=glob(folder_+data_dir+cell_name+'/*'+file_type)[0]
-folder_save=folder_+save_dir+cell_name+"/data/cell_properties/"+file_type+'_SPINE_START='+str(SPINE_START)+'/'
+folder_save=folder_+save_dir+cell_name+"/data/cell_properties/"+file_type+'/SPINE_START='+str(SPINE_START)+'/'
 folder_save+="/dend*"+str(round(resize_diam_by,2))+'&F_shrinkage='+str(round(shrinkage_factor,2))
-folder_save+=name+'_'+str(passive_val)+'/'
+folder_save+='/'+name+'/'
 folder_save+="attenuations/"
 create_folder_dirr(folder_save)
 

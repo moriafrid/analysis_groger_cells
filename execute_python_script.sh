@@ -39,4 +39,3 @@ fi
 path=$(dirname $SCRIPT_PATH)
 echo "Running: python3 $path/$script $args"
 python3 $path/$script $args
-echo "done script :)"

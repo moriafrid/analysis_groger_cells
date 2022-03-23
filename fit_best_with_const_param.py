@@ -244,6 +244,10 @@ if __name__=='__main__':
     add_figure('RA const against errors\n'+file_type,'RA const','error')
     plt.plot(RA0,errors)
     minimums_arg=np.argsort(errors)
+    dict_minimums_total=[]
+    for mini in minimums_arg:
+        dict_minimums_total.append({'RM': RMs[mini], 'RA': RAs[mini], 'CM': CMs[mini],'error':errors[mini]})
+    pickle.dump(dict_minimums_total, open(save_folder1 + "/RA_total_errors_minimums.p", "wb"))
     dict_minimums2={}
     for mini in minimums_arg[:10]:
         plt.plot(RA0[mini], errors[mini], '*',label=' RM=' + str(round(RMs[mini], 2)) + ' RA=' + str(round(RAs[mini], 2)) + ' CM=' + str(

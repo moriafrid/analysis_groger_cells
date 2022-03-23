@@ -9,8 +9,8 @@ from extra_function import create_folder_dirr,SIGSEGV_signal_arises,load_ASC,loa
 import sys
 
 if len(sys.argv) != 6:
-    # cell_name= '2017_05_08_A_5-4'
-    cell_name= '2017_03_04_A_6-7'
+    cell_name= '2017_05_08_A_5-4'
+    # cell_name= '2017_03_04_A_6-7'
     file_type2read= 'z_correct.swc'
     folder_='/ems/elsc-labs/segev-i/moria.fridman/project/analysis_groger_cells/'
     data_dir= "cells_initial_information"
@@ -26,7 +26,7 @@ print(cell_name, folder_+data_dir+"/"+cell_name+"/*"+file_type2read)
 cell_file = glob(folder_+data_dir+"/"+cell_name+"/*"+file_type2read)[0]
 
 path_short_pulse=folder_+save_dir+'/'+cell_name+'/data/electrophysio_records/short_pulse/mean_short_pulse.p'
-folder_save=folder_+save_dir+'/'+cell_name+'/data/cell_properties/diam_dis_'+file_type2read+'/'
+folder_save=folder_+save_dir+'/'+cell_name+'/data/cell_properties/diam_dis/'+file_type2read+'/'
 
 create_folder_dirr(folder_save)
 
