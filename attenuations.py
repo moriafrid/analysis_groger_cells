@@ -253,7 +253,7 @@ for i,spine_head in enumerate(spines_head):
     if clamp_injection:
         pulse_size=1000
         clamp.append(h.IClamp(spine_head(1))) # insert clamp(constant potentientiol) at the soma's center
-        clamp[i].amp = 0.05 #nA
+        clamp[i].amp = -0.05 #nA
         clamp[i].delay = 200 #ms
         clamp[i].dur = pulse_size  # ms
         h.tstop = 500
