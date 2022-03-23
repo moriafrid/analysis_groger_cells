@@ -8,8 +8,8 @@ resize_diam_by=str(1)
 shrinkage_factor=str(1)
 SPINE_STARTs=[10,20,60]
 base_command='sbatch execute_python_script.sh'
-for cell_name in ["2017_05_08_A_5-4", "2017_05_08_A_4-5","2017_03_04_A_6-7"][1:2]:
-    for file_type in ['z_correct.swc','morphology.swc','hoc','ASC'][:2]:
+for cell_name in ["2017_05_08_A_5-4", "2017_05_08_A_4-5","2017_03_04_A_6-7"][0:1]:
+    for file_type in ['z_correct.swc','morphology.swc','hoc','ASC'][2:]:
         for SPINE_START in [10,60]:#SPINE_STARTs:
             for Ra_min in [5,100]:
                 command="fit_influnce_by_initial_condition.py"
