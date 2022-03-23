@@ -10,8 +10,8 @@ SPINE_STARTs=[str(20),str(60),str(10)]
 for cell_name in cells[0:1]:
     print(cell_name)
     for file_type in file_type2read:
-        for SPINE_START in SPINE_STARTs: #SPINE_STARTs
-            jobid=os.system(" ".join(['sbatch execute_python_script.sh', 'analysis_fit_after_run.py',cell_name,file_type,resize_diam_by,shrinkage_factor,SPINE_START,folder_]))
-            # jobid=os.system(" ".join(['python', 'analysis_fit_after_run.py',cell_name,file_type,resize_diam_by,shrinkage_factor,SPINE_START,folder_]))
+        for SPINE_START in SPINE_STARTs[1:]: #SPINE_STARTs
+            # jobid=os.system(" ".join(['sbatch execute_python_script.sh', 'analysis_fit_after_run.py',cell_name,file_type,resize_diam_by,shrinkage_factor,SPINE_START,folder_]))
+            jobid=os.system(" ".join(['python', 'analysis_fit_after_run.py',cell_name,file_type,resize_diam_by,shrinkage_factor,SPINE_START,folder_]))
 
             print(file_type)

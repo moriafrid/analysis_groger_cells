@@ -20,20 +20,21 @@ for cell_name in cells:
     dict_fit_condition={}
     for fit_condition in ['const_param','different_initial_conditions']:
         print(fit_condition)
-        for file_type in file_type2read:
+        for file_type in ['z_correct.swc','morphology.swc','hoc','ASC']:
             for SPINE_START in SPINE_STARTs:
                 passive_vals_dict= {}
                 initial_folder=folder_+folder_save+cell_name+'/fit_short_pulse/'+file_type+'_SPINE_START='+str(SPINE_START)+'/'
                 # initial_folder=folder_+folder_save+cell_name+'/fit_short_pulse/'+file_type+'_SPINE_START='+str(SPINE_START)+'/'
                 initial_folder+="/dend*"+str(round(resize_diam_by,2))+'&F_shrinkage='+str(round(shrinkage_factor,2))
                 initial_folder+='/'+fit_condition
+
                 try:
                     if fit_condition=='const_param':
                         passive_val_total=read_from_pickle(glob(initial_folder+'/RA/analysis/RA_total_errors_minimums.p')[0])
                     elif fit_condition=='different_initial_conditions':
                         passive_val_total=read_from_pickle(glob(initial_folder+'/RA_min'+str(5)+'/analysis/RA_total_errors_minimums.p')[0])
                 except:
-                    print("there isn't have RA_total_errors_minimums " +SPINE_START+initial_folder)
+                    print("there isn't have RA_total_errors_minimums in spine strart=" +SPINE_START+" "+initial_folder)
                     continue
                 passive_vals_dict['RA=120']=found(passive_val_total,120)
                 passive_vals_dict['RA=150']=found(passive_val_total,150)
