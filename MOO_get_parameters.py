@@ -37,11 +37,11 @@ print(sys.argv,flush=True)
 if len(sys.argv) != 14:
     print("the function doesn't run with sys.argv",len(sys.argv),flush=True)
     cpu_node = 1
-    cell_name= '2017_05_08_A_4-5'
+    cell_name= '2017_05_08_A_5-4'
     file_type='z_correct.swc'  #file type is just used to calculate F_factor
     passive_val={'RA':float(100),'CM':1,'RM':10000}
     passive_fit_condition='const_param'
-    passive_val_name='RA=120'
+    passive_val_name='test'
     resize_dend_by=1.0
     shrinkage_by=1.0
     SPINE_START=20
@@ -66,9 +66,10 @@ else:
     RA=float(sys.argv[4])
     generation_size = 100
     num_of_genarations = 1000
+
 data_dir= "cells_initial_information/"
 save_dir ="cells_outputs_data/"
-base2 = folder_+save_dir+cell_name+'/MOO_results_'+file_type+"/"  # folder name  _RA_free
+base2 = folder_+save_dir+cell_name+'/MOO_results/'+file_type+"/"  # folder name  _RA_free
 base2+='F_shrinkage='+str(round(shrinkage_by,2))+'_dend*'+str(round(resize_dend_by,2))
 base_save_folder=base2 + '/'+passive_fit_condition+'/'+passive_val_name+'/'
 print('base_save_folder:',base_save_folder)
@@ -365,7 +366,7 @@ def run(cell, seed=0):
             value=0.002,
             bounds=[0.000000, 0.01],
             locations=[netstims[i]],
-            reletive_strength = get_parameter(cell_name,'PSD')))#  [1, 0.1]))#[1, 0.1,0.01]))
+            reletive_strength =   [get_parameter(cell_name,'PSD',spine_num=i)]))#[1, 0.1,0.01]))
 
     # this  need to add the weight to optimization
         syn_params.append(NrnNetstimWeightParameter(
@@ -375,7 +376,7 @@ def run(cell, seed=0):
             value=0.0012,
             bounds=[0.000, 0.005],
             locations=[netstims_NMDA[i]],
-            reletive_strength = [1])) #[1, 0.1,0.01]))
+            reletive_strength = [get_parameter(cell_name,'PSD',spine_num=i)])) #[1, 0.1,0.01]))
 
 
     rec.append(ephys.recordings.CompRecording(

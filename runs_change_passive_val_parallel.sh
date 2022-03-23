@@ -1,5 +1,4 @@
 #!/bin/bash
-# Write output as following (%j is JOB_ID)
 #SBATCH -o logs/%j.out
 #SBATCH -e logs/%j.err
 #SBATCH --mem 30GB
