@@ -72,6 +72,16 @@ def get_spine_params(spine_type,cell_name=''):
         df = pd.read_excel('cells_initial_information/Data2.xlsx')
         parameter_cv=df[df['cell_name']==spine_type].reset_index()
         return parameter_cv['neck_length'],parameter_cv['neck_diam'],get_R_head(parameter_cv)*2
+def get_sec_and_seg(cell_name,spine_num=None):
+    df = pd.read_excel('cells_outputs_data/'+cell_name+'/synaptic_location_seperate.xlsx',index_col=0)
+    if not spine_num is None:
+        return df[str(spine_num)]['sec_name'],df[str(spine_num)]['seg_num']
+    else:
+        sec,seg=[],[]
+        for i in range(get_n_spinese(cell_name)):
+            sec.append(df[str(i)]['sec_name'])
+            seg.append(df[str(i)]['seg_num'])
+        return sec,seg
 if __name__ == '__main__':
     cell_name='2017_03_04_A_6-7'
     get_parameter(cell_name,'PSD')

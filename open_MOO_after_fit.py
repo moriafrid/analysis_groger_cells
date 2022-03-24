@@ -16,13 +16,14 @@ signal.signal(signal.SIGSEGV, SIGSEGV_signal_arises)
 
 
 class OPEN_RES():
-    def __init__(self, res_pos='/ems/elsc-labs/segev-i/moria.fridman/project/data_analysis_git/data_analysis/test_moo/groger_spine/MOO_opt_folder_same_w_peel_syn_spines_featues_cm_g_pas_first_seed_123456/05_08_A_01062017/run_74/'):
+    def __init__(self, res_pos):
         from extraClasses import NrnSegmentSomaDistanceScaler_, NrnSectionParameterPas, neuron_start_time, \
             EFeatureImpadance, EFeaturePeak, EFeaturePeakTime, EFeatureRDSM, NrnNetstimWeightParameter, \
             SweepProtocolRin2
         self.res_pos = res_pos
         self.hall = hall = pickle.load(open(self.res_pos + 'hall_of_fame.p', 'rb'))
-        self.morph_path = hall['model'].split('morphology')[1].split('\n')[1].strip() # remove spaces
+        # self.morph_path = hall['model'].split('morphology')[1].split('\n')[1].strip() # remove spaces
+        self.morph_path = hall['model'].split('\n')[2].strip() # remove spaces
         self.fixed_params_res = dict()
         self.optimization_params_res = dict()
         for line in hall['model'].split('params:')[1].split('\n'):
@@ -70,13 +71,12 @@ class OPEN_RES():
     def get_model(self):
         return self.hoc_model
 
-    def create_synapse(self, sec, pos, number = 0,
-                       neck_diam = 0.25, neck_length = 1.35,
-                       head_diam = 0.944, hall_of_fame_num = 0, netstim=None):
+    def create_synapse(self, sec, pos, number = 0,params={"NECK_DIAM" : 0.25, "NECK_LENGHT":1.35,"HEAD_DIAM" : 0.944,},
+                       hall_of_fame_num = 0, netstim=None):
 
         spine = self.create_spine(sec, pos, number = number,
-                       neck_diam = neck_diam, neck_length = neck_length,
-                       head_diam = head_diam)
+                       neck_diam = params["NECK_DIAM"], neck_length = params["NECK_LENGHT"],
+                       head_diam = params["HEAD_DIAM"])
         syn_obj = self._add_syn_on_sec(spine[1], 1, hall_of_fame_num=hall_of_fame_num, netstim=netstim)
         return spine, syn_obj
 
@@ -134,6 +134,4 @@ class OPEN_RES():
     def destroy(self):
         pass
 
-res = OPEN_RES()
-print(res.get_model())
-print(res.res_pos)
+
