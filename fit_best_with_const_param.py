@@ -14,7 +14,7 @@ import signal
 import os
 do_calculate_F_factor=True
 if len(sys.argv) != 7:
-   cell_name= '2017_03_04_A_6-7'
+   cell_name= '2017_05_08_A_5-4'
    file_type='z_correct.swc'
    resize_diam_by=1.0
    shrinkage_factor=1.0

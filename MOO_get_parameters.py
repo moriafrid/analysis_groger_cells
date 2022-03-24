@@ -622,7 +622,8 @@ def run(cell, seed=0):
         "hall_of_fame": hall_of_fame,
         "model": model.__str__(),
         "syn_location":synapses_locations,
-        "spine": spine_properties
+        "spine": spine_properties,
+        "F_factor":F_factor
     }, open(base_save_folder + "hall_of_fame.p", "wb"))
 
     pickle.dump({
@@ -795,7 +796,6 @@ result_R_neck_m_ohm=[]
 for i in range(get_n_spinese(cell_name)):
     spine_properties[i]=get_building_spine(cell_name,i)
     result_R_neck_m_ohm.append((spine_properties[i]['NECK_LENGHT'] * 4.0 * passive_val['RA'])/(np.pi*(spine_properties[i]['NECK_DIAM']/2)**2) *100.0 *1e-6)# 0.25 is neck_diam
-
 spine_properties['F_factor']=F_factor
 
 #################################33
