@@ -34,11 +34,7 @@ create_folder_dirr(folder_save)
 for model_place in glob(folder_data+'*'):
     type=model_place.split('/')[-1]
     if type=='test': continue
-    if len(secs)>1:
-        fig = plt.figure(figsize=(10,10))
-        axs = fig.subplot_mosaic("""AB""")
-    else:
-        axs = fig.subplot_mosaic("""A""")
+
     add_figure('AMPA and NMDA impact on voltage ' + type,'mV', 'mS')
     for i in tqdm(range(10)):
         loader = OPEN_RES(res_pos=model_place + '/')
@@ -66,8 +62,14 @@ for model_place in glob(folder_data+'*'):
         names=["A","B"]
 
         figure, axis = plt.subplots(1, len(V_spine))
-        if len(spines) == 1:
+        if len(V_spine) == 1:
             axis = axis[..., np.newaxis]
+        if len(secs)>1:
+            fig = plt.figure(figsize=(10,10))
+            axs = fig.subplot_mosaic("""AB""")
+        else:
+            axs = fig.subplot_mosaic("""A""")
+
         time=np.array(time)[1900:]
 
         for i in range(len(V_spine)):
