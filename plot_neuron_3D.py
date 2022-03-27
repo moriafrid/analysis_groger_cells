@@ -8,12 +8,16 @@ signal.signal(signal.SIGSEGV, SIGSEGV_signal_arises)
 from glob import glob
 from open_pickle import read_from_pickle
 import sys
-if len(sys.argv) != 5:
+if len(sys.argv) != 6:
+    print("sys.argv not running and with length",len(sys.argv))
     cells= ['2017_05_08_A_4-5','2017_05_08_A_5-4','2017_03_04_A_6-7']
+    file_type='new.ASC'
     folder_='/ems/elsc-labs/segev-i/moria.fridman/project/analysis_groger_cells'
 else:
+    print("sys.argv not running and with length",len(sys.argv))
     cells = [sys.argv[1],sys.argv[2],sys.argv[3]]
-    folder_=sys.argv[4]
+    file_type=sys.argv[4]
+    folder_=sys.argv[5]
 print(len(sys.argv),sys.argv,flush=True)
 folder_data=folder_+'/cells_initial_information/'
 folder_save=folder_+'/cells_outputs_data/'
@@ -80,12 +84,13 @@ def plot_morphology(cell_dir,dots_dir,syn_pose_list,with_axon=False, save_place=
 
 if __name__=='__main__':
     for cell_name in cells:
+        if len(glob(folder_data+cell_name+'/*'+file_type))<1:continue
         xyz=[]
         for i in range(get_n_spinese(cell_name)):
             xyz.append(get_spine_xyz(cell_name,i))
         cell_dir=glob(folder_data+cell_name+'/*ASC')[0]
         dict_dots_dir=folder_save+cell_name+'/synapses_neuron_morphology.p'
-        plot_morphology(cell_dir,dict_dots_dir,xyz,with_axon=False, save_place=folder_save+cell_name+'/neurom morphology')
+        plot_morphology(cell_dir,dict_dots_dir,xyz,with_axon=False, save_place=folder_save+cell_name+'/neurom morphology'+file_type)
 
 
 

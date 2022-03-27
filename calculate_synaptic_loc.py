@@ -10,14 +10,18 @@ from extra_function import load_ASC,SIGSEGV_signal_arises
 from read_spine_properties import get_spine_xyz,get_n_spinese, get_spine_part
 signal.signal(signal.SIGSEGV, SIGSEGV_signal_arises)
 
-if len(sys.argv) != 6:
+if len(sys.argv) != 7:
+    print("sys.argv not running and with length",len(sys.argv))
     cells= ['2017_05_08_A_4-5','2017_05_08_A_5-4','2017_03_04_A_6-7']
+    file_type='new.ASC'
     folder_='/ems/elsc-labs/segev-i/moria.fridman/project/analysis_groger_cells'
     with_plot=True
 else:
+    print("sys.argv is correct and running")
     cells = [sys.argv[1],sys.argv[2],sys.argv[3]]
-    folder_=sys.argv[4]
-    with_plot=eval(sys.argv[5])
+    file_type=sys.argv[4]
+    folder_=sys.argv[5]
+    with_plot=eval(sys.argv[6])
 folder_data=folder_+'/cells_initial_information/'
 folder_save=folder_+'/cells_outputs_data/'
 
@@ -137,12 +141,12 @@ def synaptic_loc(cell_dir,syn_poses_list,with_plot=False, part='all', save_place
     dict =  { 'sec_name':sec_name,'sec_num':sec_num,'seg_num':seg_num,'place_name':dends_name,'dist_from_soma':dis_from_soma,'dist':dists, 'part':part}
     print(dict)
 
-    try_save_dict(dict,folder_save+cell_name+'/','synaptic_location')
+    try_save_dict(dict,folder_save+cell_name+'/','synaptic_location'+file_type)
     for i in range(len(syn_poses_list)):
         dict2[str(i)] = {'sec_name':sec_name[i],'sec_num':sec_num[i],'seg_num':seg_num[i],'place_name':dends_name[i],'dist_from_soma':dis_from_soma[i],'dist':dists[i], 'part':part}
         print(dict2)
 
-    try_save_dict(dict2,folder_save+cell_name+'/','synaptic_location_seperate')
+    try_save_dict(dict2,folder_save+cell_name+'/','synaptic_location_seperate'+file_type)
     return dict,dict2
 
 def syn_dis_from_soma(cell,syn_loc):
@@ -177,15 +181,16 @@ if __name__=='__main__':
     for cell_name in cells:
         xyz,dend_part=[],[]
     # for cell_name in ['2017_05_08_A_5-4']:
-        dir=glob(folder_data+cell_name+'/*ASC')[0]
+        if len(glob(folder_data+cell_name+'/*'+file_type))<1:continue
+        dir=glob(folder_data+cell_name+'/*'+file_type)[0]
         for i in range(get_n_spinese(cell_name)):
             print('one syn dict:',dict)
             xyz.append(list(get_spine_xyz(cell_name,i)))
             dend_part.append(get_spine_part(cell_name,i))
-        dict1,dict2=synaptic_loc(dir,xyz, part='all', save_place=folder_save+cell_name+'/synapses',with_plot=with_plot)
+        dict1,dict2=synaptic_loc(dir,xyz, part='all', save_place=folder_save+cell_name+'/synapses'+file_type,with_plot=with_plot)
         dict3[cell_name]=dict1
         for key in dict2.keys():
             dict4[cell_name+key]=dict2[key]
         print('more then one syn dict',cell_name,[xyz])
-    try_save_dict(dict3,folder_save,'synaptic_location')
-    try_save_dict(dict4,folder_save,'synaptic_location_seperate')
+    try_save_dict(dict3,folder_save,'synaptic_location'+file_type)
+    try_save_dict(dict4,folder_save,'synaptic_location_seperate'+file_type)

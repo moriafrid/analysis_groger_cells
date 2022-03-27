@@ -8,14 +8,16 @@ from glob import glob
 from extra_function import create_folder_dirr,SIGSEGV_signal_arises,load_ASC,load_hoc,load_swc
 import sys
 
-if len(sys.argv) != 6:
+if len(sys.argv) != 7:
+    print("sys.argv not running and with length",len(sys.argv))
     cell_name= '2017_05_08_A_5-4'
     # cell_name= '2017_03_04_A_6-7'
-    file_type2read= 'z_correct.swc'
+    file_type2read= 'new.hoc'
     folder_='/ems/elsc-labs/segev-i/moria.fridman/project/analysis_groger_cells/'
     data_dir= "cells_initial_information"
     save_dir ="cells_outputs_data"
 else:
+    print("sys.argv is correct and running")
     cell_name = sys.argv[1]
     file_type2read=sys.argv[2]
     folder_= sys.argv[3] #'/ems/elsc-labs/segev-i/moria.fridman/project/analysis_groger_cells/'
@@ -51,9 +53,9 @@ def track_one(terminal):
 # build the model
 ######################################################
 # h.load_file("/ems/elsc-labs/segev-i/moria.fridman/project/analysis_groger_cells/cells_initial_information/2017_03_04_A_6-7/03_24_A_11052017_Splice_Shrink_zvalue_LABEL_Bluecell_Zcorrected_by_Gregor.hoc")
-if file_type2read=='ASC':
+if 'ASC' in file_type2read:
     cell=load_ASC(cell_file)
-elif file_type2read=='hoc':
+elif 'hoc'in file_type2read:
     cell=load_hoc(cell_file)
 elif 'swc' in file_type2read:
     cell=load_swc(cell_file)

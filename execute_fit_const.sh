@@ -9,7 +9,7 @@
 #SBATCH --mem 4GB
 ##SBATCH -c 1
 ##SBATCH -t 1-0
-#SBATCH --exclude=ielsc-48,ielsc-49,ielsc-44,ielsc-45
+#SBATCH --exclude=ielsc-48,ielsc-49,ielsc-44,ielsc-45,,ielsc-46,ielsc-42
 
 echo "the number parameters the sbatch get is "$#
 
@@ -18,9 +18,6 @@ if [[ $# -lt 1 ]] ; then
     echo "Wrong usage. not have enought parameters (must receive script)"
     exit 1
 fi
-
-script=$1
-shift 1
 
 args=$@
 shift $#
@@ -38,4 +35,4 @@ fi
 
 path=$(dirname $SCRIPT_PATH)
 echo "Running: python3 $path/$script $args"
-python3 $path/$script $args
+python3 $path/$fit_best_with_const_param.py $args
