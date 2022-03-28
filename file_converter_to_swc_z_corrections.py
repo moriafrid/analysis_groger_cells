@@ -3,9 +3,9 @@ import numpy as np
 import sys
 from glob import glob
 if len(sys.argv) != 2:
-    cell_name="2017_05_08_A_5-4"
+    # cell_name="2017_05_08_A_5-4"
     # cell_name="2017_05_08_A_4-5"
-    # cell_name="2017_03_04_A_6-7"
+    cell_name="2017_03_04_A_6-7"
     folder_="/ems/elsc-labs/segev-i/moria.fridman/project/analysis_groger_cells/cells_initial_information/"
 else:
     cell_name=sys.argv[1]
@@ -43,11 +43,23 @@ def instantiate_swc(filename):
 # sp.show(0)  # show diameters
 # a=1
 pass
-def run(id, prev_id,sec,type, parent_point, print_=True):
+max_dz = 40
+def run(id, prev_id,sec,type, parent_point=np.array([0, 0, 0]), print_=True):
     sec_points = np.array([list(i) for i in sec.psection()['morphology']['pts3d']])[:,:3]
     sec_diams = np.array([list(i) for i in sec.psection()['morphology']['pts3d']])[:,3]
     if print_:
         print(sec.name(), len(sec.children()))
+    acc_z_diff = 0
+    for i in range(1, len(sec_points)):
+        sec_points[i][2] -= acc_z_diff
+        if abs(sec_points[i][2]-sec_points[i-1][2])>max_dz:
+            if sec_points[i][2]-sec_points[i-1][2]>0:
+                acc_z_diff+=sec_points[i][2]-sec_points[i-1][2]-max_dz
+                sec_points[i][2] -= sec_points[i][2]-sec_points[i-1][2]-max_dz
+            else:
+                acc_z_diff+=sec_points[i][2]-sec_points[i-1][2]+max_dz
+                sec_points[i][2]-= sec_points[i][2]-sec_points[i-1][2]+max_dz
+
     sec_points -= sec_points[0] - parent_point
     for i, point in enumerate(sec_points):
         swc_file.write(str(id)+' '+str(type)+' '+
@@ -77,11 +89,13 @@ swc_file.write('1 1 '+
                ' '.join(soma_points[:3].round(4).astype(str).tolist())+
                ' '+str(round(cell.soma[0].diam/2.0, 4))+' -1\n')
 
-def get_closest_z(soma_points, sec_point, soma_r):
-    dists = [[np.linalg.norm(point[:3]- sec_point[:3]), point[:3]] for point in soma_points]
-    dists.sort()
-    factor = soma_r/dists[0][0]
-    return dists[0][1] + (dists[0][1] - sec_point[:3])* factor
+def get_closest_z(soma_point, sec_point, soma_r):
+    # dists = [[np.linalg.norm(point[:3]- sec_point[:3]), point[:3]] for point in soma_points]
+    # dists.sort()
+    # factor = soma_r/dists[0][0]
+    vec = (-soma_point + sec_point[:3])
+    vec/=np.linalg.norm(vec)
+    return soma_point + vec * soma_r
 
 id=2
 try:cell.axon
@@ -104,8 +118,8 @@ for child in cell.soma[0].children():
             type=3
     if type is None:
         raise Exception('no type chosen')
-    parent_point = get_closest_z(np.array([list(i) for i in cell.soma[0].psection()['morphology']['pts3d']]),
-                                 np.array(child.psection()['morphology']['pts3d'][0]),
+    parent_point = get_closest_z(soma_points[:3],
+                                 np.array(child.psection()['morphology']['pts3d'][0])[:3],
                                  soma_r = round(cell.soma[0].diam/2.0, 4))
     id=run(id,1,child,type, print_=type==2, parent_point=parent_point)
 
@@ -116,3 +130,58 @@ print (cell)
 sp = h.PlotShape()
 sp.show(0)  # show diameters
 a=1
+
+# check the results:
+from extra_function import load_ASC,SIGSEGV_signal_arises,load_swc
+from glob import glob
+import signal
+signal.signal(signal.SIGSEGV, SIGSEGV_signal_arises)
+cell=None
+
+for type in ['correct.swc']:
+    print(glob('cells_initial_information/2017*6-7/*'+type)[0])
+    cell=load_swc(glob('cells_initial_information/2017*6-7/*'+type)[0])
+import numpy as np
+import matplotlib.pyplot as plt
+def get_z_jump(sec, prev_z):
+    res = []
+    for z in np.array([list(i) for i in sec.psection()['morphology']['pts3d']])[:,2]:
+        res.append(abs(z-prev_z))
+        prev_z=z
+    for child in sec.children():
+        res+=get_z_jump(child, prev_z)
+    return res
+def get_jump(sec, prev):
+    res_x,res_y,res_z = [],[],[]
+    print(prev)
+    prev_x,prev_y,prev_z=np.array(prev)
+    for x,y,z in zip([np.array([list(i) for i in sec.psection()['morphology']['pts3d']])[:,0],np.array([list(i) for i in sec.psection()['morphology']['pts3d']])[:,1],np.array([list(i) for i in sec.psection()['morphology']['pts3d']])[:,2]]):
+        res_x.append(abs(x-prev_x))
+        prev_x=x
+        res_y.append(abs(y-prev_y))
+        prev_y=y
+        res_z.append(abs(z-prev_z))
+        prev_z=z
+    prev=[prev_x,prev_y,prev_z]
+    for child in sec.children():
+        result=get_jump(child, prev)
+        res_x+=result[0]
+        res_y+=result[1]
+        res_z+=result[2]
+
+    return [res_x,res_y,res_z]
+res=[]
+mean_soma_z = np.array(cell.soma.psection()['morphology']['pts3d'])[:,2].mean()
+for child in cell.soma.children():
+    res+=get_z_jump(child, mean_soma_z)
+plt.scatter([0]*len(res), res)
+
+
+mean_soma = np.array(cell.soma.psection()['morphology']['pts3d'])[:,:3].mean(axis=0)
+res_x,res_y,res_z = [],[],[]
+for child in cell.soma.children():
+    result=get_jump(child, mean_soma)
+    res_x+=result[0]
+    res_y+=result[1]
+    res_z+=result[2]
+plt.scatter([0]*len(res), res)
