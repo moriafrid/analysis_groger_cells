@@ -1,10 +1,7 @@
 import os
-import pandas as pd
-from open_pickle import read_from_pickle
-from glob import glob
 from passive_val_function import *
-import pickle
 from read_passive_parameters_csv import get_passive_parameter
+
 
 folder_="/ems/elsc-labs/segev-i/moria.fridman/project/analysis_groger_cells/"
 folder_data="cells_initial_information/"
@@ -14,7 +11,6 @@ cells=["2017_05_08_A_5-4", "2017_05_08_A_4-5","2017_03_04_A_6-7"]
 file_type2read=['z_correct.swc','morphology.swc','hoc','ASC']
 resize_diam_by=1.0
 shrinkage_factor=1.0
-SPINE_STARTs=[str(10),str(20),str(60)]
 SPINE_START=str(20)
 i=0
     # os.system('python run_analysis_fit_after_run.py')
