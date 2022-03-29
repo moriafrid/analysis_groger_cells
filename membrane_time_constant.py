@@ -8,7 +8,7 @@ from add_figure import add_figure
 def linear(x, m,c):
     return m*x+c
 from extra_function import create_folders_list
-folder_='/ems/elsc-labs/segev-i/moria.fridman/project/analysis_groger_cells/cells_outputs_data/'
+folder_='/ems/elsc-labs/segev-i/moria.fridman/project/analysis_groger_cells/cells_outputs_data_short/'
 for cell_name in ['2017_05_08_A_4-5','2017_05_08_A_5-4','2017_03_04_A_6-7']:
     plt.close()
     plt.figure()

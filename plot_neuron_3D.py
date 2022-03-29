@@ -20,7 +20,7 @@ else:
     folder_=sys.argv[5]
 print(len(sys.argv),sys.argv,flush=True)
 folder_data=folder_+'/cells_initial_information/'
-folder_save=folder_+'/cells_outputs_data/'
+folder_save=folder_+'/cells_outputs_data_short/'
 
 def plot_morphology(cell_dir,dots_dir,syn_pose_list,with_axon=False, save_place=''):
     #syn_pose should be (x,y,z) coordinates

@@ -13,7 +13,7 @@ else:
 
 print("Remaind to choose the right syn")
 folder_data="cells_initial_information"
-folder_save="cells_outputs_data"
+folder_save="cells_outputs_data_short"
 cells=read_from_pickle(cells_name_place)
 for cell_name in cells:
     command="sbatch execute_main.sh"

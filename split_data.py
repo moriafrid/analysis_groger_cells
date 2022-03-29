@@ -16,7 +16,7 @@ from spine_classes import channel2take
 def split2phenomena(cell_name,inputs_folder, outputs_folder):
 	"""
 	important_outputs_folder: <repository>/cells_important_outputs_data/<cell_name>
-	all_outputs_folder: <repository>/cells_outputs_data/<cell_name>
+	all_outputs_folder: <repository>/cells_outputs_data_short/<cell_name>
 	"""
 	# base_folder = os.path.join(outputs_folder,'/data/',  'electrophysio_records/')
 	# base_external_folder = os.path.join(outputs_folder, '/data/')

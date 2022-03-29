@@ -23,7 +23,7 @@ else:
     folder_=sys.argv[5]
     with_plot=eval(sys.argv[6])
 folder_data=folder_+'/cells_initial_information/'
-folder_save=folder_+'/cells_outputs_data/'
+folder_save=folder_+'/cells_outputs_data_short/'
 
 def synaptic_loc(cell_dir,syn_poses_list,with_plot=False, part='all', save_place=''):
     dict2={}

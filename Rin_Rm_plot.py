@@ -42,7 +42,7 @@ folder_=''
 print(name, passive_val)
 print(name,passive_val)
 data_dir= "cells_initial_information/"
-save_dir ="cells_outputs_data/"
+save_dir = "cells_outputs_data_short/"
 folder_data=folder_+save_dir+cell_name
 cell_file = glob(folder_+data_dir+cell_name+"/*"+file_type2read)[0]
 print("cell file is " +cell_file)

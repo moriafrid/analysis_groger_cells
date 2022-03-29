@@ -40,13 +40,13 @@ if __name__ == '__main__':
     if len(sys.argv) != 5:
         cell_name= '2017_05_08_A_5-4'
         folder_='/ems/elsc-labs/segev-i/moria.fridman/project/analysis_groger_cells/'
-        data_dir= "cells_outputs_data"
-        save_dir ="cells_outputs_data"
+        data_dir= "cells_outputs_data_short"
+        save_dir = "cells_outputs_data_short"
     else:
         cell_name = sys.argv[1]
         folder_= sys.argv[2] #'/ems/elsc-labs/segev-i/moria.fridman/project/analysis_groger_cells/'
         data_dir = sys.argv[3] #cells_initial_information
-        save_dir =sys.argv[4] #cells_outputs_data
+        save_dir =sys.argv[4] #cells_outputs_data_short
     folder_data=    folder_+data_dir+'/'+cell_name+'/data/electrophysio_records/syn/syn.p'
 
     V_units,t_units=read_from_pickle(folder_data)

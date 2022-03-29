@@ -24,7 +24,7 @@ class TreeViewer():
             self.model=load_ASC(self.cell_file)
         elif cell_type=='hoc':
             self.model=load_hoc(self.cell_file)
-        dict_syn=pd.read_excel("cells_outputs_data/synaptic_location_seperate.xlsx",index_col=0)
+        dict_syn=pd.read_excel("cells_outputs_data_short/synaptic_location_seperate.xlsx",index_col=0)
         self.syn_section=[]
         for i in range(get_n_spinese(self.cell_name)):
             spine_seg=dict_syn[self.cell_name+str(i)]['seg_num']

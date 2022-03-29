@@ -60,14 +60,14 @@ plt.close('all')
 
 
 #dim-dis
-folder_='cells_outputs_data/'+cell_name
+folder_='cells_outputs_data_short/'+cell_name
 if compare_between_types:
     fig1 = plt.figure(figsize=(10,10))
     axs1 = fig1.subplot_mosaic("""AB
     CD""")
     for place,file_type in zip(["A","B","C","D"],file_types):
         show_directory(axs1[place], file_type+' diam-dis',folder_+'/data/cell_properties/diam_dis/'+file_type+'/diam-dis.png')
-        # show_text('cells_outputs_data/'+cell_name+'/data/cell_properties/diam_dis/'+file_type+'/cell_propertis.txt')
+        # show_text('cells_outputs_data_short/'+cell_name+'/data/cell_properties/diam_dis/'+file_type+'/cell_propertis.txt')
 if show_total_results:
     #cell morphology and properties:
     fig = plt.figure(figsize=(10,10))

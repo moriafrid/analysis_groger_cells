@@ -63,7 +63,7 @@ else:
     profile = sys.argv[11]
     RA=float(sys.argv[3])
 data_dir= "cells_initial_information/"
-save_dir ="cells_outputs_data/"
+save_dir = "cells_outputs_data_short/"
 RDSM_objective_file = folder_+save_dir+cell_name+"/data/electrophysio_records/syn/mean_syn.p"
 short_pulse_parameters_file=folder_+save_dir+cell_name+'/data/electrophysio_records/short_pulse_parameters.p'
 morphology_dirr =glob(folder_+data_dir+cell_name+'/*'+file_type)[0]

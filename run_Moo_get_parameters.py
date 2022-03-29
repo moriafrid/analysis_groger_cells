@@ -6,7 +6,7 @@ import pandas as pd
 from read_passive_parameters_csv import get_passive_parameter
 folder_="/ems/elsc-labs/segev-i/moria.fridman/project/analysis_groger_cells/"
 folder_data="cells_initial_information/"
-folder_save="cells_outputs_data/"
+folder_save="cells_outputs_data_short/"
 dataset_jobs_folder='/running'
 spine_type='mouse_spine'
 in_parallel=False

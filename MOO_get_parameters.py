@@ -68,7 +68,7 @@ else:
     num_of_genarations = 1000
 
 data_dir= "cells_initial_information/"
-save_dir ="cells_outputs_data/"
+save_dir = "cells_outputs_data_short/"
 base2 = folder_+save_dir+cell_name+'/MOO_results/'+file_type+"/"  # folder name  _RA_free
 base2+='F_shrinkage='+str(round(shrinkage_by,2))+'_dend*'+str(round(resize_dend_by,2))
 base_save_folder=base2 + '/'+passive_fit_condition+'/'+passive_val_name+'/'

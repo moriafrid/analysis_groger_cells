@@ -15,14 +15,14 @@ if len(sys.argv) != 7:
     file_type2read= 'new.hoc'
     folder_='/ems/elsc-labs/segev-i/moria.fridman/project/analysis_groger_cells/'
     data_dir= "cells_initial_information"
-    save_dir ="cells_outputs_data"
+    save_dir = "cells_outputs_data_short"
 else:
     print("sys.argv is correct and running")
     cell_name = sys.argv[1]
     file_type2read=sys.argv[2]
     folder_= sys.argv[3] #'/ems/elsc-labs/segev-i/moria.fridman/project/analysis_groger_cells/'
     data_dir = sys.argv[4] #cells_initial_information
-    save_dir =sys.argv[5] #cells_outputs_data
+    save_dir =sys.argv[5] #cells_outputs_data_short
 print(len(sys.argv))
 print(cell_name, folder_+data_dir+"/"+cell_name+"/*"+file_type2read)
 cell_file = glob(folder_+data_dir+"/"+cell_name+"/*"+file_type2read)[0]

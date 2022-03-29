@@ -3,9 +3,9 @@ import numpy as np
 import sys
 from glob import glob
 if len(sys.argv) != 2:
-    # cell_name="2017_05_08_A_5-4"
+    cell_name="2017_05_08_A_5-4"
     # cell_name="2017_05_08_A_4-5"
-    cell_name="2017_03_04_A_6-7"
+    # cell_name="2017_03_04_A_6-7"
     folder_="/ems/elsc-labs/segev-i/moria.fridman/project/analysis_groger_cells/cells_initial_information/"
 else:
     cell_name=sys.argv[1]
@@ -43,7 +43,7 @@ def instantiate_swc(filename):
 # sp.show(0)  # show diameters
 # a=1
 pass
-max_dz = 40
+max_dz = 60
 def run(id, prev_id,sec,type, parent_point=np.array([0, 0, 0]), print_=True):
     sec_points = np.array([list(i) for i in sec.psection()['morphology']['pts3d']])[:,:3]
     sec_diams = np.array([list(i) for i in sec.psection()['morphology']['pts3d']])[:,3]
@@ -131,57 +131,8 @@ sp = h.PlotShape()
 sp.show(0)  # show diameters
 a=1
 
-# check the results:
-from extra_function import load_ASC,SIGSEGV_signal_arises,load_swc
-from glob import glob
-import signal
-signal.signal(signal.SIGSEGV, SIGSEGV_signal_arises)
-cell=None
-
-for type in ['correct.swc']:
-    print(glob('cells_initial_information/2017*6-7/*'+type)[0])
-    cell=load_swc(glob('cells_initial_information/2017*6-7/*'+type)[0])
-import numpy as np
-import matplotlib.pyplot as plt
-def get_z_jump(sec, prev_z):
-    res = []
-    for z in np.array([list(i) for i in sec.psection()['morphology']['pts3d']])[:,2]:
-        res.append(abs(z-prev_z))
-        prev_z=z
-    for child in sec.children():
-        res+=get_z_jump(child, prev_z)
-    return res
-def get_jump(sec, prev):
-    res_x,res_y,res_z = [],[],[]
-    print(prev)
-    prev_x,prev_y,prev_z=np.array(prev)
-    for x,y,z in zip([np.array([list(i) for i in sec.psection()['morphology']['pts3d']])[:,0],np.array([list(i) for i in sec.psection()['morphology']['pts3d']])[:,1],np.array([list(i) for i in sec.psection()['morphology']['pts3d']])[:,2]]):
-        res_x.append(abs(x-prev_x))
-        prev_x=x
-        res_y.append(abs(y-prev_y))
-        prev_y=y
-        res_z.append(abs(z-prev_z))
-        prev_z=z
-    prev=[prev_x,prev_y,prev_z]
-    for child in sec.children():
-        result=get_jump(child, prev)
-        res_x+=result[0]
-        res_y+=result[1]
-        res_z+=result[2]
-
-    return [res_x,res_y,res_z]
-res=[]
-mean_soma_z = np.array(cell.soma.psection()['morphology']['pts3d'])[:,2].mean()
-for child in cell.soma.children():
-    res+=get_z_jump(child, mean_soma_z)
-plt.scatter([0]*len(res), res)
 
 
-mean_soma = np.array(cell.soma.psection()['morphology']['pts3d'])[:,:3].mean(axis=0)
-res_x,res_y,res_z = [],[],[]
-for child in cell.soma.children():
-    result=get_jump(child, mean_soma)
-    res_x+=result[0]
-    res_y+=result[1]
-    res_z+=result[2]
-plt.scatter([0]*len(res), res)
+
+
+

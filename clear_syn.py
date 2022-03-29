@@ -14,13 +14,13 @@ from scipy.signal import find_peaks
 if len(sys.argv) != 5:
     cell_name= '2017_03_04_A_6-7'
     folder_='/ems/elsc-labs/segev-i/moria.fridman/project/analysis_groger_cells/'
-    data_dir= "cells_outputs_data"
-    save_dir ="cells_outputs_data"
+    data_dir= "cells_outputs_data_short"
+    save_dir = "cells_outputs_data_short"
 else:
     cell_name = sys.argv[1]
     folder_= sys.argv[2] #'/ems/elsc-labs/segev-i/moria.fridman/project/analysis_groger_cells/'
     data_dir = sys.argv[3] #cells_initial_information
-    save_dir =sys.argv[4] #cells_outputs_data
+    save_dir =sys.argv[4] #cells_outputs_data_short
 folder_data=    folder_+data_dir+'/'+cell_name+'/data/electrophysio_records/syn/syn.p'
 folder_save=folder_+save_dir+'/'+cell_name+'/data/electrophysio_records/clear_syn/' #(path)
 create_folder_dirr(folder_save)

@@ -30,10 +30,10 @@ else:
     resize_diam_by = float(sys.argv[4]) #how much the cell sweel during the electrophisiology records
     shrinkage_factor =float(sys.argv[5]) #how much srinkage the cell get between electrophysiology record and LM
     SPINE_START = int(sys.argv[6])
-    folder_= sys.argv[7] #'/ems/elsc-labs/segev-i/moria.fridman/project/analysis_groger_cells/cells_outputs_data'
+    folder_= sys.argv[7] #'/ems/elsc-labs/segev-i/moria.fridman/project/analysis_groger_cells/cells_outputs_data_short'
 
 data_dir= "cells_initial_information/"
-save_dir ="cells_outputs_data/"
+save_dir = "cells_outputs_data_short/"
 print(folder_+save_dir+cell_name+'/data/electrophysio_records/short_pulse/mean_short_pulse_with_parameters.p')
 short_pulse_file=glob(folder_+save_dir+cell_name+'/data/electrophysio_records/short_pulse/mean_short_pulse_with_parameters.p')[0]
 print(folder_+data_dir+cell_name+'/*'+file_type)

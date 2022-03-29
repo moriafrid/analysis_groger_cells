@@ -8,10 +8,10 @@ from extra_function import create_folders_list
 import sys
 if len(sys.argv)!=5:
     cells= ['2017_05_08_A_4-5','2017_05_08_A_5-4','2017_03_04_A_6-7']
-    folder_='/ems/elsc-labs/segev-i/moria.fridman/project/analysis_groger_cells/cells_outputs_data/'
+    folder_='/ems/elsc-labs/segev-i/moria.fridman/project/analysis_groger_cells/cells_outputs_data_short/'
 else:
     cells = [sys.argv[1],sys.argv[2],sys.argv[3]]
-    folder_=sys.argv[4]+'/cells_outputs_data/'
+    folder_=sys.argv[4]+'/cells_outputs_data_short/'
 def linear(x, m,c):
     return m*x+c
 def calculate_tau_m(short_pulse_path,folder_save):

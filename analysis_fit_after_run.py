@@ -26,12 +26,12 @@ else:
     SPINE_START=int(sys.argv[5])
     folder_= sys.argv[6] #'/ems/elsc-labs/segev-i/moria.fridman/project/analysis_groger_cells/'
     print('the len of sys.argv is correct and running',flush=True)
-save_dir ="cells_outputs_data/"
+save_dir = "cells_outputs_data_short/"
 
 initial_folder=folder_+save_dir+cell_name+'/fit_short_pulse/'+file_type+'_SPINE_START='+str(SPINE_START)+'/'
 initial_folder+="/dend*"+str(round(resize_diam_by,2))+'&F_shrinkage='+str(round(shrinkage_factor,2))
 
-# location='/ems/elsc-labs/segev-i/moria.fridman/project/analysis_groger_cells/cells_outputs_data/2017_05_08_A_4-5/fit_short_pulse_ASC/dend*1.0&F_shrinkage=1.0/basic_fit'
+# location='/ems/elsc-labs/segev-i/moria.fridman/project/analysis_groger_cells/cells_outputs_data_short/2017_05_08_A_4-5/fit_short_pulse_ASC/dend*1.0&F_shrinkage=1.0/basic_fit'
 # datas2=glob(location+'/*/final_result*.p')
 def analysis_fit(location):
     save_folder=location+'/analysis'
