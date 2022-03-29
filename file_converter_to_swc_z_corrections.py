@@ -3,13 +3,12 @@ import numpy as np
 import sys
 from glob import glob
 if len(sys.argv) != 2:
-    cell_name="2017_05_08_A_5-4"
+    # cell_name="2017_05_08_A_5-4"
     # cell_name="2017_05_08_A_4-5"
-    # cell_name="2017_03_04_A_6-7"
-    folder_="/ems/elsc-labs/segev-i/moria.fridman/project/analysis_groger_cells/cells_initial_information/"
+    cell_name="2017_03_04_A_6-7"
 else:
     cell_name=sys.argv[1]
-    folder_=sys.argv[2]+'/'+sys.argv[3]
+folder_="cells_initial_information/"
 
 h.load_file("import3d.hoc")
 h.load_file("nrngui.hoc")
@@ -43,7 +42,7 @@ def instantiate_swc(filename):
 # sp.show(0)  # show diameters
 # a=1
 pass
-max_dz = 60
+max_dz = 40
 def run(id, prev_id,sec,type, parent_point=np.array([0, 0, 0]), print_=True):
     sec_points = np.array([list(i) for i in sec.psection()['morphology']['pts3d']])[:,:3]
     sec_diams = np.array([list(i) for i in sec.psection()['morphology']['pts3d']])[:,3]

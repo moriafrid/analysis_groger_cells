@@ -4,10 +4,10 @@ import sys
 from glob import glob
 if len(sys.argv) != 2:
     cell_name="2017_05_08_A_5-4"
-    folder_="/ems/elsc-labs/segev-i/moria.fridman/project/analysis_groger_cells/cells_initial_information/"
 else:
     cell_name=sys.argv[1]
-    folder_=sys.argv[2]+'/'+sys.argv[3]
+folder_="cells_initial_information/"
+
 h.load_file("import3d.hoc")
 h.load_file("nrngui.hoc")
 h.load_file('stdlib.hoc')

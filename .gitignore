@@ -132,6 +132,8 @@ dmypy.json
 #folders
 logs/
 cells_outputs_data_short/
+cells_outputs_data/
+
 fit_short_pulse_temp/
 x86_64/
 /*/.~lock.Data.xlsx#

@@ -65,6 +65,7 @@ plt.scatter([0]*len(res_z), res_z,label='scatter z')
 
 plt.legend()
 plt.show()
+a=1
 # mean_soma = np.array(cell.soma.psection()['morphology']['pts3d'])[:,:3].mean(axis=0)
 # res_x,res_y,res_z = [],[],[]
 # for child in cell.soma.children():
