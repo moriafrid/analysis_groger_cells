@@ -13,31 +13,33 @@ import pandas as pd
 from open_pickle import read_from_pickle
 from calculate_F_factor import calculate_F_factor
 from read_spine_properties import get_n_spinese
+from read_passive_parameters_csv import get_passive_parameter
 do_calculate_F_factor=True
 print("the number of parameters that sys loaded in dendogram.py is ",len(sys.argv),flush=True)
 print(len(sys.argv), sys.argv)
 
-if len(sys.argv) != 11:
+if len(sys.argv) != 8:
     print("the function doesn't run with sys.argv",flush=True)
     cell_name= '2017_05_08_A_5-4'
     file_type2read='z_correct.swc'
+    fit_condition='const_param'
     passive_val={'RA':100.0,'CM':1.0,'RM':10000.0}
     name='test'
     resize_diam_by=1.0
     shrinkage_factor=1.0
     SPINE_START=20
-    folder_='/ems/elsc-labs/segev-i/moria.fridman/project/analysis_groger_cells/'
 else:
     print("the sys.argv len is correct",flush=True)
     cell_name = sys.argv[1]
     file_type2read=sys.argv[2] #hoc ar ASC
-    passive_val={"RA":float(sys.argv[3]),"CM":float(sys.argv[4]),'RM':float(sys.argv[5])}
-    name=sys.argv[6]
-    resize_diam_by = float(sys.argv[7]) #how much the cell sweel during the electrophisiology records
-    shrinkage_factor =float(sys.argv[8]) #how much srinkage the cell get between electrophysiology record and LM
-    SPINE_START=int(sys.argv[9])
-    folder_= sys.argv[10] #'/ems/elsc-labs/segev-i/moria.fridman/project/analysis_groger_cells/cells_outputs_data'
+    fit_condition=sys.argv[3]
+    name=sys.argv[4]
+    resize_diam_by = float(sys.argv[5]) #how much the cell sweel during the electrophisiology records
+    shrinkage_factor =float(sys.argv[6]) #how much srinkage the cell get between electrophysiology record and LM
+    SPINE_START=int(sys.argv[7])
+    passive_val=get_passive_parameter(cell_name,shrinkage_resize=[shrinkage_factor,resize_diam_by],fit_condition=fit_condition,spine_start=SPINE_START,file_type=file_type2read)[name]
 print(name, passive_val)
+folder_=''
 
 data_dir= "cells_initial_information/"
 save_dir ="cells_outputs_data/"

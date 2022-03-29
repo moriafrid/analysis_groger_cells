@@ -7,9 +7,9 @@ def create_folders_list(folders_list):
         except FileExistsError:
             pass
 
-def create_folder_dirr(folder_dir,start_creat='project'):
-    new_dir=folder_dir[:folder_dir.rfind(start_creat)]+start_creat
-    for curr in folder_dir[folder_dir.rfind(start_creat):].split('/')[1:]:
+def create_folder_dirr(folder_dir):
+    new_dir=folder_dir.split('/')[0]
+    for curr in folder_dir.split('/')[1:]:
         if curr == '': continue
         new_dir=new_dir+'/'+curr
         try:

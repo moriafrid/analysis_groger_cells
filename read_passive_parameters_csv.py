@@ -4,6 +4,7 @@ def get_passive_parameter(cell_name,shrinkage_resize=[1.0,1.0],spine_start=20,fi
     df = pd.read_csv(p)
     #creat the value to run on
     df.loc[(df["fit_condition"] == fit_condition) & (df["file_type"] == file_type), :].to_dict('records')
+
     curr = df.loc[(df["fit_condition"] == fit_condition) & (df["file_type"] == file_type)&(df["spine_start"] == spine_start)&
                   (df['shrinkage&resize_factors']==str(shrinkage_resize)), :]
     passive_vals_dict={}

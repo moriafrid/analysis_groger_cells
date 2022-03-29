@@ -11,25 +11,23 @@
 #SBATCH -t 1-0
 # check if script is started via SLURM or bash
 # if with SLURM: there variable '$SLURM_JOB_ID' will exist
+#SBATCH --exclude=ielsc-48,ielsc-49
 
 echo $#
 
-if [[ $# -ne 10 ]] ; then
+if [[ $# -ne 7 ]] ; then
     echo "Wrong usage. not have enought parameters"
     exit 1
 fi
 
 cell_name=$1
 file_type2read=$2
-RA=$3
-CM=$4
-RM=$5
-name=$6
-resize_diam=$7
-shrinkage_factor=$8
-SPINE_START=$9
-folder= $10
-shift $#
+fit_condition=$3
+name=$4
+resize_diam=$5
+shrinkage_factor=$6
+SPINE_START=$7
+#shift $#
 # `if [ -n $SLURM_JOB_ID ]` checks if $SLURM_JOB_ID is not an empty string
 if [ -n $SLURM_JOB_ID ]; then
 # check the original location through scontrol and $SLURM_JOB_ID
@@ -40,22 +38,18 @@ else
 fi
 # get script's path to allow running from any folder without errors
 path=$(dirname $SCRIPT_PATH)
-# If necessary, activate anaconda installed on your user (Default: /ems/..../<lab>/<user>/anaconda3
-# source anaconda3/bin/activate
-conda init
-conda activate project
-# put your script here - example script is sitting with this bash script
 
 #echo python3 $path/analysis_fit_after_run.py $cell_name $file_type2read
 #python3 $path/analysis_fit_after_run.py $cell_name $file_type2read $resize_diam $shrinkage_factor $SPINE_START $folder
 
 echo python3 $path/Rin_Rm_plot.py $cell_name $file_type2read
-python3 $path/Rin_Rm_plot.py $cell_name $file_type2read $RA $CM $RM $name $resize_diam_by $shrinkage_factor $SPINE_START $folder
+python3 $path/Rin_Rm_plot.py $cell_name $file_type2read $fit_condition $name $resize_diam $shrinkage_factor $SPINE_START $folder
 
-#echo python3 $path/attenuations.py $cell_name $file_type2read $passive_val
-#python3 $path/attenuations.py  $cell_name $file_type2read $RA $CM $RM $resize_diam_by $shrinkage_factor $folder
+echo python3 $path/attenuations.py $cell_name $file_type2read $passive_val "True"
+python3 $path/attenuations.py  $cell_name $file_type2read $fit_condition $name "False" $resize_diam $shrinkage_factor $SPINE_START $folder
+
+echo python3 $path/attenuations.py $cell_name $file_type2read $passive_val "False"
+python3 $path/attenuations.py  $cell_name $file_type2read $fit_condition $name "True" $resize_diam $shrinkage_factor $SPINE_START $folder
 
 echo python3 $path/dendogram.py $cell_name $file_type2read
-python3 $path/dendogram.py $cell_name $file_type2read $RA $CM $RM $name $resize_diam_by $shrinkage_factor $SPINE_START $folder
-
-
+python3 $path/dendogram.py $cell_name $file_type2read $fit_condition $name $resize_diam $shrinkage_factor $SPINE_START $folder
