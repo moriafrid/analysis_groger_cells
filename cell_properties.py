@@ -7,23 +7,19 @@ from add_figure import add_figure
 from glob import glob
 from extra_function import create_folder_dirr,SIGSEGV_signal_arises,load_ASC,load_hoc,load_swc
 import sys
+print(len(sys.argv),sys.argv,flush=True)
 
-if len(sys.argv) != 7:
+if len(sys.argv) != 3:
     print("sys.argv not running and with length",len(sys.argv))
     cell_name= '2017_05_08_A_5-4'
-    # cell_name= '2017_03_04_A_6-7'
     file_type2read= 'new.hoc'
-    folder_='/ems/elsc-labs/segev-i/moria.fridman/project/analysis_groger_cells/'
-    data_dir= "cells_initial_information"
-    save_dir = "cells_outputs_data_short"
 else:
     print("sys.argv is correct and running")
     cell_name = sys.argv[1]
     file_type2read=sys.argv[2]
-    folder_= sys.argv[3] #'/ems/elsc-labs/segev-i/moria.fridman/project/analysis_groger_cells/'
-    data_dir = sys.argv[4] #cells_initial_information
-    save_dir =sys.argv[5] #cells_outputs_data_short
-print(len(sys.argv))
+folder_=''
+data_dir= "cells_initial_information"
+save_dir = "cells_outputs_data_short"
 print(cell_name, folder_+data_dir+"/"+cell_name+"/*"+file_type2read)
 cell_file = glob(folder_+data_dir+"/"+cell_name+"/*"+file_type2read)[0]
 

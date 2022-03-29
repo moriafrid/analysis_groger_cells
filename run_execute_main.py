@@ -5,10 +5,10 @@ folder_=""
 if len(sys.argv) != 2:
     # folder_="/ems/elsc-labs/segev-i/moria.fridman/project/analysis_groger_cells/"
     cells_name_place="cells_name.p"
-    print("run_execute not running with sys.argv",len(sys.argv))
+    print("run_execute_main not running with sys.argv",len(sys.argv))
 else:
     cells_name_place=sys.argv[1]
-    print("run_execute running with sys.argv",sys.argv)
+    print("run_execute_main running with sys.argv",sys.argv)
 
 cells=read_from_pickle(cells_name_place)
 print("Remaind to choose the right syn")

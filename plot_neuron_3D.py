@@ -8,19 +8,19 @@ signal.signal(signal.SIGSEGV, SIGSEGV_signal_arises)
 from glob import glob
 from open_pickle import read_from_pickle
 import sys
-if len(sys.argv) != 6:
+print(len(sys.argv),sys.argv,flush=True)
+
+if len(sys.argv) != 3:
     print("sys.argv not running and with length",len(sys.argv))
-    cells= ['2017_05_08_A_4-5','2017_05_08_A_5-4','2017_03_04_A_6-7']
-    file_type='new.ASC'
-    folder_='/ems/elsc-labs/segev-i/moria.fridman/project/analysis_groger_cells'
+    cells= read_from_pickle('cell_name.p')
+    file_type='ASC'
 else:
     print("sys.argv not running and with length",len(sys.argv))
-    cells = [sys.argv[1],sys.argv[2],sys.argv[3]]
-    file_type=sys.argv[4]
-    folder_=sys.argv[5]
-print(len(sys.argv),sys.argv,flush=True)
-folder_data=folder_+'/cells_initial_information/'
-folder_save=folder_+'/cells_outputs_data_short/'
+    cells = read_from_pickle(sys.argv[1])
+    file_type=sys.argv[2]
+folder_=''
+folder_data='cells_initial_information/'
+folder_save='cells_outputs_data_short/'
 
 def plot_morphology(cell_dir,dots_dir,syn_pose_list,with_axon=False, save_place=''):
     #syn_pose should be (x,y,z) coordinates

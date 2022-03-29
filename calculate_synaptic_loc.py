@@ -8,22 +8,22 @@ import pandas as pd
 import sys
 from extra_function import load_ASC,SIGSEGV_signal_arises
 from read_spine_properties import get_spine_xyz,get_n_spinese, get_spine_part
+from open_pickle import read_from_pickle
 signal.signal(signal.SIGSEGV, SIGSEGV_signal_arises)
 
-if len(sys.argv) != 7:
+if len(sys.argv) != 4:
     print("sys.argv not running and with length",len(sys.argv))
-    cells= ['2017_05_08_A_4-5','2017_05_08_A_5-4','2017_03_04_A_6-7']
+    cells= read_from_pickle('cell_name.p')
     file_type='new.ASC'
-    folder_='/ems/elsc-labs/segev-i/moria.fridman/project/analysis_groger_cells'
     with_plot=True
 else:
     print("sys.argv is correct and running")
-    cells = [sys.argv[1],sys.argv[2],sys.argv[3]]
-    file_type=sys.argv[4]
-    folder_=sys.argv[5]
-    with_plot=eval(sys.argv[6])
-folder_data=folder_+'/cells_initial_information/'
-folder_save=folder_+'/cells_outputs_data_short/'
+    cells = read_from_pickle(sys.argv[1])
+    file_type=sys.argv[2]
+    with_plot=eval(sys.argv[3])
+folder_=''
+folder_data='cells_initial_information/'
+folder_save='cells_outputs_data_short/'
 
 def synaptic_loc(cell_dir,syn_poses_list,with_plot=False, part='all', save_place=''):
     dict2={}
