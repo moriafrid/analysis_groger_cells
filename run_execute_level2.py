@@ -8,7 +8,7 @@ folder_data="cells_initial_information/"
 folder_save="cells_outputs_data_short/"
 cells=["2017_05_08_A_5-4", "2017_05_08_A_4-5","2017_03_04_A_6-7"]
 # file_type2read=['hoc','ASC']
-file_type2read=['z_correct.swc','morphology.swc','hoc','ASC']
+file_type2read=['z_correct.swc','morphology.swc']
 SPINE_START=str(20)
 i=0
     # os.system('python run_analysis_fit_after_run.py')
@@ -16,9 +16,9 @@ for cell_name in ["2017_05_08_A_5-4", "2017_05_08_A_4-5","2017_03_04_A_6-7"]:
     print(cell_name)
     all_data = []
     dict_fit_condition={}
-    for fit_condition in ['const_param','different_initial_conditions'][0:1]:
+    for fit_condition in ['const_param']:
         print(fit_condition)
-        for file_type in file_type2read:
+        for file_type in ['z_correct.swc','morphology.swc']:
             for resize_diam_by ,shrinkage_by in zip([1.0,1.2,1.1][1:],[1.0,1.0,1.1][1:]):
                 print('shrinkage_factor:',shrinkage_by,'reasize_dend_factor:',resize_diam_by)
                 passive_vals_dict=get_passive_parameter(cell_name,shrinkage_resize=[shrinkage_by,resize_diam_by],fit_condition=fit_condition,spine_start=int(SPINE_START),file_type=file_type)
