@@ -2,8 +2,8 @@
 #SBATCH -o logs/%j.out
 #SBATCH -e logs/%j.err
 #SBATCH --mem 30GB
-#SBATCH --exclude=ielsc-48,ielsc-49
-##SBATCH -t 2-0
+#SBATCH --exclude=ielsc-48,ielsc-49,ielsc-44,ielsc-42,ielsc-7
+##SBATCH -t 3-0
 ##SBATCH -n 30
 
 #pass 1 argument = size of ipcluster ##%%

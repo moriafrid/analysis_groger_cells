@@ -4,23 +4,30 @@ from open_pickle import read_from_pickle
 from glob import glob
 from passive_val_function import *
 import pickle
-folder_="/ems/elsc-labs/segev-i/moria.fridman/project/analysis_groger_cells/"
+import sys
+if len(sys.argv) != 2:
+    cells_name_place="cells_name.p"
+    print("creat csv for passive_val not running with sys.argv",len(sys.argv))
+else:
+    cells_name_place=sys.argv[1]
+    print("creat csv for passive_val running with sys.argv",sys.argv)
+folder_=""
 folder_data="cells_initial_information/"
 folder_save="cells_outputs_data_short/"
-cells=["2017_05_08_A_5-4", "2017_05_08_A_4-5","2017_03_04_A_6-7"]
+cells=read_from_pickle(cells_name_place)
 file_type2read=['z_correct.swc','morphology.swc','hoc','ASC']
 resize_diam_by=1.0
 shrinkage_factor=1.0
-SPINE_STARTs=[str(10),str(20),str(60)]
+SPINE_STARTs=[str(20)]#[str(10),str(20),str(60)]
 i=0
 # os.system('python run_analysis_fit_after_run.py')
 for cell_name in cells:
     print(cell_name)
     all_data = []
     dict_fit_condition={}
-    for fit_condition in ['const_param','different_initial_conditions']:
+    for fit_condition in ['const_param','different_initial_conditions'][:1]:
         print(fit_condition)
-        for file_type in ['z_correct.swc','morphology.swc','hoc','ASC']:
+        for file_type in ['z_correct.swc','morphology.swc']:
             for shrinkage_factor,resize_diam_by in zip([1.0,1.1,1.0],[1.0,1.1,1.2]):
                 for SPINE_START in SPINE_STARTs:
                     passive_vals_dict= {}
@@ -34,6 +41,7 @@ for cell_name in cells:
                             passive_val_total=read_from_pickle(glob(initial_folder+'/RA/analysis/RA_total_errors_minimums.p')[0])
                         elif fit_condition=='different_initial_conditions':
                             passive_val_total=read_from_pickle(glob(initial_folder+'/RA_min'+str(5)+'/analysis/RA_total_errors_minimums.p')[0])
+                        print('is founde ',initial_folder)
                     except:
                         print("there isn't have RA_total_errors_minimums in spine strart=" +SPINE_START+" "+initial_folder)
                         continue

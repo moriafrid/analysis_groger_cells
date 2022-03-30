@@ -49,6 +49,6 @@ def mean_best_n(list_dicts,n):
         RM.append(list_dicts[i]['RM'])
         CM.append(list_dicts[i]['CM'])
         error.append(list_dicts[i]['error'])
-    print('std from '+str(n)+' best solution is ',{'RA':np.std(RA),'RM':np.std(RM),'CM':np.std(CM),'error':np.std(error)})
+    # print('std from '+str(n)+' best solution is ',{'RA':np.std(RA),'RM':np.std(RM),'CM':np.std(CM),'error':np.std(error)})
     return {'RA':np.mean(RA),'RM':np.mean(RM),'CM':np.mean(CM),'error':np.mean(error)}
 # def min_RA()

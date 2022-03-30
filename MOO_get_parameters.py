@@ -34,7 +34,7 @@ runnum2compare = '13'
 # spine_type="mouse_spine" #"groger_spine"
 
 print(sys.argv,flush=True)
-if len(sys.argv) != 14:
+if len(sys.argv) != 13:
     print("the function doesn't run with sys.argv",len(sys.argv),flush=True)
     cpu_node = 1
     cell_name= '2017_05_08_A_5-4'
@@ -45,7 +45,6 @@ if len(sys.argv) != 14:
     resize_dend_by=1.0
     shrinkage_by=1.0
     SPINE_START=20
-    folder_='/ems/elsc-labs/segev-i/moria.fridman/project/analysis_groger_cells/'
     profile = '_'
     RA=float(100)
     generation_size = 5
@@ -61,12 +60,11 @@ else:
     resize_dend_by = float(sys.argv[9]) #how much the cell sweel during the electrophisiology records
     shrinkage_by =float(sys.argv[10]) #how much srinkage the cell get between electrophysiology record and LM
     SPINE_START=int(sys.argv[11])
-    folder_= sys.argv[12]
-    profile = sys.argv[13]
+    profile = sys.argv[12]
     RA=float(sys.argv[4])
     generation_size = 100
     num_of_genarations = 1000
-
+folder_=''
 data_dir= "cells_initial_information/"
 save_dir = "cells_outputs_data_short/"
 base2 = folder_+save_dir+cell_name+'/MOO_results/'+file_type+"/"  # folder name  _RA_free
