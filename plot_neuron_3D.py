@@ -15,7 +15,7 @@ if len(sys.argv) != 3:
     cells= read_from_pickle('cell_name.p')
     file_type='ASC'
 else:
-    print("sys.argv not running and with length",len(sys.argv))
+    print("sys.argv is running")
     cells = read_from_pickle(sys.argv[1])
     file_type=sys.argv[2]
 folder_=''

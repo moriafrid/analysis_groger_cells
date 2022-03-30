@@ -141,12 +141,12 @@ def synaptic_loc(cell_dir,syn_poses_list,with_plot=False, part='all', save_place
     dict =  { 'sec_name':sec_name,'sec_num':sec_num,'seg_num':seg_num,'place_name':dends_name,'dist_from_soma':dis_from_soma,'dist':dists, 'part':part}
     print(dict)
 
-    try_save_dict(dict,folder_save+cell_name+'/','synaptic_location'+file_type)
+    try_save_dict(dict,folder_save+cell_name+'/','synaptic_location')
     for i in range(len(syn_poses_list)):
         dict2[str(i)] = {'sec_name':sec_name[i],'sec_num':sec_num[i],'seg_num':seg_num[i],'place_name':dends_name[i],'dist_from_soma':dis_from_soma[i],'dist':dists[i], 'part':part}
         print(dict2)
 
-    try_save_dict(dict2,folder_save+cell_name+'/','synaptic_location_seperate'+file_type)
+    try_save_dict(dict2,folder_save+cell_name+'/','synaptic_location_seperate')
     return dict,dict2
 
 def syn_dis_from_soma(cell,syn_loc):
@@ -187,10 +187,10 @@ if __name__=='__main__':
             print('one syn dict:',dict)
             xyz.append(list(get_spine_xyz(cell_name,i)))
             dend_part.append(get_spine_part(cell_name,i))
-        dict1,dict2=synaptic_loc(dir,xyz, part='all', save_place=folder_save+cell_name+'/synapses'+file_type,with_plot=with_plot)
+        dict1,dict2=synaptic_loc(dir,xyz, part='all', save_place=folder_save+cell_name+'/synapses',with_plot=with_plot)
         dict3[cell_name]=dict1
         for key in dict2.keys():
             dict4[cell_name+key]=dict2[key]
         print('more then one syn dict',cell_name,[xyz])
-    try_save_dict(dict3,folder_save,'synaptic_location'+file_type)
-    try_save_dict(dict4,folder_save,'synaptic_location_seperate'+file_type)
+    try_save_dict(dict3,folder_save,'synaptic_location')
+    try_save_dict(dict4,folder_save,'synaptic_location_seperate')

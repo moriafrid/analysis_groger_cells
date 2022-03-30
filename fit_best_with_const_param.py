@@ -13,20 +13,19 @@ from glob import glob
 import signal
 import os
 do_calculate_F_factor=True
-if len(sys.argv) != 7:
+if len(sys.argv) != 6:
    cell_name= '2017_05_08_A_5-4'
    file_type='z_correct.swc'
    resize_diam_by=1.0
    shrinkage_factor=1.0
-   SPINE_START=30
-   folder_='/ems/elsc-labs/segev-i/moria.fridman/project/analysis_groger_cells/'
+   SPINE_START=20
 else:
    cell_name = sys.argv[1]
    file_type=sys.argv[2] #hoc ar ASC
    resize_diam_by = float(sys.argv[3]) #how much the cell sweel during the electrophisiology records
    shrinkage_factor =float(sys.argv[4]) #how much srinkage the cell get between electrophysiology record and LM
    SPINE_START=int(sys.argv[5])
-   folder_= sys.argv[6] #'/ems/elsc-labs/segev-i/moria.fridman/project/analysis_groger_cells/cells_outputs_data_short'
+folder_=''
 data_dir= "cells_initial_information/"
 save_dir = "cells_outputs_data_short/"
 path_short_pulse=glob(folder_+save_dir+cell_name+'/data/electrophysio_records/short_pulse/mean_short_pulse_with_parameters.p')[0]
@@ -135,7 +134,6 @@ if __name__=='__main__':
     for sec in cell.all_sec():
         sec.diam = sec.diam*resize_diam_by
         sec.L*=shrinkage_factor
-    SPINE_START = 60
     hz= 0.1
 
     if do_calculate_F_factor:
