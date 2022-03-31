@@ -49,6 +49,7 @@ if len(sys.argv) != 13:
     RA=float(100)
     generation_size = 5
     num_of_genarations = 2
+    same_strengh=True
 else:
     print("the sys.argv len is correct",flush=True)
     cpu_node = int(sys.argv[1])
@@ -60,10 +61,23 @@ else:
     resize_dend_by = float(sys.argv[9]) #how much the cell sweel during the electrophisiology records
     shrinkage_by =float(sys.argv[10]) #how much srinkage the cell get between electrophysiology record and LM
     SPINE_START=int(sys.argv[11])
+    # same_strengh=sys.argv[12]
     profile = sys.argv[12]
     RA=float(sys.argv[4])
     generation_size = 100
     num_of_genarations = 1000
+same_strengh=False
+
+if same_strengh:
+    reletive_strengths=np.ones(get_n_spinese(cell_name))
+else:
+    psd_sizes=get_parameter(cell_name,'PSD')
+    if psd_sizes[0]/psd_sizes[1]>=1:
+        reletive_strengths=[1,psd_sizes[1]/psd_sizes[0]]
+    elif psd_sizes[1]/psd_sizes[0]>=1:
+        reletive_strengths=[psd_sizes[0]/psd_sizes[1],1]
+    else:
+        raise "there is a problem with the PSD"
 folder_=''
 data_dir= "cells_initial_information/"
 save_dir = "cells_outputs_data_short/"
@@ -364,9 +378,10 @@ def run(cell, seed=0):
             value=0.002,
             bounds=[0.000000, 0.01],
             locations=[netstims[i]],
-            reletive_strength =   [get_parameter(cell_name,'PSD',spine_num=i)]))#[1, 0.1,0.01]))
-
+            reletive_strength = [reletive_strengths[i]])) #[1, 0.1,0.01]))
+            # reletive_strength =   [get_parameter(cell_name,'PSD',spine_num=i)]))#[1, 0.1,0.01]))
     # this  need to add the weight to optimization
+
         syn_params.append(NrnNetstimWeightParameter(
             name='weight_NMDA',
             param_name='weight[0]',
@@ -374,7 +389,9 @@ def run(cell, seed=0):
             value=0.0012,
             bounds=[0.000, 0.005],
             locations=[netstims_NMDA[i]],
-            reletive_strength = [get_parameter(cell_name,'PSD',spine_num=i)])) #[1, 0.1,0.01]))
+            reletive_strength = [reletive_strengths[i]])) #[1, 0.1,0.01]))
+
+            # reletive_strength = [get_parameter(cell_name,'PSD',spine_num=i)])) #[1, 0.1,0.01]))
 
 
     rec.append(ephys.recordings.CompRecording(

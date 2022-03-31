@@ -20,14 +20,14 @@ folder_save="cells_outputs_data_short/"
 
 os.system('python csv_for_passive_val_results.py')
 
-file_types=['z_correct.swc','morphology.swc'][:1]
+file_types=['z_correct.swc','morphology.swc'][:]
 SPINE_STARTs=[20]
 for cell_name in read_from_pickle(cells_name_place)[1:2]:
     passive_vals_dict= {}
     # p='cells_initiall_information/'+cell_name+'/results_passive_fits.csv'
     p='cells_outputs_data_short/'+cell_name+'/fit_short_pulse/results_passive_fits.csv'
     df = pd.read_csv(p)
-    for resize_diam_by ,shrinkage_by in zip([1.0,1.1,1.2][1:2],[1.0,1.1,1.0][1:2]):
+    for resize_diam_by ,shrinkage_by in zip([1.0,1.1,1.2],[1.0,1.1,1.0]):
         for fit_condition in ['const_param','different_initial_conditions'][:1]:
             for file_type in file_types:
                 for SPINE_START in [20]:
@@ -50,7 +50,7 @@ for cell_name in read_from_pickle(cells_name_place)[1:2]:
                             command="sbatch -p ss.q,elsc.q runs_change_passive_val.sh"
                             send_command = " ".join([command,"1",cell_name,file_type,RA,CM,RM,fit_condition,passive_val_name,str(resize_diam_by),str(shrinkage_by),str(SPINE_START),folder_])
                         print(send_command)
-                        # os.system(send_command)
+                        os.system(send_command)
 # command="sbatch -p ss.q,elsc.q runs_change_passive_val.sh"
 # p4=" ".join([command,'1', '2017_05_08_A_5-4', 'morphology.swc', '120.0', '2.974997902411084', '6992.0', 'const_param', 'RA=120', '1.0', '1.0', '20'])
 # p5=" ".join([command,'1', '2017_05_08_A_4-5', 'morphology.swc', '74.0', '2.072525235725758', '7485.0', 'const_param', 'RA_best_fit', '1.0', '1.0', '20'])

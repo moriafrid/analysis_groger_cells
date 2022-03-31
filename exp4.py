@@ -88,7 +88,7 @@ for model_place in glob(folder_data+'*'):
             axs[names[j]].set_ylabel('mv')
 
         # plt.plot(time, V_spine, label='hall_'+str(i),alpha=0.1)
-    passive_propert_title='Rm='+str(round(1.0/model.soma.g_pas,2)) +' Ra='+str(round(model.soma.Ra,2))+' Cm='+str(round(model.soma.cm,2))
+    passive_propert_title='Rm='+str(round(1.0/model.soma[0].g_pas,2)) +' Ra='+str(round(model.soma[0].Ra,2))+' Cm='+str(round(model.soma[0].cm,2))
     plt.title('AMPA and NMDA impact on voltage ' +" ".join(model_place.split('/')[-1].split('_')[2:]) + '\n' + passive_propert_title)
     plt.legend()
     plt.savefig(folder_save+type+'.png')
