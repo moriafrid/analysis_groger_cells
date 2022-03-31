@@ -9,7 +9,7 @@
 #SBATCH --mem 4GB
 ##SBATCH -c 1
 ##SBATCH -t 1-0
-#SBATCH --exclude=ielsc-48,ielsc-49,ielsc-10,ielsc-7,ielsc-44
+#SBATCH --exclude=ielsc-48,ielsc-49,ielsc-10,ielsc-7,ielsc-44,ielsc-42
 
 echo "the number parameters the sbatch get is "$#
 

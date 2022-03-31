@@ -16,28 +16,29 @@ SPINE_START=str(20)
 os.system('python csv_for_passive_val_results.py')
 i=0
     # os.system('python run_analysis_fit_after_run.py')
-for cell_name in cells:
+for cell_name in cells[:2]:
     print(cell_name)
     all_data = []
     dict_fit_condition={}
     for fit_condition in ['const_param']:
         print(fit_condition)
         for file_type in file_type2read:
-            for resize_diam_by ,shrinkage_by in zip([1.0,1.2,1.1],[1.0,1.0,1.1]):
+            for resize_diam_by ,shrinkage_by in zip([1.0,1.1,1.2],[1.0,1.1,1.0]):
                 print('shrinkage_factor:',shrinkage_by,'reasize_dend_factor:',resize_diam_by)
                 passive_vals_dict=get_passive_parameter(cell_name,shrinkage_resize=[shrinkage_by,resize_diam_by],fit_condition=fit_condition,spine_start=int(SPINE_START),file_type=file_type)
                 for name in ['RA=120','RA=150','RA_min_error','RA_best_fit']:
-                    # if i>1: continue
+                    if i<1: continue
                     i+=1
                     try: passive_vals_dict[name]
                     except:
                         print('passive_vals_dict is empty')
                         continue
                     RA,CM,RM=get_passive_val(passive_vals_dict[name])
+                    if float(RA)<50:continue
                     print(name,RA,CM,RM)
                     command="sbatch execute_level2.sh"
                     send_command = " ".join([command,cell_name,file_type,fit_condition,name,str(resize_diam_by),str(shrinkage_by),SPINE_START])
-                    # os.system(send_command)
+                    os.system(send_command)
                     print(cell_name+ ' .'+file_type+': execute level2.py, dendogram.py, Rin_Rm.py','attenuations.py')
 
 

@@ -16,7 +16,7 @@ base_command='sbatch execute_python_script.sh'
 for cell_name in read_from_pickle(cells_name_place)[2:]:
     for file_type in ['z_correct.swc','morphology.swc']:
         for SPINE_START in [20]:#SPINE_STARTs:
-            for resize_diam_by ,shrinkage_by in zip([1.0,1.1,1.2][2:],[1.0,1.1,1.0][:2]):
+            for resize_diam_by ,shrinkage_by in zip([1.0,1.1,1.2][:2],[1.0,1.1,1.0][:2]):
                 # for Ra_min in [5,100]:
                     # command="fit_influnce_by_initial_condition.py"
                     # send_command = " ".join([base_command,command, cell_name,file_type,str(Ra_min),resize_diam_by,shrinkage_factor,str(SPINE_START),folder_])
