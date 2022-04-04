@@ -34,7 +34,7 @@ runnum2compare = '13'
 # spine_type="mouse_spine" #"groger_spine"
 
 print(sys.argv,flush=True)
-if len(sys.argv) != 14:
+if len(sys.argv) != 15:
     print("the function doesn't run with sys.argv",len(sys.argv),flush=True)
     cpu_node = 1
     cell_name= '2017_05_08_A_5-4'
@@ -50,6 +50,8 @@ if len(sys.argv) != 14:
     generation_size = 5
     num_of_genarations = 2
     same_strengh=True
+    double_spine_area=True
+
 else:
     print("the sys.argv len is correct",flush=True)
     cpu_node = int(sys.argv[1])
@@ -62,7 +64,8 @@ else:
     shrinkage_by =float(sys.argv[10]) #how much srinkage the cell get between electrophysiology record and LM
     SPINE_START=int(sys.argv[11])
     same_strengh=eval(sys.argv[12])
-    profile = sys.argv[13]
+    double_spine_area=eval(sys.argv[13])
+    profile = sys.argv[14]
     RA=float(sys.argv[4])
     generation_size = 100
     num_of_genarations = 1000
@@ -81,10 +84,13 @@ save_dir = "cells_outputs_data_short/"
 if same_strengh:
     base2 = folder_+save_dir+cell_name+'/MOO_results_same_strange/'+file_type+"/"  # folder name  _RA_free
 else:
-    base2 = folder_+save_dir+cell_name+'/MOO_results_relative_streng/'+file_type+"/"  # folder name  _RA_free
+    base2 = folder_+save_dir+cell_name+'/MOO_results_relative_strange/'+file_type+"/"  # folder name  _RA_free
 
 base2+='F_shrinkage='+str(round(shrinkage_by,2))+'_dend*'+str(round(resize_dend_by,2))
+if double_spine_area:
+    base2+='_double_spine_area'
 base_save_folder=base2 + '/'+passive_fit_condition+'/'+passive_val_name+'/'
+
 print('base_save_folder:',base_save_folder)
 create_folder_dirr(base_save_folder)
 RDSM_objective_file = folder_+save_dir+cell_name+"/data/electrophysio_records/syn/mean_syn.p"
@@ -803,7 +809,7 @@ if do_calculate_F_factor:
     for sec in temp_cell.dend+temp_cell.apic:
         sec.diam=sec.diam*resize_dend_by
         sec.L=sec.L*shrinkage_by
-    F_factor=calculate_F_factor(temp_cell,'mouse_spine')
+    F_factor=calculate_F_factor(temp_cell,'mouse_spine',double_spine=double_spine_area)
 else:
     F_factor = 1.9
 temp_cell=None

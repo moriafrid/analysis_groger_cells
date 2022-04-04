@@ -7,7 +7,7 @@ from glob import glob
 from extra_function import load_ASC,load_hoc
 from read_spine_properties import get_F_factor_params
 ######################################################
-def calculate_F_factor(cell,spine_type,spines_density=1.08,spine_num=1, is_debug_print=False):
+def calculate_F_factor(cell,spine_type,spines_density=1.08,spine_num=1, double_spine=False,is_debug_print=False):
     #spine type can be the cell_name or "mouse_spine", "human_spine" or "shaft_spine"
     if is_debug_print:
         print("the spine_type for calculate the F_factor is "+spine_type)
@@ -28,8 +28,9 @@ def calculate_F_factor(cell,spine_type,spines_density=1.08,spine_num=1, is_debug
     neck_area=2*pi*(neck_diam/2)*neck_length
     spine_area=neck_area+head_area
     print('neck_area:',neck_area,'head_area:',head_area,'spine_area:',spine_area)
-    spine_area*=2
-    print('the spine area change to be',spine_area)
+    if double_spine:
+        spine_area*=2
+        print('the spine area change to be',spine_area)
     spines_area=spine_area*dend_len*spines_density
     dends_area=np.sum([seg.area() for sec in cell.dend for seg in sec]) #* (1.0/0.7)
     try:dends_area+=np.sum([seg.area() for sec in cell.apic for seg in sec]) #* (1.0/0.7)
