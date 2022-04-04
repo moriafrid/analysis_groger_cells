@@ -26,6 +26,7 @@ else:
    shrinkage_factor =float(sys.argv[4]) #how much srinkage the cell get between electrophysiology record and LM
    SPINE_START=int(sys.argv[5])
 folder_=''
+double_spine_area=False
 data_dir= "cells_initial_information/"
 save_dir = "cells_outputs_data_short/"
 path_short_pulse=glob(folder_+save_dir+cell_name+'/data/electrophysio_records/short_pulse/mean_short_pulse_with_parameters.p')[0]
@@ -33,6 +34,8 @@ cell_file=glob(folder_+data_dir+cell_name+'/*'+file_type)[0]
 
 initial_folder=folder_+save_dir+cell_name+'/fit_short_pulse/'+file_type+'_SPINE_START='+str(SPINE_START)+'/'
 initial_folder+="/dend*"+str(round(resize_diam_by,2))+'&F_shrinkage='+str(round(shrinkage_factor,2))
+if double_spine_area:
+    initial_folder+='/double_spine_area'
 initial_folder +="/const_param/RA"
 create_folder_dirr(initial_folder)
 
