@@ -5,18 +5,20 @@ from pdf2image import convert_from_path
 from glob import glob
 
 SPINE_START=20
-cell_name =read_from_pickle('cells_name.p')[2]
+
 file_types=['z_correct.swc','morphology.swc','hoc','ASC']
 file_type='z_correct.swc'
 # for passive_val_name in ['RA=120','RA=150','RA_min_error','RA_best_fit']:
 passive_val_name='RA=120'
+cell_name =read_from_pickle('cells_name.p')[1]
 plot_all_Moo_results=True
+same=False
 compare_between_types=False
 compare_diffrent_passive_value=False
 compare_spine_start=False
 show_total_results=False
 place=["A","B","C","D","E","F","G","H","I","J","K","L","M","N","O","P","Q","R","S","T","U","V","W","X","Y","Z","a","b","c","d","e","f"]
-folder_='cells_outputs_data/'+cell_name
+folder_='cells_outputs_data_short/'+cell_name
 i=0
 def show_dirr(png_file):
     if png_file.split('.')[-1]=='pdf':  # if only have pdf (no png) => create png and read it later
@@ -137,14 +139,20 @@ if compare_diffrent_passive_value:
         show_directory(axs2[place[i]],'syn fit',folder_+'/MOO_results/'+file_type+'/F_shrinkage=1.0_dend*1.0/const_param/'+passive_val_name+'/fit_transient_RDSM.pdf')
 if plot_all_Moo_results:
     fig=plt.figure()
-    plt.title(cell_name)
-    ax = fig.subplot_mosaic("""ABCD
-    EFGH
-    IJKL""")
+    # plt.title(cell_name)
+    ax = fig.subplot_mosaic("""ABC
+    DEF
+    GHI""")
     i=0
     # passive_vals_dict=get_passive_parameter(cell_name,shrinkage_resize=[shrinkage_by,resize_diam_by],fit_condition=fit_condition,spine_start=int(SPINE_START),file_type=file_type)
-
-    for z,p in enumerate(glob('cells_outputs_data_short/'+cell_name+'/MOO_results/z_correct.swc/F_shrinkage=*/const_param/*/fit_transient_RDSM.png')):
+    if '4-5' in cell_name:
+        same_diff=""
+    else:
+        if same==True:
+            same_diff='_same'
+        else:
+            same_diff='_relative'
+    for z,p in enumerate(glob('cells_outputs_data_short/'+cell_name+'/MOO_results'+same_diff+'*/z_correct.swc/F_shrinkage=*/const_param/*/fit_transient_RDSM.png')):
         if p.split('/')[6]=='test': continue
         # RA,CM,RM=get_passive_val(passive_vals_dict[p.split('/')[6]])
         show_directory(ax[place[i]],p.split('/')[4]+p.split('/')[6],p)
