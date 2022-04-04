@@ -34,7 +34,7 @@ runnum2compare = '13'
 # spine_type="mouse_spine" #"groger_spine"
 
 print(sys.argv,flush=True)
-if len(sys.argv) != 13:
+if len(sys.argv) != 14:
     print("the function doesn't run with sys.argv",len(sys.argv),flush=True)
     cpu_node = 1
     cell_name= '2017_05_08_A_5-4'
@@ -42,7 +42,7 @@ if len(sys.argv) != 13:
     passive_val={'RA':float(100),'CM':1,'RM':10000}
     passive_fit_condition='const_param'
     passive_val_name='test'
-    resize_dend_by=1.0
+    resize_dend_by=1.2
     shrinkage_by=1.0
     SPINE_START=20
     profile = '_'
@@ -61,27 +61,28 @@ else:
     resize_dend_by = float(sys.argv[9]) #how much the cell sweel during the electrophisiology records
     shrinkage_by =float(sys.argv[10]) #how much srinkage the cell get between electrophysiology record and LM
     SPINE_START=int(sys.argv[11])
-    # same_strengh=sys.argv[12]
-    profile = sys.argv[12]
+    same_strengh=eval(sys.argv[12])
+    profile = sys.argv[13]
     RA=float(sys.argv[4])
     generation_size = 100
     num_of_genarations = 1000
-same_strengh=False
+# same_strengh=False
 
 if same_strengh:
     reletive_strengths=np.ones(get_n_spinese(cell_name))
 else:
     psd_sizes=get_parameter(cell_name,'PSD')
-    if psd_sizes[0]/psd_sizes[1]>=1:
-        reletive_strengths=[1,psd_sizes[1]/psd_sizes[0]]
-    elif psd_sizes[1]/psd_sizes[0]>=1:
-        reletive_strengths=[psd_sizes[0]/psd_sizes[1],1]
-    else:
-        raise "there is a problem with the PSD"
+    argmax=np.argmax(psd_sizes)
+    reletive_strengths=psd_sizes/psd_sizes[argmax]
+
 folder_=''
 data_dir= "cells_initial_information/"
 save_dir = "cells_outputs_data_short/"
-base2 = folder_+save_dir+cell_name+'/MOO_results/'+file_type+"/"  # folder name  _RA_free
+if same_strengh:
+    base2 = folder_+save_dir+cell_name+'/MOO_results_same_strange/'+file_type+"/"  # folder name  _RA_free
+else:
+    base2 = folder_+save_dir+cell_name+'/MOO_results_relative_streng/'+file_type+"/"  # folder name  _RA_free
+
 base2+='F_shrinkage='+str(round(shrinkage_by,2))+'_dend*'+str(round(resize_dend_by,2))
 base_save_folder=base2 + '/'+passive_fit_condition+'/'+passive_val_name+'/'
 print('base_save_folder:',base_save_folder)
@@ -110,6 +111,8 @@ if do_compare2result:
 if frozen_NMDA_weigth:
     model_description=model_description+'\nthere is no NMDA in the experiment '
 model_description=model_description+'\n'
+
+model_description+="the model is run with relative strenght of "+str(reletive_strengths)
 print(model_description,flush=True)
 # import ast
 #from utiles import *
@@ -748,7 +751,7 @@ def run(cell, seed=0):
 
     plt.xlabel('time(ms)')
     plt.ylabel('V(mV)')
-    plt.plot([], [], ' ', label='gmax_AMPA='+str(round(best[0]*1000,3))+' [nS] \ngmax_NMDA=' +str(round(best[1]*1000,3))+' [nS]')
+    plt.plot([], [], ' ', label='gmax_AMPA='+str(round(best[0]*1000,3))+' [nS] \ngmax_NMDA=' +str(round(best[1]*1000,3))+' [nS]\nrelative strenght '+str(reletive_strengths))
     plt.legend(fontsize=12)
     plt.savefig(base_save_folder + 'fit_transient_RDSM.png')
     plt.savefig(base_save_folder + 'fit_transient_RDSM.pdf')

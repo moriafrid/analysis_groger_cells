@@ -28,8 +28,8 @@ for cell_name in cells:
     for fit_condition in ['const_param','different_initial_conditions'][:1]:
         print(fit_condition)
         for file_type in ['z_correct.swc','morphology.swc']:
-            for shrinkage_factor,resize_diam_by in zip([1.0,1.1,1.0],[1.0,1.1,1.2]):
-                for SPINE_START in SPINE_STARTs:
+            for shrinkage_factor,resize_diam_by in zip([1.0,1.1,1.0,1.0],[1.0,1.1,1.2,1.5]):
+                for SPINE_START in [str(20),str(10),str(60)]:
                     passive_vals_dict= {}
                     initial_folder=folder_+folder_save+cell_name+'/fit_short_pulse/'+file_type+'_SPINE_START='+str(SPINE_START)+'/'
                     # initial_folder=folder_+folder_save+cell_name+'/fit_short_pulse/'+file_type+'_SPINE_START='+str(SPINE_START)+'/'

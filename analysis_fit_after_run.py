@@ -10,12 +10,15 @@ from extra_function import create_folder_dirr
 import matplotlib
 matplotlib.use('agg')
 print(len(sys.argv),sys.argv,flush=True)
+def find_nearest(array, values):
+    indices = np.abs(np.subtract.outer(array, values)).argmin(0)
+    return indices
 if len(sys.argv) != 7:
     cell_name= '2017_05_08_A_4-5'
     file_type='z_correct.swc'
     resize_diam_by=1.0
     shrinkage_factor=1.0
-    SPINE_START=10
+    SPINE_START=60
     folder_='/ems/elsc-labs/segev-i/moria.fridman/project/analysis_groger_cells/'
     print("the function doesn't run with sys.argv",flush=True)
 else:
@@ -129,6 +132,22 @@ if __name__ == '__main__':
         plt.legend(loc='upper left')
         plt.savefig(save_folder1+'/RA const against errors until point '+str(end_plot))
 
+        add_figure('RA const against errors choosing params\n'+loc.split('/')[-1],'RA const','error')
+        plt.plot(RA0,errors)
+        RA0120= find_nearest(RA0,120)
+        RA0150= find_nearest(RA0,150)
+        RA_min= RA0[minimums_arg[0]]
+        RA0_best_fit=find_nearest(errors[RA_min:],0.1)+RA_min
+        for mini,name in zip([RA0120,RA0150,RA_min,RA0_best_fit],['RA=120', 'RA=150','Ra_min','RA0_best_fit']):
+            plt.plot(RA0[mini], errors[mini], '*',label=name+' RM=' + str(round(RMs[mini], 2)) + ' RA=' + str(round(RAs[mini], 2)) + ' CM=' + str(
+                         round(CMs[mini], 2)) + ' error=' +  str(round(errors[mini], 3)))
+        plt.legend(loc='upper left')
+        plt.savefig(save_folder1+'/RA const against errors2 '+str(end_plot))
+
+        add_figure('RA const against errors choosing params\n'+loc.split('/')[-1],'RA const','error')
+        plt.plot(RA0,errors)
+
+        plt.plot()
         add_figure('RA const against RMs\n'+loc.split('/')[-1],'RA const','RM')
         plt.plot(RA0,RMs)
         plt.savefig(save_folder1+'/RA const against RM')
