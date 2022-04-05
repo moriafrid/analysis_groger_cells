@@ -14,12 +14,12 @@ def find_nearest(array, values):
     indices = np.abs(np.subtract.outer(array, values)).argmin(0)
     return indices
 if len(sys.argv) != 7:
-    cell_name= '2017_05_08_A_4-5'
+    cell_name= '2017_03_04_A_6-7'
     file_type='z_correct.swc'
-    resize_diam_by=1.0
-    shrinkage_factor=1.0
+    resize_diam_by=1.1
+    shrinkage_factor=1.1
     SPINE_START=20
-    double_spine_area='True'
+    double_spine_area='False'
     print("the function doesn't run with sys.argv",flush=True)
 else:
     cell_name = sys.argv[1]
@@ -31,10 +31,7 @@ else:
     print('the len of sys.argv is correct and running',flush=True)
 save_dir = "cells_outputs_data_short/"
 folder_=''
-initial_folder=folder_+save_dir+cell_name+'/fit_short_pulse/'+file_type+'_SPINE_START='+str(SPINE_START)+'/'
-initial_folder+="/dend*"+str(round(resize_diam_by,2))+'&F_shrinkage='+str(round(shrinkage_factor,2))
-if double_spine_area:
-    initial_folder+='_double_spine_area'
+
 # location='/ems/elsc-labs/segev-i/moria.fridman/project/analysis_groger_cells/cells_outputs_data_short/2017_05_08_A_4-5/fit_short_pulse_ASC/dend*1.0&F_shrinkage=1.0/basic_fit'
 # datas2=glob(location+'/*/final_result*.p')
 def analysis_fit(location):
@@ -81,13 +78,19 @@ def analysis_fit(location):
 
 if __name__ == '__main__':
     print("Do analysis fit:", flush=True)
+    initial_folder1=folder_+save_dir+cell_name+'/fit_short_pulse/'
+    initial_folder=folder_+save_dir+cell_name+'/fit_short_pulse/'+file_type+'_SPINE_START='+str(SPINE_START)+'/'
+    initial_folder+="/dend*"+str(round(resize_diam_by,2))+'&F_shrinkage='+str(round(shrinkage_factor,2))
+    if double_spine_area:
+        initial_folder+='_double_spine_area'
+
     if len(glob(initial_folder+'/basic_fit/analysis/*'))>0:
         analysis_fit(initial_folder+'/basic_fit')
 
-    for loc in glob(initial_folder+'/different_initial_conditions/RA*'):
+    for loc in glob(initial_folder1+'/*/*/different_initial_conditions/RA*'):
         analysis_fit(loc)
 
-    initial_locs=glob(initial_folder)
+    initial_locs=glob(initial_folder1+'/*SPINE_START*/*shrinkage*/')
     print("Done analysis fit. Loop over ", initial_locs, flush=True)
     for loc in initial_locs:
         data=glob(loc+'/const_param/RA/Ra_const_errors.p')[0]
