@@ -17,6 +17,7 @@ compare_between_types=False
 compare_diffrent_passive_value=False
 compare_spine_start=False
 show_total_results=False
+compare_between_change_in_the_morphology_passive_fits=True
 place=["A","B","C","D","E","F","G","H","I","J","K","L","M","N","O","P","Q","R","S","T","U","V","W","X","Y","Z","a","b","c","d","e","f"]
 folder_='cells_outputs_data_short/'+cell_name
 i=0
@@ -137,13 +138,25 @@ if compare_diffrent_passive_value:
         # show_directory(axs2[place2[i]], 'M_dendogram',folder_+'/data/cell_properties/'+file_type+'/SPINE_START=20/dend*1.0&F_shrinkage=1.0/'+passive_val_name+'/M_dendogram/all.pdf')
         show_directory(axs2[place[i]], 'M_dendogram',folder_+'/data/cell_properties/'+file_type+'/SPINE_START=20/dend*1.0&F_shrinkage=1.0/'+passive_val_name+'/M_dendogram/dend_only.pdf')
         show_directory(axs2[place[i]],'syn fit',folder_+'/MOO_results/'+file_type+'/F_shrinkage=1.0_dend*1.0/const_param/'+passive_val_name+'/fit_transient_RDSM.pdf')
+if compare_between_change_in_the_morphology_passive_fits:
+    fig=plt.figure()
+    # plt.title(cell_name)
+    ax = fig.subplot_mosaic("""ABCD
+    EFGH
+    """)
+    i=0
+    for z,p in enumerate(glob('cells_outputs_data_short/'+cell_name+'/fit_short_pulse/z_correct.swc_SPINE_START=*/*/const_param/RA/analysis/RA const against errors2 60.png')):
+        show_directory(ax[place[i]],p.split('/')[3]+'\n'+p.split('/')[4],p)
+
 if plot_all_Moo_results:
     fig=plt.figure()
     # plt.title(cell_name)
-    ax = fig.subplot_mosaic("""ABC
-    DEF
-    GHI""")
+    ax = fig.subplot_mosaic("""ABCD
+    EFGH
+    IJKL
+    MNOP""")
     i=0
+
     # passive_vals_dict=get_passive_parameter(cell_name,shrinkage_resize=[shrinkage_by,resize_diam_by],fit_condition=fit_condition,spine_start=int(SPINE_START),file_type=file_type)
     if '4-5' in cell_name:
         same_diff=""
@@ -153,6 +166,27 @@ if plot_all_Moo_results:
         else:
             same_diff='_relative'
     for z,p in enumerate(glob('cells_outputs_data_short/'+cell_name+'/MOO_results'+same_diff+'*/z_correct.swc/F_shrinkage=*/const_param/*/fit_transient_RDSM.png')):
+        if p.split('/')[6]=='test': continue
+        # RA,CM,RM=get_passive_val(passive_vals_dict[p.split('/')[6]])
+        show_directory(ax[place[i]],p.split('/')[4]+p.split('/')[6],p)
+
+    fig=plt.figure()
+    # plt.title(cell_name)
+    ax = fig.subplot_mosaic("""ABC
+    DEF
+    GHI
+    """)
+    i=0
+
+    # passive_vals_dict=get_passive_parameter(cell_name,shrinkage_resize=[shrinkage_by,resize_diam_by],fit_condition=fit_condition,spine_start=int(SPINE_START),file_type=file_type)
+    if '4-5' in cell_name:
+        same_diff=""
+    else:
+        if same==True:
+            same_diff='_same'
+        else:
+            same_diff='_relative'
+    for z,p in enumerate(glob('cells_outputs_data_short/'+cell_name+'/MOO_results'+same_diff+'*/morphology.swc/F_shrinkage=*/const_param/*/fit_transient_RDSM.png')):
         if p.split('/')[6]=='test': continue
         # RA,CM,RM=get_passive_val(passive_vals_dict[p.split('/')[6]])
         show_directory(ax[place[i]],p.split('/')[4]+p.split('/')[6],p)
