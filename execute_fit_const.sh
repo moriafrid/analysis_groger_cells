@@ -34,5 +34,5 @@ else
 fi
 
 path=$(dirname $SCRIPT_PATH)
-echo "Running: python3 $path/$fit_best_with_const_param.py $args"
 python3 $path/fit_best_with_const_param.py $args
+echo "Running: python3 $path/$fit_best_with_const_param.py $args"

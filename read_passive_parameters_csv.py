@@ -5,11 +5,9 @@ def get_passive_parameter(cell_name,double_spine_area=False,shrinkage_resize=[1.
     #creat the value to run on
     df.loc[(df["fit_condition"] == fit_condition) & (df["file_type"] == file_type), :].to_dict('records')
 
-    curr = df.loc[(df["fit_condition"] == fit_condition) & (df["file_type"] == file_type)&(df["spine_start"] == spine_start)&
-                  (df['shrinkage&resize_factors']==str(shrinkage_resize)), :]
     if double_spine_area:
         curr = df.loc[(df["fit_condition"] == fit_condition) & (df["file_type"] == file_type)&(df["spine_start"] == spine_start)&
-              (df['shrinkage&resize_factors']==str(shrinkage_resize))&df['double_spine_area']==double_spine_area, :]
+              (df['shrinkage&resize_factors']==str(shrinkage_resize))&df['double_spine_area']==eval(double_spine_area), :]
     else:
         curr = df.loc[(df["fit_condition"] == fit_condition) & (df["file_type"] == file_type)&(df["spine_start"] == spine_start)&
               (df['shrinkage&resize_factors']==str(shrinkage_resize)), :]

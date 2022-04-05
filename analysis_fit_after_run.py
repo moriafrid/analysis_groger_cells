@@ -18,8 +18,8 @@ if len(sys.argv) != 7:
     file_type='z_correct.swc'
     resize_diam_by=1.0
     shrinkage_factor=1.0
-    SPINE_START=60
-    folder_='/ems/elsc-labs/segev-i/moria.fridman/project/analysis_groger_cells/'
+    SPINE_START=20
+    double_spine_area='True'
     print("the function doesn't run with sys.argv",flush=True)
 else:
     cell_name = sys.argv[1]
@@ -27,13 +27,14 @@ else:
     resize_diam_by = float(sys.argv[3]) #how much the cell sweel during the electrophisiology records
     shrinkage_factor =float(sys.argv[4]) #how much srinkage the cell get between electrophysiology record and LM
     SPINE_START=int(sys.argv[5])
-    folder_= sys.argv[6] #'/ems/elsc-labs/segev-i/moria.fridman/project/analysis_groger_cells/'
+    double_spine_area=eval(sys.argv[6])
     print('the len of sys.argv is correct and running',flush=True)
 save_dir = "cells_outputs_data_short/"
-
+folder_=''
 initial_folder=folder_+save_dir+cell_name+'/fit_short_pulse/'+file_type+'_SPINE_START='+str(SPINE_START)+'/'
 initial_folder+="/dend*"+str(round(resize_diam_by,2))+'&F_shrinkage='+str(round(shrinkage_factor,2))
-
+if double_spine_area:
+    initial_folder+='_double_spine_area'
 # location='/ems/elsc-labs/segev-i/moria.fridman/project/analysis_groger_cells/cells_outputs_data_short/2017_05_08_A_4-5/fit_short_pulse_ASC/dend*1.0&F_shrinkage=1.0/basic_fit'
 # datas2=glob(location+'/*/final_result*.p')
 def analysis_fit(location):

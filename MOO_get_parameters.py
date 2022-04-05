@@ -42,15 +42,15 @@ if len(sys.argv) != 15:
     passive_val={'RA':float(100),'CM':1,'RM':10000}
     passive_fit_condition='const_param'
     passive_val_name='test'
-    resize_dend_by=1.2
+    resize_dend_by=1.0
     shrinkage_by=1.0
     SPINE_START=20
     profile = '_'
     RA=float(100)
     generation_size = 5
     num_of_genarations = 2
-    same_strengh=True
     double_spine_area=True
+    same_strengh=True
 
 else:
     print("the sys.argv len is correct",flush=True)
@@ -63,8 +63,8 @@ else:
     resize_dend_by = float(sys.argv[9]) #how much the cell sweel during the electrophisiology records
     shrinkage_by =float(sys.argv[10]) #how much srinkage the cell get between electrophysiology record and LM
     SPINE_START=int(sys.argv[11])
-    same_strengh=eval(sys.argv[12])
-    double_spine_area=eval(sys.argv[13])
+    double_spine_area=eval(sys.argv[12])
+    same_strengh=eval(sys.argv[13])
     profile = sys.argv[14]
     RA=float(sys.argv[4])
     generation_size = 100

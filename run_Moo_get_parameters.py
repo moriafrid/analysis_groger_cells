@@ -18,20 +18,20 @@ folder_=""
 folder_data="cells_initial_information/"
 folder_save="cells_outputs_data_short/"
 
-os.system('python csv_for_passive_val_results.py')
+# os.system('python csv_for_passive_val_results.py')
 
 file_types=['z_correct.swc','morphology.swc'][:1]
 SPINE_STARTs=[60]
-for cell_name in read_from_pickle(cells_name_place)[1:2]:
+for cell_name in read_from_pickle(cells_name_place):
     passive_vals_dict= {}
     # p='cells_initiall_information/'+cell_name+'/results_passive_fits.csv'
     p='cells_outputs_data_short/'+cell_name+'/fit_short_pulse/results_passive_fits.csv'
     df = pd.read_csv(p)
-    for resize_diam_by ,shrinkage_by in zip([1.0],[1.0]):#zip([1.0,1.1,1.2],[1.0,1.1,1.0]):
+    for resize_diam_by ,shrinkage_by in zip([1.0,1.1,1.2,1.5][:1],[1.0,1.1,1.0,1.0][:1]):#zip([1.0],[1.0]):
         for fit_condition in ['const_param','different_initial_conditions'][:1]:
             for file_type in file_types:
                 for SPINE_START in [20,60,10][:1]:
-                    for double_spine_area in ['True','False']:
+                    for double_spine_area in ['True','False'][0:1]:
                         passive_vals_dict=get_passive_parameter(cell_name,double_spine_area=double_spine_area,shrinkage_resize=[shrinkage_by,resize_diam_by],fit_condition=fit_condition,spine_start=SPINE_START,file_type=file_type)
                         for i, passive_val_name in enumerate(['RA=120','RA=150','RA_min_error','RA_best_fit']):
                             # if i!=2: continue
