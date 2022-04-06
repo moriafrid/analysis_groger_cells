@@ -1,9 +1,15 @@
 import numpy as np
-def get_passive_val(passive_val_dict):
+def get_passive_val(passive_val_dict,what_return='string'):
     RA=passive_val_dict['RA']
     CM=passive_val_dict['CM']
     RM=passive_val_dict['RM']
-    return str(RA),str(CM),str(RM)
+    if what_return=='string':
+        return str(RA),str(CM),str(RM)
+    elif what_return=='nice_results':
+        return 'RA:'+str(round(RA,2))+' CM:'+str(round(CM,2))+ ' RM: '+str(round(RM,2))
+    else: raise "what return isn't possible"
+
+
 def found_min_parameter(list_dicts,parameter='CM'):
     temp_dict=list_dicts[0]
     for passive_val_dict in list_dicts:

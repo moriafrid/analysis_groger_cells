@@ -37,7 +37,7 @@ print(sys.argv,flush=True)
 if len(sys.argv) != 15:
     print("the function doesn't run with sys.argv",len(sys.argv),flush=True)
     cpu_node = 1
-    cell_name= '2017_05_08_A_5-4'
+    cell_name= '2017_05_08_A_4-5'
     file_type='z_correct.swc'  #file type is just used to calculate F_factor
     passive_val={'RA':float(100),'CM':1,'RM':10000}
     passive_fit_condition='const_param'
@@ -82,9 +82,9 @@ folder_=''
 data_dir= "cells_initial_information/"
 save_dir = "cells_outputs_data_short/"
 if same_strengh:
-    base2 = folder_+save_dir+cell_name+'/MOO_results_same_strange/'+file_type+"/"  # folder name  _RA_free
+    base2 = folder_+save_dir+cell_name+'/MOO_results_same_strange/'+file_type+'_SPINE_START='+str(SPINE_START)+'/'  # folder name  _RA_free
 else:
-    base2 = folder_+save_dir+cell_name+'/MOO_results_relative_strange/'+file_type+"/"  # folder name  _RA_free
+    base2 = folder_+save_dir+cell_name+'/MOO_results_relative_strange/'+file_type+'_SPINE_START='+str(SPINE_START)+'/'  # folder name  _RA_free
 
 base2+='F_shrinkage='+str(round(shrinkage_by,2))+'_dend*'+str(round(resize_dend_by,2))
 if double_spine_area:

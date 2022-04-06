@@ -27,7 +27,7 @@ for cell_name in cells:
     dict_fit_condition={}
     for fit_condition in ['const_param','different_initial_conditions'][:1]:
         print(fit_condition)
-        for file_type in ['z_correct.swc','morphology.swc']:
+        for file_type in ['z_correct.swc','morphology.swc','ASC']:
             for shrinkage_factor,resize_diam_by in zip([1.0,1.1,1.0,1.0],[1.0,1.1,1.2,1.5]):
                 for SPINE_START in [str(20),str(10),str(60)]:
                     for double_spine_area in ['True','False']:
