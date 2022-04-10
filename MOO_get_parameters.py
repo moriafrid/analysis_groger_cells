@@ -18,6 +18,9 @@ import logging
 import signal
 from extra_function import SIGSEGV_signal_arises, load_hoc,load_ASC,load_swc,create_folder_dirr
 from glob import glob
+matplotlib.rcParams['pdf.fonttype'] = 42
+matplotlib.rcParams['png.fonttype'] = 42
+matplotlib.rcParams['svg.fonttype'] = 'none'
 
 signal.signal(signal.SIGSEGV, SIGSEGV_signal_arises)
 logger = logging.getLogger(__name__)
@@ -604,7 +607,7 @@ def run(cell, seed=0):
         #     if model1.params[param].frozen:
         #         continue
         #     start_values1[param] = model1.params[param].value
-        add_figure('befure fit',T_with_units.units,V_with_units.units)
+        fig=add_figure('befure fit',T_with_units.units,V_with_units.units)
         responses = protocol.run(cell_model=model, param_values=start_values, sim=sim)
         temp = np.array(responses['soma.v']['time'])
         temp2 = np.array(responses['soma.v']['voltage'])
@@ -618,6 +621,8 @@ def run(cell, seed=0):
         plt.plot(T_base, V_base, color='black',alpha=0.2,label='data',lw=5)
         plt.legend()
         plt.savefig(base_save_folder + 'before_fit_transient_RDSM.png')
+        pickle.dump(fig, open(base_save_folder + 'before_fit_transient_RDSM.p', 'wb'))
+
         plt.close()
     final_pop, hall_of_fame, logs, hist = optimisation.run(max_ngen=num_of_genarations)
 
@@ -736,7 +741,7 @@ def run(cell, seed=0):
     # for key, val in zip(parameters2, best_ind):
     #     default_params[key] = val
     print(default_params)
-    add_figure('MOO RDSM fit to transient',T_with_units.units,V_with_units.units)
+    fig=add_figure('MOO RDSM fit to transient',T_with_units.units,V_with_units.units)
     responses = protocol.run(cell_model=model, param_values=best_ind_dict, sim=sim)
 
     temp = np.array(responses['soma.v']['time'])
@@ -761,6 +766,7 @@ def run(cell, seed=0):
     plt.legend(fontsize=12)
     plt.savefig(base_save_folder + 'fit_transient_RDSM.png')
     plt.savefig(base_save_folder + 'fit_transient_RDSM.pdf')
+    pickle.dump(fig, open(base_save_folder + 'fit_transient_RDSM.p', 'wb'))
     plt.close()
 
     print("when done h.dt = ", sim.neuron.h.dt)

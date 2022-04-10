@@ -2,11 +2,14 @@ from open_MOO_after_fit import OPEN_RES
 import numpy as np
 # from neuron import h
 import matplotlib.pyplot as plt
-import os
 from glob import glob
-import sys
 from read_spine_properties import get_sec_and_seg,get_building_spine,get_n_spinese
 from tqdm import tqdm
+import matplotlib
+import pickle
+matplotlib.rcParams['pdf.fonttype'] = 42
+matplotlib.rcParams['png.fonttype'] = 42
+matplotlib.rcParams['svg.fonttype'] = 'none'
 
 folder_= ''
 folder_data=folder_+'cells_outputs_data_short/*/MOO_results*/*/F_shrinkage=*/const_param/'
@@ -80,6 +83,8 @@ for model_place in tqdm(glob(folder_data+'*')):
     plt.legend()
     plt.savefig(model_place+save_name+'.png')
     plt.savefig(model_place+save_name+'.pdf')
+    pickle.dump(fig, open(model_place+save_name+'.p', 'wb'))
+
     # plt.show()
 
     # plt.plot(time_all, V_spine_All-V_spine_All[0], color='k', label='all',alpha=0.3)

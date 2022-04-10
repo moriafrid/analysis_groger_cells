@@ -4,14 +4,18 @@ import matplotlib.pyplot as plt
 from scipy.optimize import curve_fit
 import os
 from add_figure import add_figure
-
+import pickle
+import matplotlib
+matplotlib.rcParams['pdf.fonttype'] = 42
+matplotlib.rcParams['png.fonttype'] = 42
+matplotlib.rcParams['svg.fonttype'] = 'none'
 def linear(x, m,c):
     return m*x+c
 from extra_function import create_folders_list
 folder_='/ems/elsc-labs/segev-i/moria.fridman/project/analysis_groger_cells/cells_outputs_data_short/'
 for cell_name in ['2017_05_08_A_4-5','2017_05_08_A_5-4','2017_03_04_A_6-7']:
     plt.close()
-    plt.figure()
+    fig1=plt.figure()
     folder_data=folder_+cell_name+'/data/electrophysio_records/short_pulse/mean_short_pulse_with_parameters.p'
     folder_save=folder_+cell_name+'/fit/tau_m'
     create_folders_list([folder_save])
@@ -43,9 +47,11 @@ for cell_name in ['2017_05_08_A_4-5','2017_05_08_A_5-4','2017_03_04_A_6-7']:
     plt.legend()
 
     plt.savefig(folder_save+'/all_tau')
+    pickle.dump(fig1, open(folder_save+'/all_tau.p', 'wb'))
+
     plt.show()
     for i,point in enumerate(points):
-        add_figure('find tau from '+str(point),'t[ms]','ln(short_pulse)')
+        fig=add_figure('find tau from '+str(point),'t[ms]','ln(short_pulse)')
         plt.plot(T, log_v, label="ln(short_pulse)", alpha=0.3, lw=3)
         popt, pcov = curve_fit(linear, T[point[0]:point[1]], log_v[point[0]:point[1]])
         plt.plot(T, linear(np.array(T), *popt), color=colors[i], lw=2, label='tau=' + str( round(-1.0/popt[0], 3)) + ' 1/s',)
@@ -53,6 +59,8 @@ for cell_name in ['2017_05_08_A_4-5','2017_05_08_A_5-4','2017_03_04_A_6-7']:
         print(1.0 / (abs(log_v[point[1]] - log_v[point[0]]) / abs(T[point[1]] - T[point[0]])))
         plt.legend()
         plt.savefig(folder_save+'/tau='+str( -round(1.0/popt[0], 3))+'.png')
+        pickle.dump(fig, open(folder_save+'/tau='+str( -round(1.0/popt[0], 3))+'.p', 'wb'))
+
     #
     # points = [295, 1300]
     # popt, pcov = curve_fit(linear, T[points[0]:points[1]], log_v[points[0]:points[1]])

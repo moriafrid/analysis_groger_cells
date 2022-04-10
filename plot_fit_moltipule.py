@@ -10,6 +10,11 @@ import quantities as pq
 from glob import glob
 import pickle
 from calculate_F_factor import calculate_F_factor
+import matplotlib
+matplotlib.rcParams['pdf.fonttype'] = 42
+matplotlib.rcParams['png.fonttype'] = 42
+matplotlib.rcParams['svg.fonttype'] = 'none'
+
 path_single_traces=glob('data/traces_img/2017_05_08_A_0006/*pA.p')
 path=path_single_traces[0]
 I=int(path[path.rfind('/')+1:path.rfind('pA')])
@@ -220,7 +225,7 @@ if resize_diam_by!=1:
 else:
     # for name in ['gregor par','free fit','RA=0','RA=70','CM=1,RA=0']:
     for name in dict.keys():
-        add_figure("Fits [Rm,RA,Cm]", short_pulse[1].units, short_pulse[0].units)
+        fig=add_figure("Fits [Rm,RA,Cm]", short_pulse[1].units, short_pulse[0].units)
         plt.plot(T[start_fit:end_fit], V[start_fit:end_fit], color='black', lw=4, alpha=0.2)
         RM, RA, CM=dict[name]
         plot_res(RM, RA, CM,name=name)
@@ -229,6 +234,8 @@ else:
         plt.legend(loc="lower left",prop={'size': 10})
         plt.savefig(folder_ +  'fits_together/'+name)
         plt.savefig(folder_ +  'fits_together/'+name+'.pdf')
+        pickle.dump(fig, open(folder_ +  'fits_together/'+name+'.p', 'wb'))
+
         plt.close()
 
 

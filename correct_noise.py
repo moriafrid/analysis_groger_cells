@@ -1,14 +1,17 @@
 #need to be deleted
 import sys,os
-file_dir = os.path.dirname(__file__)
-sys.path.append(file_dir)
-import matplotlib
 from matplotlib import pyplot as plt
 import numpy as np
 from add_figure import add_figure
-matplotlib.use('agg')
 import pickle
 from tqdm import tqdm
+import matplotlib
+matplotlib.use('agg')
+matplotlib.rcParams['pdf.fonttype'] = 42
+matplotlib.rcParams['png.fonttype'] = 42
+matplotlib.rcParams['svg.fonttype'] = 'none'
+file_dir = os.path.dirname(__file__)
+sys.path.append(file_dir)
 #hendel function
 def reshape_data(data):
 	minlen = min(len(r) for r in data)

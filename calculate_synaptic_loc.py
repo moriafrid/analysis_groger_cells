@@ -91,7 +91,7 @@ def synaptic_loc(cell_dir,syn_poses_list,with_plot=False, part='all', save_place
                     seg_num[j]=round(accumalate_len / total_len,3)
                     sec_num[j]=int(str(sec)[str(sec).find('[')+1:-1])
     if with_plot:
-        plt.figure()
+        fig=plt.figure()
         for p in all_points:
             plt.scatter(p[0], p[1], color='black',s=0.5)
     dend_pos_dict={}
@@ -134,11 +134,13 @@ def synaptic_loc(cell_dir,syn_poses_list,with_plot=False, part='all', save_place
         plt.legend(handles=legend_elements, loc="best")
         plt.savefig(save_place+'.pdf')
         plt.savefig(save_place)
+        pickle.dump(fig, open(save_place+'.p', 'wb'))
+
         plt.close()
     with open(save_place + '_neuron_morphology.p', 'wb') as f:
         pickle.dump({"all_point":all_points,"synaptic_dend":dend_pos_dict,"syn_pos":xyz,"syn_sec_pos":dends_name}, f)
 
-    dict =  { 'sec_name':sec_name,'sec_num':sec_num,'seg_num':seg_num,'place_name':dends_name,'dist_from_soma':dis_from_soma,'dist':dists, 'part':part}
+    dict = {'sec_name':sec_name,'sec_num':sec_num,'seg_num':seg_num,'place_name':dends_name,'dist_from_soma':dis_from_soma,'dist':dists, 'part':part}
     print(dict)
 
     try_save_dict(dict,folder_save+cell_name+'/','synaptic_location')

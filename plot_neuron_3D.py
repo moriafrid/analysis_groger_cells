@@ -8,6 +8,11 @@ signal.signal(signal.SIGSEGV, SIGSEGV_signal_arises)
 from glob import glob
 from open_pickle import read_from_pickle
 import sys
+import pickle
+import matplotlib
+matplotlib.rcParams['pdf.fonttype'] = 42
+matplotlib.rcParams['png.fonttype'] = 42
+matplotlib.rcParams['svg.fonttype'] = 'none'
 print(len(sys.argv),sys.argv,flush=True)
 
 if len(sys.argv) != 3:
@@ -28,7 +33,7 @@ def plot_morphology(cell_dir,dots_dir,syn_pose_list,with_axon=False, save_place=
     cell=load_ASC(cell_dir,delete_axon=not with_axon)
     h.load_file("nrngui.hoc")
     color_code={'basal':'blue','apical':'black','axon':'red','soma':'purple','synapse':'cyan','synaptic_dend':'green'}
-    plt.figure()
+    fig=plt.figure()
     ax = plt.axes(projection ="3d")
 
     plt.title("neuron morphology")
@@ -78,6 +83,7 @@ def plot_morphology(cell_dir,dots_dir,syn_pose_list,with_axon=False, save_place=
     plt.legend(handles=legend_elements, loc="best")
     plt.savefig(save_place+'.pdf')
     plt.savefig(save_place+'.png')
+    pickle.dump(fig, open(save_place+'.p', 'wb'))
 
     plt.close()
 

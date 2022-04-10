@@ -3,6 +3,12 @@ from extra_function import load_ASC,SIGSEGV_signal_arises,load_swc
 from glob import glob
 import signal
 from neuron import gui,h
+import numpy as np
+import matplotlib.pyplot as plt
+import matplotlib
+matplotlib.rcParams['pdf.fonttype'] = 42
+matplotlib.rcParams['png.fonttype'] = 42
+matplotlib.rcParams['svg.fonttype'] = 'none'
 signal.signal(signal.SIGSEGV, SIGSEGV_signal_arises)
 cell=None
 cell_name='6-7'
@@ -11,8 +17,6 @@ for type in ['correct.swc']:
     cell=load_swc(glob('cells_initial_information/2017*'+cell_name+'/*'+type)[0])
 sp = h.PlotShape()
 sp.show(0)  # show diameters
-import numpy as np
-import matplotlib.pyplot as plt
 def get_z_jump(sec, prev_z,place=2):
     res = []
     for z in np.array([list(i) for i in sec.psection()['morphology']['pts3d']])[:,place]:

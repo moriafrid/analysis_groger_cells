@@ -2,14 +2,15 @@ from open_MOO_after_fit import OPEN_RES
 import numpy as np
 from neuron import h
 import matplotlib.pyplot as plt
-import os
 from glob import glob
 from tqdm import tqdm
-from add_figure import add_figure
-from open_pickle import read_from_pickle
 from read_spine_properties import get_sec_and_seg,get_building_spine,get_n_spinese
-
 from extra_function import create_folder_dirr
+import matplotlib
+import pickle
+matplotlib.rcParams['pdf.fonttype'] = 42
+matplotlib.rcParams['png.fonttype'] = 42
+matplotlib.rcParams['svg.fonttype'] = 'none'
 import sys
 if len(sys.argv) != 7:
    cell_name= '2017_05_08_A_5-4'
@@ -42,11 +43,12 @@ for model_place in glob(folder_data+'*'):
     plt.title('AMPA and NMDA impact on voltage ')
     if get_n_spinese(cell_name) == 1:
         axis = axis[..., np.newaxis]
+
     if get_n_spinese(cell_name) == 2:
-        fig = plt.figure(figsize=(10,10))
-        axs = fig.subplot_mosaic("""AB""")
+        figure = plt.figure(figsize=(10,10))
+        axis = figure.subplot_mosaic("""AB""")
     else:
-        axs = fig.subplot_mosaic("""A""")
+        axs = figure.subplot_mosaic("""A""")
     # add_figure('AMPA and NMDA impact on voltage ' + type,'mV', 'mS')
     for i in tqdm(range(10)):
         loader = OPEN_RES(res_pos=model_place + '/')
@@ -92,3 +94,5 @@ for model_place in glob(folder_data+'*'):
     plt.title('AMPA and NMDA impact on voltage ' +" ".join(model_place.split('/')[-1].split('_')[2:]) + '\n' + passive_propert_title)
     plt.legend()
     plt.savefig(folder_save+type+'.png')
+    pickle.dump(figure, open(folder_save+type+'.p', 'wb'))
+

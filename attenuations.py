@@ -11,6 +11,10 @@ from read_spine_properties import get_n_spinese,get_building_spine
 import json
 from open_pickle import read_from_pickle
 from read_passive_parameters_csv import get_passive_parameter
+import matplotlib
+matplotlib.rcParams['pdf.fonttype'] = 42
+matplotlib.rcParams['png.fonttype'] = 42
+matplotlib.rcParams['svg.fonttype'] = 'none'
 
 freq=100
 do_calculate_F_factor=True

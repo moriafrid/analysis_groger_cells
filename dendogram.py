@@ -14,6 +14,10 @@ from open_pickle import read_from_pickle
 from calculate_F_factor import calculate_F_factor
 from read_spine_properties import get_n_spinese
 from read_passive_parameters_csv import get_passive_parameter
+import pickle
+matplotlib.rcParams['pdf.fonttype'] = 42
+matplotlib.rcParams['png.fonttype'] = 42
+matplotlib.rcParams['svg.fonttype'] = 'none'
 do_calculate_F_factor=True
 print("the number of parameters that sys loaded in dendogram.py is ",len(sys.argv),flush=True)
 print(len(sys.argv), sys.argv)
@@ -266,7 +270,7 @@ class Dendogram():
         return x_pos, mid_x
 
     def plot(self, save_folder, max_y=None,title='Dendogram',ylabel='distance from soma'):
-        plt.figure(figsize=(10, 10))
+        fig=plt.figure(figsize=(10, 10))
         plt.title(title+'\n'+name+' '+str(passive_val),fontsize=24)
         plt.ylabel(ylabel,fontsize=16)
         x_pos = 0.0
@@ -299,6 +303,8 @@ class Dendogram():
         plt.ylim([-0.1, max_y])
         plt.savefig(save_folder + self.name)
         plt.savefig(save_folder + self.name+ ".pdf")
+        pickle.dump(fig, open(save_folder + self.name+'.p', 'wb'))
+
         plt.close()
         self.done_section = set()
         return max_y

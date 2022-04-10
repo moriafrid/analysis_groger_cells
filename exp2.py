@@ -6,6 +6,12 @@ from read_spine_properties import get_sec_and_seg,get_building_spine,get_n_spine
 import os
 from glob import glob
 from tqdm import tqdm
+import pickle
+import matplotlib
+matplotlib.rcParams['pdf.fonttype'] = 42
+matplotlib.rcParams['png.fonttype'] = 42
+matplotlib.rcParams['svg.fonttype'] = 'none'
+
 folder_= ''
 folder_data=folder_+'cells_outputs_data_short/*/MOO_results*/*/F_shrinkage=*/const_param/'
 save_name='/AMPA&NMDA'
@@ -66,7 +72,7 @@ for model_place in tqdm(glob(folder_data+'*')):
     from add_figure import add_figure
 
     passive_propert_title='Rm='+str(round(1.0/model.soma[0].g_pas,2)) +' Ra='+str(round(model.soma[0].Ra,2))+' Cm='+str(round(model.soma[0].cm,2))
-    add_figure('AMPA and NMDA impact on voltage '+" ".join(model_place.split('/')[-1].split('_')[2:])+'\n'+passive_propert_title,'time[ms]','Voltage[mV]')
+    fig=add_figure('AMPA and NMDA impact on voltage '+" ".join(model_place.split('/')[-1].split('_')[2:])+'\n'+passive_propert_title,'time[ms]','Voltage[mV]')
     plt.plot(time_all, V_soma_All, color='g', lw=5,label='all',alpha=0.4)
     plt.plot(time_all, V_soma_AMPA, color='b', lw=2,linestyle='--', label='AMPA',alpha=0.8)
     # plt.plot(time_all, V_NMDA,lw=2, color='r', linestyle='--', label='NMDA',alpha=0.8)
@@ -75,5 +81,6 @@ for model_place in tqdm(glob(folder_data+'*')):
     plt.legend()
     plt.savefig(model_place+save_name+'.png')
     plt.savefig(model_place+save_name+'.pdf')
+    pickle.dump(fig, open(model_place+save_name+'.p', 'wb'))
 
     plt.show()

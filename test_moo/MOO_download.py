@@ -13,6 +13,9 @@ from add_figure import add_figure
 from open_pickle import read_from_pickle
 from calculate_F_factor import calculate_F_factor
 matplotlib.use('agg')
+matplotlib.rcParams['pdf.fonttype'] = 42
+matplotlib.rcParams['png.fonttype'] = 42
+matplotlib.rcParams['svg.fonttype'] = 'none'
 
 # import argparse
 # parser = argparse.ArgumentParser(description='')
@@ -614,7 +617,7 @@ def run(cell, seed=0):
             if model1.params[param].frozen:
                 continue
             start_values1[param] = model1.params[param].value
-        add_figure('befure fit',T_with_units.units,V_with_units.units)
+        fig=add_figure('befure fit',T_with_units.units,V_with_units.units)
         responses = protocol.run(cell_model=model, param_values=start_values, sim=sim)
         temp = np.array(responses['soma.v']['time'])
         temp2 = np.array(responses['soma.v']['voltage'])
@@ -640,6 +643,8 @@ def run(cell, seed=0):
             plt.text(100,-76.5,'max_vol_other_morph='+str(round(np.amax(temp2),2)))
         plt.legend()
         plt.savefig(base_save_folder + 'before_fit_transient_RDSM')
+        pickle.dump(fig, open(base_save_folder + 'before_fit_transient_RDSM.p', 'wb'))
+
         plt.close()
     final_pop, hall_of_fame, logs, hist = optimisation.run(max_ngen=num_of_genarations)
 
@@ -757,7 +762,7 @@ def run(cell, seed=0):
     # for key, val in zip(parameters2, best_ind):
     #     default_params[key] = val
     print(default_params)
-    add_figure('MOO RDSM fit to transient',T_with_units.units,V_with_units.units)
+    fig=add_figure('MOO RDSM fit to transient',T_with_units.units,V_with_units.units)
     responses = protocol.run(cell_model=model, param_values=best_ind_dict, sim=sim)
 
     temp = np.array(responses['soma.v']['time'])
@@ -800,6 +805,8 @@ def run(cell, seed=0):
     plt.legend(fontsize=12)
     plt.savefig(base_save_folder + 'fit_transient_RDSM')
     plt.savefig(base_save_folder + 'fit_transient_RDSM.pdf')
+    pickle.dump(fig, open(base_save_folder + 'fit_transient_RDSM.p', 'wb'))
+
     plt.close()
 
     print("when done h.dt = ", sim.neuron.h.dt)

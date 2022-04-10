@@ -12,7 +12,11 @@ import pandas as pd
 from calculate_F_factor import calculate_F_factor
 import pandas as pd
 from read_passive_parameters_csv import get_passive_parameter
-
+import pickle
+import matplotlib
+matplotlib.rcParams['pdf.fonttype'] = 42
+matplotlib.rcParams['png.fonttype'] = 42
+matplotlib.rcParams['svg.fonttype'] = 'none'
 
 do_calculate_F_factor=True
 print("the number of parameters that sys loaded in Rin_Rm_plot.py is ",len(sys.argv),flush=True)
@@ -107,7 +111,7 @@ for sec in cell.all_sec():
 change_model_pas(CM=CM, RA = RA, RM =RM, E_PAS = E_pas,F_factor= F_factor)
 imp = h.Impedance(sec=soma)
 imp.loc(0.5, sec=soma)
-add_figure('Rin to Rm for diffrent Ra'+'\n'+name+' '+str(passive_val),'Rm [Ohm/cm^2]','Rin [M ohm]')
+fig=add_figure('Rin to Rm for diffrent Ra'+'\n'+name+' '+str(passive_val),'Rm [Ohm/cm^2]','Rin [M ohm]')
 Rm_arr = np.hstack([np.arange(10, 2511, 100), np.arange(2510, 20011, 1000)])
 for Ra in [1e-9, 70, 100, 150, 200]:
     res = []
@@ -122,6 +126,8 @@ plt.xlabel('Rm (ohm/cm**2)')
 plt.ylabel('Rin (M ohm)')
 plt.legend()
 plt.savefig(folder_save+'/Rin_Rm')
+pickle.dump(fig, open(folder_save+'/Rin_Rm.p', 'wb'))
+
 freqs=np.linspace(0,200,num=100)
 dict_syn=pd.read_excel(folder_+save_dir+"synaptic_location_seperate.xlsx",index_col=0)
 # for spine_sec,spine_seg in zip(spines_sec,spines_seg):
@@ -136,12 +142,14 @@ for spine_num in range(get_n_spinese(cell_name)):
         imp_0.loc(spine_seg, sec=spine_sec)
         imp_0.compute(freq)  # check if you need at 10 Hz
         Rin_syn.append( imp_0.input(spine_seg, sec=spine_sec))
-    add_figure('Rin to freq'+'\n'+name+' '+str(passive_val),'freq [hz]','Rinput [M ohm]')
+    fig=add_figure('Rin to freq'+'\n'+name+' '+str(passive_val),'freq [hz]','Rinput [M ohm]')
     plt.plot(freqs,Rin_syn)
     imp_0.compute(100)
     plt.plot(100,   imp_0.input(spine_seg, sec=spine_sec)  ,'*')
     plt.legend(['Rin2freq',str([10,   round(imp_0.input(spine_seg, sec=spine_sec),2)])])
     plt.savefig(folder_save+'/Rin_freq for spinenum '+str(spine_num))
+    pickle.dump(fig, open(folder_save+'/Rin_freq for spinenum '+str(spine_num)+'.p', 'wb'))
+
     Rin,dis=[],[]
     freq=100
     h.distance(0,0.5, sec=soma)
@@ -159,7 +167,7 @@ for spine_num in range(get_n_spinese(cell_name)):
             # imp_0.input(seg, sec=sec)
             Rin.append( imp_0.transfer(spine_sec(spine_seg)))
             dis.append(h.distance(spine_sec(spine_seg)))
-    add_figure('transfer impadence at freq '+str(freq)+'Hz'+'\n'+name+' '+str(passive_val),'ditance form soma [micron]','transfer_resistance[ohm]' )
+    fig=add_figure('transfer impadence at freq '+str(freq)+'Hz'+'\n'+name+' '+str(passive_val),'ditance form soma [micron]','transfer_resistance[ohm]' )
     plt.plot(dis,Rin,'.')
     dis_syn=h.distance(spine_sec(spine_seg))
     Rin_syn=imp_0.transfer(spine_sec(spine_seg))
@@ -167,6 +175,7 @@ for spine_num in range(get_n_spinese(cell_name)):
     plt.text(0,0,'Cm,Ra,Rm=[2,70,5684]')
     plt.legend()
     plt.savefig(folder_save+'/transfer resistance for spinemum '+str(spine_num))
+    pickle.dump(fig, open(folder_save+'/transfer resistance for spinemum '+str(spine_num)+'.p', 'wb'))
 
 print('Rin_Rm.py is complite to run for '+cell_name)
 

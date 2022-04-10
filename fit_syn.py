@@ -10,6 +10,11 @@ import quantities as pq
 from glob import glob
 import pickle
 from calculate_F_factor import calculate_F_factor
+import matplotlib
+matplotlib.rcParams['pdf.fonttype'] = 42
+matplotlib.rcParams['png.fonttype'] = 42
+matplotlib.rcParams['svg.fonttype'] = 'none'
+
 path_single_traces=glob('data/traces_img/2017_05_08_A_0006/*pA.p')
 path=path_single_traces[0]
 I=int(path[path.rfind('/')+1:path.rfind('pA')])

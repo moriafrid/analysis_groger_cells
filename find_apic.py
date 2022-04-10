@@ -1,12 +1,3 @@
-import signal
-from neuron import h, gui
-import numpy as np
-import matplotlib.pyplot as plt
-from tqdm import tqdm
-from add_figure import add_figure
-from glob import glob
-import os
-
 def run_find_apic(apics,last_apic):
     for child in last_apic.children():
         apics.append(child)

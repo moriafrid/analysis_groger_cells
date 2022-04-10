@@ -7,6 +7,11 @@ from glob import glob
 import sys
 from read_spine_properties import get_sec_and_seg,get_building_spine,get_n_spinese
 from tqdm import tqdm
+import pickle
+import matplotlib
+matplotlib.rcParams['pdf.fonttype'] = 42
+matplotlib.rcParams['png.fonttype'] = 42
+matplotlib.rcParams['svg.fonttype'] = 'none'
 
 if len(sys.argv) != 7:
   cell_name= '2017_05_08_A_5-4'
@@ -96,6 +101,7 @@ for model_place in tqdm(glob(folder_data+'*')):
 
     plt.savefig(model_place+save_name+'.png')
     plt.savefig(model_place+save_name+'.pdf')
+    pickle.dump(fig, open(model_place+save_name+'.p', 'wb'))
 
     # plt.show()
 

@@ -6,6 +6,12 @@ from scipy.optimize import curve_fit
 from add_figure import add_figure
 from extra_function import create_folders_list
 import sys
+import pickle
+import matplotlib
+matplotlib.rcParams['pdf.fonttype'] = 42
+matplotlib.rcParams['png.fonttype'] = 42
+matplotlib.rcParams['svg.fonttype'] = 'none'
+
 if len(sys.argv)!=5:
     cells= ['2017_05_08_A_4-5','2017_05_08_A_5-4','2017_03_04_A_6-7']
     folder_='/ems/elsc-labs/segev-i/moria.fridman/project/analysis_groger_cells/cells_outputs_data_short/'
@@ -26,7 +32,7 @@ def calculate_tau_m(short_pulse_path,folder_save):
     plt.plot(ln_pulse)
     plt.show()
     while again=="y":
-        add_figure(cell_name,'0.1 ms','ln(mV)')
+        fig=add_figure(cell_name,'0.1 ms','ln(mV)')
         dot1=int(input("put the begining dot for the decay"))
         dot2=int(input("put the end dot for the decay"))
         m=(ln_pulse[dot2]-ln_pulse[dot1])/(dot2-dot1)
@@ -38,7 +44,11 @@ def calculate_tau_m(short_pulse_path,folder_save):
         plt.plot(T, linear(np.array(T), *popt), lw=1, label='tau=' + str(tau_m) + ' 1/s',
                  alpha=0.5)
         plt.legend()
-        plt.savefig(folder_save+'/calculate tau_m')
+        plt.savefig(folder_save+'/calculate tau_m.pdf')
+        plt.savefig(folder_save+'/calculate tau_m.png')
+
+        pickle.dump(fig, open(folder_save+'/calculate tau_m.p', 'wb'))
+
         plt.show()
         again=input("chose another dots? (y/n")
     d={'decay':tau_m ,'dots2calculate':[dot1, dot2]}

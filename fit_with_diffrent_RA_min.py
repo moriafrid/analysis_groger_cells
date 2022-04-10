@@ -11,7 +11,10 @@ from calculate_F_factor import calculate_F_factor
 from extra_function import load_ASC,load_hoc,load_swc,SIGSEGV_signal_arises,create_folder_dirr
 import sys
 from analysis_fit_after_run import analysis_fit
-
+import matplotlib
+matplotlib.rcParams['pdf.fonttype'] = 42
+matplotlib.rcParams['png.fonttype'] = 42
+matplotlib.rcParams['svg.fonttype'] = 'none'
 signal.signal(signal.SIGSEGV, SIGSEGV_signal_arises)
 if len(sys.argv) != 8:
     cell_name= '2017_05_08_A_4-5'

@@ -1,15 +1,16 @@
 import matplotlib.pyplot as plt
 import numpy as np
 from open_pickle import read_from_pickle
-import os
 from add_figure import add_figure
 import pickle
 import sys
 from extra_function import create_folder_dirr,create_folders_list
-from spine_classes import  SpineLocatin
 from syn2clear_data import Syn2Clear
 from scipy.signal import find_peaks
-
+import matplotlib
+matplotlib.rcParams['pdf.fonttype'] = 42
+matplotlib.rcParams['png.fonttype'] = 42
+matplotlib.rcParams['svg.fonttype'] = 'none'
 
 if len(sys.argv) != 5:
     cell_name= '2017_03_04_A_6-7'
@@ -102,16 +103,20 @@ remove=syns_records.remove
 # remove=[11,19,24,]
 
 new_syn2=np.delete(new_syn1,remove,axis=0)+REST
-add_figure('correct synapse',V_units.units,t_units.units)
+fig=add_figure('correct synapse',V_units.units,t_units.units)
 for v in new_syn2:
     plt.plot(t,v, alpha=0.1,lw=0.5)
 plt.plot(t,np.mean(new_syn2,axis=0),'black',lw=2)
 plt.savefig(folder_save+'/clear_syn')
+pickle.dump(fig, open(folder_save+'/clear_syn_fig.p', 'wb'))
+
 with open(folder_save + '/clear_syn.p', 'wb') as f:
     pickle.dump([new_syn2*V_units.units,t] , f)
-add_figure('mean correct synepses',V_units.units,t_units.units)
+fig1=add_figure('mean correct synepses',V_units.units,t_units.units)
 plt.plot(t,np.mean(new_syn2,axis=0),'black',linewidth=2)
 plt.savefig(folder_save+'/mean_clear_syn')
+pickle.dump(fig1, open(folder_save+'/mean_clear_syn.p', 'wb'))
+
 with open(folder_save + '/mean_syn.p', 'wb') as f:
     pickle.dump({'mean':[(np.mean(new_syn2, axis=0)) * V_units.units,t],'E_pas':REST}, f)
 

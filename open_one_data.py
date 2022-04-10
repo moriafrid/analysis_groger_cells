@@ -5,6 +5,10 @@ from add_figure import add_figure
 import signal
 from scipy.signal import find_peaks
 from extra_function import SIGSEGV_signal_arises
+import matplotlib
+matplotlib.rcParams['pdf.fonttype'] = 42
+matplotlib.rcParams['png.fonttype'] = 42
+matplotlib.rcParams['svg.fonttype'] = 'none'
 
 signal.signal(signal.SIGSEGV, SIGSEGV_signal_arises)
 
@@ -20,11 +24,13 @@ def reshape_data(data):
 
 def clear_phenomena_partial(phenomena,phenomena_name,part_name,base,prominanace=0.4,std_max=3.3,start=None,end=None):
 	phenomena_mean=np.mean(phenomena,axis=0)
-	add_figure('clear part of the graph by max','point','mV')
+	fig=add_figure('clear part of the graph by max','point','mV')
 	for v in phenomena:
 		plt.plot(v)
 	plt.plot(np.arange(start, end), phenomena_mean[start:end],'black',linewidth=7)
 	plt.savefig(base+phenomena_name+'/place2clear_bymax_'+part_name)
+	pickle.dump(fig, open(base+phenomena_name+'/place2clear_bymax_'+part_name+'.p', 'wb'))
+
 	index2del,index2delby_peak=[],[]
 	add_figure('clear noises from ' + phenomena_name, 'Vec_index', 'mV')
 	count = 0
@@ -138,16 +144,20 @@ def phenomena(t1,t2,T,base,x_units='S',Y_units='mV'):
 	T_syn=T[0][syn_place-1000:syn_place+1500]
 	T_V=T[0]
 	for y_phen,x,name in zip([syn0,short_pulse0,spike0],[T_syn,T_short_pulse,T_spike],['syn/initial_syn','short_pulse/initial_short_pulse','spike/initial_spike']):
-		add_figure('initial data','ms','mV')
+		fig=add_figure('initial data','ms','mV')
 		for y in y_phen:
 			plt.plot(x,y)
+		pickle.dump(fig, open(base + name+'.p', 'wb'))
+
 		plt.savefig(base + name+'.pdf')
 		plt.close()
 	for y_phen,x,name in zip([syn,short_pulse,spike],[T_syn,T_short_pulse,T_spike],['syn/syn','short_pulse/short_pulse','spike/spike']):
-		add_figure('data aftre rest correction','ms','mV')
+		fig=add_figure('data aftre rest correction','ms','mV')
 		for y in y_phen:
 			plt.plot(x,y)
 		plt.savefig(base + name+'-rest.pdf')
+		pickle.dump(fig, open(base + name+'-rest.p', 'wb'))
+
 		plt.close()
 	with open(base + '/V1/V.p', 'wb') as f:
 		pickle.dump( [V,T], f)
@@ -182,11 +192,13 @@ def phenomena(t1,t2,T,base,x_units='S',Y_units='mV'):
 	names=['short_pulse','spike']
 	for i,phenomena in enumerate([new_short_pulse2,spike]):
 		plt.close()
-		add_figure('clear '+names[i],'index',t1.units)
+		fig=add_figure('clear '+names[i],'index',t1.units)
 		for v in phenomena:
 			plt.plot(v,alpha=0.1,lw=0.5,color='grey')
 		plt.plot(np.mean(phenomena,axis=0),'black',lw=3)
 		plt.savefig(base+names[i]+'/clear_'+names[i])
+		pickle.dump(fig, open(base+names[i]+'/clear_'+names[i]+'.p', 'wb'))
+
 		with open(base +names[i]+'/clear_'+names[i]+'.p', 'wb') as f:
 			pickle.dump( [np.array(phenomena),eval('T_'+names[i])], f)
 
@@ -194,10 +206,12 @@ def phenomena(t1,t2,T,base,x_units='S',Y_units='mV'):
 		pickle.dump( np.array(V), f)
 
 	for i,phenomena in enumerate([new_short_pulse2,spike]):
-		add_figure('mean '+names[i],eval('T_'+names[i])[0].units,t1.units)
+		fig=add_figure('mean '+names[i],eval('T_'+names[i])[0].units,t1.units)
 		mean=np.mean(phenomena,axis=0)
 		plt.plot(eval('T_'+names[i]),mean)
 		plt.savefig(base+names[i]+'/mean_'+names[i])
+		pickle.dump(fig, open(base+names[i]+'/mean_'+names[i]+'.p', 'wb'))
+
 		with open(base +names[i]+'/mean_'+names[i]+'.p', 'wb') as f:
 			pickle.dump( [mean*t1.units,eval('T_'+names[i])], f)
 	with open(base + '/V1/mean_V.p', 'wb') as f:
@@ -215,9 +229,12 @@ def phenomena(t1,t2,T,base,x_units='S',Y_units='mV'):
 			pickle.dump({'units':{'y':t1.units,'x': T[0].units},'E_pas':REST,'points2calsulate_E_pas':point2calculate_E_pas }, f)
 
 	#add to the other currents for I-V curve
-	add_figure('I_V curve_together', 'points', t1.units)
+	fig=add_figure('I_V curve_together', 'points', t1.units)
 	plt.plot(new_short_pulse2)
 	plt.savefig(base + '/-50pA.png')
+	plt.savefig(base + '/-50pA.pdf')
+	pickle.dump(fig, open(base + '/-50pAt.p', 'wb'))
+
 	with open(base + '/-50pA.p', 'wb') as f:
 		pickle.dump({'mean': [np.mean(new_short_pulse2,axis=0) * t1.units, T_short_pulse], 'E_pas': REST,}, f)
 	return REST,np.mean(new_short_pulse2,axis=0)* t1.units,T_short_pulse

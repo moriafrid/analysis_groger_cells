@@ -53,18 +53,20 @@ def split2phenomena(cell_name,inputs_folder, outputs_folder):
 			pickle.dump([t, T], fr)
 		with open(save_folder + '/first_channel.p', 'wb') as fr:
 			pickle.dump([np.array(t1) * t_i.units, T], fr)
-		add_figure(f[f.rfind('/') + 1:-4] + '\n first_channel', T[0].units, t[0].units)
+		fig1=add_figure(f[f.rfind('/') + 1:-4] + '\n first_channel', T[0].units, t[0].units)
 		plt.plot(np.array(T).flatten(), np.array(t1).flatten())
 		plt.savefig(save_folder + '/first_channel.png')
 		plt.savefig(save_folder + '/first_channel.pdf')
+		pickle.dump(fig1, open(save_folder+'/second_channel.p', 'wb'))
 
 		with open(save_folder + '/second_channel.p', 'wb') as fr:
 			pickle.dump([np.array(t2) * t_i.units, T], fr)
 		plt.close()
-		add_figure(f[f.rfind('/') + 1:-4] + '\n second_channel', T[0].units, t[0].units)
+		fig2=add_figure(f[f.rfind('/') + 1:-4] + '\n second_channel', T[0].units, t[0].units)
 		plt.plot(np.array(T).flatten(), np.array(t2).flatten())
 		plt.savefig(save_folder + '/second_channel.png')
 		plt.savefig(save_folder + '/second_channel.pdf')
+		pickle.dump(fig2, open(save_folder+'/second_channel.p', 'wb'))
 
 		# split to syn, short_pulse, spike ,noise
 		if f.endswith(".abf") and "stable_conc_aligned" and "average" in f:  # pattern: *stable_conc_aligned_average*.abf

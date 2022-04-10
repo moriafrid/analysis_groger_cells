@@ -82,7 +82,7 @@ def clear_noise(phenomena,base,STDtime2clear=2,jumps=1):
 		else:
 			wrong_num+=1
 
-	add_figure(name+' after clean noise', 'time [ms]', 'V [mV]')
+	fig=add_figure(name+' after clean noise', 'time [ms]', 'V [mV]')
 	print('plot the traces of '+name+ ' after the noise removal', flush= True)
 	for i,v in enumerate(tqdm(correct)):
 		plt.plot(x_correct[i][::jumps],v[::jumps], alpha=0.2)
@@ -92,16 +92,18 @@ def clear_noise(phenomena,base,STDtime2clear=2,jumps=1):
 	start_program=time.time()
 	plt.savefig(save_folder + '/after_clean_noise')
 	plt.savefig(save_folder+'/after_clean_noise.pdf')
+	pickle.dump(fig, open(save_folder+'/after_clean_noise.p', 'wb'))
 
 	end_program=time.time()
 	print('the time taken for savefig after noise removal = ', end_program - start_program)
 	plt.close()
 
 	print('in '+name+' the number of right traces is '+str(correct_num)+'/'+str(correct_num+wrong_num))
-	add_figure(name+' mean', 'time [ms]', 'V [mV]')
+	fig1=add_figure(name+' mean', 'time [ms]', 'V [mV]')
 	plt.plot(x_mean,mean,color='black')
 	plt.savefig(save_folder + '/mean')
 	plt.savefig(save_folder + '/mean.pdf')
+	pickle.dump(fig1, open(save_folder + '/mean_fig.p', 'wb'))
 
 	plt.close()
 

@@ -73,13 +73,15 @@ def plot_res(RM, RA, CM, save_name= "fit",save_folder='',print_full_graph=False)
     h.run()
     npTvec = np.array(Tvec)
     npVec = np.array(Vvec)
-    add_figure(cell_name+" fit "+save_folder.split('/')[-3]+"\nRM="+str(round(RM,1))+",RA="+str(round(RA,1))+",CM="+str(round(CM,2)),'ms','mV')
+    fig=add_figure(cell_name+" fit "+save_folder.split('/')[-3]+"\nRM="+str(round(RM,1))+",RA="+str(round(RA,1))+",CM="+str(round(CM,2)),'ms','mV')
     plt.plot(npTvec[start_fit:end_fit], npVec[start_fit:end_fit], color = 'r', linestyle ="--") #plot the recorded short_pulse
     plt.plot(T[start_fit:end_fit], V[start_fit:end_fit],color = 'green')
     plt.plot(npTvec[start_fit:end_fit], npVec[start_fit:end_fit], color = 'r', linestyle ="--") #plot the recorded short_pulse
 
     plt.legend(['NEURON_sim','decay_to_fitting'])
     plt.savefig(save_folder+'/'+save_name+"_decay.png")
+    pickle.dump(fig, open(save_folder+'/'+save_name+'_decay.p', 'wb'))
+
     plt.close()
     exp_V = V#[int(180.0 / h.dt):int(800.0 / h.dt)]
     npVec = npVec#[int(180.0 / h.dt):int(800.0 / h.dt)]
@@ -95,7 +97,7 @@ def plot_res(RM, RA, CM, save_name= "fit",save_folder='',print_full_graph=False)
     print('error_mean_max_voltage=', round(error_3,3))
     print('error_from_rest=', round(error_1,3))
     if print_full_graph:
-        add_figure(cell_name+": RM="+str(round(RM,1))+",RA="+str(round(RA,1))+",CM="+str(round(CM,2)),'ms','mV')
+        fig=add_figure(cell_name+": RM="+str(round(RM,1))+",RA="+str(round(RA,1))+",CM="+str(round(CM,2)),'ms','mV')
         plt.plot(T, V, color = 'k',label='data') #plot short_pulse data
         plt.plot(T[start_fit:end_fit], V[start_fit:end_fit],color = 'green',label='decay_to_fit')
         # plt.plot(T[end_fit:end_fit+1500], V[end_fit:end_fit+1500],color = 'yellow',label='maxV_to_fit')
@@ -106,6 +108,8 @@ def plot_res(RM, RA, CM, save_name= "fit",save_folder='',print_full_graph=False)
         plt.legend()
         plt.savefig(save_folder+'/'+save_name+"_full_graph.pdf")
         plt.savefig(save_folder+'/'+save_name+"_full_graph.png")
+        pickle.dump(fig, open(save_folder+'/'+save_name+'_full_graph.p', 'wb'))
+
         plt.show()
         plt.close()
     return error_2 ,error_2 + error_3

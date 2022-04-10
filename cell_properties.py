@@ -7,12 +7,18 @@ from add_figure import add_figure
 from glob import glob
 from extra_function import create_folder_dirr,SIGSEGV_signal_arises,load_ASC,load_hoc,load_swc
 import sys
+import pickle
+import matplotlib
+matplotlib.rcParams['pdf.fonttype'] = 42
+matplotlib.rcParams['png.fonttype'] = 42
+matplotlib.rcParams['svg.fonttype'] = 'none'
+
 print(len(sys.argv),sys.argv,flush=True)
 
 if len(sys.argv) != 3:
     print("sys.argv not running and with length",len(sys.argv))
-    cell_name= '2017_05_08_A_5-4'
-    file_type2read= 'new.hoc'
+    cell_name= '2017_05_08_A_4-5'
+    file_type2read= 'z_correct.swc'
 else:
     print("sys.argv is correct and running")
     cell_name = sys.argv[1]
@@ -115,7 +121,7 @@ for sec in cell.dend:
     if len(sec.children())==0:
         terminals.append(sec)
 plt.close()
-add_figure('diam-dis relation along dendrites with diffrent collors\n'+cell_name+' '+file_type2read,'distance from soma','diameter')
+fig=add_figure('diam-dis relation along dendrites with diffrent collors\n'+cell_name+' '+file_type2read,'distance from soma','diameter')
 i=0
 for terminal in terminals:
     i+=1
@@ -125,4 +131,5 @@ for terminal in terminals:
         plt.plot(dis,diam,'*')
 plt.savefig(folder_save+'diam-dis.png')
 plt.savefig(folder_save+'diam-dis.pdf')
+pickle.dump(fig, open(folder_save+'diam-dis.p', 'wb'))
 plt.show()

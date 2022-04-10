@@ -9,6 +9,9 @@ import sys
 from extra_function import create_folder_dirr
 import matplotlib
 matplotlib.use('agg')
+matplotlib.rcParams['pdf.fonttype'] = 42
+matplotlib.rcParams['png.fonttype'] = 42
+matplotlib.rcParams['svg.fonttype'] = 'none'
 print(len(sys.argv),sys.argv,flush=True)
 def find_nearest(array, values):
     indices = np.abs(np.subtract.outer(array, values)).argmin(0)
@@ -54,7 +57,7 @@ def analysis_fit(location):
         dict_minimums_total.append({'RM': RMs[mini], 'RA': RAs[mini], 'CM': CMs[mini],'error':errors[mini]})
     pickle.dump(dict_minimums_total, open(save_folder + "/RA_total_errors_minimums.p", "wb"))
     dict_minimums={}
-    add_figure('diffrent RA against error\n'+dirr.split('/')[-3],'RA','errors')
+    fig=add_figure('diffrent RA against error\n'+dirr.split('/')[-3],'RA','errors')
     plt.plot(RAs,errors,'.')
     for mini in minimums_arg[:10]:
         plt.plot(RAs[mini], errors[mini], '*',
@@ -63,16 +66,23 @@ def analysis_fit(location):
                      round(CMs[mini], 2)) +' '+names[mini]+ ' error=' +  str(round(errors[mini], 3)) )
     plt.legend(loc='upper left')
     plt.savefig(save_folder+'/diffrent RA against error.png')
+    pickle.dump(fig, open(save_folder+'/diffrent RA against error.p', 'wb'))
 
-    add_figure('diffrent '+condition+' against CM\n'+dirr.split('/')[-1],condition,'CM')
+    fig1=add_figure('diffrent '+condition+' against CM\n'+dirr.split('/')[-1],condition,'CM')
     plt.plot(diffrent_condition,CMs,'.')
     plt.savefig(save_folder+'/diffrent '+condition+' against CM.png')
-    add_figure('diffrent '+condition+' against RA after fit\n'+dirr.split('/')[-3],'RA0','RA')
+    pickle.dump(fig1, open(save_folder+'/diffrent '+condition+' against CM.p', 'wb'))
+
+    fig2=add_figure('diffrent '+condition+' against RA after fit\n'+dirr.split('/')[-3],'RA0','RA')
     plt.plot(diffrent_condition,RAs,'.')
     plt.savefig(save_folder+'/diffrent '+condition+' against RA after fit.png')
-    add_figure('diffrent '+condition+' against RM\n'+dirr.split('/')[-3],'RA0','RM')
+    pickle.dump(fig2, open(save_folder+'/diffrent '+condition+' against RA after fit.p', 'wb'))
+
+    fig3=add_figure('diffrent '+condition+' against RM\n'+dirr.split('/')[-3],'RA0','RM')
     plt.plot(diffrent_condition,RMs,'.')
     plt.savefig(save_folder+'/diffrent '+condition+' against RM.png')
+    pickle.dump(fig3, open(save_folder+'/diffrent '+condition+' against RM.p', 'wb'))
+
     pickle.dump(dict_minimums, open(save_folder + "/ "+condition+" _10_minimums.p", "wb"))
 
 
@@ -107,7 +117,7 @@ if __name__ == '__main__':
         RAs=[value['RA'] for value in dict3['params']]
         RMs=[value['RM'] for value in dict3['params']]
         CMs=[value['CM'] for value in dict3['params']]
-        add_figure('RA const against errors\n'+loc.split('/')[-1],'RA const','error')
+        fig=add_figure('RA const against errors\n'+loc.split('/')[-1],'RA const','error')
         plt.plot(RA0,errors)
         minimums_arg=np.argsort(errors)
         dict_minimums_total=[]
@@ -126,17 +136,19 @@ if __name__ == '__main__':
         plt.legend(loc='upper left')
         plt.savefig(save_folder1+'/RA const against errors')
         plt.savefig(save_folder1+'/RA const against errors.pdf')
+        pickle.dump(fig, open(save_folder1+'/RA const against errors.p', 'wb'))
 
         end_plot=60
-        add_figure('RA const against errors\n'+loc.split('/')[-1],'RA const','error')
+        fig1=add_figure('RA const against errors\n'+loc.split('/')[-1],'RA const','error')
         plt.plot(RA0[:end_plot],errors[:end_plot])
         for mini in minimums_arg[:10]:
             plt.plot(RA0[mini], errors[mini], '*',label=' RM=' + str(round(RMs[mini], 2)) + ' RA=' + str(round(RAs[mini], 2)) + ' CM=' + str(
                          round(CMs[mini], 2)) + ' error=' +  str(round(errors[mini], 3)))
         plt.legend(loc='upper left')
         plt.savefig(save_folder1+'/RA const against errors until point '+str(end_plot))
+        pickle.dump(fig1, open(save_folder1+'/RA const against errors until point '+str(end_plot)+'.p', 'wb'))
 
-        add_figure('RA const against errors choosing params\n'+loc.split('/')[-1],'RA const','error')
+        fig2=add_figure('RA const against errors choosing params\n'+loc.split('/')[-1],'RA const','error')
         plt.plot(RA0,errors)
         RA0120= find_nearest(RA0,120)
         RA0150= find_nearest(RA0,150)
@@ -147,19 +159,27 @@ if __name__ == '__main__':
                          round(CMs[mini], 2)) + ' error=' +  str(round(errors[mini], 3)))
         plt.legend(loc='upper left')
         plt.savefig(save_folder1+'/RA const against errors2 '+str(end_plot))
+        pickle.dump(fig2, open(save_folder1+'/RA const against errors2 '+str(end_plot)+'.p', 'wb'))
 
-        add_figure('RA const against errors choosing params\n'+loc.split('/')[-1],'RA const','error')
+        fig3=add_figure('RA const against errors choosing params\n'+loc.split('/')[-1],'RA const','error')
         plt.plot(RA0,errors)
-
         plt.plot()
-        add_figure('RA const against RMs\n'+loc.split('/')[-1],'RA const','RM')
+        plt.savefig(save_folder1+'/RA const against errors3 '+str(end_plot))
+        pickle.dump(fig3, open(save_folder1+'/RA const against errors3 '+str(end_plot)+'.p', 'wb'))
+
+        fig4=add_figure('RA const against RMs\n'+loc.split('/')[-1],'RA const','RM')
         plt.plot(RA0,RMs)
         plt.savefig(save_folder1+'/RA const against RM')
-        add_figure('RA const against RA after fit\n'+loc.split('/')[-1],'RA const','RA')
+        pickle.dump(fig4, open(save_folder1+'/RA const against RM.p', 'wb'))
+
+        fig5=add_figure('RA const against RA after fit\n'+loc.split('/')[-1],'RA const','RA')
         plt.plot(RA0,RAs)
         plt.savefig(save_folder1+'/RA const against RA after fit')
-        add_figure('RA const against CM\n'+loc.split('/')[-1],'RA const','CM')
+        pickle.dump(fig5, open(save_folder1+'/RA const against RA after fit.p', 'wb'))
+
+        fig6=add_figure('RA const against CM\n'+loc.split('/')[-1],'RA const','CM')
         plt.plot(RA0,CMs)
         plt.savefig(save_folder1+'/RA const against CMs')
+        pickle.dump(fig6, open(save_folder1+'/RA const against CMs.p', 'wb'))
 
         print('analysis_fit_after_re.py complite to run')

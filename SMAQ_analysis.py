@@ -2,6 +2,10 @@ from open_pickle import read_from_pickle
 import matplotlib.pyplot as plt
 import numpy as np
 import scipy.stats as stats
+import matplotlib
+matplotlib.rcParams['pdf.fonttype'] = 42
+matplotlib.rcParams['png.fonttype'] = 42
+matplotlib.rcParams['svg.fonttype'] = 'none'
 
 EPSP1=read_from_pickle('/ems/elsc-labs/segev-i/moria.fridman/project/data_analysis_git/data_analysis/data/syn/syn.p')
 

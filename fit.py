@@ -11,6 +11,10 @@ import pickle
 from calculate_F_factor import calculate_F_factor
 from extra_function import load_ASC,load_hoc,load_swc,SIGSEGV_signal_arises,create_folder_dirr
 import sys
+import matplotlib
+matplotlib.rcParams['pdf.fonttype'] = 42
+matplotlib.rcParams['png.fonttype'] = 42
+matplotlib.rcParams['svg.fonttype'] = 'none'
 
 signal.signal(signal.SIGSEGV, SIGSEGV_signal_arises)
 if len(sys.argv) != 7:

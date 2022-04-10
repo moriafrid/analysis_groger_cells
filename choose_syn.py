@@ -4,6 +4,10 @@ import numpy as np
 import matplotlib.pyplot as plt
 from add_figure import add_figure
 from scipy.signal import find_peaks
+import matplotlib
+matplotlib.rcParams['pdf.fonttype'] = 42
+matplotlib.rcParams['png.fonttype'] = 42
+matplotlib.rcParams['svg.fonttype'] = 'none'
 def close_event():
     plt.close()
 
@@ -69,12 +73,13 @@ for cell in ['2017_03_04_A_6-7']:#[ '2017_03_04_A_6-7','2017_05_08_A_5-4','2017_
     with open(base_dir+"correct_syn_traces.p", 'wb') as handle:
         pickle.dump(correct_traces, handle, protocol=pickle.HIGHEST_PROTOCOL)
     from add_figure import add_figure
-    add_figure('clear_syn',data[1].units,data[0].units)
+    fig=add_figure('clear_syn',data[1].units,data[0].units)
     for v in filterd_traces_first:
         plt.plot(data[1],v)
     plt.plot(data[1],np.mean(filterd_traces_first,axis=0),label='mean_syn')
     plt.savefig(base_dir+"clear_syn.png")
     plt.savefig(base_dir+"clear_syn.pdf")
+    pickle.dump(fig, open(base_dir+'clear_syn_fig.p', 'wb'))
 
     plt.close()
 # #this code is just to correct wrong loading data - need to be run fro the consule
