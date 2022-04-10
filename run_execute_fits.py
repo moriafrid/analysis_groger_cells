@@ -13,11 +13,11 @@ else:
 print('plot_neuron_3D.py for all cells in ',cells_name_place,'with file type of','ASC')
 folder_='/ems/elsc-labs/segev-i/moria.fridman/project/analysis_groger_cells/'
 base_command='sbatch execute_python_script.sh'
-for cell_name in read_from_pickle(cells_name_place):
+for cell_name in read_from_pickle(cells_name_place)[2:]:
     for file_type in ['z_correct.swc','morphology.swc'][0:1]:
         for SPINE_START in [20,60,10][0:1]:#SPINE_STARTs:
-            for resize_diam_by ,shrinkage_by in zip([1.0,1.1,1.2,1.5][:1],[1.0,1.1,1.0,1.0][:1]):
-                for double_spine_area in ['True','False'][0:1]:
+            for resize_diam_by ,shrinkage_by in zip([1.0,1.1,1.2,1.5][1:2],[1.0,1.1,1.0,1.0][1:2]):
+                for double_spine_area in ['True','False'][1:2]:
                     # for Ra_min in [5,100]:
                         # command="fit_influnce_by_initial_condition.py"
                         # send_command = " ".join([base_command,command, cell_name,file_type,str(Ra_min),resize_diam_by,shrinkage_factor,str(SPINE_START),folder_])
@@ -27,7 +27,7 @@ for cell_name in read_from_pickle(cells_name_place):
                     command2="sbatch execute_fit_const.sh"
                     # command2="sbatch execute_python_script.sh fit_best_with_const_param.py"
 
-                    # command2="python fit_best_with_const_param.py"
+                    command2="python fit_best_with_const_param.py"
                     send_command = " ".join([command2, cell_name,file_type,str(resize_diam_by),str(shrinkage_by),str(SPINE_START),double_spine_area])
                     os.system(send_command)
                     # time.sleep(10)
