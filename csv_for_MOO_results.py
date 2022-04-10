@@ -20,7 +20,7 @@ cells=read_from_pickle(cells_name_place)
 file_type2read=['z_correct.swc','morphology.swc','hoc','ASC']
 i=0
 # os.system('python run_analysis_fit_after_run.py')
-for cell_name in cells[0:2]:
+for cell_name in cells:
     print(cell_name)
     all_data = []
     for loc in glob(folder_save+cell_name+'/MOO_results*/*_SPINE_START=*/F_shrinkage=*/const_param/*/hall_of_fame.p'):
