@@ -13,8 +13,9 @@ file_type='z_correct.swc'
 # for passive_val_name in ['RA=120','RA=150','RA_min_error','RA_best_fit']:
 passive_val_name='RA=120'
 cell_name =read_from_pickle('cells_name.p')[1]
-plot_all_Moo_results=True
-same=False
+plot_all_Moo_results=False
+compare_MOO_results=True
+
 compare_between_types=False
 compare_diffrent_passive_value=False
 compare_spine_start=False
@@ -152,18 +153,7 @@ if compare_between_change_in_the_morphology_passive_fits:
         show_directory(ax[place[i]],p.split('/')[3]+'\n'+p.split('/')[4],p)
 
 if plot_all_Moo_results:
-    fig=plt.figure()
-    # plt.title(cell_name)
-    i=0
-    ax = fig.subplot_mosaic("""AB
-    CD""")
-    # ax = fig.subplot_mosaic("""ABC
-    # DEF
-    # GHI
-    # JKL
-    # """)
-
-    # passive_vals_dict=get_passive_parameter(cell_name,shrinkage_resize=[shrinkage_by,resize_diam_by],fit_condition=fit_condition,spine_start=int(SPINE_START),file_type=file_type)
+    same=True
     if '4-5' in cell_name:
         same=True
 
@@ -171,18 +161,48 @@ if plot_all_Moo_results:
         same_diff='_same'
     else:
         same_diff='_relative'
+    if '6-7' in cell_name:
+        same_diff=''
 
-    for z,p in enumerate(glob('cells_outputs_data_short/'+cell_name+'/MOO_results'+same_diff+'*/z_correct.swc_SPINE_START=*/F_shrinkage=*/const_param/*/fit_transient_RDSM.png')):
+    fig=plt.figure()
+    # plt.title(cell_name)
+    i=0
+    # ax = fig.subplot_mosaic("""AB
+    # CD""")
+
+    dirr_len=len(glob('cells_outputs_data_short/'+cell_name+'/MOO_results'+same_diff+'*/z_correct.swc_SPINE_START=*/F_shrinkage=*/const_param/*/fit_transient_RDSM.png'))
+    if dirr_len<10:
+        ax = fig.subplot_mosaic("""ABC
+        DEF
+        GHI
+        """)
+    elif dirr_len<=13:
+        ax = fig.subplot_mosaic("""ABC
+        DEF
+        GHI
+        JKL
+        """)
+    elif dirr_len>14:
+        ax = fig.subplot_mosaic("""ABCD
+        EFGH
+        IJKL
+        MNOP
+        """)
+
+    # passive_vals_dict=get_passive_parameter(cell_name,shrinkage_resize=[shrinkage_by,resize_diam_by],fit_condition=fit_condition,spine_start=int(SPINE_START),file_type=file_type)
+    # ax = fig.subplot_mosaic("""ABC""")
+
+    for z,p in enumerate(glob('cells_outputs_data_short/'+cell_name+'/MOO_results'+same_diff+'*/z_correct.swc_SPINE_START=*/F_shrinkage=*double*/const_param/*/fit_transient_RDSM.png')):
         if p.split('/')[6]=='test': continue
         # if p.split('/')[6]=='RA_min_error': continue
 
         shrinkage_resize=re.findall(r"[-+]?\d*\.\d+|\d+", p.split('/')[4])
         shrinkage_resize=[float(num) for num in shrinkage_resize]
-        if shrinkage_resize!=[1.0,1.5]:continue
+        if shrinkage_resize==[1.1,1.1]:continue
         if 'double_spine_area' in p.split('/')[4]:
-            double_spine_area=True
+            double_spine_area='True'
         else:
-            double_spine_area=False
+            double_spine_area='False'
         spine_start=int(re.findall(r"[-+]?\d*\.\d+|\d+", p.split('/')[3])[0])
         from read_passive_parameters_csv import get_passive_parameter
         passive_vals_dict=get_passive_parameter(cell_name,double_spine_area=double_spine_area,shrinkage_resize=shrinkage_resize,spine_start=spine_start,fit_condition=p.split('/')[5],file_type='z_correct.swc')
@@ -193,10 +213,16 @@ if plot_all_Moo_results:
     if plot_to_morphology_swc_too:
         fig=plt.figure()
         # plt.title(cell_name)
-        ax = fig.subplot_mosaic("""ABC
-        DEF
-        GHI
-        """)
+        try:
+            ax = fig.subplot_mosaic("""ABC
+            DEF
+            GHI
+            """)
+        except:
+            ax = fig.subplot_mosaic("""ABCD
+            EFGH
+            IJKL
+            """)
         i=0
 
         # passive_vals_dict=get_passive_parameter(cell_name,shrinkage_resize=[shrinkage_by,resize_diam_by],fit_condition=fit_condition,spine_start=int(SPINE_START),file_type=file_type)
@@ -211,6 +237,57 @@ if plot_all_Moo_results:
             if p.split('/')[6]=='test': continue
             # RA,CM,RM=get_passive_val(passive_vals_dict[p.split('/')[6]])
             show_directory(ax[place[i]],p.split('/')[4]+p.split('/')[6],p)
+if compare_MOO_results:
+    same=True
+    if '4-5' in cell_name:
+        same=True
+
+    if same==True:
+        same_diff='_same'
+    else:
+        same_diff='_relative'
+    if '6-7' in cell_name:
+        same_diff=''
+
+    fig=plt.figure()
+    # plt.title(cell_name)
+    i=0
+    # ax = fig.subplot_mosaic("""AB
+    # CD""")
+
+    dirr_len=len(glob('cells_outputs_data_short/'+cell_name+'/MOO_results'+same_diff+'*/z_correct.swc_SPINE_START=*/F_shrinkage=*/const_param/*/fit_transient_RDSM.png'))
+    if dirr_len<10:
+        ax = fig.subplot_mosaic("""ABC
+        DEF
+        GHI
+        """)
+    elif dirr_len<=13:
+        ax = fig.subplot_mosaic("""ABCD
+        EFGH
+        IJKL
+        MNOP
+        QRST
+        """)
+
+
+    for z,p in enumerate(glob('cells_outputs_data_short/'+cell_name+'/MOO_results'+same_diff+'*/z_correct.swc_SPINE_START=*/F_shrinkage*1.0**1.0*/const_param/*/*.pdf')):
+        if p.split('/')[6]=='test': continue
+        # if p.split('/')[6]=='RA_min_error': continue
+        if 'double' in p.split('/')[4]: continue
+        shrinkage_resize=re.findall(r"[-+]?\d*\.\d+|\d+", p.split('/')[4])
+        shrinkage_resize=[float(num) for num in shrinkage_resize]
+        if shrinkage_resize==[1.0,1.5]:continue
+        if 'double_spine_area' in p.split('/')[4]:
+            double_spine_area='True'
+        else:
+            double_spine_area='False'
+        spine_start=int(re.findall(r"[-+]?\d*\.\d+|\d+", p.split('/')[3])[0])
+        from read_passive_parameters_csv import get_passive_parameter
+        passive_vals_dict=get_passive_parameter(cell_name,double_spine_area=double_spine_area,shrinkage_resize=shrinkage_resize,spine_start=spine_start,fit_condition=p.split('/')[5],file_type='z_correct.swc')
+        RA_CM_RM=get_passive_val(passive_vals_dict[p.split('/')[6]],what_return='nice_results')
+        show_directory(ax[place[i]],p.split('/')[4]+p.split('/')[6]+'\n'+RA_CM_RM,p)
+
+
     plt.show()
 if compare_spine_start:
     pass
