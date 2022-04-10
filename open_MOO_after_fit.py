@@ -130,7 +130,8 @@ class OPEN_RES():
         netcon_AMPA.weight[0] = self.get_param('weight_AMPA', hall_of_fame_num)
         netcon_NMDA.weight[0] = self.get_param('weight_NMDA', hall_of_fame_num)
         return [AMPA_PART, netcon_AMPA], [NMDA_PART, netcon_NMDA]
-
+    def __del__(self):
+        self.hoc_model=None
     def destroy(self):
         pass
 
