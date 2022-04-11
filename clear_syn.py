@@ -9,7 +9,6 @@ from syn2clear_data import Syn2Clear
 from scipy.signal import find_peaks
 import matplotlib
 matplotlib.rcParams['pdf.fonttype'] = 42
-matplotlib.rcParams['png.fonttype'] = 42
 matplotlib.rcParams['svg.fonttype'] = 'none'
 
 if len(sys.argv) != 5:

@@ -57,7 +57,7 @@ def split2phenomena(cell_name,inputs_folder, outputs_folder):
 		plt.plot(np.array(T).flatten(), np.array(t1).flatten())
 		plt.savefig(save_folder + '/first_channel.png')
 		plt.savefig(save_folder + '/first_channel.pdf')
-		pickle.dump(fig1, open(save_folder+'/second_channel.p', 'wb'))
+		pickle.dump(fig1, open(save_folder + '/first_channel_fig.p', 'wb'))
 
 		with open(save_folder + '/second_channel.p', 'wb') as fr:
 			pickle.dump([np.array(t2) * t_i.units, T], fr)
@@ -66,7 +66,7 @@ def split2phenomena(cell_name,inputs_folder, outputs_folder):
 		plt.plot(np.array(T).flatten(), np.array(t2).flatten())
 		plt.savefig(save_folder + '/second_channel.png')
 		plt.savefig(save_folder + '/second_channel.pdf')
-		pickle.dump(fig2, open(save_folder+'/second_channel.p', 'wb'))
+		pickle.dump(fig2, open(save_folder+'/second_channel_fig.p', 'wb'))
 
 		# split to syn, short_pulse, spike ,noise
 		if f.endswith(".abf") and "stable_conc_aligned" and "average" in f:  # pattern: *stable_conc_aligned_average*.abf

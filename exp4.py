@@ -9,7 +9,6 @@ from extra_function import create_folder_dirr
 import matplotlib
 import pickle
 matplotlib.rcParams['pdf.fonttype'] = 42
-matplotlib.rcParams['png.fonttype'] = 42
 matplotlib.rcParams['svg.fonttype'] = 'none'
 import sys
 if len(sys.argv) != 7:

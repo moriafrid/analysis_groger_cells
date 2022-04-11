@@ -4,7 +4,6 @@ from add_figure import add_figure
 import pickle
 import matplotlib
 matplotlib.rcParams['pdf.fonttype'] = 42
-matplotlib.rcParams['png.fonttype'] = 42
 matplotlib.rcParams['svg.fonttype'] = 'none'
 def check_dynamics(short_pulse,x_short_pulse,save_folder):
     add_figure('short_pulse',x_short_pulse.units,short_pulse.units)

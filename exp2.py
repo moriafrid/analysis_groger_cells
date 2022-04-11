@@ -9,7 +9,6 @@ from tqdm import tqdm
 import pickle
 import matplotlib
 matplotlib.rcParams['pdf.fonttype'] = 42
-matplotlib.rcParams['png.fonttype'] = 42
 matplotlib.rcParams['svg.fonttype'] = 'none'
 
 folder_= ''

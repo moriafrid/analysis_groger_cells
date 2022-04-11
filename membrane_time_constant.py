@@ -7,7 +7,6 @@ from add_figure import add_figure
 import pickle
 import matplotlib
 matplotlib.rcParams['pdf.fonttype'] = 42
-matplotlib.rcParams['png.fonttype'] = 42
 matplotlib.rcParams['svg.fonttype'] = 'none'
 def linear(x, m,c):
     return m*x+c

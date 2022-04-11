@@ -13,7 +13,6 @@ import sys
 from analysis_fit_after_run import analysis_fit
 import matplotlib
 matplotlib.rcParams['pdf.fonttype'] = 42
-matplotlib.rcParams['png.fonttype'] = 42
 matplotlib.rcParams['svg.fonttype'] = 'none'
 
 signal.signal(signal.SIGSEGV, SIGSEGV_signal_arises)

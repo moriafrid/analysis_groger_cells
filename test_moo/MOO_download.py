@@ -14,7 +14,6 @@ from open_pickle import read_from_pickle
 from calculate_F_factor import calculate_F_factor
 matplotlib.use('agg')
 matplotlib.rcParams['pdf.fonttype'] = 42
-matplotlib.rcParams['png.fonttype'] = 42
 matplotlib.rcParams['svg.fonttype'] = 'none'
 
 # import argparse

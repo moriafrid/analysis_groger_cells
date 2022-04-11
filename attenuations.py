@@ -13,7 +13,6 @@ from open_pickle import read_from_pickle
 from read_passive_parameters_csv import get_passive_parameter
 import matplotlib
 matplotlib.rcParams['pdf.fonttype'] = 42
-matplotlib.rcParams['png.fonttype'] = 42
 matplotlib.rcParams['svg.fonttype'] = 'none'
 
 freq=100

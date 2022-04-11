@@ -16,7 +16,6 @@ from read_spine_properties import get_n_spinese
 from read_passive_parameters_csv import get_passive_parameter
 import pickle
 matplotlib.rcParams['pdf.fonttype'] = 42
-matplotlib.rcParams['png.fonttype'] = 42
 matplotlib.rcParams['svg.fonttype'] = 'none'
 do_calculate_F_factor=True
 print("the number of parameters that sys loaded in dendogram.py is ",len(sys.argv),flush=True)

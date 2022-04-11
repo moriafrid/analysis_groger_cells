@@ -7,7 +7,6 @@ from extra_function import create_folder_dirr,create_folders_list
 from scipy.signal import find_peaks
 import matplotlib
 matplotlib.rcParams['pdf.fonttype'] = 42
-matplotlib.rcParams['png.fonttype'] = 42
 matplotlib.rcParams['svg.fonttype'] = 'none'
 
 class Syn2Clear:

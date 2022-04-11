@@ -12,7 +12,6 @@ import pickle
 from calculate_F_factor import calculate_F_factor
 import matplotlib
 matplotlib.rcParams['pdf.fonttype'] = 42
-matplotlib.rcParams['png.fonttype'] = 42
 matplotlib.rcParams['svg.fonttype'] = 'none'
 
 path_single_traces=glob('data/traces_img/2017_05_08_A_0006/*pA.p')

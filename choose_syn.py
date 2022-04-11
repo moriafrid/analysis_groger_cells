@@ -6,7 +6,6 @@ from add_figure import add_figure
 from scipy.signal import find_peaks
 import matplotlib
 matplotlib.rcParams['pdf.fonttype'] = 42
-matplotlib.rcParams['png.fonttype'] = 42
 matplotlib.rcParams['svg.fonttype'] = 'none'
 def close_event():
     plt.close()

@@ -8,7 +8,6 @@ from read_passive_parameters_csv import get_passive_parameter
 import matplotlib
 matplotlib.use('egg')
 matplotlib.rcParams['pdf.fonttype'] = 42
-matplotlib.rcParams['png.fonttype'] = 42
 matplotlib.rcParams['svg.fonttype'] = 'none'
 
 from passive_val_function import get_passive_val

@@ -11,7 +11,6 @@ import sys
 import pickle
 import matplotlib
 matplotlib.rcParams['pdf.fonttype'] = 42
-matplotlib.rcParams['png.fonttype'] = 42
 matplotlib.rcParams['svg.fonttype'] = 'none'
 print(len(sys.argv),sys.argv,flush=True)
 

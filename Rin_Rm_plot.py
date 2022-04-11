@@ -15,7 +15,6 @@ from read_passive_parameters_csv import get_passive_parameter
 import pickle
 import matplotlib
 matplotlib.rcParams['pdf.fonttype'] = 42
-matplotlib.rcParams['png.fonttype'] = 42
 matplotlib.rcParams['svg.fonttype'] = 'none'
 
 do_calculate_F_factor=True
