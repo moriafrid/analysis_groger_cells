@@ -96,6 +96,7 @@ base_save_folder=base2 + '/'+passive_fit_condition+'/'+passive_val_name+'/'
 print('base_save_folder:',base_save_folder)
 create_folder_dirr(base_save_folder)
 RDSM_objective_file = folder_+save_dir+cell_name+"/data/electrophysio_records/syn/mean_syn.p"
+RDSM_objective_file = folder_+data_dir+cell_name+"/mean_syn.p"
 short_pulse_parameters_file=folder_+save_dir+cell_name+'/data/electrophysio_records/short_pulse_parameters.p'
 morphology_dirr =glob(folder_+data_dir+cell_name+'/*'+file_type)[0]
 # morphology_dirr =glob( folder_+data_dir+cell_name+'/*z_correct.swc')[0]
