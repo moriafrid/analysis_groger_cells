@@ -2,6 +2,9 @@ import pickle
 pickle.HIGHEST_PROTOCOL
 from extra_function import create_folder_dirr
 import matplotlib.pyplot as plt
+from scipy.signal import find_peaks
+from glob import glob
+
 # from matplotlib_scalebar.scalebar import ScaleBar
 from scalebars import AnchoredScaleBar
 global AnchoredScaleBar
@@ -14,93 +17,119 @@ import matplotlib
 import numpy as np
 matplotlib.rcParams['pdf.fonttype'] = 42
 matplotlib.rcParams['svg.fonttype'] = 'none'
+class Graph_edit:
+    def __init__(self,dirr):
+        self.fig1=pickle.load(open(dirr, 'rb'))
+        self.cell_name=dirr[dirr.rfind('2017'):].split('/')[0]
+        self.ax=self.fig1.gca()
+    def remove_axis(self):
+        self.ax.spines['top'].set_visible(False)
+        self.ax.spines['right'].set_visible(False)
+        self.ax.spines['bottom'].set_visible(False)
+        self.ax.spines['left'].set_visible(False)
+    def change_axis_name(self,title='',xlabel='',ylabel=''):
+        if title!='':
+            self.ax.set_title(title,fontsize = 30)
+        if xlabel!='':
+            self.ax.set_xlabel(xlabel,fontsize=20)
+        if ylabel!='':
+            self.ax.set_ylabel(ylabel,fontsize=20)
+    def show(self):
+        plt.show()
 def graph_plot_again(dirr):
     fig1=pickle.load(open(dirr, 'rb'))
-    fig=plt.figure()
+    cell_name=dirr[dirr.rfind('2017'):].split('/')[0]
+    fig_name=dirr.split('/')[-1][:-2]
     ax=fig1.gca()
+    fig=plt.figure()
     ax.spines['top'].set_visible(False)
     ax.spines['right'].set_visible(False)
     ax.spines['bottom'].set_visible(False)
     ax.spines['left'].set_visible(False)
+    mean_x=np.mean([line.get_xdata().rescale('ms') for line in ax.lines],axis=0)
+    mean_x-=mean_x[0]
+    mean_y=np.mean([line.get_ydata() for line in ax.lines],axis=0)
+    peaks,param=find_peaks(mean_y,prominence=1)
+    index2cat=peaks[0]-200
+    index2end=index2cat+2000
     for line in ax.lines:
-        line.set_linewidth(0.5)
-        # scel=AnchoredScaleBar()
-        bar_x=AnchoredSizeBar(ax.transData,200/0.1,'200 ms','lower left',frameon=False,label_top=True,size_vertical=0.05)
         if len(line.get_xdata()>1):
-            plt.plot(line.get_xdata(),line.get_ydata())
+            x=line.get_xdata().rescale('ms')
+            x-=x[0]
+            plt.plot(x[index2cat:index2end],line.get_ydata()[index2cat:index2end],alpha=0.02,color=line.get_color())
         else:
             plt.plot(line.get_xdata(),line.get_ydata(),'*')
-        # a=ax._get_axis_list()
-        plt.xlabel(ax.get_xlabel(),fontsize = 20)
-        plt.ylabel(ax.get_ylabel(),fontsize = 20)
-        plt.title(ax.get_title(),fontsize = 30)
-        plt.axis('off')
-    pass
+    plt.xlabel(ax.get_xlabel(),fontsize = 20)
+    plt.ylabel(ax.get_ylabel(),fontsize = 20)
+    plt.title(ax.get_title(),fontsize = 30)
+    plt.plot(mean_x[index2cat:index2end],mean_y[index2cat:index2end],color='black',lw=2)
+    return fig,cell_name,fig_name
+
+
+
 def graph_edition(dirr,plot_again=False):
     fig1=pickle.load(open(dirr, 'rb'))
     cell_name=dirr[dirr.rfind('2017'):].split('/')[0]
-    plt.axis('off')
-    if plot_again:
-        fig=plt.figure()
+    cell_name=dirr.split('/')[1]
+    fig_name=dirr.split('/')[-1][:-2]
     ax=fig1.gca()
-    ax.set_xlabel('0.1 ms',fontsize=20)
-    ax.set_ylabel('mV',fontsize=20)
-
-    ax.set_xticks([])
     ax.spines['top'].set_visible(False)
     ax.spines['right'].set_visible(False)
-    ax.spines['bottom'].set_visible(False)
-    ax.spines['left'].set_visible(False)
-    scel=AnchoredScaleBar(ax.transData,200/0.1,1,'200 ms','1mV','lower left')
-    bar_x=AnchoredSizeBar(ax.transData,200/0.1,'200 ms','center left',frameon=False,label_top=True,size_vertical=0.05)
-    # bar_x=AnchoredSizeBar(ax.get_xaxis_transform(),200/0.1,'200 ms','lower left',frameon=False,label_top=True,size_vertical=0.05)
-    # bar_x=AnchoredSizeBar(ax.get_yaxis_transform(),200/0.1,'200 ms','lower left',frameon=False,label_top=True,size_vertical=0.05)
-
-    bar_x.set_width(0.01)
-    bar_x.set_height(0.0001)
-    bar_x.set_snap(False)
-    ax.add_artist(scel)
-
-    ax.set_title('Long Pulse',fontsize = 30)
-    # ax.set_yticklabels('mV')
-
-    # scalebar_x = ScaleBar(0.08, units="m",dimension="si-length", length_fraction=0.25)
-    # scalebar_y = ScaleBar(0.08, units="m",rotation="vertical",scale_loc="bottom")
-    # ax.add_artist(scalebar_y)
-    # ax.add_artist(scalebar_x)
-
-
-    # example_line_x=np.mean([line.get_xdata() for line in ax.lines],axis=0)
-    # example_line_y=np.mean([line.get_ydata() for line in ax.lines],axis=0)
-    example_line_x=ax.lines[0].get_xdata()
-    example_line_y=ax.lines[0].get_ydata()
-        # ax.bar(example_line_x[0:100],0.5,bottom=example_line_y[0],)
-        # ax.annotate('mv',example_line_x[0:100])
-        # ax.annotate('ms',example_line_y[0:100])
-        # ax.lines[0].set_color('red')
-        # plt.set_color('r')
-    for line in ax.lines:
-        line.set_linewidth(0.5)
-        if plot_again:
-            if len(line.get_xdata()>1):
-                plt.plot(line.get_xdata(),line.get_ydata())
-            else:
-                plt.plot(line.get_xdata(),line.get_ydata(),'*')
-            # a=ax._get_axis_list()
-            plt.xlabel(ax.get_xlabel(),fontsize = 20)
-            plt.ylabel(ax.get_ylabel(),fontsize = 20)
-            plt.title(ax.get_title(),fontsize = 30)
-            plt.axis('off')
-    plt.show()
-    # plt.close()
+    ax.spines['bottom'].set_position('zero')
+    ax.spines['left'].set_position('zero')
     create_folder_dirr('cells_initial_information/'+cell_name+'/final_data/png')
     create_folder_dirr('cells_initial_information/'+cell_name+'/final_data/pdf')
-    plt.savefig('cells_initial_information/'+cell_name+'/final_data/png/'+dirr.split('/')[-1][:-2]+'.png')
-    plt.savefig('cells_initial_information/'+cell_name+'/final_data/pdf/'+dirr.split('/')[-1][:-2]+'.pdf')
-    with open('cells_initial_information/'+cell_name+'/final_data/png/'+dirr.split('/')[-1][:-2]+'.p', 'wb') as file:
-        pickle.dump(fig1, file)
-    return fig
+    plt.savefig('cells_initial_information/'+cell_name+'/final_data/png/'+fig_name+'.png')
+    plt.savefig('cells_initial_information/'+cell_name+'/final_data/pdf/'+fig_name+'.pdf')
+
+    return fig1,cell_name,fig_name
 
 if __name__=="__main__":
-    graph_edition('cells_outputs_data_short/2017_05_08_A_4-5/data/electrophysio_records/short_pulse/clear_short_pulse_fig.p')
-    graph_edition('cells_outputs_data_short/2017_05_08_A_4-5/data/electrophysio_records/syn/clear_syn_fig.p')
+    # short_pulse=Graph_edit('cells_outputs_data_short/2017_05_08_A_4-5/data/electrophysio_records/short_pulse/clear_short_pulse_fig.p')
+
+    # cell_name='2017_05_08_A_4-5'
+    # fig_fit_hsort_pulse,cell_name,fig_name=
+
+    fig_IV,cell_name,fig_name=graph_edition(glob('cells_outputs_data_short/'+cell_name+'/data/electrophysio_records/*/I_V_curve_fit.p')[0])
+    ax3=fig_IV.gca()
+    ax3.set_xlabel(ax3.get_xlabel(),loc='right')
+    ax3.set_ylabel(ax3.get_ylabel(),loc='top')
+    for line in ax3.lines:
+        line.set_linewidth(3)
+        line.set_markersize(15)
+    plt.legend(loc='lower right')
+    plt.savefig('cells_initial_information/'+cell_name+'/final_data/png/'+fig_name+'.png')
+    plt.savefig('cells_initial_information/'+cell_name+'/final_data/pdf/'+fig_name+'.pdf')
+    pickle.dump(fig_IV, open('cells_initial_information/'+cell_name+'/final_data/png/'+fig_name+'.png', 'wb'))
+
+    plt.show()
+
+    fig_long_pulse,cell_name,fig_name=graph_edition('cells_outputs_data_short/'+cell_name+'/data/electrophysio_records/short_pulse/clear_short_pulse_fig.p')
+    # plt.axis('off')
+    ax=fig_long_pulse.gca()
+    ax.set_title('Long Pulse',fontsize = 30)
+    ax.set_xlabel('0.1 ms',fontsize=20)
+    ax.set_ylabel('mV',fontsize=20)
+    pickle.dump(fig_long_pulse, open('cells_initial_information/'+cell_name+'/final_data/png/'+fig_name+'.png', 'wb'))
+    scel=AnchoredScaleBar(ax.transData,200/0.1,1,'200 ms','1mV','lower left')
+    ax.add_artist(scel)
+    plt.savefig('cells_initial_information/'+cell_name+'/final_data/png/'+fig_name+'.png')
+    plt.savefig('cells_initial_information/'+cell_name+'/final_data/pdf/'+fig_name+'.pdf')
+    # plt.show()
+
+    fig_syn,cell_name,fig_name=graph_plot_again('cells_outputs_data_short/'+cell_name+'/data/electrophysio_records/syn/clear_syn_fig.p')
+    # plt.axis('off')
+    ax2=fig_syn.gca()
+    # plt.plot(ax2.lines[0].get_xdata(),ax2.lines[0].get_ydata(),'r')
+    ax2.set_title('synapse',fontsize = 30)
+    ax2.set_xlabel('ms',fontsize=20)
+    ax2.set_ylabel('mV',fontsize=20)
+    pickle.dump(fig_long_pulse, open('cells_initial_information/'+cell_name+'/final_data/png/'+fig_name+'.png', 'wb'))
+    scel=AnchoredScaleBar(ax.transData,2000,2,'200 ms','1 mV','center right')
+    ax2.add_artist(scel)
+    plt.savefig('cells_initial_information/'+cell_name+'/final_data/png/'+fig_name+'.png')
+    plt.savefig('cells_initial_information/'+cell_name+'/final_data/pdf/'+fig_name+'.pdf')
+    plt.show()
+
+
+    a=1
