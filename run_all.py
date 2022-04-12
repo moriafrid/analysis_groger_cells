@@ -4,7 +4,10 @@ import os
 #     if not ax.get_subplotspec().is_first_col():
 #         ax.spines['top'].set_visible(False)
 #         ax.spines['right'].set_visible(False)
-
+#
+#
+# matplotlib.rcParams['pdf.fonttype'] = 42
+# matplotlib.rcParams['svg.fonttype'] = 'none'
 #fontsize as parameter for xlabel etc (for everything, title...)
 
 cells_name_place='cells_name.p'
