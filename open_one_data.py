@@ -196,7 +196,7 @@ def phenomena(t1,t2,T,base,x_units='S',Y_units='mV'):
 			plt.plot(v,alpha=0.1,lw=0.5,color='grey')
 		plt.plot(np.mean(phenomena,axis=0),'black',lw=3)
 		plt.savefig(base+names[i]+'/clear_'+names[i])
-		pickle.dump(fig, open(base+names[i]+'/clear_'+names[i]+'.p', 'wb'))
+		pickle.dump(fig, open(base+names[i]+'/clear_'+names[i]+'_fig.p', 'wb'))
 
 		with open(base +names[i]+'/clear_'+names[i]+'.p', 'wb') as f:
 			pickle.dump( [np.array(phenomena),eval('T_'+names[i])], f)
