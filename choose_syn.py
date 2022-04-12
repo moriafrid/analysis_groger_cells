@@ -74,12 +74,11 @@ for cell in ['2017_03_04_A_6-7']:#[ '2017_03_04_A_6-7','2017_05_08_A_5-4','2017_
     from add_figure import add_figure
     fig=add_figure('clear_syn',data[1].units,data[0].units)
     for v in filterd_traces_first:
-        plt.plot(data[1],v)
-    plt.plot(data[1],np.mean(filterd_traces_first,axis=0),label='mean_syn')
+        plt.plot(data[1],v,'black',alpha=0.1,lw=0.2)
+    plt.plot(data[1],np.mean(filterd_traces_first,axis=0),'black',lw=2,label='mean_syn')
     plt.savefig(base_dir+"clear_syn.png")
     plt.savefig(base_dir+"clear_syn.pdf")
     pickle.dump(fig, open(base_dir+'clear_syn_fig.p', 'wb'))
-
     plt.close()
 # #this code is just to correct wrong loading data - need to be run fro the consule
 # from open_pickle import read_from_pickle
