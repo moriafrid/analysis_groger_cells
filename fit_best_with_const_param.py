@@ -270,7 +270,7 @@ if __name__=='__main__':
     plt.savefig(save_folder1+'/RA const against errors')
     plt.savefig(save_folder1+'/RA const against errors.pdf')
     pickle.dump(fig3, open(save_folder1+'/RA const against errors.p', 'wb'))
-    from find_nearest import find_nearest
+    from analysis_fit_after_run import find_nearest
     fig4=add_figure('RA const against errors choosing params','RA const','error')
     plt.plot(RA0,errors)
     RA0120= find_nearest(RA0,120)

@@ -69,7 +69,6 @@ def graph_plot_again(dirr):
 
 def graph_edition(dirr,plot_again=False):
     fig1=pickle.load(open(dirr, 'rb'))
-    cell_name=dirr[dirr.rfind('2017'):].split('/')[0]
     cell_name=dirr.split('/')[1]
     fig_name=dirr.split('/')[-1][:-2]
     ax=fig1.gca()
@@ -87,9 +86,16 @@ def graph_edition(dirr,plot_again=False):
 if __name__=="__main__":
     # short_pulse=Graph_edit('cells_outputs_data_short/2017_05_08_A_4-5/data/electrophysio_records/short_pulse/clear_short_pulse_fig.p')
 
-    # cell_name='2017_05_08_A_4-5'
-    # fig_fit_hsort_pulse,cell_name,fig_name=
-
+    cell_name='2017_05_08_A_4-5'
+    fig_fit_short_pulse,cell_name,fig_name=graph_edition('cells_outputs_data_short/'+cell_name+'/fit_short_pulse/z_correct.swc_SPINE_START=20/dend*1.0&F_shrinkage=1.0/const_param/RA/fit RA=73.p')
+    ax0=fig_fit_short_pulse.gca()
+    for line in ax0.lines:
+        line.set_linewidth(3)
+    plt.legend(loc='lower right')
+    plt.savefig('cells_initial_information/'+cell_name+'/final_data/png/'+fig_name+'.png')
+    plt.savefig('cells_initial_information/'+cell_name+'/final_data/pdf/'+fig_name+'.pdf')
+    pickle.dump(fig_fit_short_pulse, open('cells_initial_information/'+cell_name+'/final_data/png/'+fig_name+'.png', 'wb'))
+    plt.show()
     fig_IV,cell_name,fig_name=graph_edition(glob('cells_outputs_data_short/'+cell_name+'/data/electrophysio_records/*/I_V_curve_fit.p')[0])
     ax3=fig_IV.gca()
     ax3.set_xlabel(ax3.get_xlabel(),loc='right')
