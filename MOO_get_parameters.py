@@ -39,9 +39,9 @@ print(sys.argv,flush=True)
 if len(sys.argv) != 15:
     print("the function doesn't run with sys.argv",len(sys.argv),flush=True)
     cpu_node = 1
-    cell_name= '2017_05_08_A_4-5'
+    cell_name= '2017_03_04_A_6-7'
     file_type='z_correct.swc'  #file type is just used to calculate F_factor
-    passive_val={'RA':float(100),'CM':1,'RM':10000}
+    passive_val={'RA':float(120),'CM':1.6713,'RM':12075}
     passive_fit_condition='const_param'
     passive_val_name='test'
     resize_dend_by=1.0
@@ -52,7 +52,7 @@ if len(sys.argv) != 15:
     generation_size = 5
     num_of_genarations = 2
     double_spine_area=True
-    same_strengh=True
+    same_strengh=False
 
 else:
     print("the sys.argv len is correct",flush=True)
@@ -149,7 +149,12 @@ def create_spine(sim, icell, sec, seg, number=0, neck_diam=0.25, neck_length=1.3
     neck.connect(sec(seg))
     sim.neuron.h("access " + str(neck.hoc_internal_name()))
     try: icell.add_sec(neck)
-    except: icell.all.append(neck)
+    except:
+        icell.all.append(neck)
+        if sec.name().find('apic') > -1:
+            icell.apical.append(neck)
+        else:
+            icell.basal.append(neck)
     # if sec.name().find('dend') > -1: #?# moria- need to be sure it is ok to remove the neck and head from the dend list
     #     icell.dend.append(neck)
     # else:
@@ -157,7 +162,12 @@ def create_spine(sim, icell, sec, seg, number=0, neck_diam=0.25, neck_length=1.3
     sim.neuron.h.pop_section()
     sim.neuron.h("access " + str(head.hoc_internal_name()))
     try:icell.add_sec(head) #if using in hoc or ASC file (load_hoc,load_ASC
-    except:icell.all.append(head) #if using in swc
+    except:
+        icell.all.append(head) #if using in swc
+        if sec.name().find('apic') > -1:
+            icell.apical.append(head)
+        else:
+            icell.basal.append(head)
     # if sec.name().find('dend') > -1: #?# moria- need to be sure it is ok to remove the neck and head from the dend list
     #     icell.dend.append(head)
     # else:
@@ -168,6 +178,8 @@ def create_spine(sim, icell, sec, seg, number=0, neck_diam=0.25, neck_length=1.3
     neck.g_pas = 1.0 / passive_val["RM"]
     neck.cm= passive_val["CM"]
     neck.Ra=passive_val["RA"]#int(Rneck)
+    # neck.e_pas=E_pas
+    # head.e_pas=icell.soma[0].e_pas
     return [neck, head]
 
 
@@ -241,7 +253,7 @@ def run(cell, seed=0):
         seg=float(synapses_dict[cell_name+str(i)]['seg_num'])
         synapses_locations.append([sec,seg])
         spine_properties[i]=get_building_spine(cell_name,i)
-
+        spine_properties[i]['weight']=reletive_strengths[i]
 
     morphology = ephys.morphologies.NrnFileMorphology(morphology_dirr, load_cell_function=load_cell_function,do_replace_axon=True,
                                                       extra_func=True, extra_func_run=add_morph, spine_poses=synapses_locations,
@@ -297,7 +309,7 @@ def run(cell, seed=0):
                                                       dist_thresh_apical=SPINE_START,
                                                       dist_thresh_basal=SPINE_START,
                                                       F_factor=F_factor,
-                                                      shrinckage_factor=shrinkage_by)
+                                                      shrinckage_factor=shrinkage_by)#the shrinkage factor is unused in that function
     parameters_list.append(
         ephys.parameters.NrnSectionParameter(name="Ra", param_name="Ra", value=passive_val["RA"],
                                              bounds=[60, 350], locations=sec_list, frozen=RA_FROZEN)) #@# in the paper they said bound of 70-100 ohm*cm
@@ -359,7 +371,6 @@ def run(cell, seed=0):
         NMDA_param_locs.append(ephys.locations.NrnPointProcessLocation(
             'NMDA_loc' + str(i),
             pprocess_mech=syn_mec[-1]))
-#@# why I need to add AMPA and NMDA recheptors for each synaptic location instead one
         #################################diff weight to synapses###################################################
         #
         stim_start = spike_timeing + neuron_start_time
@@ -387,46 +398,43 @@ def run(cell, seed=0):
             name='weight_AMPA',
             param_name='weight[0]',
             frozen=False,
-            value=0.002,
-            bounds=[0.000000, 0.01],
+            value=12.0054239913091/1000,
+            bounds=[0.000000, 0.02/sum(reletive_strengths)],#0.01],
             locations=[netstims[i]],
             reletive_strength = [reletive_strengths[i]])) #[1, 0.1,0.01]))
-            # reletive_strength =   [get_parameter(cell_name,'PSD',spine_num=i)]))#[1, 0.1,0.01]))
-    # this  need to add the weight to optimization
 
         syn_params.append(NrnNetstimWeightParameter(
             name='weight_NMDA',
             param_name='weight[0]',
             frozen=frozen_NMDA_weigth,
-            value=0.0012,
+            value=3.9702950525904908/1000,
             bounds=[0.000, 0.005],
             locations=[netstims_NMDA[i]],
             reletive_strength = [reletive_strengths[i]])) #[1, 0.1,0.01]))
-
-            # reletive_strength = [get_parameter(cell_name,'PSD',spine_num=i)])) #[1, 0.1,0.01]))
+        rec.append(ephys.recordings.CompRecording(
+            name='syn'+str(i)+'.v',
+            location=syn_locations[0],
+            variable='v'))
 
 
     rec.append(ephys.recordings.CompRecording(
         name='soma.v',
         location=somacenter_loc,
         variable='v'))
-    # for syn_loc in syn_locations:
-    rec.append(ephys.recordings.CompRecording(
-        name='syn0.v',
-        location=syn_locations[0],
-        variable='v'))
+
+
 
     syn_params.append(ephys.parameters.NrnPointProcessParameter(
         name='exp2syn_tau1',
         param_name='tau1',
-        value=0.0012,
+        value=0.06276467256184666,
         frozen=AMPA_RISE_FIX,
         bounds=[0.001, 2.1],#[0.1, 0.4],
         locations=tau_param_locs))
     syn_params.append(ephys.parameters.NrnPointProcessParameter(
         name='exp2syn_tau2',
         param_name='tau2',
-        value=1.8,#1.8,  # min(AMPA_FIT[cell]['tau2'],8),
+        value=0.7068789695815033,#1.8,  # min(AMPA_FIT[cell]['tau2'],8),
         frozen=AMPA_DECAY_FIX,
         bounds=[0.01, 4],#[1, 3],
         locations=tau_param_locs))
@@ -434,14 +442,14 @@ def run(cell, seed=0):
     syn_params.append(ephys.parameters.NrnPointProcessParameter(
         name='NMDA_tau_r_NMDA',
         param_name='tau_r_NMDA',
-        value=8,
+        value=7.017839009279828,
         frozen=False,
-        bounds=[7, 15],
+        bounds=[3, 15],
         locations=NMDA_param_locs))
     syn_params.append(ephys.parameters.NrnPointProcessParameter(
         name='NMDA_tau_d_NMDA',
         param_name='tau_d_NMDA',
-        value=35,
+        value=68.15239933603264,
         frozen=False,
         bounds=[25, 90],
         locations=NMDA_param_locs))
@@ -460,8 +468,10 @@ def run(cell, seed=0):
         bounds=[0.06, 0.09],
         locations=NMDA_param_locs))
 
-    protocol = ephys.protocols.SweepProtocol('netstim_protocol', netstims + netstims_NMDA, [rec[0]], cvode_active=False)
-    protocol_spine_head = ephys.protocols.SweepProtocol('netstim_protocol', netstims+ netstims_NMDA , [rec[1]], cvode_active=False)
+    protocol = ephys.protocols.SweepProtocol('netstim_protocol', netstims + netstims_NMDA, [rec[-1]], cvode_active=False)
+    protocol_spine_head=[]
+    for i in range(len(synapses_locations)):
+        protocol_spine_head.append(ephys.protocols.SweepProtocol('netstim_protocol', netstims+ netstims_NMDA , [rec[i]], cvode_active=False))
 
     ##################################################################################
 
@@ -476,6 +486,7 @@ def run(cell, seed=0):
                                    params=parameters_list + syn_params,
                                    # seclist_names=['dendritic']
                                    )
+
     param_names = [param.name for param in model.params.values() if not param.frozen]  # parameters for oprimization
 
     ##################################################################################
@@ -491,6 +502,8 @@ def run(cell, seed=0):
     ##################################################################################
     sim = ephys.simulators.NrnSimulator(dt=dt,
                                         cvode_active=False)  # this uses neuron as the simulator*
+    # model.instantiate(sim)
+
     ##################################################################################
 
 
@@ -504,7 +517,7 @@ def run(cell, seed=0):
     feature3 = EFeaturePeak(T_base, V_base, exp_std=0.05)
 
     objective1 = ephys.objectives.SingletonObjective('netstim_protocol1', feature1)
-    objective2 = ephys.objectives.SingletonObjective('netstim_protocol1', feature2)
+    objective2 = ephys.objectives.SingletonObjective('netstim_protocol2', feature2)
     objective3 = ephys.objectives.SingletonObjective('netstim_protocol3', feature3)
 
     # objectives=[objective1,objective2 , objective3]
@@ -652,7 +665,8 @@ def run(cell, seed=0):
         "model": model.__str__(),
         "syn_location":synapses_locations,
         "spine": spine_properties,
-        "F_factor":F_factor
+        "F_factor":F_factor,
+        "spine_start":SPINE_START
     }, open(base_save_folder + "hall_of_fame.p", "wb"))
 
     pickle.dump({
@@ -751,10 +765,9 @@ def run(cell, seed=0):
     temp = temp[start:]
     temp2 = temp2[start:]
 
-    if do_resize_dend:
-        plt.plot(temp, temp2, color='yellowgreen', linewidth=5,label='after fit dend*'+str(resize_dend_by))
-    else:
-        plt.plot(temp, temp2, color='yellowgreen', linewidth=5,label='after fit dend=1')
+
+    plt.plot(temp, temp2, color='yellowgreen', linewidth=5,label='after fit dend*'+str(resize_dend_by))
+
 
     # plt.errorbar(T_base,V_base, yerr=V2, color = 'k', ecolor="b", alpha = 0.03)
     plt.plot(T_base, V_base, color='black',label='data',alpha=0.2,lw=5)
