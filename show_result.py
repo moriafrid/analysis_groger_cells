@@ -6,7 +6,6 @@ from glob import glob
 import re
 from read_passive_parameters_csv import get_passive_parameter
 import matplotlib
-matplotlib.use('egg')
 matplotlib.rcParams['pdf.fonttype'] = 42
 matplotlib.rcParams['svg.fonttype'] = 'none'
 
@@ -18,7 +17,7 @@ file_type='z_correct.swc'
 # for passive_val_name in ['RA=120','RA=150','RA_min_error','RA_best_fit']:
 passive_val_name='RA=120'
 cell_name =read_from_pickle('cells_name.p')[1]
-plot_all_Moo_results=False
+plot_all_Moo_results=True
 compare_MOO_results=True
 
 compare_between_types=False
@@ -149,10 +148,16 @@ if compare_diffrent_passive_value:
 if compare_between_change_in_the_morphology_passive_fits:
     fig=plt.figure()
     # plt.title(cell_name)
-    ax = fig.subplot_mosaic("""ABCD
-    EFGH
-    IJKL
-    """)
+    dirr_len=len(glob('cells_outputs_data_short/'+cell_name+'/fit_short_pulse/*_SPINE_START=*/*/const_param/RA/analysis/RA const against errors2 60.png'))
+    if dirr_len<=10:
+        ax = fig.subplot_mosaic("""ABC
+        DEF
+        GHI""")
+    else:
+        ax = fig.subplot_mosaic("""ABCD
+        EFGH
+        IJKL
+        """)
     i=0
     for z,p in enumerate(glob('cells_outputs_data_short/'+cell_name+'/fit_short_pulse/*_SPINE_START=*/*/const_param/RA/analysis/RA const against errors2 60.png')):
         show_directory(ax[place[i]],p.split('/')[3]+'\n'+p.split('/')[4],p)
@@ -242,6 +247,9 @@ if plot_all_Moo_results:
             if p.split('/')[6]=='test': continue
             # RA,CM,RM=get_passive_val(passive_vals_dict[p.split('/')[6]])
             show_directory(ax[place[i]],p.split('/')[4]+p.split('/')[6],p)
+
+
+
 if compare_MOO_results:
     same=True
     if '4-5' in cell_name:
@@ -257,35 +265,37 @@ if compare_MOO_results:
     fig=plt.figure()
     # plt.title(cell_name)
     i=0
-    # ax = fig.subplot_mosaic("""AB
-    # CD""")
+    ax = fig.subplot_mosaic("""ABCD
+    EFGH
+    IJKL""")
 
-    dirr_len=len(glob('cells_outputs_data_short/'+cell_name+'/MOO_results'+same_diff+'*/z_correct.swc_SPINE_START=*/F_shrinkage=*/const_param/*/fit_transient_RDSM.png'))
-    if dirr_len<10:
-        ax = fig.subplot_mosaic("""ABC
-        DEF
-        GHI
-        """)
-    elif dirr_len<=13:
-        ax = fig.subplot_mosaic("""ABCD
-        EFGH
-        IJKL
-        MNOP
-        QRST
-        """)
+    # dirr_len=len(glob('cells_outputs_data_short/'+cell_name+'/MOO_results'+same_diff+'*/z_correct.swc_SPINE_START=*/F_shrinkage=*/const_param/*/fit_transient_RDSM.png'))
+    # if dirr_len<10:
+    #     ax = fig.subplot_mosaic("""ABC
+    #     DEF
+    #     GHI
+    #     """)
+    # elif dirr_len>=13:
+    #     ax = fig.subplot_mosaic("""ABCD
+    #     EFGH
+    #     IJKL
+    #     MNOP
+    #     """)
 
 
     for z,p in enumerate(glob('cells_outputs_data_short/'+cell_name+'/MOO_results'+same_diff+'*/z_correct.swc_SPINE_START=*/F_shrinkage*1.0**1.0*/const_param/*/*.pdf')):
         if p.split('/')[6]=='test': continue
         # if p.split('/')[6]=='RA_min_error': continue
-        if 'double' in p.split('/')[4]: continue
+        # if 'double' in p.split('/')[4]: continue
+        if p.split('/')[6]!='RA_min_error':continue
         shrinkage_resize=re.findall(r"[-+]?\d*\.\d+|\d+", p.split('/')[4])
         shrinkage_resize=[float(num) for num in shrinkage_resize]
-        if shrinkage_resize==[1.0,1.5]:continue
+        if shrinkage_resize!=[1.0,1.0]:continue
         if 'double_spine_area' in p.split('/')[4]:
             double_spine_area='True'
         else:
             double_spine_area='False'
+        print(p)
         spine_start=int(re.findall(r"[-+]?\d*\.\d+|\d+", p.split('/')[3])[0])
         from read_passive_parameters_csv import get_passive_parameter
         passive_vals_dict=get_passive_parameter(cell_name,double_spine_area=double_spine_area,shrinkage_resize=shrinkage_resize,spine_start=spine_start,fit_condition=p.split('/')[5],file_type='z_correct.swc')
