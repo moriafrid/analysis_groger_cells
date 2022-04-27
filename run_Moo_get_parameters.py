@@ -22,20 +22,24 @@ folder_save="cells_outputs_data_short/"
 
 file_types=['z_correct.swc','morphology.swc','ASC']
 SPINE_STARTs=[60]
-for cell_name in read_from_pickle(cells_name_place)[0:1]:
+for cell_name in read_from_pickle(cells_name_place)[2:3]:
     passive_vals_dict= {}
     # p='cells_initiall_information/'+cell_name+'/results_passive_fits.csv'
     p='cells_outputs_data_short/'+cell_name+'/fit_short_pulse/results_passive_fits.csv'
     df = pd.read_csv(p)
     for resize_diam_by ,shrinkage_by in zip([1.0,1.1,1.2,1.5][:3],[1.0,1.1,1.0,1.0][:3]):#zip([1.0],[1.0]):
         for fit_condition in ['const_param','different_initial_conditions'][:1]:
-            for file_type in file_types:
-                for SPINE_START in [20,60,10][:1]:
-                    if resize_diam_by==1.0 and shrinkage_by==1.0:
-                        do_double_spine_area=['True','False']
+            for SPINE_START in [20,60,10][:1]:
+                if resize_diam_by==1.0 and shrinkage_by==1.0:
+                    do_double_spine_area=['True','False']
+                else:
+                    do_double_spine_area=['False']
+                for double_spine_area in do_double_spine_area:
+                    if resize_diam_by==1.0 and shrinkage_by==1.0 and double_spine_area=='False':
+                        file_types=['z_correct.swc','morphology.swc','ASC']
                     else:
-                        do_double_spine_area=['False']
-                    for double_spine_area in do_double_spine_area:
+                        file_types=['z_correct.swc']
+                    for file_type in file_types:
                         passive_vals_dict=get_passive_parameter(cell_name,double_spine_area=double_spine_area,shrinkage_resize=[shrinkage_by,resize_diam_by],fit_condition=fit_condition,spine_start=SPINE_START,file_type=file_type)
                         for i, passive_val_name in enumerate(['RA=120','RA=150','RA_min_error','RA_best_fit']):
                             # if i!=2: continue
