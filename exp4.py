@@ -4,7 +4,7 @@ from neuron import h
 import matplotlib.pyplot as plt
 from glob import glob
 from tqdm import tqdm
-from read_spine_properties import get_sec_and_seg,get_building_spine,get_n_spinese
+from read_spine_properties import get_sec_and_seg,get_building_spine,get_n_spinese,get_parameter
 from extra_function import create_folder_dirr
 import matplotlib
 import pickle
@@ -36,6 +36,12 @@ for model_place in glob(folder_data+'*'):
     if type=='test': continue
     folder_save=model_place+'/hall_of_fame_together/'
     create_folder_dirr(folder_save)
+    if 'relative' in model_place:
+        psd_sizes=get_parameter(cell_name,'PSD')
+        argmax=np.argmax(psd_sizes)
+        reletive_strengths=psd_sizes/psd_sizes[argmax]
+    else:
+        reletive_strengths=np.ones(get_n_spinese(cell_name))
     names=["A","B"]
 
     figure, axis = plt.subplots(1, get_n_spinese(cell_name))
@@ -64,9 +70,10 @@ for model_place in glob(folder_data+'*'):
         V_spine=[]
         spines=[]
         syn_objs=[]
+
         for sec,seg in zip(secs,segs):
             dict_spine_param=get_building_spine(cell_name,num)
-            spine, syn_obj = loader.create_synapse(eval('model.'+sec), seg,params=dict_spine_param, number=num,netstim=netstim, hall_of_fame_num=i)
+            spine, syn_obj = loader.create_synapse(eval('model.'+sec), seg,reletive_strengths[num],params=dict_spine_param, number=num,netstim=netstim, hall_of_fame_num=i)
             spines.append(spine)
             syn_objs.append(syn_obj)
             V_spine.append(h.Vector())

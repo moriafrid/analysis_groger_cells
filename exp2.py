@@ -2,28 +2,36 @@ from open_MOO_after_fit import OPEN_RES
 import numpy as np
 # from neuron import h
 import matplotlib.pyplot as plt
-from read_spine_properties import get_sec_and_seg,get_building_spine,get_n_spinese
+from read_spine_properties import get_sec_and_seg,get_building_spine,get_n_spinese,get_parameter
 import os
 from glob import glob
 from tqdm import tqdm
 import pickle
 import matplotlib
+from open_pickle import read_from_pickle
 matplotlib.rcParams['pdf.fonttype'] = 42
 matplotlib.rcParams['svg.fonttype'] = 'none'
 
 folder_= ''
-folder_data=folder_+'cells_outputs_data_short/*/MOO_results*/*/F_shrinkage=*/const_param/'
+folder_data=folder_+'cells_outputs_data_short/*6-7/MOO_results*re*/*/F_shrinkage=*/const_param/'
 save_name='/AMPA&NMDA'
 
 for model_place in tqdm(glob(folder_data+'*')):
+    # print(model_place)
     type=model_place.split('/')[-1]
     cell_name=model_place.split('/')[1]
-    if type=='test': continue
+    if type!='test': continue
     loader=None
     try:loader = OPEN_RES(res_pos=model_place+'/')
     except:
        print(model_place + '/hall_of_fame.p is not exsist' )
        continue
+    if 'relative' in model_place:
+        psd_sizes=get_parameter(cell_name,'PSD')
+        argmax=np.argmax(psd_sizes)
+        reletive_strengths=psd_sizes/psd_sizes[argmax]
+    else:
+        reletive_strengths=np.ones(get_n_spinese(cell_name))
     model=None
     model=loader.get_model()
 
@@ -40,7 +48,7 @@ for model_place in tqdm(glob(folder_data+'*')):
     syn_objs=[]
     for sec,seg in zip(secs,segs):
         dict_spine_param=get_building_spine(cell_name,num)
-        spine, syn_obj = loader.create_synapse(eval('model.'+sec), seg,params=dict_spine_param, number=num,netstim=netstim)
+        spine, syn_obj = loader.create_synapse(eval('model.'+sec), seg,reletive_strengths[num], number=num,netstim=netstim)
         spines.append(spine)
         syn_objs.append(syn_obj)
         # V_spine.append(h.Vector())
@@ -59,6 +67,7 @@ for model_place in tqdm(glob(folder_data+'*')):
 
     V_soma_All = np.array(V_soma)[1700:]
     time_all = np.array(time)[1700:]
+    time_all-=time_all[0]
     # take syn_obj to be 0 to see the NMDA
     for j in range(num):
         syn_objs[j][1][1].weight[0]=0
@@ -76,10 +85,15 @@ for model_place in tqdm(glob(folder_data+'*')):
     plt.plot(time_all, V_soma_AMPA, color='b', lw=2,linestyle='--', label='AMPA',alpha=0.8)
     # plt.plot(time_all, V_NMDA,lw=2, color='r', linestyle='--', label='NMDA',alpha=0.8)
     plt.plot(time_all, V_NMDA+V_soma_All[0],lw=2, color='r', linestyle='--', label='NMDA',alpha=0.8)
+    RDSM_objective_file = folder_+'cells_initial_information/'+cell_name+"/mean_syn.p"
+    T_data,V_data=read_from_pickle(RDSM_objective_file)
+    T_data=np.array(T_data.rescale('ms'))[700:]
+    T_data=T_data-T_data[0]
+    plt.plot(np.array(T_data), np.array(V_data)[700:]+loader.get_param('e_pas'), color='black',label='EP record',alpha=0.2,lw=5)
 
     plt.legend()
     plt.savefig(model_place+save_name+'.png')
     plt.savefig(model_place+save_name+'.pdf')
     pickle.dump(fig, open(model_place+save_name+'.p', 'wb'))
 
-    plt.show()
+    # plt.show()
