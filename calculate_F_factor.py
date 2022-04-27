@@ -17,7 +17,7 @@ def calculate_F_factor(cell,spine_type,spines_density=1.08,spine_num=1, double_s
             spines_density=spines_density
         else:
             spines_density=spines_density_temp
-    print(spines_density)
+    print("spine density="+str(spines_density))
 
     dend_len=np.sum([sec.L for sec in cell.dend])
     try: dend_len+=np.sum([sec.L for sec in cell.apic])
