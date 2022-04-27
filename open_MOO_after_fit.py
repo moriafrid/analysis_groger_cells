@@ -1,5 +1,5 @@
 #! /ems/elsc-labs/segev-i/yoni.leibner/anaconda2/bin/ipython
-#70
+# 70
 from __future__ import print_function
 import bluepyopt as bpopt
 import bluepyopt.ephys as ephys
@@ -10,8 +10,12 @@ from add_figure import add_figure
 from open_pickle import read_from_pickle
 from calculate_F_factor import calculate_F_factor
 import signal
+
+
 def SIGSEGV_signal_arises(signalNum, stack):
     print(f"{signalNum} : SIGSEGV arises")
+
+
 signal.signal(signal.SIGSEGV, SIGSEGV_signal_arises)
 
 
@@ -21,20 +25,21 @@ class OPEN_RES():
             EFeatureImpadance, EFeaturePeak, EFeaturePeakTime, EFeatureRDSM, NrnNetstimWeightParameter, \
             SweepProtocolRin2
         self.res_pos = res_pos
+        self.dt = 0.1
         self.hall = hall = pickle.load(open(self.res_pos + 'hall_of_fame.p', 'rb'))
         # self.morph_path = hall['model'].split('morphology')[1].split('\n')[1].strip() # remove spaces
-        self.morph_path = hall['model'].split('\n')[2].strip() # remove spaces
+        self.morph_path = hall['model'].split('\n')[2].strip()  # remove spaces
         self.fixed_params_res = dict()
         self.optimization_params_res = dict()
         for line in hall['model'].split('params:')[1].split('\n'):
             param_name = line.split(':')[0]
-            if len(line.split('='))>=2 and line.split('=')[1].find('[')==-1:
+            if len(line.split('=')) >= 2 and line.split('=')[1].find('[') == -1:
                 self.fixed_params_res[param_name.strip()] = float(line.split('=')[1])
         hall_of_phase_results = np.array(hall['hall_of_fame'].items)
         for i, param in enumerate(hall['parameters']):
             self.optimization_params_res[param] = hall_of_phase_results[:, i]
 
-        self.mechanisms={}
+        self.mechanisms = {}
         somatic_loc = ephys.locations.NrnSeclistLocation('somatic', seclist_name='somatic')
         basal_loc = ephys.locations.NrnSeclistLocation('basal', seclist_name='basal')
         apical_loc = ephys.locations.NrnSeclistLocation('apical', seclist_name='apical')
@@ -46,47 +51,66 @@ class OPEN_RES():
                          'axonal': [axonal_loc]}
 
         # self.spine_properties=hall['spine']
-        self.morphology = ephys.morphologies.NrnFileMorphology(self.morph_path, do_replace_axon=True,
-                                                      do_resize_dend=False,nseg_frequency=40)
-        self.mechanism_list=[]
-        sec_list=location_dict ['all']
+
+        from extra_function import load_swc
+        self.synapses_locations = hall['syn_location']
+        self.spine_properties = hall['spine']
+        import re
+        self.shrinkage_by, self.resize_dend_by = re.findall("\d+\.\d+", self.res_pos.split('/')[4])
+        self.morphology = ephys.morphologies.NrnFileMorphology(self.morph_path, load_cell_function=load_swc,
+                                                               do_replace_axon=True,
+                                                               resize_dend_by=float(self.resize_dend_by),
+                                                               shrinkage_by=float(self.shrinkage_by))
+        self.mechanism_list = []
+        sec_list = location_dict['all']
         # for mech in self.mechanisms.keys():
         self.mechanism_list.append(ephys.mechanisms.NrnMODMechanism(name='pas', prefix='pas', locations=sec_list))
+        self.spine_start = int(re.findall("\d+", self.res_pos.split('/')[3])[0])
+        self.F_factor = hall['F_factor']
         F_FACTOR_DISTANCE = NrnSegmentSomaDistanceScaler_(name='spine_factor',
-                                                          dist_thresh_apical=60,
-                                                          dist_thresh_basal=60,
-                                                          F_factor=hall['F_factor'])
-        self.parameters_list=[]
+                                                          dist_thresh_apical=self.spine_start,
+                                                          dist_thresh_basal=self.spine_start,
+                                                          F_factor=self.F_factor)
+        self.parameters_list = []
         for parameter in self.fixed_params_res.keys():
             if parameter in ['cm', 'g_pas']:
-                self.parameters_list.append(ephys.parameters.NrnSectionParameter(name=parameter, param_name=parameter,value_scaler=F_FACTOR_DISTANCE, value=self.fixed_params_res[parameter], locations=sec_list,frozen=True))
+                self.parameters_list.append(ephys.parameters.NrnSectionParameter(name=parameter, param_name=parameter,
+                                                                                 value_scaler=F_FACTOR_DISTANCE,
+                                                                                 value=self.fixed_params_res[parameter],
+                                                                                 locations=sec_list, frozen=True))
             elif parameter in ['Ra', 'e_pas']:
-                self.parameters_list.append(ephys.parameters.NrnSectionParameter(name=parameter, param_name=parameter, value=self.fixed_params_res[parameter], locations=sec_list,frozen=True))
-        self.sim=ephys.simulators.NrnSimulator(cvode_active=False)
+                self.parameters_list.append(ephys.parameters.NrnSectionParameter(name=parameter, param_name=parameter,
+                                                                                 value=self.fixed_params_res[parameter],
+                                                                                 locations=sec_list, frozen=True))
+        self.sim = ephys.simulators.NrnSimulator(cvode_active=False, dt=self.dt)
         self.model = ephys.models.CellModel('Model', morph=self.morphology, mechs=self.mechanism_list,
-                                   params=self.parameters_list)
+                                            params=self.parameters_list)
         self.model.instantiate(self.sim)
         self.hoc_model = self.sim.neuron.h.Model[-1]
 
     def get_model(self):
         return self.hoc_model
 
-    def create_synapse(self, sec, pos, number = 0,params={"NECK_DIAM" : 0.25, "NECK_LENGHT":1.35,"HEAD_DIAM" : 0.944,},
-                       hall_of_fame_num = 0, netstim=None):
+    def create_synapse(self, sec, pos, weight, number=0,
+                       hall_of_fame_num=0, netstim=None, ignore_netstim=False):
 
-        spine = self.create_spine(sec, pos, number = number,
-                       neck_diam = params["NECK_DIAM"], neck_length = params["NECK_LENGHT"],
-                       head_diam = params["HEAD_DIAM"])
-        syn_obj = self._add_syn_on_sec(spine[1], 1, hall_of_fame_num=hall_of_fame_num, netstim=netstim)
+        spine = self.create_spine(sec, pos, number=number,
+                                  neck_diam=self.hall['spine'][number]["NECK_DIAM"],
+                                  neck_length=self.hall['spine'][number]["NECK_LENGHT"],
+                                  head_diam=self.hall['spine'][number]["HEAD_DIAM"])
+
+        if not ignore_netstim:
+            syn_obj = self._add_syn_on_sec(spine[1], weight, pos=1, hall_of_fame_num=hall_of_fame_num, netstim=netstim)
+        else:
+            syn_obj = None
         return spine, syn_obj
-
 
     def create_spine(self, sec, pos, number=0, neck_diam=0.25, neck_length=1.35,
                      head_diam=0.944):  # np.sqrt(2.8/(4*np.pi))
         neck = self.sim.neuron.h.Section(name="spineNeck" + str(number))
         head = self.sim.neuron.h.Section(name="spineHead" + str(number))
-        self.hoc_model.all.append(neck)
-        self.hoc_model.all.append(head)
+        # self.hoc_model.all.append(neck)
+        # self.hoc_model.all.append(head)
         neck.L = neck_length
         neck.diam = neck_diam
         head.L = head.diam = head_diam
@@ -94,13 +118,22 @@ class OPEN_RES():
         neck.connect(sec(pos))
         self.sim.neuron.h("access " + str(neck.hoc_internal_name()))
         self.hoc_model.all.append(neck)
+        if sec.name().find('apic') > -1:
+            self.hoc_model.apical.append(neck)
+        else:
+            self.hoc_model.basal.append(neck)
         self.sim.neuron.h.pop_section()
         self.sim.neuron.h("access " + str(head.hoc_internal_name()))
         self.hoc_model.all.append(head)
+        if sec.name().find('apic') > -1:
+            self.hoc_model.apical.append(head)
+        else:
+            self.hoc_model.basal.append(head)
         self.sim.neuron.h.pop_section()
         for sec in [neck, head]:
             sec.insert("pas")
             sec.g_pas = self.get_param('g_pas')
+            sec.e_pas = self.get_param('e_pas')
             sec.cm = self.get_param('cm')
             sec.Ra = self.get_param('Ra')
         return [neck, head]
@@ -110,9 +143,9 @@ class OPEN_RES():
             return self.fixed_params_res[param_name]
         elif param_name in self.optimization_params_res.keys():
             return self.optimization_params_res[param_name][hall_num]
-        raise Exception('parameter name isnt correct: '+str(param_name))
+        raise Exception('parameter name isnt correct: ' + str(param_name))
 
-    def _add_syn_on_sec(self, sec, pos=1, netstim=None, hall_of_fame_num=0):
+    def _add_syn_on_sec(self, sec, weight, pos=1, netstim=None, hall_of_fame_num=0):
         if netstim == None:
             raise Exception('we need netstim!:)')
         AMPA_PART = self.sim.neuron.h.Exp2Syn(sec(pos))
@@ -121,18 +154,21 @@ class OPEN_RES():
         AMPA_PART.tau2 = self.get_param('exp2syn_tau2', hall_of_fame_num)
         AMPA_PART.e = 0
         NMDA_PART.e = 0
-        NMDA_PART.tau_r_NMDA=self.get_param('NMDA_tau_r_NMDA', hall_of_fame_num)
-        NMDA_PART.tau_d_NMDA=self.get_param('NMDA_tau_d_NMDA', hall_of_fame_num)
-        NMDA_PART.n_NMDA=self.get_param('NMDA_n_NMDA', hall_of_fame_num)
-        NMDA_PART.gama_NMDA=self.get_param('NMDA_gama_NMDA', hall_of_fame_num)
+        NMDA_PART.tau_r_NMDA = self.get_param('NMDA_tau_r_NMDA', hall_of_fame_num)
+        NMDA_PART.tau_d_NMDA = self.get_param('NMDA_tau_d_NMDA', hall_of_fame_num)
+        NMDA_PART.n_NMDA = self.get_param('NMDA_n_NMDA', hall_of_fame_num)
+        NMDA_PART.gama_NMDA = self.get_param('NMDA_gama_NMDA', hall_of_fame_num)
         netcon_AMPA = self.sim.neuron.h.NetCon(netstim, AMPA_PART)
         netcon_NMDA = self.sim.neuron.h.NetCon(netstim, NMDA_PART)
-        netcon_AMPA.weight[0] = self.get_param('weight_AMPA', hall_of_fame_num)
-        netcon_NMDA.weight[0] = self.get_param('weight_NMDA', hall_of_fame_num)
+        netcon_AMPA.weight[0] = self.get_param('weight_AMPA', hall_of_fame_num) * weight / 2
+        netcon_NMDA.weight[0] = self.get_param('weight_NMDA', hall_of_fame_num) * weight / 2
+        # netcon_NMDA.weight[0]=0
         return [AMPA_PART, netcon_AMPA], [NMDA_PART, netcon_NMDA]
+
     def __del__(self):
-        self.hoc_model=None
-    def destroy(self):
+        # self.hoc_model=None
+        # self.destroy()
         pass
 
-
+    def destroy(self):
+        self.model.destroy(self.sim)
