@@ -160,8 +160,8 @@ class OPEN_RES():
         NMDA_PART.gama_NMDA = self.get_param('NMDA_gama_NMDA', hall_of_fame_num)
         netcon_AMPA = self.sim.neuron.h.NetCon(netstim, AMPA_PART)
         netcon_NMDA = self.sim.neuron.h.NetCon(netstim, NMDA_PART)
-        netcon_AMPA.weight[0] = self.get_param('weight_AMPA', hall_of_fame_num) * weight / 2
-        netcon_NMDA.weight[0] = self.get_param('weight_NMDA', hall_of_fame_num) * weight / 2
+        netcon_AMPA.weight[0] = self.get_param('weight_AMPA', hall_of_fame_num) * weight
+        netcon_NMDA.weight[0] = self.get_param('weight_NMDA', hall_of_fame_num) * weight
         # netcon_NMDA.weight[0]=0
         return [AMPA_PART, netcon_AMPA], [NMDA_PART, netcon_NMDA]
 

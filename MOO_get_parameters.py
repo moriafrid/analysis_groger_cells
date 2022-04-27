@@ -52,7 +52,7 @@ if len(sys.argv) != 15:
     generation_size = 5
     num_of_genarations = 2
     double_spine_area=True
-    same_strengh=False
+    same_strengh=True
 
 else:
     print("the sys.argv len is correct",flush=True)
@@ -394,28 +394,30 @@ def run(cell, seed=0):
             weight=5e-4,
             locations=[NMDA_param_locs[i]]))
 
-        syn_params.append(NrnNetstimWeightParameter(
-            name='weight_AMPA',
-            param_name='weight[0]',
-            frozen=False,
-            value=12.0054239913091/1000,
-            bounds=[0.000000, 0.02/sum(reletive_strengths)],#0.01],
-            locations=[netstims[i]],
-            reletive_strength = [reletive_strengths[i]])) #[1, 0.1,0.01]))
 
-        syn_params.append(NrnNetstimWeightParameter(
-            name='weight_NMDA',
-            param_name='weight[0]',
-            frozen=frozen_NMDA_weigth,
-            value=3.9702950525904908/1000,
-            bounds=[0.000, 0.005],
-            locations=[netstims_NMDA[i]],
-            reletive_strength = [reletive_strengths[i]])) #[1, 0.1,0.01]))
         rec.append(ephys.recordings.CompRecording(
             name='syn'+str(i)+'.v',
             location=syn_locations[0],
             variable='v'))
+            # reletive_strength = [get_parameter(cell_name,'PSD',spine_num=i)])) #[1, 0.1,0.01]))
 
+    syn_params.append(NrnNetstimWeightParameter(
+            name='weight_AMPA',
+            param_name='weight[0]',
+            frozen=False,
+            value=9.0054239913091/1000,
+            bounds=[0.000000, 0.02/sum(reletive_strengths)],#0.01],
+            locations=netstims,
+            reletive_strength = reletive_strengths)) #[1, 0.1,0.01]))
+
+    syn_params.append(NrnNetstimWeightParameter(
+        name='weight_NMDA',
+        param_name='weight[0]',
+        frozen=frozen_NMDA_weigth,
+        value=3.9702950525904908/1000,
+        bounds=[0.000, 0.005],
+        locations=netstims_NMDA,
+        reletive_strength = reletive_strengths)) #[1, 0.1,0.01]))
 
     rec.append(ephys.recordings.CompRecording(
         name='soma.v',
