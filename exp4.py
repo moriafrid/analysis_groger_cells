@@ -11,20 +11,9 @@ import pickle
 matplotlib.rcParams['pdf.fonttype'] = 42
 matplotlib.rcParams['svg.fonttype'] = 'none'
 import sys
-if len(sys.argv) != 7:
-   cell_name= '2017_05_08_A_5-4'
-   file_type='z_correct.swc'
-   resize_diam_by=1.0
-   shrinkage_factor=1.0
-   SPINE_START=20
-else:
-   cell_name = sys.argv[1]
-   file_type=sys.argv[2] #hoc ar ASC
-   resize_diam_by = float(sys.argv[3]) #how much the cell sweel during the electrophisiology records
-   shrinkage_factor =float(sys.argv[4]) #how much srinkage the cell get between electrophysiology record and LM
-   SPINE_START=int(sys.argv[5])
+
 folder_= ''
-folder_data=folder_+'cells_outputs_data_short/'+cell_name+'/MOO_results/'+file_type+'/F_shrinkage='+str(shrinkage_factor)+'_dend*'+str(resize_diam_by)+'/const_param/'
+folder_data=folder_+'cells_outputs_data_short/*4-5/MOO_results_*/*/F_shrinkage=*/const_param'
 # folder_save=folder_data+'/MOO_results/hall_of_fame_together/'
 def get_cmap(n, name='hsv'):
     '''Returns a function that maps each index in 0, 1, ..., n-1 to a distinct

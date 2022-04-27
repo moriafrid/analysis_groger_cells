@@ -15,7 +15,7 @@ matplotlib.rcParams['pdf.fonttype'] = 42
 matplotlib.rcParams['svg.fonttype'] = 'none'
 
 folder_= ''
-folder_data=folder_+'cells_outputs_data_short/*6-7/MOO_results*same*/*/F_shrinkage=*/const_param'
+folder_data=folder_+'cells_outputs_data_short/*4-5/MOO_results_*/*/F_shrinkage=*/const_param'
 save_name='/fit_transient_RDSM'
 
 for model_place in tqdm(glob(folder_data+'/*')):
@@ -28,7 +28,7 @@ for model_place in tqdm(glob(folder_data+'/*')):
         reletive_strengths=psd_sizes/psd_sizes[argmax]
     else:
         reletive_strengths=np.ones(get_n_spinese(cell_name))
-    if model_type!='test': continue
+    if model_type=='test': continue
 
     short_pulse_parameters_file=folder_+'cells_outputs_data_short/'+cell_name+'/data/electrophysio_records/short_pulse_parameters.p'
     RDSM_objective_file = folder_+'cells_initial_information/'+cell_name+"/mean_syn.p"
@@ -75,10 +75,6 @@ for model_place in tqdm(glob(folder_data+'/*')):
     syn_objs=[]
     for sec,seg in zip(secs,segs):
         spine, syn_obj = loader.create_synapse(eval('model.'+sec), seg,reletive_strengths[num], number=num,netstim=netstim)
-        # for sec_ in spine:
-        #     sec_.cm=1.9
-        #     sec_.g_pas = 1.0/8000.0
-        #     sec_.Ra=120
         spines.append(spine)
         syn_objs.append(syn_obj)
         num+=1
@@ -101,13 +97,8 @@ for model_place in tqdm(glob(folder_data+'/*')):
     cut_from_start_time=int(neuron_start_time/0.1)
     plt.plot(time[cut_from_start_time:]-time[cut_from_start_time], V_soma[cut_from_start_time:], color='yellowgreen', lw=5,label='after fit')
     # plt.plot(time, V_soma, color='yellowgreen', lw=5,label='after fit')
-
     plt.plot(T_base, np.array(V_base)+loader.get_param('e_pas'), color='black',label='EP record',alpha=0.2,lw=5)
-
-
-
     plt.plot([], [], ' ', label='gmax_AMPA='+str(round(loader.get_param('weight_AMPA')*1000,3))+' [nS] \ngmax_NMDA=' +str(round(loader.get_param('weight_NMDA')*1000,3))+' [nS]\nrelative strenght '+str(reletive_strengths))
-
     plt.legend()
     plt.savefig(model_place+save_name+'_fig.png')
     # plt.savefig(model_place+save_name+'_fig.pdf')

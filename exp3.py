@@ -7,11 +7,14 @@ from read_spine_properties import get_sec_and_seg,get_building_spine,get_n_spine
 from tqdm import tqdm
 import matplotlib
 import pickle
+from open_pickle import read_from_pickle
+from extraClasses import neuron_start_time
+
 matplotlib.rcParams['pdf.fonttype'] = 42
 matplotlib.rcParams['svg.fonttype'] = 'none'
 
 folder_= ''
-folder_data=folder_+'cells_outputs_data_short/*/MOO_results*/*/F_shrinkage=*/const_param/'
+folder_data=folder_+'cells_outputs_data_short/*4-5/MOO_results*/*/F_shrinkage=*/const_param/'
 save_name='/g_max'
 
 for model_place in tqdm(glob(folder_data+'*')):
@@ -19,6 +22,7 @@ for model_place in tqdm(glob(folder_data+'*')):
     cell_name=model_place.split('/')[1]
     if type=='test': continue
     loader=None
+    model=None
     try:loader = OPEN_RES(res_pos=model_place+'/')
     except:
        print(model_place + '/hall_of_fame.p is not exsist' )
@@ -29,13 +33,27 @@ for model_place in tqdm(glob(folder_data+'*')):
         reletive_strengths=psd_sizes/psd_sizes[argmax]
     else:
         reletive_strengths=np.ones(get_n_spinese(cell_name))
-    model=None
+    RDSM_objective_file = folder_+'cells_initial_information/'+cell_name+"/mean_syn.p"
+    T_data,V_data=read_from_pickle(RDSM_objective_file)
+    T_with_units=T_data-T_data[0]
+    T_with_units=T_with_units*1000
+    T_base = np.array(T_with_units)
+    V_base = np.array(V_data)
+    # T_with_units=T_data.rescale('ms')
+    spike_timeing=T_base[np.argmax(np.array(V_base))-65]
+    total_duration= neuron_start_time+500
+    # V_base=V_base+E_PAS
+
+
     model=loader.get_model()
+
     h=loader.sim.neuron.h
     netstim = h.NetStim()  # the location of the NetStim does not matter
     netstim.number = 1
-    netstim.start = 200
+    netstim.start = spike_timeing + neuron_start_time
     netstim.noise = 0
+    h.tstop = total_duration
+
     secs,segs=get_sec_and_seg(cell_name)
     num=0
     V_spine=[]
@@ -45,7 +63,7 @@ for model_place in tqdm(glob(folder_data+'*')):
 
     for sec,seg in zip(secs,segs):
         dict_spine_param=get_building_spine(cell_name,num)
-        spine, syn_obj = loader.create_synapse(eval('model.'+sec), seg,reletive_strengths[num],params=dict_spine_param, number=num,netstim=netstim)
+        spine, syn_obj = loader.create_synapse(eval('model.'+sec), seg,reletive_strengths[num], number=num,netstim=netstim)
         spines.append(spine)
         syn_objs.append(syn_obj)
         V_spine.append(h.Vector())
@@ -55,15 +73,15 @@ for model_place in tqdm(glob(folder_data+'*')):
         num+=1
 
     # spine, syn_obj = loader.create_synapse(model.dend[82], 0.165, netstim=netstim)
-    h.tstop = 500
     time = h.Vector()
     time.record(h._ref_t)
     h.dt = 0.1
     h.steps_per_ms = 1.0/h.dt
     h.run()
 
+    cut_from_start_time=int(neuron_start_time/0.1)
 
-    time_all = np.array(time)[1900:]
+    time_all = np.array(time)[cut_from_start_time:]
     names=["A","B"]
     fig = plt.figure()
     if get_n_spinese(cell_name) == 2:
@@ -74,9 +92,9 @@ for model_place in tqdm(glob(folder_data+'*')):
     fig.suptitle('NMDA g\n '+" ".join([model_place.split('/')[1],model_place.split('/')[-1],'\n'+passive_propert_title]))
     V_spine_All,g_spine_All=[],[]
     for j in range(len(V_spine)):
-        V_spine_All.append(np.array(V_spine[j])[1900:])
-        g_spine_All.append(np.array(g_spine_NMDA[j])[1900:])
-        # g_spine_All.append(np.array(g_spine_AMPA[j])[1900:])
+        V_spine_All.append(np.array(V_spine[j])[cut_from_start_time:])
+        g_spine_All.append(np.array(g_spine_NMDA[j])[cut_from_start_time:])
+        # g_spine_All.append(np.array(g_spine_AMPA[j])[cut_from_start_time:])
         axs[names[j]].set_title('spine'+str(j)+" "+secs[j]+" "+str(segs[j]))
         axs[names[j]].plot(time_all, g_spine_All[j], color='red', linestyle='--', label='NMDA g')
         g_max=np.argmax(g_spine_All[j])
