@@ -13,8 +13,7 @@ from bluepyopt.ephys.parameterscalers import *
 import logging
 logger = logging.getLogger(__name__)
 ##########################################################
-neuron_start_time = 300
-
+neuron_start_time=300
 class NrnSegmentSomaDistanceScaler_(ParameterScaler, DictMixin):
     """Scaler based on distance from soma"""
     # SERIALIZED_FIELDS = ('name', 'comment', 'distribution',)
@@ -90,7 +89,6 @@ class NrnSegmentSomaDistanceScaler_(ParameterScaler, DictMixin):
                 print(sec, "spine factor < 1")
             sim.neuron.h.pop_section()
             # print(sec.name(), distance, value, value*spine_factor)
-
             return value * spine_factor# * self.shrinckage_factor
         except:
             return value #* self.shrinckage_factor
