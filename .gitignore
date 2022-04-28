@@ -136,8 +136,8 @@ cells_outputs_data/
 
 fit_short_pulse_temp/
 x86_64/
-/*/.~lock.Data.xlsx#
+/*/*.~lock.Data.xlsx#
 /.~lock.Data.xlsx#
 */*.xlsx#
 /*/*/.~*csv#
-
+*/*.~lock.Data.xlsx#

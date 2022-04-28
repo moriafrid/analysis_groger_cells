@@ -20,7 +20,7 @@ resize_diam_by=1.0
 shrinkage_factor=1.0
 SPINE_STARTs=[str(20)]#[str(10),str(20),str(60)]
 i=0
-# os.system('python run_analysis_fit_after_run.py')
+os.system('python run_analysis_fit_after_run.py')
 for cell_name in cells:
     print(cell_name)
     all_data = []
@@ -43,9 +43,9 @@ for cell_name in cells:
                                 passive_val_total=read_from_pickle(glob(initial_folder+'/RA/analysis/RA_total_errors_minimums.p')[0])
                             elif fit_condition=='different_initial_conditions':
                                 passive_val_total=read_from_pickle(glob(initial_folder+'/RA_min'+str(5)+'/analysis/RA_total_errors_minimums.p')[0])
-                            print('is founde ',initial_folder)
+                            # print('is founde ',initial_folder)
                         except:
-                            print("there isn't have RA_total_errors_minimums in spine strart=" +SPINE_START+" "+initial_folder)
+                            # print("there isn't have RA_total_errors_minimums in spine strart=" +SPINE_START+" "+initial_folder)
                             continue
                         passive_vals_dict['RA=120']=found(passive_val_total,120)
                         passive_vals_dict['RA=150']=found(passive_val_total,150)
