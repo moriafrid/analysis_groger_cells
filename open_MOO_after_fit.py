@@ -32,7 +32,7 @@ class OPEN_RES():
         self.fixed_params_res = dict()
         self.optimization_params_res = dict()
         for line in hall['model'].split('params:')[1].split('\n'):
-            param_name = line.split(':')[0]
+            param_name = line.split(':')[0].strip()
             if len(line.split('=')) >= 2 and line.split('=')[1].find('[') == -1:
                 self.fixed_params_res[param_name.strip()] = float(line.split('=')[1])
         hall_of_phase_results = np.array(hall['hall_of_fame'].items)
@@ -166,9 +166,14 @@ class OPEN_RES():
         return [AMPA_PART, netcon_AMPA], [NMDA_PART, netcon_NMDA]
 
     def __del__(self):
-        # self.hoc_model=None
-        # self.destroy()
-        pass
+        self.destroy()
+        self.hoc_model=None
+        self.model=None
+        # pass
 
     def destroy(self):
         self.model.destroy(self.sim)
+        self.hoc_model.destroy(self.sim)
+        self.morphology.destroy(self.sim)
+        self.sim=None
+

@@ -168,9 +168,9 @@ if plot_all_Moo_results:
         same=True
 
     if same==True:
-        same_diff='_same'
+        same_diff='same'
     else:
-        same_diff='_relative'
+        same_diff='relative'
     if '6-7' in cell_name:
         same_diff=''
 
@@ -179,8 +179,9 @@ if plot_all_Moo_results:
     i=0
     # ax = fig.subplot_mosaic("""AB
     # CD""")
+    dirr=glob('cells_outputs_data_short/'+cell_name+'/MOO_results_'+same_diff+'*/z_correct.swc_SPINE_START=20/F_shrinkage*1.0**1.0*/const_param/*best*/fit_transient_RDSM.png')
+    dirr_len=len(dirr)
 
-    dirr_len=len(glob('cells_outputs_data_short/'+cell_name+'/MOO_results'+same_diff+'*/z_correct.swc_SPINE_START=*/F_shrinkage=*/const_param/*/fit_transient_RDSM.png'))
     if dirr_len<10:
         ax = fig.subplot_mosaic("""ABC
         DEF
@@ -202,7 +203,7 @@ if plot_all_Moo_results:
     # passive_vals_dict=get_passive_parameter(cell_name,shrinkage_resize=[shrinkage_by,resize_diam_by],fit_condition=fit_condition,spine_start=int(SPINE_START),file_type=file_type)
     # ax = fig.subplot_mosaic("""ABC""")
 
-    for z,p in enumerate(glob('cells_outputs_data_short/'+cell_name+'/MOO_results'+same_diff+'*/z_correct.swc_SPINE_START=*/F_shrinkage=*double*/const_param/*/fit_transient_RDSM.png')):
+    for z,p in enumerate(dirr):
         if p.split('/')[6]=='test': continue
         # if p.split('/')[6]=='RA_min_error': continue
 
@@ -256,9 +257,9 @@ if compare_MOO_results:
         same=True
 
     if same==True:
-        same_diff='_same'
+        same_diff='same'
     else:
-        same_diff='_relative'
+        same_diff='relative'
     if '6-7' in cell_name:
         same_diff=''
 
@@ -267,7 +268,8 @@ if compare_MOO_results:
     i=0
     ax = fig.subplot_mosaic("""ABCD
     EFGH
-    IJKL""")
+    IJKL
+    MNOP""")
 
     # dirr_len=len(glob('cells_outputs_data_short/'+cell_name+'/MOO_results'+same_diff+'*/z_correct.swc_SPINE_START=*/F_shrinkage=*/const_param/*/fit_transient_RDSM.png'))
     # if dirr_len<10:
@@ -283,16 +285,17 @@ if compare_MOO_results:
     #     """)
 
 
-    for z,p in enumerate(glob('cells_outputs_data_short/'+cell_name+'/MOO_results'+same_diff+'*/z_correct.swc_SPINE_START=*/F_shrinkage*1.0**1.0*/const_param/*/*.pdf')):
+    for z,p in enumerate(glob('cells_outputs_data_short/'+cell_name+'/MOO_results_'+same_diff+'*/z_correct.swc_SPINE_START=20/F_shrinkage*/const_param/*best*/*.pdf')):
         if p.split('/')[6]=='test': continue
         # if p.split('/')[6]=='RA_min_error': continue
         # if 'double' in p.split('/')[4]: continue
-        if p.split('/')[6]!='RA_min_error':continue
+        # if p.split('/')[6]!='RA_min_error':continue
         shrinkage_resize=re.findall(r"[-+]?\d*\.\d+|\d+", p.split('/')[4])
         shrinkage_resize=[float(num) for num in shrinkage_resize]
-        if shrinkage_resize!=[1.0,1.0]:continue
+        # if shrinkage_resize!=[1.0,1.0]:continue
         if 'double_spine_area' in p.split('/')[4]:
             double_spine_area='True'
+            continue
         else:
             double_spine_area='False'
         print(p)
