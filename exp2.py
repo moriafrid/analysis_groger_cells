@@ -102,5 +102,5 @@ for model_place in tqdm(glob(folder_data+'*')):
     plt.savefig(model_place+save_name+'.png')
     plt.savefig(model_place+save_name+'.pdf')
     pickle.dump(fig, open(model_place+save_name+'.p', 'wb'))
-
+    plt.close()
     # plt.show()

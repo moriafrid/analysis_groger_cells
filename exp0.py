@@ -15,7 +15,7 @@ matplotlib.rcParams['pdf.fonttype'] = 42
 matplotlib.rcParams['svg.fonttype'] = 'none'
 
 folder_= ''
-folder_data=folder_+'cells_outputs_data_short/*4-5/MOO_results_*/*/F_shrinkage=*/const_param'
+folder_data=folder_+'cells_outputs_data_short/*5-4/MOO_results_*/*/F_shrinkage=*/const_param'
 save_name='/fit_transient_RDSM'
 
 for model_place in tqdm(glob(folder_data+'/*')):
@@ -43,8 +43,8 @@ for model_place in tqdm(glob(folder_data+'/*')):
     total_duration=T_base[-1] + neuron_start_time
     # V_base=V_base+E_PAS
 
-    loader=None
     model=None
+    loader=None
 
     try:loader = OPEN_RES(res_pos=model_place+'/')
     except:
@@ -105,3 +105,8 @@ for model_place in tqdm(glob(folder_data+'/*')):
     pickle.dump(fig, open(model_place+save_name+'_fig.p', 'wb'))
 
     plt.show()
+    plt.close()
+
+    # loader.destroy()
+    # model.destroy()
+

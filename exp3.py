@@ -109,7 +109,7 @@ for model_place in tqdm(glob(folder_data+'*')):
     pickle.dump(fig, open(model_place+save_name+'.p', 'wb'))
 
     # plt.show()
-
+    plt.close()
     # plt.plot(time_all, V_spine_All-V_spine_All[0], color='k', label='all',alpha=0.3)
     # plt.plot(time_all, g_spine_All, color='red', linestyle='--', label='NMDA gmax')
     # plt.plot(time_all, g_spine_All, color='b', linestyle='--', label='AMPA gmax')

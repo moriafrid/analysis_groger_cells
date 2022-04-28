@@ -93,3 +93,4 @@ for model_place in tqdm(glob(folder_data+'*')):
     # plt.plot([], [], ' ', label='gmax_AMPA='+str(round(loader.get_param('weight_AMPA')*1000,3))+' [nS] \ngmax_NMDA=' +str(round(loader.get_param('weight_NMDA')*1000,3))+' [nS]\nrelative strenght '+str(reletive_strengths))
     plt.legend()
     plt.show()
+    plt.close()

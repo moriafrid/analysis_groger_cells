@@ -90,4 +90,5 @@ for model_place in glob(folder_data+'*'):
     plt.legend()
     plt.savefig(folder_save+type+'.png')
     pickle.dump(figure, open(folder_save+type+'.p', 'wb'))
+    plt.close()
 

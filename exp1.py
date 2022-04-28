@@ -13,7 +13,7 @@ matplotlib.rcParams['pdf.fonttype'] = 42
 matplotlib.rcParams['svg.fonttype'] = 'none'
 #
 folder_= ''
-folder_data=folder_+'cells_outputs_data_short/*4-5/MOO_results_*/*/F_shrinkage=*/const_param/'
+folder_data=folder_+'cells_outputs_data_short/*5-4/MOO_results_*/*/F_shrinkage=*/const_param/'
 save_name='/Voltage Spine&Soma'
 
 for model_place in tqdm(glob(folder_data+'*')):
@@ -106,6 +106,7 @@ for model_place in tqdm(glob(folder_data+'*')):
     plt.savefig(model_place+save_name+'.png')
     plt.savefig(model_place+save_name+'.pdf')
     pickle.dump(fig, open(model_place+save_name+'.p', 'wb'))
+    plt.close()
 
     # plt.show()
 
