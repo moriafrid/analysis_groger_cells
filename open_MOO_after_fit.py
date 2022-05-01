@@ -165,15 +165,14 @@ class OPEN_RES():
         # netcon_NMDA.weight[0]=0
         return [AMPA_PART, netcon_AMPA], [NMDA_PART, netcon_NMDA]
 
-    def __del__(self):
-        self.destroy()
-        self.hoc_model=None
-        self.model=None
+    # def __del__(self):
+    #     self.destroy()
+        # self.hoc_model=None
+        # self.model=None
         # pass
 
     def destroy(self):
         self.model.destroy(self.sim)
-        self.hoc_model.destroy(self.sim)
-        self.morphology.destroy(self.sim)
-        self.sim=None
+        # self.hoc_model.destroy(self.sim)
+        # self.morphology.destroy(self.sim)
 
