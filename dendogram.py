@@ -41,11 +41,11 @@ else:
     resize_diam_by = float(sys.argv[5]) #how much the cell sweel during the electrophisiology records
     shrinkage_factor =float(sys.argv[6]) #how much srinkage the cell get between electrophysiology record and LM
     SPINE_START=int(sys.argv[7])
-    double_spine=eval(sys.argv[8])
+    double_spine=sys.argv[8]
     passive_val=get_passive_parameter(cell_name,double_spine_area=double_spine,shrinkage_resize=[shrinkage_factor,resize_diam_by],fit_condition=fit_condition,spine_start=SPINE_START,file_type=file_type2read)[name]
 print(name, passive_val)
 folder_=''
-
+double_spine=eval(double_spine)
 data_dir= "cells_initial_information/"
 save_dir = "cells_outputs_data_short/"
 cell_file=glob(folder_+data_dir+cell_name+'/*'+file_type2read)[0]
@@ -357,4 +357,4 @@ dendogram = Dendogram('all_with_syn', morph_path, add_sec,load_func=load_func)
 dendogram.cumpute_distances(dendogram.cell.soma)
 max_y = dendogram.plot(save_folder_E,title=save_folder_E.split('/')[-2],ylabel="distance from soma (lamda)")
 dendogram=None
-print('dendogram.py is complte to run for '+cell_name)
+print('dendogram.py is complete to run for '+cell_name)

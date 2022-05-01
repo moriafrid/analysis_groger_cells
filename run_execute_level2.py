@@ -36,26 +36,26 @@ for cell_name in cells:
                     file_types=['z_correct.swc','morphology.swc','ASC']
                 else:
                     file_types=['z_correct.swc']
-                try: passive_vals_dict[name]
-                except:
-                    print('passive_vals_dict is empty')
-                    continue
+
                 for file_type in file_types:
                     if resize_diam_by==1.0 and shrinkage_by==1.0 and double_spine_area=='False' and file_type=='z_correct.swc' and cell_name=='2017_05_08_A_4-5':
                         SPINE_STARTs=[str(20),str(60)]
                     else:
                         SPINE_STARTs=[str(20)]
                     for SPINE_START in SPINE_STARTs:
-
                         passive_vals_dict=get_passive_parameter(cell_name,double_spine_area=double_spine_area,shrinkage_resize=[shrinkage_by,resize_diam_by],fit_condition=fit_condition,spine_start=SPINE_START,file_type=file_type)
-
                         for name in ['RA=120','RA=150','RA_min_error','RA_best_fit']:
-
+                            # if i>1: continue
+                            i+=1
+                            try: passive_vals_dict[name]
+                            except:
+                                print('passive_vals_dict is empty')
+                                continue
                             RA,CM,RM=get_passive_val(passive_vals_dict[name])
                             if float(RA)<50:continue
                             print(name,RA,CM,RM)
                             command="sbatch execute_level2.sh"
-                            send_command = " ".join([command,cell_name,file_type,fit_condition,name,str(resize_diam_by),str(shrinkage_by),str(SPINE_START),eval(double_spine_area)])
+                            send_command = " ".join([command,cell_name,file_type,fit_condition,name,str(resize_diam_by),str(shrinkage_by),str(SPINE_START),double_spine_area])
                             os.system(send_command)
                             print(cell_name+ ' .'+file_type+': execute level2.py, dendogram.py, Rin_Rm.py','attenuations.py')
 

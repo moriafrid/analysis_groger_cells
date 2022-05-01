@@ -48,10 +48,10 @@ else:
     resize_diam_by = float(sys.argv[6]) #how much the cell sweel during the electrophisiology records
     shrinkage_factor =float(sys.argv[7]) #how much srinkage the cell get between electrophysiology record and LM
     SPINE_START=int(sys.argv[8])
-    double_spine=eval(sys.argv[9])
+    double_spine=sys.argv[9]
     passive_val=get_passive_parameter(cell_name,double_spine_area=double_spine,shrinkage_resize=[shrinkage_factor,resize_diam_by],fit_condition=fit_condition,spine_start=SPINE_START,file_type=file_type)[name]
 folder_=''
-
+double_spine=eval(double_spine)
 if not syn_injection:
     clamp_injection=True
 
@@ -340,6 +340,5 @@ if put_syn_on_spine_head:
     plot_records(RM, RA, CM,cell,syns, spines=spines_head,save_name= "lambda for syn "+str(i))
 else:
     plot_records(RM, RA, CM,cell,syns,save_name= "lambda for syn "+str(i))
-print( 'attenuation is run in diraction'+folder_save)
-
+print('attenuation.py is complete to run for '+cell_name)
 a=1
