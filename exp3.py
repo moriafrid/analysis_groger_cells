@@ -14,7 +14,7 @@ matplotlib.rcParams['pdf.fonttype'] = 42
 matplotlib.rcParams['svg.fonttype'] = 'none'
 
 folder_= ''
-folder_data=folder_+'cells_outputs_data_short/*4-5/MOO_results*/*/F_shrinkage=*/const_param/'
+folder_data=folder_+'cells_outputs_data_short/*/MOO_results*/*/F_shrinkage=*/const_param/'
 save_name='/g_max'
 
 for model_place in tqdm(glob(folder_data+'*')):

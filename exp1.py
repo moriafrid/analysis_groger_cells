@@ -13,7 +13,7 @@ matplotlib.rcParams['pdf.fonttype'] = 42
 matplotlib.rcParams['svg.fonttype'] = 'none'
 #
 folder_= ''
-folder_data=folder_+'cells_outputs_data_short/*5-4/MOO_results_*/*/F_shrinkage=*/const_param/'
+folder_data=folder_+'cells_outputs_data_short/*/MOO_results_*/*/F_shrinkage=*/const_param/'
 save_name='/Voltage Spine&Soma'
 
 for model_place in tqdm(glob(folder_data+'*')):

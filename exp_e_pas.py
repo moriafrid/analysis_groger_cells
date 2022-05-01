@@ -10,15 +10,42 @@ import pickle
 import matplotlib
 from add_figure import add_figure
 from open_pickle import read_from_pickle
+from extraClasses import neuron_start_time
 
 matplotlib.rcParams['pdf.fonttype'] = 42
 matplotlib.rcParams['svg.fonttype'] = 'none'
 
 folder_= ''
-folder_data=folder_+'cells_outputs_data_short/*/MOO_results*/*/F_shrinkage=*/const_param/'
-save_name='/fit_transient_RDSM'
+folder_data=folder_+'cells_outputs_data_short/*/MOO_results_*/*/F_shrinkage=*/const_param/'
+save_name='/e_pas'
 
 for model_place in tqdm(glob(folder_data+'*')):
+    # print(model_place)
+    type=model_place.split('/')[-1]
+    cell_name=model_place.split('/')[1]
+    if type=='test': continue
+    loader=None
+    try:loader = OPEN_RES(res_pos=model_place+'/')
+    except:
+       print(model_place + '/hall_of_fame.p is not exsist' )
+       continue
+    if 'relative' in model_place:
+        psd_sizes=get_parameter(cell_name,'PSD')
+        argmax=np.argmax(psd_sizes)
+        reletive_strengths=psd_sizes/psd_sizes[argmax]
+    else:
+        reletive_strengths=np.ones(get_n_spinese(cell_name))
+    RDSM_objective_file = folder_+'cells_initial_information/'+cell_name+"/mean_syn.p"
+    T_data,V_data=read_from_pickle(RDSM_objective_file)
+    T_with_units=T_data-T_data[0]
+    T_with_units=T_with_units*1000
+    T_base = np.array(T_with_units)
+    V_base = np.array(V_data)
+    # T_with_units=T_data.rescale('ms')
+    spike_timeing=T_base[np.argmax(np.array(V_base))-65]
+    total_duration=T_base[-1] + neuron_start_time
+    # V_base=V_base+E_PAS
+
     print(model_place)
     model_type=model_place.split('/')[-1]
     cell_name=model_place.split('/')[1]
@@ -40,8 +67,10 @@ for model_place in tqdm(glob(folder_data+'*')):
     h=loader.sim.neuron.h
     netstim = h.NetStim()  # the location of the NetStim does not matter
     netstim.number = 1
-    netstim.start = 200
+    netstim.start = spike_timeing + neuron_start_time
     netstim.noise = 0
+    h.tstop = total_duration
+
 
     secs,segs=get_sec_and_seg(cell_name)
     num=0
@@ -86,7 +115,11 @@ for model_place in tqdm(glob(folder_data+'*')):
                 sec_.e_pas = e_pas
         passive_propert_title='Rm='+str(round(1.0/loader.get_param('g_pas'),2)) +' Ra='+str(round(loader.get_param('Ra'),2))+' Cm='+str(round(loader.get_param('cm'),2))
         # plt.suptitle('\n'+model_place.split('/')[4]+'\n'+passive_propert_title,fontsize=10)
-        plt.plot(time[1000:]-time[1000], V_soma[1000:], lw=(ii+1)*2, label='e_pas='+str(round(e_pas, 2)), alpha=0.5)
+        cut_from_start_time=int(neuron_start_time/0.1)
+
+        plt.plot(time[cut_from_start_time:]-time[cut_from_start_time], V_soma[cut_from_start_time:],  label='e_pas='+str(round(e_pas, 2)), alpha=0.5)
+        plt.plot(T_base, np.array(V_base)+loader.get_param('e_pas'), color='black',label='EP record',alpha=0.2,lw=5)
+
 
 
 

@@ -1,9 +1,8 @@
 from open_MOO_after_fit import OPEN_RES
 import numpy as np
-# from neuron import h
+from neuron import h
 import matplotlib.pyplot as plt
 from read_spine_properties import get_sec_and_seg,get_building_spine,get_n_spinese,get_parameter
-import os
 from glob import glob
 from tqdm import tqdm
 import pickle
@@ -15,7 +14,7 @@ matplotlib.rcParams['pdf.fonttype'] = 42
 matplotlib.rcParams['svg.fonttype'] = 'none'
 
 folder_= ''
-folder_data=folder_+'cells_outputs_data_short/*4-5/MOO_results_*/*/F_shrinkage=*/const_param/'
+folder_data=folder_+'cells_outputs_data_short/*/MOO_results_*/*/F_shrinkage=*/const_param/'
 save_name='/AMPA&NMDA'
 
 for model_place in tqdm(glob(folder_data+'*')):
@@ -23,7 +22,6 @@ for model_place in tqdm(glob(folder_data+'*')):
     type=model_place.split('/')[-1]
     cell_name=model_place.split('/')[1]
     if type=='test': continue
-    loader=None
     try:loader = OPEN_RES(res_pos=model_place+'/')
     except:
        print(model_place + '/hall_of_fame.p is not exsist' )
@@ -102,5 +100,7 @@ for model_place in tqdm(glob(folder_data+'*')):
     plt.savefig(model_place+save_name+'.png')
     plt.savefig(model_place+save_name+'.pdf')
     pickle.dump(fig, open(model_place+save_name+'.p', 'wb'))
-    plt.close()
     # plt.show()
+    plt.close()
+    loader.destroy()
+
