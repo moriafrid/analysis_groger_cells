@@ -21,7 +21,7 @@ do_calculate_F_factor=True
 print("the number of parameters that sys loaded in dendogram.py is ",len(sys.argv),flush=True)
 print(len(sys.argv), sys.argv)
 
-if len(sys.argv) != 8:
+if len(sys.argv) != 9:
     print("the function doesn't run with sys.argv",flush=True)
     cell_name= '2017_05_08_A_5-4'
     file_type2read='z_correct.swc'
@@ -31,6 +31,7 @@ if len(sys.argv) != 8:
     resize_diam_by=1.0
     shrinkage_factor=1.0
     SPINE_START=20
+    double_spine='False'
 else:
     print("the sys.argv len is correct",flush=True)
     cell_name = sys.argv[1]
@@ -40,7 +41,8 @@ else:
     resize_diam_by = float(sys.argv[5]) #how much the cell sweel during the electrophisiology records
     shrinkage_factor =float(sys.argv[6]) #how much srinkage the cell get between electrophysiology record and LM
     SPINE_START=int(sys.argv[7])
-    passive_val=get_passive_parameter(cell_name,shrinkage_resize=[shrinkage_factor,resize_diam_by],fit_condition=fit_condition,spine_start=SPINE_START,file_type=file_type2read)[name]
+    double_spine=eval(sys.argv[8])
+    passive_val=get_passive_parameter(cell_name,double_spine_area=double_spine,shrinkage_resize=[shrinkage_factor,resize_diam_by],fit_condition=fit_condition,spine_start=SPINE_START,file_type=file_type2read)[name]
 print(name, passive_val)
 folder_=''
 
@@ -82,8 +84,8 @@ def get_segment_length_lamda(seg):
     d = seg.diam #micro meter
     R_total = 1.0 / seg.g_pas #Rm[cm^2*oum] sce.Ra[cm*oum]
     lamda = np.sqrt((R_total / sec.Ra) * (d / 10000.0) / 4.0) #micro meter
-    # return (float(seg_len) / 10000.0) / lamda
-    return lamda
+    return (float(seg_len) / 10000.0) / lamda
+    # return lamda
 
 
 
@@ -109,14 +111,14 @@ def add_sec2(self, sec):
     h.distance(0, 0.5, sec=self.cell.soma)
     self.tree_dendogram_dist[sec] = h.distance(1, sec=sec)
 
-def get_spine_area():
-    neck_length=0.78
-    neck_diam = 1.64
-    head_volume = 0.14
-    head_r = (head_volume*3/4/np.pi)**(1/3)
-    head_area = 4*np.pi*head_r**3
-    neck_area = np.pi * neck_diam * neck_length
-    return head_area +neck_area
+# def get_spine_area():
+#     neck_length=0.78
+#     neck_diam = 1.64
+#     head_volume = 0.14
+#     head_r = (head_volume*3/4/np.pi)**(1/3)
+#     head_area = 4*np.pi*head_r**3
+#     neck_area = np.pi * neck_diam * neck_length
+#     return head_area +neck_area
 
 
 def change_model_pas(cell,CM=1, RA = 250, RM = 20000.0, E_PAS = -70.0,F_factor=1.9):
@@ -162,7 +164,7 @@ class Dendogram():
             sec.insert('pas')
             sec.nseg = max(int(sec.L), 1)
         if do_calculate_F_factor:
-           F_factor=calculate_F_factor(self.cell,'mouse_spine')
+           F_factor=calculate_F_factor(self.cell,'mouse_spine',double_spine=double_spine)
         else:
            F_factor = 1.9
         self.cell=change_model_pas(self.cell, CM=passive_val['CM'], RA = passive_val['RA'], RM = passive_val['RM'], E_PAS = E_PAS,F_factor=F_factor)
@@ -303,9 +305,9 @@ class Dendogram():
         plt.savefig(save_folder + self.name)
         plt.savefig(save_folder + self.name+ ".pdf")
         pickle.dump(fig, open(save_folder + self.name+'.p', 'wb'))
-
         plt.close()
         self.done_section = set()
+
         return max_y
 
     # def find_apic(self):

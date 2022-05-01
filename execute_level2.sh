@@ -27,6 +27,7 @@ name=$4
 resize_diam=$5
 shrinkage_factor=$6
 SPINE_START=$7
+$doublse_spine=$8
 #shift $#
 # `if [ -n $SLURM_JOB_ID ]` checks if $SLURM_JOB_ID is not an empty string
 if [ -n $SLURM_JOB_ID ]; then
@@ -43,13 +44,13 @@ path=$(dirname $SCRIPT_PATH)
 #python3 $path/analysis_fit_after_run.py $cell_name $file_type2read $resize_diam $shrinkage_factor $SPINE_START $folder
 
 echo python3 $path/Rin_Rm_plot.py $cell_name $file_type2read
-python3 $path/Rin_Rm_plot.py $cell_name $file_type2read $fit_condition $name $resize_diam $shrinkage_factor $SPINE_START $folder
+python3 $path/Rin_Rm_plot.py $cell_name $file_type2read $fit_condition $name $resize_diam $shrinkage_factor $SPINE_START $doublse_spine
 
 echo python3 $path/attenuations.py $cell_name $file_type2read $passive_val "True"
-python3 $path/attenuations.py  $cell_name $file_type2read $fit_condition $name "False" $resize_diam $shrinkage_factor $SPINE_START $folder
+python3 $path/attenuations.py  $cell_name $file_type2read $fit_condition $name "False" $resize_diam $shrinkage_factor $SPINE_START $doublse_spine
 
 echo python3 $path/attenuations.py $cell_name $file_type2read $passive_val "False"
-python3 $path/attenuations.py  $cell_name $file_type2read $fit_condition $name "True" $resize_diam $shrinkage_factor $SPINE_START $folder
+python3 $path/attenuations.py  $cell_name $file_type2read $fit_condition $name "True" $resize_diam $shrinkage_factor $SPINE_START $doublse_spine
 
 echo python3 $path/dendogram.py $cell_name $file_type2read
-python3 $path/dendogram.py $cell_name $file_type2read $fit_condition $name $resize_diam $shrinkage_factor $SPINE_START $folder
+python3 $path/dendogram.py $cell_name $file_type2read $fit_condition $name $resize_diam $shrinkage_factor $SPINE_START $doublse_spine

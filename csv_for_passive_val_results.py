@@ -20,13 +20,14 @@ resize_diam_by=1.0
 shrinkage_factor=1.0
 SPINE_STARTs=[str(20)]#[str(10),str(20),str(60)]
 i=0
-os.system('python run_analysis_fit_after_run.py')
+# os.system('python run_analysis_fit_after_run.py')
+
 for cell_name in cells:
-    print(cell_name)
+    # print(cell_name)
     all_data = []
     dict_fit_condition={}
     for fit_condition in ['const_param','different_initial_conditions'][:1]:
-        print(fit_condition)
+        # print(fit_condition)
         for file_type in ['z_correct.swc','morphology.swc','ASC']:
             for shrinkage_factor,resize_diam_by in zip([1.0,1.1,1.0,1.0],[1.0,1.1,1.2,1.5]):
                 for SPINE_START in [str(20),str(10),str(60)]:

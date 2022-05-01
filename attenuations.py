@@ -25,7 +25,7 @@ clamp_injection=False
 print("the number of parameters that sys loaded in attenuation.py is ",len(sys.argv),flush=True)
 print(len(sys.argv), sys.argv)
 do_resize_dend=True
-if len(sys.argv) != 9:
+if len(sys.argv) != 10:
     print("the function doesn't run with sys.argv",flush=True)
     cell_name= '2017_05_08_A_5-4'
     file_type='z_correct.swc'
@@ -36,6 +36,8 @@ if len(sys.argv) != 9:
     resize_diam_by=1.2
     shrinkage_factor=1.0
     SPINE_START=20
+    double_spine='False'
+
 else:
     print("the sys.argv len is correct",flush=True)
     cell_name = sys.argv[1]
@@ -46,7 +48,8 @@ else:
     resize_diam_by = float(sys.argv[6]) #how much the cell sweel during the electrophisiology records
     shrinkage_factor =float(sys.argv[7]) #how much srinkage the cell get between electrophysiology record and LM
     SPINE_START=int(sys.argv[8])
-    passive_val=get_passive_parameter(cell_name,shrinkage_resize=[shrinkage_factor,resize_diam_by],fit_condition=fit_condition,spine_start=SPINE_START,file_type=file_type)[name]
+    double_spine=eval(sys.argv[9])
+    passive_val=get_passive_parameter(cell_name,double_spine_area=double_spine,shrinkage_resize=[shrinkage_factor,resize_diam_by],fit_condition=fit_condition,spine_start=SPINE_START,file_type=file_type)[name]
 folder_=''
 
 if not syn_injection:
@@ -220,7 +223,7 @@ elif file_type=='hoc':
 elif 'swc' in file_type:
     cell =load_swc(cell_file)
 if do_calculate_F_factor:
-   F_factor=calculate_F_factor(cell,'mouse_spine')
+   F_factor=calculate_F_factor(cell,'mouse_spine',double_spine=double_spine)
 else:
    F_factor = 1.9
 
