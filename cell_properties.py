@@ -16,7 +16,7 @@ print(len(sys.argv),sys.argv,flush=True)
 
 if len(sys.argv) != 3:
     print("sys.argv not running and with length",len(sys.argv))
-    cell_name= '2017_05_08_A_4-5'
+    cell_name= '2017_03_04_A_6-7'
     file_type2read= 'z_correct.swc'
 else:
     print("sys.argv is correct and running")
@@ -29,7 +29,8 @@ print(cell_name, folder_+data_dir+"/"+cell_name+"/*"+file_type2read)
 cell_file = glob(folder_+data_dir+"/"+cell_name+"/*"+file_type2read)[0]
 
 path_short_pulse=folder_+save_dir+'/'+cell_name+'/data/electrophysio_records/short_pulse/mean_short_pulse.p'
-folder_save=folder_+save_dir+'/'+cell_name+'/data/cell_properties/diam_dis/'+file_type2read+'/'
+# folder_save=folder_+save_dir+'/'+cell_name+'/data/cell_properties/'+file_type2read+'SPINE_START=20/dend*'++'&F_shrinkage'++'/diam_dis/'
+folder_save=folder_+save_dir+'/'+cell_name+'/data/cell_properties/'+file_type2read+'/diam_dis/'
 
 create_folder_dirr(folder_save)
 
@@ -37,15 +38,30 @@ signal.signal(signal.SIGSEGV, SIGSEGV_signal_arises)
 
 f=open(folder_save+'cell_propertis.txt', 'w')
 f.write('The '+cell_name+ ' cell_propertis\n')
+def cumpute_distances(base_sec):
+    for sec in h.SectionRef(sec=base_sec).child:
+        add_sec(sec)
+        cumpute_distances(sec)
+def add_sec(sec):
+    """
+    morpho dendogram
+    :param sec:
+    :return:
+    """
+    h.distance(0, 0.5, sec=cell.soma)
+    dist[sec] = h.distance(1, sec=sec)
 
 #track from the terminals to the soma
 def track_one(terminal):
-    h.distance(0, 0.5, sec=soma)
+    # h.distance(0, 0.5, sec=soma)
     sec=terminal
     dis=[]
     diam=[]
     while sec !=soma:
-        dis.append(h.distance(sec.parentseg()))
+        # dis.append(h.distance(sec.parentseg()))
+        h.distance(0, 0.5, sec=soma)
+
+        dis.append(h.distance(1,sec=sec))
         sec_ref=h.SectionRef(sec=sec)
         diam.append(sec.diam)
         sec=sec_ref.parent
