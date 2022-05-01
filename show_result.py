@@ -16,7 +16,7 @@ file_types=['z_correct.swc','morphology.swc','hoc','ASC']
 file_type='z_correct.swc'
 # for passive_val_name in ['RA=120','RA=150','RA_min_error','RA_best_fit']:
 passive_val_name='RA=120'
-cell_name =read_from_pickle('cells_name.p')[1]
+cell_name =read_from_pickle('cells_name.p')[0]
 plot_all_Moo_results=True
 compare_MOO_results=True
 
@@ -244,7 +244,7 @@ if plot_all_Moo_results:
                 same_diff='_same'
             else:
                 same_diff='_relative'
-        for z,p in enumerate(glob('cells_outputs_data_short/'+cell_name+'/MOO_results'+same_diff+'*/morphology.swc/F_shrinkage=*/const_param/*/fit_transient_RDSM.png')):
+        for z,p in enumerate(glob('cells_outputs_data_short/'+cell_name+'/MOO_results_'+same_diff+'*/morphology.swc/F_shrinkage=*/const_param/*/fit_transient_RDSM.png')):
             if p.split('/')[6]=='test': continue
             # RA,CM,RM=get_passive_val(passive_vals_dict[p.split('/')[6]])
             show_directory(ax[place[i]],p.split('/')[4]+p.split('/')[6],p)
