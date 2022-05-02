@@ -133,11 +133,13 @@ dmypy.json
 logs/
 cells_outputs_data_short/
 cells_outputs_data/
+drivesync/
 
 fit_short_pulse_temp/
 x86_64/
+cells_initial_information/.~lock.Data2.xlsx#
 /*/*.~lock.Data.xlsx#
-/.~lock.Data.xlsx#
+*/.~lock.Data.xlsx#
 */*.xlsx#
 /*/*/.~*csv#
 */*.~lock.Data.xlsx#
