@@ -7,7 +7,8 @@ from glob import glob
 
 # from matplotlib_scalebar.scalebar import ScaleBar
 from scalebars import AnchoredScaleBar
-global AnchoredScaleBar
+from scalbar_sapir import AnchoredHScaleBar
+# global AnchoredScaleBar
 from mpl_toolkits.axes_grid1.anchored_artists import AnchoredSizeBar
 # for ax in fig1.get_axes():  #show only specific spines
 #     if not ax.get_subplotspec().is_first_col():
@@ -95,7 +96,7 @@ if __name__=="__main__":
     plt.savefig('cells_initial_information/'+cell_name+'/final_data/png/'+fig_name+'.png')
     plt.savefig('cells_initial_information/'+cell_name+'/final_data/pdf/'+fig_name+'.pdf')
     pickle.dump(fig_fit_short_pulse, open('cells_initial_information/'+cell_name+'/final_data/png/'+fig_name+'.png', 'wb'))
-    plt.show()
+    # plt.show()
     fig_IV,cell_name,fig_name=graph_edition(glob('cells_outputs_data_short/'+cell_name+'/data/electrophysio_records/*/I_V_curve_fit.p')[0])
     ax3=fig_IV.gca()
     ax3.set_xlabel(ax3.get_xlabel(),loc='right')
@@ -108,7 +109,7 @@ if __name__=="__main__":
     plt.savefig('cells_initial_information/'+cell_name+'/final_data/pdf/'+fig_name+'.pdf')
     pickle.dump(fig_IV, open('cells_initial_information/'+cell_name+'/final_data/png/'+fig_name+'.png', 'wb'))
 
-    plt.show()
+    # plt.show()
 
     fig_long_pulse,cell_name,fig_name=graph_edition('cells_outputs_data_short/'+cell_name+'/data/electrophysio_records/short_pulse/clear_short_pulse_fig.p')
     # plt.axis('off')
@@ -118,10 +119,14 @@ if __name__=="__main__":
     ax.set_ylabel('mV',fontsize=20)
     pickle.dump(fig_long_pulse, open('cells_initial_information/'+cell_name+'/final_data/png/'+fig_name+'.png', 'wb'))
     scel=AnchoredScaleBar(ax.transData,200/0.1,1,'200 ms','1mV','lower left')
+    scel2=AnchoredHScaleBar(ax=ax,size_x=200, size_y=1, linekw=dict(color="crimson"), x_to_ms=lambda x: x/0.1)
+    # scel=AnchoredHScaleBar(ax=ax,size_x=1.2, linekw=dict(color="crimson"))
     ax.add_artist(scel)
+    ax.add_artist(scel2)
     plt.savefig('cells_initial_information/'+cell_name+'/final_data/png/'+fig_name+'.png')
     plt.savefig('cells_initial_information/'+cell_name+'/final_data/pdf/'+fig_name+'.pdf')
-    # plt.show()
+    plt.show()
+    plt.close('all')
 
     fig_syn,cell_name,fig_name=graph_plot_again('cells_outputs_data_short/'+cell_name+'/data/electrophysio_records/syn/clear_syn_fig.p')
     # plt.axis('off')
@@ -130,9 +135,11 @@ if __name__=="__main__":
     ax2.set_title('synapse',fontsize = 30)
     ax2.set_xlabel('ms',fontsize=20)
     ax2.set_ylabel('mV',fontsize=20)
-    pickle.dump(fig_long_pulse, open('cells_initial_information/'+cell_name+'/final_data/png/'+fig_name+'.png', 'wb'))
-    scel=AnchoredScaleBar(ax.transData,2000,2,'200 ms','1 mV','center right')
+    # pickle.dump(fig_long_pulse, open('cells_initial_information/'+cell_name+'/final_data/png/'+fig_name+'.png', 'wb'))
+    scel=AnchoredScaleBar(ax2.transData,20,2,'200 ms','1 mV','center right')
+    scel2=AnchoredHScaleBar(ax=ax2,size_x=2/0.1, size_y=1, linekw=dict(color="black"), txtkw=dict(fontsize=5), loc='center left')
     ax2.add_artist(scel)
+    ax2.add_artist(scel2)
     plt.savefig('cells_initial_information/'+cell_name+'/final_data/png/'+fig_name+'.png')
     plt.savefig('cells_initial_information/'+cell_name+'/final_data/pdf/'+fig_name+'.pdf')
     plt.show()
