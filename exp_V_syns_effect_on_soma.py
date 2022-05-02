@@ -9,19 +9,27 @@ import pickle
 import matplotlib
 from open_pickle import read_from_pickle
 from extraClasses import neuron_start_time
+import sys
 matplotlib.rcParams['pdf.fonttype'] = 42
 matplotlib.rcParams['svg.fonttype'] = 'none'
-#
+if len(sys.argv) != 3:
+    specipic_cell='5-4'
+    specipc_moo_file='_syn_par_corrrection'
+else:
+    print("the sys.argv len is correct",flush=True)
+    specipic_cell = sys.argv[1]
+    specipc_moo_file=sys.argv[2]
+
 folder_= ''
-folder_data=folder_+'cells_outputs_data_short/*/MOO_results_*/*/F_shrinkage=*/const_param/'
+folder_data=folder_+'cells_outputs_data_short/*'+specipic_cell+'/MOO_results'+specipc_moo_file+'*/*/F_shrinkage=*/const_param/'
 save_name='/Voltage Spine&Soma'
 
-for model_place in tqdm(glob(folder_data+'*')):
+
+for curr_i, model_place in tqdm(enumerate(glob(folder_data+'*'))):
     type=model_place.split('/')[-1]
     cell_name=model_place.split('/')[1]
     if type=='test': continue
-    loader=None
-    try:loader = OPEN_RES(res_pos=model_place+'/')
+    try:loader = OPEN_RES(res_pos=model_place+'/', curr_i=curr_i)
     except:
         print(model_place + '/hall_of_fame.p is not exsist' )
         continue
@@ -108,5 +116,8 @@ for model_place in tqdm(glob(folder_data+'*')):
     pickle.dump(fig, open(model_place+save_name+'.p', 'wb'))
     plt.close()
 
-    # plt.show()
+    plt.show()
+    loader.destroy()
+    model.destroy()
+
 
