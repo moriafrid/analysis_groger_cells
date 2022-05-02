@@ -20,7 +20,10 @@ signal.signal(signal.SIGSEGV, SIGSEGV_signal_arises)
 
 
 class OPEN_RES():
-    def __init__(self, res_pos):
+    def __init__(self, res_pos, curr_i=0):
+        """
+        curr_i should be overridden as not 0 if this is called multiple times (if called within for loop)
+        """
         from extraClasses import NrnSegmentSomaDistanceScaler_, NrnSectionParameterPas, neuron_start_time, \
             EFeatureImpadance, EFeaturePeak, EFeaturePeakTime, EFeatureRDSM, NrnNetstimWeightParameter, \
             SweepProtocolRin2
@@ -83,10 +86,12 @@ class OPEN_RES():
                                                                                  value=self.fixed_params_res[parameter],
                                                                                  locations=sec_list, frozen=True))
         self.sim = ephys.simulators.NrnSimulator(cvode_active=False, dt=self.dt)
-        self.model = ephys.models.CellModel('Model', morph=self.morphology, mechs=self.mechanism_list,
+        self.model = ephys.models.CellModel('Model' + str(curr_i), morph=self.morphology, mechs=self.mechanism_list,
                                             params=self.parameters_list)
         self.model.instantiate(self.sim)
-        self.hoc_model = self.sim.neuron.h.Model[-1]
+        self.hoc_model = getattr(self.sim.neuron.h, 'Model' + str(curr_i))[0]  # unique Model name - otherwise it will not override (despite destroy ahaaahhhaaa)
+        # print("Loaded ", self.fixed_params_res)
+        # print("Params: ", [(self.parameters_list[i].to_dict()['value'], self.parameters_list[i].to_dict()['name']) for i in range(len(self.parameters_list))])
 
     def get_model(self):
         return self.hoc_model
@@ -173,6 +178,8 @@ class OPEN_RES():
 
     def destroy(self):
         self.model.destroy(self.sim)
-        # self.hoc_model.destroy(self.sim)
-        # self.morphology.destroy(self.sim)
+        self.hoc_model.destroy(self.sim)
+        self.morphology.destroy(self.sim)
+        # for curr in self.parameters_list:
+        #     curr.destroy(self.sim)
 
