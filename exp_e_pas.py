@@ -19,13 +19,13 @@ folder_= ''
 folder_data=folder_+'cells_outputs_data_short/*/MOO_results_*/*/F_shrinkage=*/const_param/'
 save_name='/e_pas'
 
-for model_place in tqdm(glob(folder_data+'*')):
+for curr_i, model_place in tqdm(enumerate(glob(folder_data+'*'))):
     # print(model_place)
     type=model_place.split('/')[-1]
     cell_name=model_place.split('/')[1]
     if type=='test': continue
     loader=None
-    try:loader = OPEN_RES(res_pos=model_place+'/')
+    try:loader = OPEN_RES(res_pos=model_place+'/', curr_i=curr_i)
     except:
        print(model_place + '/hall_of_fame.p is not exsist' )
        continue
@@ -127,3 +127,5 @@ for model_place in tqdm(glob(folder_data+'*')):
     plt.legend()
     plt.show()
     plt.close()
+    loader.destroy()
+    model.destroy()

@@ -24,7 +24,6 @@ else:
 
 folder_= ''
 folder_data=folder_+'cells_outputs_data_short/*'+specipic_cell+'/MOO_results'+specipc_moo_file+'*/*/F_shrinkage=*/const_param/'
-
 save_name='/AMPA&NMDA_soma'
 for curr_i, model_place in tqdm(enumerate(glob(folder_data+'*'))):
     print(model_place)
@@ -111,7 +110,7 @@ for curr_i, model_place in tqdm(enumerate(glob(folder_data+'*'))):
     plt.savefig(model_place+save_name+'.png')
     plt.savefig(model_place+save_name+'.pdf')
     pickle.dump(fig, open(model_place+save_name+'.p', 'wb'))
-    plt.show()
+    # plt.show()
     plt.close()
     loader.destroy()
     # model.destroy()

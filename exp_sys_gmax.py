@@ -25,13 +25,13 @@ folder_= ''
 folder_data=folder_+'cells_outputs_data_short/*'+specipic_cell+'/MOO_results'+specipc_moo_file+'*/*/F_shrinkage=*/const_param/'
 save_name='/g_max'
 
-for model_place in tqdm(glob(folder_data+'*')):
+for curr_i, model_place in tqdm(enumerate(glob(folder_data+'*'))):
     type=model_place.split('/')[-1]
     cell_name=model_place.split('/')[1]
     if type=='test': continue
     loader=None
     model=None
-    try:loader = OPEN_RES(res_pos=model_place+'/')
+    try:loader = OPEN_RES(res_pos=model_place+'/', curr_i=curr_i)
     except:
        print(model_place + '/hall_of_fame.p is not exsist' )
        continue
