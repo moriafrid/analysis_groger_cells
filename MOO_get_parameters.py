@@ -84,9 +84,9 @@ folder_=''
 data_dir= "cells_initial_information/"
 save_dir = "cells_outputs_data_short/"
 if same_strengh:
-    base2 = folder_+save_dir+cell_name+'/MOO_results_same_strange/'+file_type+'_SPINE_START='+str(SPINE_START)+'/'  # folder name  _RA_free
+    base2 = folder_+save_dir+cell_name+'/MOO_results_syn_par_corrrection_correction_same_strange/'+file_type+'_SPINE_START='+str(SPINE_START)+'/'  # folder name  _RA_free
 else:
-    base2 = folder_+save_dir+cell_name+'/MOO_results_relative_strange/'+file_type+'_SPINE_START='+str(SPINE_START)+'/'  # folder name  _RA_free
+    base2 = folder_+save_dir+cell_name+'/MOO_results_syn_par_corrrection_relative_strange/'+file_type+'_SPINE_START='+str(SPINE_START)+'/'  # folder name  _RA_free
 
 base2+='F_shrinkage='+str(round(shrinkage_by,2))+'_dend*'+str(round(resize_dend_by,2))
 if double_spine_area:
@@ -415,7 +415,7 @@ def run(cell, seed=0):
         param_name='weight[0]',
         frozen=frozen_NMDA_weigth,
         value=3.9702950525904908/1000,
-        bounds=[0.000, 0.005],
+        bounds=[0.000005, 0.03/sum(reletive_strengths)],
         locations=netstims_NMDA,
         reletive_strength = reletive_strengths)) #[1, 0.1,0.01]))
 
@@ -429,16 +429,16 @@ def run(cell, seed=0):
     syn_params.append(ephys.parameters.NrnPointProcessParameter(
         name='exp2syn_tau1',
         param_name='tau1',
-        value=0.06276467256184666,
+        value=0.3276467256184666,
         frozen=AMPA_RISE_FIX,
-        bounds=[0.001, 2.1],#[0.1, 0.4],
+        bounds=[0.1, 0.4],#[0.1, 0.4],
         locations=tau_param_locs))
     syn_params.append(ephys.parameters.NrnPointProcessParameter(
         name='exp2syn_tau2',
         param_name='tau2',
-        value=0.7068789695815033,#1.8,  # min(AMPA_FIT[cell]['tau2'],8),
+        value=1.7068789695815033,#1.8,  # min(AMPA_FIT[cell]['tau2'],8),
         frozen=AMPA_DECAY_FIX,
-        bounds=[0.01, 4],#[1, 3],
+        bounds=[1, 3],
         locations=tau_param_locs))
 
     syn_params.append(ephys.parameters.NrnPointProcessParameter(
@@ -465,7 +465,7 @@ def run(cell, seed=0):
     syn_params.append(ephys.parameters.NrnPointProcessParameter(
         name='NMDA_gama_NMDA',
         param_name='gama_NMDA',
-        value=0.076,
+        value=0.062,
         frozen=GAMMA_FROZEN,
         bounds=[0.06, 0.09],
         locations=NMDA_param_locs))
