@@ -10,7 +10,7 @@ import os
 # matplotlib.rcParams['svg.fonttype'] = 'none'
 #fontsize as parameter for xlabel etc (for everything, title...)
 
-cells_name_place='cells_name.p'
+cells_name_place='cells_name2.p'
 commet_main=" ".join(["python run_execute_main.py", cells_name_place ])
 os.system(commet_main)
 

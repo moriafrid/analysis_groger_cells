@@ -16,7 +16,7 @@ matplotlib.rcParams['pdf.fonttype'] = 42
 matplotlib.rcParams['svg.fonttype'] = 'none'
 signal.signal(signal.SIGSEGV, SIGSEGV_signal_arises)
 if len(sys.argv) != 8:
-    cell_name= '2017_05_08_A_4-5'
+    cell_name= '2017_05_08_A_4-5(0)(0)'
     file_type='hoc'
     resize_diam_by=1.0
     shrinkage_factor=1.0

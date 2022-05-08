@@ -38,7 +38,7 @@ for cell_name in cells:
                     file_types=['z_correct.swc']
 
                 for file_type in file_types:
-                    if resize_diam_by==1.0 and shrinkage_by==1.0 and double_spine_area=='False' and file_type=='z_correct.swc' and cell_name=='2017_05_08_A_4-5':
+                    if resize_diam_by==1.0 and shrinkage_by==1.0 and double_spine_area=='False' and file_type=='z_correct.swc' and cell_name=='2017_05_08_A_4-5(0)(0)':
                         SPINE_STARTs=[str(20),str(60)]
                     else:
                         SPINE_STARTs=[str(20)]

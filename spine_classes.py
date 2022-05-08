@@ -1,24 +1,24 @@
 from math import pi,sqrt
 
 def get_n_spinese(cell_name):
-    if cell_name == "2017_03_04_A_6-7":
+    if cell_name == "2017_03_04_A_6-7(0)":
         return 2
-    if cell_name == "2017_05_08_A_4-5":
+    if cell_name == "2017_05_08_A_4-5(0)":
         return 1
-    if cell_name == "2017_05_08_A_5-4":
+    if cell_name == "2017_05_08_A_5-4(0)":
         return 2
 
 def channel2take(cell_name,type,pre_post=None):
     if type=="electopysio":
         if pre_post is None:
             raise "need to take pre_post to be 'pre' for presynaptic neuron or 'post for postsynaptic b=neuron"
-        if cell_name == "2017_03_04_A_6-7":
+        if cell_name == "2017_03_04_A_6-7(0)":
             pre='1'
             post='2'
-        elif cell_name == "2017_05_08_A_4-5":
+        elif cell_name == "2017_05_08_A_4-5(0)":
             pre='2'
             post='1'
-        elif cell_name == "2017_05_08_A_5-4":
+        elif cell_name == "2017_05_08_A_5-4(0)":
             pre='1'
             post='2'
         if pre_post=='pre':
@@ -26,11 +26,11 @@ def channel2take(cell_name,type,pre_post=None):
         elif pre_post=='post':
             return post
     if type=="IV_curve":
-        if cell_name == "2017_03_04_A_6-7":
+        if cell_name == "2017_03_04_A_6-7(0)":
             return 2
-        elif cell_name == "2017_05_08_A_4-5":
+        elif cell_name == "2017_05_08_A_4-5(0)":
             return 1
-        elif cell_name == "2017_05_08_A_5-4":
+        elif cell_name == "2017_05_08_A_5-4(0)":
             return 2
     else:
         raise "this isn't correct channels"
@@ -38,7 +38,7 @@ def channel2take(cell_name,type,pre_post=None):
 class SpinesParams:
     def __init__(self, cell_name,spine_num=5):
         self.cell_name=cell_name
-        if cell_name == "2017_05_08_A_4-5":
+        if cell_name == "2017_05_08_A_4-5(0)(0)":
             self.V_spine=0.16884774101 #[µm^3]
             self.V_head=0.13906972096 #4/3*pi*self.R_head**3
             self.V_neck=0.02977802005
@@ -47,7 +47,7 @@ class SpinesParams:
             self.R_head = (self.V_spine/(4*pi/3))**(1/3) #0.32µm
             self.head_diam=2*self.R_head #µm 0.64
             self.PSD_area=0.14
-        if cell_name == "2017_05_08_A_5-4":
+        if cell_name == "2017_05_08_A_5-4(0)(0)":
             if spine_num==0:
                 self.V_spine=0.06818310193 #[µm^3]
                 self.V_head=0.03371715503 #[µm^3] #4/3*pi*self.R_head**3
@@ -68,7 +68,7 @@ class SpinesParams:
                 self.PSD_area=0.014
             else: raise "there is more than one synapse"
 
-        if cell_name == "2017_03_04_A_6-7":
+        if cell_name == "2017_03_04_A_6-7(0)(0)":
             if spine_num==0:
                 self.V_spine=0.08501695029 #[µm^3]
                 self.V_head=0.0745871871 #[µm^3] #4/3*pi*self.R_head**3
@@ -124,13 +124,13 @@ class GeneralSpine:
 
 class SpineLocatin:
     def __init__(self, cell_name,spine_num=5):
-        if cell_name == "2017_05_08_A_4-5":
+        if cell_name == "2017_05_08_A_4-5(0)(0)":
             self.dis_from_soma=83.8
             self.locatin_xyz=() #need to be change
             self.sec=82
             self.seg=0.165
             self.PSD=0.14
-        if cell_name == "2017_05_08_A_5-4":
+        if cell_name == "2017_05_08_A_5-4(0)(0)":
             if spine_num==0:
                 self.dis_from_soma=77.5
                 self.locatin_xyz=() #need to be change
@@ -144,7 +144,7 @@ class SpineLocatin:
                 self.seg=0.1 #need to be change
                 self.PSD=0.014
             else: raise "there is more than one synapse"
-        if cell_name == "2017_03_04_A_6-7":
+        if cell_name == "2017_03_04_A_6-7(0)(0)":
             if spine_num==0:
                 self.dis_from_soma=32.6
                 self.locatin_xyz=() #need to be change
@@ -164,4 +164,4 @@ class SpineLocatin:
 
 
 if __name__ == '__main__':
-    spine=SpinesParams("2017_05_08_A_4-5")
+    spine=SpinesParams("2017_05_08_A_4-5(0)(0)")

@@ -3,7 +3,7 @@ import numpy as np
 import sys
 from glob import glob
 if len(sys.argv) != 2:
-    cell_name="2017_05_08_A_5-4"
+    cell_name="2017_05_08_A_5-4(0)(0)"
 else:
     cell_name=sys.argv[1]
 folder_="cells_initial_information/"

@@ -2,7 +2,7 @@ import os
 from open_pickle import read_from_pickle
 import sys
 if len(sys.argv) != 2:
-    cells_name_place="cells_name.p"
+    cells_name_place="cells_name2.p"
     print("run_execute_level1.py not running with sys.argv",len(sys.argv))
 else:
     cells_name_place=sys.argv[1]
@@ -13,7 +13,7 @@ os.system(" ".join(['sbatch execute_python_script.sh', 'calculate_synaptic_loc.p
 print('calculate_synaptic_loc.py for all cells in ',cells_name_place )
 
 for cell_name in read_from_pickle(cells_name_place):
-    for file_type in ['z_correct.swc','morphology.swc']:
+    for file_type in ['z_correct.swc','morphology.swc','ASC']:
         command="sbatch execute_python_script.sh cell_properties.py"
         # command="python cell_properties.py"
         send_command = " ".join([command,cell_name,file_type])

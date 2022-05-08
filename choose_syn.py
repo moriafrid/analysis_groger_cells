@@ -5,6 +5,7 @@ import matplotlib.pyplot as plt
 from add_figure import add_figure
 from scipy.signal import find_peaks
 import matplotlib
+from open_pickle import read_from_pickle
 matplotlib.rcParams['pdf.fonttype'] = 42
 matplotlib.rcParams['svg.fonttype'] = 'none'
 def close_event():
@@ -14,7 +15,7 @@ dt = 0.1
 fig, ax = plt.subplots(1, 1)
 timer = fig.canvas.new_timer(interval=3000)
 timer.add_callback(close_event)
-for cell in ['2017_03_04_A_6-7']:#[ '2017_03_04_A_6-7','2017_05_08_A_5-4','2017_05_08_A_4-5']:
+for cell in read_from_pickle('cells_name2.p'):#[ '2017_03_04_A_6-7(0)(0)','2017_05_08_A_5-4(0)(0)','2017_05_08_A_4-5(0)(0)']:
     base_dir="cells_outputs_data_short/"+cell+"/data/electrophysio_records/syn/"
     print(cell)
     with open(base_dir+"/syn.p", 'rb') as handle:
@@ -87,10 +88,10 @@ for cell in ['2017_03_04_A_6-7']:#[ '2017_03_04_A_6-7','2017_05_08_A_5-4','2017_
 # from scipy.signal import find_peaks
 # import pickle
 #
-# p=read_from_pickle('/ems/elsc-labs/segev-i/moria.fridman/project/analysis_groger_cells/cells_outputs_data_short/2017_03_04_A_6-7/data/electrophysio_records/syn/syn.p')
-# t=read_from_pickle('/ems/elsc-labs/segev-i/moria.fridman/project/analysis_groger_cells/cells_outputs_data_short/2017_03_04_A_6-7/data/electrophysio_records/syn/correct_syn_traces.p')
+# p=read_from_pickle('/ems/elsc-labs/segev-i/moria.fridman/project/analysis_groger_cells/cells_outputs_data_short/2017_03_04_A_6-7(0)(0)/data/electrophysio_records/syn/syn.p')
+# t=read_from_pickle('/ems/elsc-labs/segev-i/moria.fridman/project/analysis_groger_cells/cells_outputs_data_short/2017_03_04_A_6-7(0)(0)/data/electrophysio_records/syn/correct_syn_traces.p')
 #
-# base_dir="cells_outputs_data_short/2017_03_04_A_6-7/data/electrophysio_records/syn/"
+# base_dir="cells_outputs_data_short/2017_03_04_A_6-7(0)(0)/data/electrophysio_records/syn/"
 # a=[]
 # b=[]
 # for i in t:
@@ -112,7 +113,7 @@ for cell in ['2017_03_04_A_6-7']:#[ '2017_03_04_A_6-7','2017_05_08_A_5-4','2017_
 #     pickle.dump({'data':[p[1], b * p[0].units]}, handle, protocol=pickle.HIGHEST_PROTOCOL)
 # with open(base_dir+"mean_syn.p", 'wb') as handle:
 #     pickle.dump([p[1],np.mean(b,axis=0)*p[0].units], handle, protocol=pickle.HIGHEST_PROTOCOL)
-# for cell_name in [ '2017_03_04_A_6-7','2017_05_08_A_5-4','2017_05_08_A_4-5']:
+# for cell_name in [ '2017_03_04_A_6-7(0)(0)','2017_05_08_A_5-4(0)(0)','2017_05_08_A_4-5(0)(0)']:
 #     n=read_from_pickle('/ems/elsc-labs/segev-i/moria.fridman/project/analysis_groger_cells/cells_outputs_data_short/'+cell_name+'/data/electrophysio_records/syn/clear_syn.p')
 #     plt.figure()
 #     plt.title(cell_name)
@@ -121,7 +122,7 @@ for cell in ['2017_03_04_A_6-7']:#[ '2017_03_04_A_6-7','2017_05_08_A_5-4','2017_
 # plt.show()
 # plot the clear synapse syn:
 # plt.close('all')
-# for cell in [ '2017_03_04_A_6-7','2017_05_08_A_5-4','2017_05_08_A_4-5']:
+# for cell in [ '2017_03_04_A_6-7(0)(0)','2017_05_08_A_5-4(0)(0)','2017_05_08_A_4-5(0)(0)']:
 #     base_dir="cells_outputs_data_short/"+cell+"/data/electrophysio_records/syn/"
 #     n=read_from_pickle('/ems/elsc-labs/segev-i/moria.fridman/project/analysis_groger_cells/cells_outputs_data_short/'+cell_name+'/data/electrophysio_records/syn/clear_syn.p')
 #

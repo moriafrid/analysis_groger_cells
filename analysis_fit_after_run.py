@@ -16,7 +16,7 @@ def find_nearest(array, values):
     indices = np.abs(np.subtract.outer(array, values)).argmin(0)
     return indices
 if len(sys.argv) != 7:
-    cell_name= '2017_03_04_A_6-7'
+    cell_name= '2017_03_04_A_6-7(0)(0)'
     file_type='z_correct.swc'
     resize_diam_by=1.1
     shrinkage_factor=1.1
@@ -34,7 +34,7 @@ else:
 save_dir = "cells_outputs_data_short/"
 folder_=''
 
-# location='/ems/elsc-labs/segev-i/moria.fridman/project/analysis_groger_cells/cells_outputs_data_short/2017_05_08_A_4-5/fit_short_pulse_ASC/dend*1.0&F_shrinkage=1.0/basic_fit'
+# location='/ems/elsc-labs/segev-i/moria.fridman/project/analysis_groger_cells/cells_outputs_data_short/2017_05_08_A_4-5(0)(0)/fit_short_pulse_ASC/dend*1.0&F_shrinkage=1.0/basic_fit'
 # datas2=glob(location+'/*/final_result*.p')
 def analysis_fit(location):
     save_folder=location+'/analysis'

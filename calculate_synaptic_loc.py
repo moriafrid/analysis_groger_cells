@@ -182,7 +182,7 @@ if __name__=='__main__':
     name2save=''
     for cell_name in cells:
         xyz,dend_part=[],[]
-    # for cell_name in ['2017_05_08_A_5-4']:
+    # for cell_name in ['2017_05_08_A_5-4(0)(0)']:
         if len(glob(folder_data+cell_name+'/*'+file_type))<1:continue
         dir=glob(folder_data+cell_name+'/*'+file_type)[0]
         for i in range(get_n_spinese(cell_name)):

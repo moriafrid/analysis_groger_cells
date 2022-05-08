@@ -27,7 +27,7 @@ print(len(sys.argv), sys.argv)
 do_resize_dend=True
 if len(sys.argv) != 10:
     print("the function doesn't run with sys.argv",flush=True)
-    cell_name= '2017_05_08_A_5-4'
+    cell_name= '2017_05_08_A_5-4(0)(0)'
     file_type='z_correct.swc'
     fit_condition='const_param'
     passive_val={'RA':100.0,'CM':1.0,'RM':10000.0}

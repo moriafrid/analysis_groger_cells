@@ -191,6 +191,6 @@ class TreeViewer():
 
 if __name__ == '__main__':
     folder='/ems/elsc-labs/segev-i/moria.fridman/project/analysis_groger_cells/cells_initial_information/'
-    cell_name=[ '2017_03_04_A_6-7','2017_05_08_A_5-4','2017_05_08_A_4-5']
+    cell_name=[ '2017_03_04_A_6-7(0)','2017_05_08_A_5-4(0)','2017_05_08_A_4-5(0)']
     a=TreeViewer(cell_name[0],'ASC')
     a.display()

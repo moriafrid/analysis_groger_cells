@@ -90,7 +90,7 @@ def find_maxi(V,save_folder,width=500):
 # if __name__=='__main__':
 #     I=[-200,-160,-120,-80,-40,-0,40,80,120,160]
 #     #    creat_data
-#     f='2017_03_04_A_6-7'
+#     f='2017_03_04_A_6-7(0)(0)'
 #     r=io.AxonIO(f+'.abf')
 #     bl = r.read_block(lazy=False)
 #     t_total,T_total,max_t=[],[],[]

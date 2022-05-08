@@ -11,7 +11,7 @@ data_dir='cells_initial_information/'
 save_dir = "cells_outputs_data_short/"
 
 file_type='z_correct.swc'
-cell_name='2017_05_08_A_4-5'
+cell_name='2017_05_08_A_4-5(0)(0)'
 cell_file=glob(folder_+data_dir+cell_name+'/*'+file_type)[0]
 
 def create_spine( icell, sec, seg, number=0, neck_diam=0.25, neck_length=1.35,head_diam=0.944):

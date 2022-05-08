@@ -12,7 +12,7 @@ def linear(x, m,c):
     return m*x+c
 from extra_function import create_folders_list
 folder_='/ems/elsc-labs/segev-i/moria.fridman/project/analysis_groger_cells/cells_outputs_data_short/'
-for cell_name in ['2017_05_08_A_4-5','2017_05_08_A_5-4','2017_03_04_A_6-7']:
+for cell_name in ['2017_05_08_A_4-5(0)','2017_05_08_A_5-4(0)','2017_03_04_A_6-7(0)']:
     plt.close()
     fig1=plt.figure()
     folder_data=folder_+cell_name+'/data/electrophysio_records/short_pulse/mean_short_pulse_with_parameters.p'

@@ -31,7 +31,7 @@ for cell_name in read_from_pickle(cells_name_place):
     for resize_diam_by ,shrinkage_by in zip([1.0,1.1,1.2,1.5],[1.0,1.1,1.0,1.0]):#zip([1.0],[1.0]):
         for fit_condition in ['const_param','different_initial_conditions'][:1]:
             for SPINE_START in [20,60,10][:1]:
-                if cell_name!='2017_05_08_A_4-5' and resize_diam_by==1.5:continue
+                if cell_name!='2017_05_08_A_4-5(0)(0)' and resize_diam_by==1.5:continue
                 # if shrinkage_by!=1.0:continue
                 if resize_diam_by==1.0 and shrinkage_by==1.0:
                     do_double_spine_area=['True','False']

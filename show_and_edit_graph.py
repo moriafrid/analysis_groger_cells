@@ -85,9 +85,9 @@ def graph_edition(dirr,plot_again=False):
     return fig1,cell_name,fig_name
 
 if __name__=="__main__":
-    # short_pulse=Graph_edit('cells_outputs_data_short/2017_05_08_A_4-5/data/electrophysio_records/short_pulse/clear_short_pulse_fig.p')
+    # short_pulse=Graph_edit('cells_outputs_data_short/2017_05_08_A_4-5(0)(0)/data/electrophysio_records/short_pulse/clear_short_pulse_fig.p')
 
-    cell_name='2017_05_08_A_4-5'
+    cell_name='2017_05_08_A_4-5(0)(0)'
     fig_fit_short_pulse,cell_name,fig_name=graph_edition('cells_outputs_data_short/'+cell_name+'/fit_short_pulse/z_correct.swc_SPINE_START=20/dend*1.0&F_shrinkage=1.0/const_param/RA/fit RA=73.p')
     ax0=fig_fit_short_pulse.gca()
     for line in ax0.lines:

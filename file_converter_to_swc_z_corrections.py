@@ -3,9 +3,9 @@ import numpy as np
 import sys
 from glob import glob
 if len(sys.argv) != 2:
-    # cell_name="2017_05_08_A_5-4"
-    # cell_name="2017_05_08_A_4-5"
-    cell_name="2017_03_04_A_6-7"
+    # cell_name="2017_05_08_A_5-4(0)"
+    # cell_name="2017_05_08_A_4-5(0)"
+    cell_name="2017_03_04_A_6-7(0)"
 else:
     cell_name=sys.argv[1]
 folder_="cells_initial_information/"
@@ -110,7 +110,7 @@ for child in cell.soma[0].children():
     elif child in cell.apic:
         type=4
 
-    if cell_name=="2017_03_04_A_6-7":
+    if cell_name=="2017_03_04_A_6-7(0)":
         if child==cell.dend[56]:
             type=2
         elif child==cell.axon[0]:

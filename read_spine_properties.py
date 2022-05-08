@@ -90,9 +90,9 @@ def get_sec_and_seg(cell_name,spine_num=None):
             seg.append(df[str(i)]['seg_num'])
         return sec,seg
 if __name__ == '__main__':
-    cell_name='2017_03_04_A_6-7'
+    cell_name='2017_03_04_A_6-7(0)'
     get_parameter(cell_name,'PSD')
     get_F_factor_params('human_spine')
     get_R_head(cell_name,i=0)
-    get_spine_xyz('2017_05_08_A_5-4',0)
+    get_spine_xyz('2017_05_08_A_5-4(0)',0)
     # get_psd(cell_name)

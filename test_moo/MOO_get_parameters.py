@@ -38,7 +38,7 @@ runnum2compare = '13'
 spine_type="mouse_spine" #"groger_spine"
 
 if len(sys.argv) != 12:
-    cell_name= '2017_05_08_A_5-4'
+    cell_name= '2017_05_08_A_5-4(0)(0)'
     file_type='hoc'
     passive_val={'RA':100,'CM':1,'RM':10000}
     passive_val_name='const_ra'

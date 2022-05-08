@@ -12,7 +12,7 @@ for cell_name in read_from_pickle('cells_name.p'):
 for cell_name in read_from_pickle('cells_name.p'):
     print(cell_name)
     temp_cell=None
-    morphology_dirr=glob('cells_initial_information/2017_03_04_A_6-7/morphology_z_correct.swc')[0]
+    morphology_dirr=glob('cells_initial_information/2017_03_04_A_6-7(0)/morphology_z_correct.swc')[0]
     temp_cell=load_swc(glob(morphology_dirr[:morphology_dirr.rfind('/')]+'/*'+'z_correct.swc')[0])
     F_factor=calculate_F_factor(temp_cell,'mouse_spine')
     print(F_factor)

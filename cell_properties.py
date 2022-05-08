@@ -16,7 +16,7 @@ print(len(sys.argv),sys.argv,flush=True)
 
 if len(sys.argv) != 3:
     print("sys.argv not running and with length",len(sys.argv))
-    cell_name= '2017_03_04_A_6-7'
+    cell_name= '2017_03_04_A_6-7(0)'
     file_type2read= 'z_correct.swc'
 else:
     print("sys.argv is correct and running")
@@ -69,7 +69,7 @@ def track_one(terminal):
 ######################################################
 # build the model
 ######################################################
-# h.load_file("/ems/elsc-labs/segev-i/moria.fridman/project/analysis_groger_cells/cells_initial_information/2017_03_04_A_6-7/03_24_A_11052017_Splice_Shrink_zvalue_LABEL_Bluecell_Zcorrected_by_Gregor.hoc")
+# h.load_file("/ems/elsc-labs/segev-i/moria.fridman/project/analysis_groger_cells/cells_initial_information/2017_03_04_A_6-7(0)(0)/03_24_A_11052017_Splice_Shrink_zvalue_LABEL_Bluecell_Zcorrected_by_Gregor.hoc")
 if 'ASC' in file_type2read:
     cell=load_ASC(cell_file)
 elif 'hoc'in file_type2read:
