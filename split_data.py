@@ -35,6 +35,11 @@ def split2phenomena(cell_name,inputs_folder, outputs_folder):
 	IV_file=abf_files[place_IV]
 	abf_files.pop(place_IV)
 	abf_files.append(IV_file)
+	place_unaligment=np.where(['stable_conc.abf' in a for a in abf_files])[0][0]
+	unaligment_file=abf_files[place_unaligment]
+	abf_files.pop(place_unaligment)
+	abf_files.append(unaligment_file)
+
 
 	print("Found input files {0} in {1}".format(abf_files, inputs_folder))
 
