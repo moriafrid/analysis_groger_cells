@@ -19,6 +19,7 @@ if len(sys.argv)!=5:
 else:
     cells = [sys.argv[1],sys.argv[2],sys.argv[3]]
     folder_=sys.argv[4]+'/cells_outputs_data_short/'
+# cells=['2017_05_08_A_4-5']
 def linear(x, m,c):
     return m*x+c
 def calculate_tau_m(short_pulse_path,folder_save):

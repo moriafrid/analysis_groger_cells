@@ -7,7 +7,7 @@ from split_data import split2phenomena
 if __name__ == '__main__':
     print(len(sys.argv))
     if len(sys.argv) != 2:
-        cell_name= '2016_08_30_A'
+        cell_name= '2017_07_06_C_3-4'
         print('main dont run with sys.argv len is '+str(len(sys.argv)))
     else:
         cell_name = sys.argv[1]

@@ -47,5 +47,5 @@ python3 $path/file_converter_to_swc_z_corrections.py $cell_name
 #echo python3 $path/clear_syn.py $cell_name
 #echo "before run the execute_level1 remaind to choose the correct syn from the diraction" $folder $save_dir
 #python3 $path/clear_syn.py $cell_name $folder $save_dir $save_dir
-echo "execute_main is complite to run"
+#echo "execute_main is complite to run"
 
