@@ -44,7 +44,7 @@ def clear_phenomena_partial(phenomena,phenomena_name,part_name,base,prominanace=
 	print(len(phenomena), filtered.shape)
 	print(count,' is remove out of '+str(len(phenomena))+' from '+part_name,'by std of '+str(std_max))
 
-	plt.suptitle(count,' is remove out of '+str(len(phenomena))+' from '+part_name,'by std of '+str(std_max)+'\n')
+	plt.suptitle(str(count)+' is remove out of '+str(len(phenomena))+' from '+part_name+'by std of '+str(std_max))
 	plt.savefig(base+phenomena_name+'/noise2clear_'+part_name+'_'+phenomena_name)
 	pickle.dump(fig, open(base +phenomena_name+'/noise2clear_'+part_name+'_'+phenomena_name+'.p', 'wb'))
 	plt.show()
@@ -121,6 +121,7 @@ def clear_phenomena(phenomena,phenomena_name,base,std_mean=3,std_max=6,bymax=Fal
 	plt.savefig(base+phenomena_name+'/noise2clear_'+phenomena_name)
 	plt.close()
 	return index2del
+
 def correct_rest(phenomena,rest_point=[]):
 	new_phenomena=[]
 	rest=[]
@@ -235,7 +236,12 @@ def phenomena(t1,t2,T,base,x_units='S',Y_units='mV'):
 	# index2del_short_pulse_end = clear_phenomena_partial(new_short_pulse1, 'short_pulse','end', base ,start=short_pulse_time2clear2+700,end=short_pulse_time2clear2+1000)
 	#
 	new_short_pulse1,E_pas_short_pulse_0=correct_rest(short_pulse,[short_pulse_time2clear1-500,short_pulse_time2clear1-10]) #moria not change a lot
-	index2del_short_pulse,new_short_pulse2 = clear_phenomena_partial(new_short_pulse1, 'short_pulse','center_end', base ,prominanace=1.4,start=short_pulse_time2clear1,end=short_pulse_time2clear2)
+	std_max=1.5
+	index2del_short_pulse,new_short_pulse2 = clear_phenomena_partial(new_short_pulse1, 'short_pulse','center_end', base,std_max=std_max ,prominanace=1.4,start=short_pulse_time2clear1,end=short_pulse_time2clear2)
+	while len(new_short_pulse2)<40 :#or index2del_short_pulse/len(new_short_pulse1)<0.4 or :
+		std_max+=0.1
+		index2del_short_pulse,new_short_pulse2 = clear_phenomena_partial(new_short_pulse1, 'short_pulse','center_end', base ,std_max=std_max,prominanace=1.4,start=short_pulse_time2clear1,end=short_pulse_time2clear2)
+
 	new_short_pulse2 = np.delete(new_short_pulse1, list(index2del_short_pulse), axis=0)+ REST
 
 	names=['short_pulse','spike']
