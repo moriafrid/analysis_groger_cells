@@ -6,10 +6,10 @@
 #SBATCH -e logs/%j.err
 # Ask for one CPU, one GPU, enter the GPU queue, and limit run to 1 days
 #SBATCH -p ss.q
-#SBATCH --mem 10000
+#SBATCH --mem 6000
 #SBATCH -c 1
 #SBATCH -t 1-0
-#SBATCH --exclude=ielsc-48,ielsc-49
+#SBATCH --exclude=ielsc-48,ielsc-49,ielsc-85,ielsc-84
 # check if script is started via SLURM or bash
 # if with SLURM: there variable '$SLURM_JOB_ID' will exist
 
