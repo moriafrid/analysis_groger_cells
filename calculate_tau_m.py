@@ -19,13 +19,13 @@ if len(sys.argv)!=5:
 else:
     cells = [sys.argv[1],sys.argv[2],sys.argv[3]]
     folder_=sys.argv[4]+'/cells_outputs_data_short/'
-# cells=['2017_05_08_A_4-5']
+cells=['2017_07_06_C_3-4']
 def linear(x, m,c):
     return m*x+c
 def calculate_tau_m(short_pulse_path,folder_save):
     again='y'
     short_pulse_dict=read_from_pickle(short_pulse_path)
-    pulse=short_pulse_dict['mean'][0][1000:3000]
+    pulse=short_pulse_dict['mean'][0][:3000]
     E_PAS=short_pulse_dict['E_pas']
 
     # T=read_from_pickle(short_pulse_path)[1][1000:3000].rescale('ms')

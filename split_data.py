@@ -100,7 +100,7 @@ def split2phenomena(cell_name,inputs_folder, outputs_folder):
 			REST, short_pulse, T_short_pulse = phenomena(np.array(presnaptic_channel) * t_i.units,postsynaptic_channel, T, base_folder, x_units=T[0].units, Y_units=t_i.units)
 		elif f.endswith("stable_conc.abf"):  # pattern: *stable_conc_aligned*.abf
 			print(f, 'correct one_data')
-			base_folder_unaligment = ''.join([outputs_folder,'/data/',  'electrophysio_records/',f.split('/')[-1]],'/')
+			base_folder_unaligment = ''.join([outputs_folder,'/data/',  'electrophysio_records/',f.split('/')[-1],'/'])
 			folder_names = ['V1', 'short_pulse', 'syn', 'spike', 'noise1', 'noise2','noise3']
 			create_folder_dirr(base_folder_unaligment)
 			create_folders_list([os.path.join(base_folder_unaligment, n) for n in folder_names])
@@ -117,7 +117,6 @@ def split2phenomena(cell_name,inputs_folder, outputs_folder):
 				axs[1].plot(np.array(T).flatten(), np.array(t2).flatten())
 				axs[1].set_title('channels2')
 				plt.savefig(save_folder + '/IV_curve_channel1&channel2.pdf')
-			# t1=eval('t'+str(channel2take(cell_name,'IV_curve')))
 			t1=eval('t'+str(int(get_parameter(cell_name,'channel2take_IV')[0])))
 			# plt.show()
 			save_folder_IV_curve = save_folder  # moria
