@@ -166,8 +166,8 @@ def phenomena(t1,t2,T,base,x_units='S',Y_units='mV'):
 
 
 	short_pulse_start_temp,short_pulse_end_temp=find_short_pulse_edges(np.mean(t1,axis=0)[short_pulse_place-4000:short_pulse_place+3000])
-	short_pulse_start_temp+=short_pulse_place-5000
-	short_pulse_end_temp+=short_pulse_place-5000
+	short_pulse_start_temp+=short_pulse_place-4000
+	short_pulse_end_temp+=short_pulse_place-4000
 
 
 	syn_place,_= find_places(np.mean(t2,axis=0),two_peak=False)
@@ -218,7 +218,6 @@ def phenomena(t1,t2,T,base,x_units='S',Y_units='mV'):
 		for y in y_phen:
 			plt.plot(x,y)
 		pickle.dump(fig, open(base + name+'.p', 'wb'))
-
 		plt.savefig(base + name+'.pdf')
 		plt.close()
 	for y_phen,x,name in zip([syn,short_pulse,spike],[T_syn,T_short_pulse,T_spike],['syn/syn','short_pulse/short_pulse','spike/spike']):
@@ -227,7 +226,6 @@ def phenomena(t1,t2,T,base,x_units='S',Y_units='mV'):
 			plt.plot(x,y)
 		plt.savefig(base + name+'-rest.pdf')
 		pickle.dump(fig, open(base + name+'-rest.p', 'wb'))
-
 		plt.close()
 	with open(base + '/V1/V.p', 'wb') as f:
 		pickle.dump( [V,T], f)
