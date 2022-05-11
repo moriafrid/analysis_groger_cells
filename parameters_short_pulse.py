@@ -1,6 +1,6 @@
 start_short_pulse=2000 #start short_pulse
 end_short_pulse=4000 # end short_pulse
-short_pulse_evaluate_size=2000 #just sort of
+short_pulse_evaluate_size=2200 #just sort of
 
 start_decey2fit=+200 # from start short_pulse
 end_decey2fit=+800 #from end short_pulse
