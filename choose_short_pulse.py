@@ -7,7 +7,7 @@ from scipy.signal import find_peaks
 import matplotlib
 from open_pickle import read_from_pickle
 from parameters_short_pulse import *
-from open_one_data import find_short_pulse_eges
+from open_one_data import find_short_pulse_edges
 
 matplotlib.rcParams['pdf.fonttype'] = 42
 matplotlib.rcParams['svg.fonttype'] = 'none'
@@ -27,7 +27,7 @@ for cell in read_from_pickle('cells_name2.p')[5:]:#[ '2017_03_04_A_6-7(0)(0)','2
     npV=np.array(data[0])
 
     short_pulse_mean=np.mean(npV,axis=0)
-    start_short_pulse,end_short_pulse=find_short_pulse_eges(short_pulse_mean)
+    start_short_pulse,end_short_pulse=find_short_pulse_edges(short_pulse_mean)
 
 
     run_again='y'
