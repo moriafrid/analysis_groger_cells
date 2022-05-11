@@ -98,7 +98,7 @@ def split2phenomena(cell_name,inputs_folder, outputs_folder):
 			postsynaptic_channel=eval('t'+str(int(get_parameter(cell_name,'channel2take_postsynaptic')[0])))
 			#here nedd to be choose what channel is the presynaptic channel and what is the post_synaptic channels
 			REST, short_pulse, T_short_pulse = phenomena(np.array(presnaptic_channel) * t_i.units,postsynaptic_channel, T, base_folder, x_units=T[0].units, Y_units=t_i.units)
-		elif f.endswith("stable_conc.abf"):  # pattern: *stable_conc_aligned*.abf
+		elif f.endswith("stable_conc.abf"):
 			print(f, 'correct one_data')
 			base_folder_unaligment = ''.join([outputs_folder,'/data/',  'electrophysio_records/',f.split('/')[-1],'/'])
 			folder_names = ['V1', 'short_pulse', 'syn', 'spike', 'noise1', 'noise2','noise3']
@@ -107,7 +107,9 @@ def split2phenomena(cell_name,inputs_folder, outputs_folder):
 			presnaptic_channel=eval('t'+str(int(get_parameter(cell_name,'channel2take_presynaptic')[0])))
 			postsynaptic_channel=eval('t'+str(int(get_parameter(cell_name,'channel2take_postsynaptic')[0])))
 			#here nedd to be choose what channel is the presynaptic channel and what is the post_synaptic channels
-			REST, short_pulse, T_short_pulse = phenomena(np.array(presnaptic_channel) * t_i.units,postsynaptic_channel, T, base_folder_unaligment, x_units=T[0].units,Y_units=t_i.units)
+			try:REST, short_pulse, T_short_pulse = phenomena(np.array(presnaptic_channel) * t_i.units,postsynaptic_channel, T, base_folder_unaligment, x_units=T[0].units,Y_units=t_i.units)
+			except:
+				pass
 		elif f.endswith("IV.abf"):  # moria: check name?
 			fig, axs = plt.subplots(2)
 			fig.suptitle('decide on the right channels')
@@ -123,12 +125,12 @@ def split2phenomena(cell_name,inputs_folder, outputs_folder):
 			I = [-200, -160, -120, -80, -40, -0, 40, 80, 120, 160]
 			# print(f,'correct IV_curve')
 			maxi = sepereat_by_current(np.array(t1) * t_i.units, T, I, save_folder_IV_curve)
-			REST=read_from_pickle('cells_outputs_data_short/'+cell_name+'/data/electrophysio_records/short_pulse_parameters.p')['E_pas']
-			short_pulse,T_short_pulse=read_from_pickle('cells_outputs_data_short/'+cell_name+'/data/electrophysio_records/short_pulse/mean_short_pulse.p')
-			maxi = np.append(maxi, find_maxi(np.array(short_pulse) - REST, save_folder_IV_curve)[0])
+			REST=read_from_pickle('cells_outputs_data_short/'+cell_name+'/data/electrophysio_records/short_pulse_parameters0.p')['E_pas']
+			short_pulse,T_short_pulse=read_from_pickle('cells_outputs_data_short/'+cell_name+'/data/electrophysio_records/short_pulse/mean0_short_pulse.p')
+			maxi = np.append(maxi, find_maxi(np.array(short_pulse) + REST, save_folder_IV_curve)[0])
 			I.append(-50)
 			with open(save_folder_IV_curve + 'max_vol_curr_inj.p', 'wb') as fr:
-				pickle.dump([maxi * short_pulse.units, I * pq.pA], fr)
+				pickle.dump([maxi * t_i.units, I * pq.pA], fr)
 			I_V_curve(maxi, I * pq.pA, save_folder_IV_curve)
 			check_dynamics(short_pulse, T_short_pulse, create_folder_dirr(base_external_folder + '/check_dynamic/'))
 		else:
