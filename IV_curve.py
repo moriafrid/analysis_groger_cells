@@ -58,6 +58,7 @@ def I_V_curve(maxi,I,save_file):
     # plt.legend(['max volt to diffrent current inject','fit=I*'+str(round(popt[0]*1e-12/1e-3*1e12,3))+'pohm',str(I[-1])+'pA'])
     plt.savefig(save_file + 'I_V_curve_fit')
     pickle.dump(fig, open(save_file + 'I_V_curve_fit.p', 'wb'))
+    plt.close()
 
     print('The input resistance from I_V cureve is ',round(popt[0]*1e-12/1e-3*1e12,3),'pOhm')
     print('The input resistance from I=-50pA is ', round(popt1[0] * 1e-12 / 1e-3 * 1e12, 3), 'pOhm')
