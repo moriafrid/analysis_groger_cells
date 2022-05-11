@@ -1,12 +1,12 @@
-from neo import io
 from matplotlib import pyplot as plt
 import numpy as np
-from tqdm import tqdm
 from add_figure import add_figure
 import pickle
 from scipy.optimize import curve_fit
 import quantities as pq
 from scipy.signal import find_peaks
+from parameters_short_pulse import *
+
 
 
 def linear(x, m):
@@ -59,23 +59,23 @@ def I_V_curve(maxi,I,save_file):
     plt.savefig(save_file + 'I_V_curve_fit')
     pickle.dump(fig, open(save_file + 'I_V_curve_fit.p', 'wb'))
     plt.close()
-
     print('The input resistance from I_V cureve is ',round(popt[0]*1e-12/1e-3*1e12,3),'pOhm')
     print('The input resistance from I=-50pA is ', round(popt1[0] * 1e-12 / 1e-3 * 1e12, 3), 'pOhm')
     return popt1[0]*10e-12/10e-3*pq.ohm
 
 
-def find_maxi(V,save_folder,width=500):
+def find_maxi(V,save_folder):
+    width=500
     peak,dict_peaks=find_peaks(abs(V),width=width)
-    while len(peak)!=1:
-        if len(peak)<1:
-            width-=300
-            peak,dict_peaks=find_peaks(abs(V),width=width)
-        elif len(peak)>1:
-            width+=300
-            peak,dict_peaks=find_peaks(abs(V),width=width)
-    left_ips=int(dict_peaks["left_ips"])+700
-    right_ips=int(dict_peaks["right_ips"])-200
+    if len(peak)<1:
+        width-=200
+        peak,dict_peaks=find_peaks(abs(V),width=width)
+    arregment_peaks=np.argsort(dict_peaks['widths'])
+	# short_pulse_start=peak[arregment_peaks[0]]
+    from open_one_data import find_short_pulse_edges
+    find_short_pulse_edges(V)
+    left_ips=int(dict_peaks["right_ips"][arregment_peaks[0]])+start_full_capacity
+    right_ips=int(dict_peaks["right_ips"][arregment_peaks[0]])+end_full_capacity
     fig=add_figure('check if the maxi correct','ms','mV')
     plt.plot(V,label='full trace')
     plt.plot([left_ips,right_ips],[V[left_ips],V[right_ips]],'*')
@@ -85,38 +85,7 @@ def find_maxi(V,save_folder,width=500):
     plt.savefig(save_folder + '/-50pA.png')
     plt.savefig(save_folder + '/-50pA.pdf')
     pickle.dump(fig, open(save_folder + '/-50pA.p', 'wb'))
+    plt.close()
     return np.mean(V[left_ips:right_ips]),[left_ips,right_ips]
 
-
-# if __name__=='__main__':
-#     I=[-200,-160,-120,-80,-40,-0,40,80,120,160]
-#     #    creat_data
-#     f='2017_03_04_A_6-7(0)(0)'
-#     r=io.AxonIO(f+'.abf')
-#     bl = r.read_block(lazy=False)
-#     t_total,T_total,max_t=[],[],[]
-#     for i in tqdm(range(len(bl.segments))):
-#         segment =bl.segments[i]
-#         hz = segment.analogsignals[0].sampling_rate
-#         t_start=segment.analogsignals[0].t_start
-#         t_stop=segment.analogsignals[0].t_stop
-#         t = np.array(segment.analogsignals[0])
-#         V_unit=segment.analogsignals[0].units
-#         #t = np.array(t).flatten()
-#         T = np.linspace(t_start,t_stop, len(t))
-#         t_total.append(t[:,0])
-#         T_total.append(T)
-#     save_folder_IV_curve =  'data/traces_img/' + f + '/'
-#     maxi=sepereat_by_current(t_total*V_unit,T_total,I,save_folder_IV_curve)
-#     from open_pickle import read_from_pickle
-#     mean_short_pulse= read_from_pickle('cells_outputs_data_short/data_analysis/data/short_pulse/mean_short_pulse_with_parameters.p')
-#     t_50pA,T_50pA=mean_short_pulse['mean']
-#     t_50pA=np.array(t_50pA)-mean_short_pulse['E_pas']
-#     maxi=np.append(maxi,find_maxi(t_50pA,f))
-#     I.append(-50)
-#     # I_V_curve(t_total*V_unit, T_total,maxi,I,f)
-#
-#     I_V_curve(maxi, I, save_folder_IV_curve)
-#     plt.show()
-#     a=1
 
