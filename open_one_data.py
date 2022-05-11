@@ -164,7 +164,8 @@ def phenomena(t1,t2,T,base,x_units='S',Y_units='mV'):
 	if abs(spike_place-spike_place2)>2000:
 		short_pulse_place=spike_place2
 
-	short_pulse_start_temp,short_pulse_end_temp=find_short_pulse_edges(np.mean(t1,axis=0)[short_pulse_place-5000:short_pulse_place+3000])
+
+	short_pulse_start_temp,short_pulse_end_temp=find_short_pulse_edges(np.mean(t1,axis=0)[short_pulse_place-4000:short_pulse_place+3000])
 	short_pulse_start_temp+=short_pulse_place-5000
 	short_pulse_end_temp+=short_pulse_place-5000
 
