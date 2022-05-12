@@ -8,6 +8,8 @@ import matplotlib
 from open_pickle import read_from_pickle
 from parameters_short_pulse import *
 from open_one_data import find_short_pulse_edges
+from glob import glob
+
 
 matplotlib.rcParams['pdf.fonttype'] = 42
 matplotlib.rcParams['svg.fonttype'] = 'none'
@@ -86,15 +88,16 @@ for cell in read_from_pickle('cells_name2.p')[:7]:#[ '2017_03_04_A_6-7(0)(0)','2
         try:(np.savetxt(base_dir+"/peeling.txt", "traces number is "+str(correct_traces)+"\n"+[data[1], np.mean(filterd_traces_first,axis=0).flatten()*data[0].units]))
         except:"txt not secsseed to save"
         with open(base_dir+"clear_short_pulse.p", 'wb') as handle:
-            pickle.dump([data[1],filterd_traces_first], handle, protocol=pickle.HIGHEST_PROTOCOL)
+            pickle.dump([filterd_traces_first,data[1]], handle, protocol=pickle.HIGHEST_PROTOCOL)
         with open(base_dir+"mean_short_pulse.p", 'wb') as handle:
-            pickle.dump([data[1],np.mean(filterd_traces_first,axis=0)], handle, protocol=pickle.HIGHEST_PROTOCOL)
+            pickle.dump([np.mean(filterd_traces_first,axis=0),data[1]], handle, protocol=pickle.HIGHEST_PROTOCOL)
         with open(base_dir+"correct_short_pulse_traces.p", 'wb') as handle:
             pickle.dump(correct_traces, handle, protocol=pickle.HIGHEST_PROTOCOL)
         from add_figure import add_figure
         fig=add_figure('clear_short_pulse','ms','mV')
         for v in filterd_traces_first:
             plt.plot(data[1],v,'black',alpha=0.1,lw=0.2)
+
         plt.plot(data[1],np.mean(filterd_traces_first,axis=0),'black',lw=2,label='mean_short_pulse')
         plt.savefig(base_dir+"clear_short_pulse_after_peeling.png")
         plt.savefig(base_dir+"clear_short_pulse_after_peeling.pdf")
@@ -107,6 +110,14 @@ for cell in read_from_pickle('cells_name2.p')[:7]:#[ '2017_03_04_A_6-7(0)(0)','2
         for v in filterd_traces_first:
             plt.plot(v)
         plt.show()
-
+        new_dict={}
+        temp_dict=read_from_pickle(glob(base_dir+'mean0_short_pulse_with_parameters.p')[0])
+        new_dict['mean']=[filterd_traces_first,data[1]]
+        new_dict['E_pas']=temp_dict['E_pas']
+        new_dict['points2calsulate_E_pas']=temp_dict['points2calsulate_E_pas']
+        print(new_dict)
+        print(base_dir+'mean_short_pulse_with_parameters.p')
+        with open(base_dir+'mean_short_pulse_with_parameters.p', 'wb') as handle:
+            pickle.dump(new_dict, handle, protocol=pickle.HIGHEST_PROTOCOL)
         run_again=input("run again? (y/enter)")
 
