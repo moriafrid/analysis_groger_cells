@@ -16,24 +16,22 @@ matplotlib.rcParams['pdf.fonttype'] = 42
 matplotlib.rcParams['svg.fonttype'] = 'none'
 
 signal.signal(signal.SIGSEGV, SIGSEGV_signal_arises)
-if len(sys.argv) != 7:
-    cell_name= '2017_05_08_A_4-5(0)(0)'
+if len(sys.argv) != 6:
+    cell_name= '2017_05_08_A_4-5'
     file_type='z_correct.swc'
     resize_diam_by=1.0
     shrinkage_factor=1.0
     SPINE_START = 20
-    folder_='/ems/elsc-labs/segev-i/moria.fridman/project/analysis_groger_cells/'
 else:
     cell_name = sys.argv[1]
     file_type=sys.argv[2] #hoc ar ASC
     resize_diam_by = float(sys.argv[3]) #how much the cell sweel during the electrophisiology records
     shrinkage_factor =float(sys.argv[4]) #how much srinkage the cell get between electrophysiology record and LM
     SPINE_START = int(sys.argv[5])
-    folder_= sys.argv[6] #'/ems/elsc-labs/segev-i/moria.fridman/project/analysis_groger_cells/cells_outputs_data_short'
 # path_single_traces=glob('data/traces_img/2017_05_08_A_0006/*pA.p')
 # path=path_single_traces[0]
 # I=int(path[path.rfind('/')+1:path.rfind('pA')])
-
+folder_=''
 data_dir= "cells_initial_information/"
 save_dir = "cells_outputs_data_short/"
 path_short_pulse=glob(folder_+save_dir+cell_name+'/data/electrophysio_records/short_pulse/mean_short_pulse_with_parameters.p')[0]
@@ -47,8 +45,8 @@ I=-50
 save_folder+='dend*'+str(round(resize_diam_by,2))+'&F_shrinkage='+str(round(shrinkage_factor,2))+'/basic_fit'
 do_calculate_F_factor=True
 
-shrinkage_factor=1#1.0/0.7
-resize_diam_by=1
+shrinkage_factor=1.0#1.0/0.7
+resize_diam_by=1.0
 spine_type="mouse_spine"
 
 CM=1#2/2
