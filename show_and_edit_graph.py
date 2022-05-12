@@ -37,6 +37,17 @@ class Graph_edit:
             self.ax.set_ylabel(ylabel,fontsize=20)
     def show(self):
         plt.show()
+def show_picture(dirr):
+    fig1=pickle.load(open(dirr, 'rb'))
+    cell_name=dirr[dirr.rfind('2017'):].split('/')[0]
+    fig_name=dirr.split('/')[-1][:-2]
+    ax=fig1.gca()
+    for line in ax.lines:
+        plt.plot(line.get_xdata(),line.get_ydata(),'*')
+    plt.xlabel(ax.get_xlabel(),fontsize = 20)
+    plt.ylabel(ax.get_ylabel(),fontsize = 20)
+    plt.title(ax.get_title(),fontsize = 30)
+    plt.show()
 def graph_plot_again(dirr):
     fig1=pickle.load(open(dirr, 'rb'))
     cell_name=dirr[dirr.rfind('2017'):].split('/')[0]
