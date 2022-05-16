@@ -8,6 +8,7 @@ import matplotlib
 from open_pickle import read_from_pickle
 from parameters_short_pulse import *
 from open_one_data import find_short_pulse_edges
+from extra_fit_func import short_pulse_edges
 from glob import glob
 
 
@@ -31,6 +32,8 @@ for cell in read_from_pickle('cells_name2.p')[:1]:#[ '2017_03_04_A_6-7(0)(0)','2
 
     short_pulse_mean=np.mean(npV,axis=0)
     start_short_pulse,end_short_pulse=find_short_pulse_edges(short_pulse_mean)
+    start_short_pulse,end_short_pulse,len=find_short_pulse_edges(cell)
+
     timer = fig.canvas.new_timer(interval=10000)
     timer.add_callback(close_event)
     for v in npV:
