@@ -13,8 +13,8 @@ signal.signal(signal.SIGSEGV, SIGSEGV_signal_arises)
 
 if len(sys.argv) != 4:
     print("sys.argv not running and with length",len(sys.argv))
-    cells= read_from_pickle('cell_name.p')
-    file_type='new.ASC'
+    cells= read_from_pickle('cells_name2.p')
+    file_type='.ASC'
     with_plot=True
 else:
     print("sys.argv is correct and running")
@@ -182,7 +182,6 @@ if __name__=='__main__':
     name2save=''
     for cell_name in cells:
         xyz,dend_part=[],[]
-    # for cell_name in ['2017_05_08_A_5-4(0)(0)']:
         if len(glob(folder_data+cell_name+'/*'+file_type))<1:continue
         dir=glob(folder_data+cell_name+'/*'+file_type)[0]
         for i in range(get_n_spinese(cell_name)):
