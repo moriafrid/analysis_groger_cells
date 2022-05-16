@@ -24,8 +24,8 @@ def find_injection(V,E_PAS,prominence=1,duration=200):
     idx_start = np.where(V[start:]<E_PAS)[0][0] + start
     # idx_end_decay= np.where(V[start:]<E_PAS)[0][0] + start
     return idx_start ,end
-def short_pulse_edges(cell_name,with_len=True):
-    df = pd.read_csv('cells_initial_information/short_pulse_edges.csv')
+def short_pulse_edges(cell_name,p='cells_initial_information/short_pulse_edges.csv',with_len=True):
+    df = pd.read_csv(p)
     curr=df.loc[(df["cell_name"] == cell_name), :].to_dict('records')[0]
     start=curr['start']
     end=curr['end']
