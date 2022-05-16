@@ -73,7 +73,7 @@ def find_maxi(V,save_folder):
     arregment_peaks=np.argsort(dict_peaks['widths'])
 	# short_pulse_start=peak[arregment_peaks[0]]
     from open_one_data import find_short_pulse_edges
-    find_short_pulse_edges(V)
+    start,end=find_short_pulse_edges(V)
     left_ips=int(dict_peaks["right_ips"][arregment_peaks[0]])+start_full_capacity
     right_ips=int(dict_peaks["right_ips"][arregment_peaks[0]])+end_full_capacity
     fig=add_figure('check if the maxi correct','ms','mV')
