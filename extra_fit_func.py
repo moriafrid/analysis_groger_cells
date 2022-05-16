@@ -1,6 +1,7 @@
 from scipy.signal import find_peaks
 import numpy as np
 from parameters_short_pulse import short_pulse_evaluate_size
+import pandas as pd
 
 
 def get_inj(T,I,V):
@@ -23,8 +24,16 @@ def find_injection(V,E_PAS,prominence=1,duration=200):
     idx_start = np.where(V[start:]<E_PAS)[0][0] + start
     # idx_end_decay= np.where(V[start:]<E_PAS)[0][0] + start
     return idx_start ,end
+def short_pulse_edges(cell_name,with_len=True):
+    df = pd.read_csv('cells_initial_information/short_pulse_edges.csv')
+    curr=df.loc[(df["cell_name"] == cell_name), :].to_dict('records')[0]
+    start=curr['start']
+    end=curr['end']
+    length=curr['len']
+    return start, end,length
+
 def find_short_pulse_edges(signal,prominence=0.5,height=0.1):
-    peak0,parameters0=find_peaks(abs(signal),prominence=0.4)
+    peak0,parameters0=find_peaks(abs(signal),prominence=0.4,width=40)
     arregment_peaks0=np.argsort(parameters0['prominences'])
     short_pulse_end=peak0[arregment_peaks0[0]]
     prominence=0.4
@@ -59,3 +68,21 @@ def initiate_simulation(self):
     h.dt = 0.1
     h.steps_per_ms = h.dt
     return clamp,E_PAS, T, V
+
+if __name__ =='__main__':
+    from open_pickle import read_from_pickle
+    from glob import glob
+    import matplotlib.pyplot as plt
+    folder_='cells_outputs_data_short/'
+    for cell_name in read_from_pickle('cells_name2.p'):
+
+        short_pulse_edges(cell_name)
+        pulse=read_from_pickle(glob(folder_+cell_name+'/data/electrophysio_records/short_pulse/mean_short_pulse.p')[0])[0]
+        # start,end=find_injection(pulse)
+        plt.plot(pulse)
+        # plt.scatter([start,end],[pulse[start],pulse[end]],label='find_injection')
+        start,end=find_short_pulse_edges(pulse)
+        plt.scatter([start,end],[pulse[start],pulse[end]],label=str([start,end]))
+        plt.title(cell_name)
+        plt.show()
+
