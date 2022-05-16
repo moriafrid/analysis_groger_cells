@@ -44,7 +44,6 @@ def find_places(signal,prominence=0.5,two_peak=True):
 	return spike_peak,short_pulse_peak
 
 def find_short_pulse_edges(signal,prominence=0.5,height=0.1):
-
 	peak0,parameters0=find_peaks(abs(signal),prominence=0.4)
 	arregment_peaks0=np.argsort(parameters0['prominences'])
 	short_pulse_end=peak0[arregment_peaks0[0]]

@@ -21,7 +21,7 @@ fig, ax = plt.subplots(1, 1)
 timer = fig.canvas.new_timer(interval=3000)
 timer.add_callback(close_event)
 check='again'
-for cell in read_from_pickle('cells_name2.p')[:7]:#[ '2017_03_04_A_6-7(0)(0)','2017_05_08_A_5-4(0)(0)','2017_05_08_A_4-5(0)(0)']:
+for cell in read_from_pickle('cells_name2.p')[:1]:#[ '2017_03_04_A_6-7(0)(0)','2017_05_08_A_5-4(0)(0)','2017_05_08_A_4-5(0)(0)']:
     base_dir="cells_outputs_data_short/"+cell+"/data/electrophysio_records/short_pulse/"
     print(cell)
     data=read_from_pickle(base_dir+"/clear0_short_pulse.p")

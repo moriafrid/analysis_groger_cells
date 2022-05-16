@@ -6,14 +6,14 @@ from passive_val_function import *
 import pickle
 import sys
 if len(sys.argv) != 2:
-    cells_name_place="cells_name.p"
+    cells_name_place="cells_name2.p"
     print("creat csv for passive_val not running with sys.argv",len(sys.argv))
 else:
     cells_name_place=sys.argv[1]
     print("creat csv for passive_val running with sys.argv",sys.argv)
 folder_=""
 folder_data="cells_initial_information/"
-folder_save="cells_outputs_data_short/"
+folder_save="cells_outputs_short/"
 cells=read_from_pickle(cells_name_place)
 file_type2read=['z_correct.swc','morphology.swc','hoc','ASC']
 resize_diam_by=1.0

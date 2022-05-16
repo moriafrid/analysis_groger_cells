@@ -1,4 +1,3 @@
-'3'
 import signal
 from neuron import h, gui
 import numpy as np
@@ -12,6 +11,8 @@ from calculate_F_factor import calculate_F_factor
 from extra_function import load_ASC,load_hoc,load_swc,SIGSEGV_signal_arises,create_folder_dirr
 import sys
 import matplotlib
+from extra_fit_func import find_injection,find_short_pulse_edges
+
 matplotlib.rcParams['pdf.fonttype'] = 42
 matplotlib.rcParams['svg.fonttype'] = 'none'
 
@@ -220,9 +221,10 @@ T=T
 # clamp = h.IClamp(cell.dend[82](0.996)) # insert clamp(constant potentientiol) at the soma's center
 clamp = h.IClamp(soma(0.5)) # insert clamp(constant potentientiol) at the soma's center
 clamp.amp = I/1000#-0.05 ## supopsed to be 0.05nA
-from extra_fit_func import find_injection
 hz=0.1 #moria
-start,end=find_injection(V,E_PAS,duration=int(200/hz))
+# start,end=find_injection(V,E_PAS,duration=int(200/hz))
+start,end=find_short_pulse_edges(V)
+
 # start+=add2start
 start_fit= start-100#2000   #moria
 end_fit=end-1200#4900#3960  #moria
