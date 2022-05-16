@@ -25,11 +25,11 @@ for cell_name in read_from_pickle('cells_name2.p'):
     len=end-start
     dict_for_records={}
     dicty={'start':start,'end':end,'len':len}
-    dict_for_records['cells_name']=cell_name
+    dict_for_records['cell_name']=cell_name
     dict_for_records.update(dicty)
     all_data.append(dict_for_records)
     output_df = pd.DataFrame.from_records(all_data)
-    output_df.to_csv(folder_data+"short_pulse_edges.csv", index=False)
+    output_df.to_csv(folder_+"short_pulse_edges.csv", index=False)
 
 
 
