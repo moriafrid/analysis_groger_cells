@@ -3,7 +3,7 @@ import time
 import sys
 from open_pickle import read_from_pickle
 if len(sys.argv) != 2:
-    cells_name_place="cells_name.p"
+    cells_name_place="cells_name2.p"
     print("run_execute_level1.py not running with sys.argv",len(sys.argv))
 else:
     cells_name_place=sys.argv[1]
@@ -13,11 +13,13 @@ else:
 print('plot_neuron_3D.py for all cells in ',cells_name_place,'with file type of','ASC')
 folder_='/ems/elsc-labs/segev-i/moria.fridman/project/analysis_groger_cells/'
 base_command='sbatch execute_python_script.sh'
-for cell_name in read_from_pickle(cells_name_place)[2:]:
+for cell_name in read_from_pickle(cells_name_place):
     for file_type in ['z_correct.swc','morphology.swc'][0:1]:
         for SPINE_START in [20,60,10][0:1]:#SPINE_STARTs:
-            for resize_diam_by ,shrinkage_by in zip([1.0,1.1,1.2,1.5][1:2],[1.0,1.1,1.0,1.0][1:2]):
+            for resize_diam_by ,shrinkage_by in zip([1.0,1.1,1.2,1.5],[1.0,1.1,1.0,1.0]):
+                if cell_name!='2017_05_08_A_4-5' and resize_diam_by==1.5: continue
                 for double_spine_area in ['True','False'][1:2]:
+                    if cell_name!='2017_05_08_A_4-5' or cell_name!='' and double_spine_area=='True': continue
                     # for Ra_min in [5,100]:
                         # command="fit_influnce_by_initial_condition.py"
                         # send_command = " ".join([base_command,command, cell_name,file_type,str(Ra_min),resize_diam_by,shrinkage_factor,str(SPINE_START),folder_])

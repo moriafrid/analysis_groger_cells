@@ -9,7 +9,7 @@ import signal
 from glob import glob
 import sys
 from extra_function import load_ASC,load_hoc,load_swc,SIGSEGV_signal_arises,create_folder_dirr,create_folders_list
-from extra_fit_func import find_injection
+from extra_fit_func import find_injection,find_short_pulse_edges
 from analysis_fit_after_run import analysis_fit
 
 do_calculate_F_factor=True
@@ -220,7 +220,9 @@ if __name__=='__main__':
     T = np.array(short_pulse['mean'][1].rescale('ms'))
     T = T-T[0]
     E_PAS=short_pulse['E_pas']#np.mean(V[:start]) #or read it from the pickle
-    start,end=find_injection(V,E_PAS,duration=int(200/hz))
+    # start,end=find_injection(V,E_PAS,duration=int(200/hz))
+    start,end=find_short_pulse_edges(V)
+
     start_fit= start-100#2000   #moria
     end_fit=end-1200#4900#3960  #moria
     max2fit=end-10

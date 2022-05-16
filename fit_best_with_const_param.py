@@ -6,7 +6,7 @@ from calculate_F_factor import calculate_F_factor
 from add_figure import add_figure
 import pickle
 from extra_function import load_ASC,load_hoc,load_swc,SIGSEGV_signal_arises,create_folder_dirr
-from extra_fit_func import find_injection
+from extra_fit_func import find_injection,find_short_pulse_edges
 import pandas as pd
 import sys
 from glob import glob
@@ -14,7 +14,7 @@ import signal
 import os
 do_calculate_F_factor=True
 if len(sys.argv) != 7:
-   cell_name= '2017_05_08_A_5-4(0)(0)'
+   cell_name= '2017_05_08_A_5-4'
    file_type='z_correct.swc'
    resize_diam_by=1.0
    shrinkage_factor=1.0
@@ -157,7 +157,8 @@ if __name__=='__main__':
     T = np.array(short_pulse['mean'][1].rescale('ms'))
     T = T-T[0]
     E_PAS = short_pulse['E_pas']
-    start,end=find_injection(V, E_PAS,duration=int(200/hz))
+    # start,end=find_injection(V, E_PAS,duration=int(200/hz))
+    start,end=find_short_pulse_edges(V)
     start_fit= start-100
     end_fit=end-1200
     max2fit=end-10
