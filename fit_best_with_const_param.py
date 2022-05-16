@@ -6,7 +6,7 @@ from calculate_F_factor import calculate_F_factor
 from add_figure import add_figure
 import pickle
 from extra_function import load_ASC,load_hoc,load_swc,SIGSEGV_signal_arises,create_folder_dirr
-from extra_fit_func import find_injection,find_short_pulse_edges
+from extra_fit_func import find_injection,short_pulse_edges
 import pandas as pd
 import sys
 from glob import glob
@@ -158,7 +158,7 @@ if __name__=='__main__':
     T = T-T[0]
     E_PAS = short_pulse['E_pas']
     # start,end=find_injection(V, E_PAS,duration=int(200/hz))
-    start,end=find_short_pulse_edges(V)
+    start,end,length=short_pulse_edges(cell_name)
     start_fit= start-100
     end_fit=end-1200
     max2fit=end-10

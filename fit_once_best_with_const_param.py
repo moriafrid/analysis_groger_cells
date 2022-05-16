@@ -11,6 +11,7 @@ import sys
 from glob import glob
 import signal
 import os
+from extra_fit_fun import short_pulse_edges
 do_calculate_F_factor=True
 if len(sys.argv) != 7:
    cell_name= '2017_05_08_A_4-5(0)(0)'
@@ -160,7 +161,7 @@ if __name__=='__main__':
     T = T-T[0]
     E_PAS = short_pulse['E_pas']
     # start,end=find_injection(V, E_PAS,duration=int(200/hz))
-    start,end=find_short_pulse_edges(V)
+    start,end,length=short_pulse_edges(cell_name)
 
     start_fit= start-100
     end_fit=end-1200
