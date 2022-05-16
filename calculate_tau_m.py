@@ -10,6 +10,7 @@ import pickle
 import matplotlib
 from glob import glob
 from open_one_data import find_short_pulse_edges
+from extra_fit_func import short_pulse_edges
 from parameters_short_pulse import *
 matplotlib.rcParams['pdf.fonttype'] = 42
 matplotlib.rcParams['svg.fonttype'] = 'none'
@@ -38,7 +39,7 @@ def calculate_tau_m(cell_name):
     again2='y'
 
     pulse,T=read_from_pickle(short_pulse_path)
-    start_short_pulse,end_short_pulse=find_short_pulse_edges(pulse)
+    start_short_pulse,end_short_pulse,length_short_pulse=short_pulse_edges(pulse)
     #if i want i ca add one dot in the middle and still i wnt to understand what timegive ne the best fir results
     # need to run the function again (less lan(Vexp(t0)) to find tau1
     pulse=pulse[start_short_pulse+2:3000]
