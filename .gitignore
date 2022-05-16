@@ -141,10 +141,15 @@ fit_short_pulse_temp/
 x86_64/
 cells_initial_information/.~lock.Data2.xlsx#
 /*/*.~lock.Data.xlsx#
-*/.~lock.Data.xlsx#
+*/.~lock.*.xlsx#
 */*.xlsx#
 /*/*/.~*csv#
 */*.~lock.Data.xlsx#
+*/*.~lock*.xlsx#
+*/.~lock.tau_m_cells.csv#
+*/*/.nfs000000017684af760000202c
+*/.~lock.short_pulse_edges.csv#
+
 
 
 #function
