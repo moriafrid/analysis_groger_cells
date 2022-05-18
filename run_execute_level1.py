@@ -7,7 +7,7 @@ if len(sys.argv) != 2:
 else:
     cells_name_place=sys.argv[1]
     print("run_execute_level1.py running with sys.argv",sys.argv)
-
+os.system("sbatch execute_python_script.sh run_check_dinamic_and_IV.py")
 file_type='.ASC'
 os.system(" ".join(['sbatch execute_python_script.sh', 'calculate_synaptic_loc.py',cells_name_place,file_type,'True']))
 print('calculate_synaptic_loc.py for all cells in ',cells_name_place )
