@@ -50,19 +50,23 @@ def I_V_curve(maxi,I,save_file):
     fig=add_figure('I-V Curve\nfit to V=I*Rinput','Current I[pA]','Voltage V[mV]')
     plt.plot(I,maxi,'.',label='max volt to diffrent current inject')
     popt, pcov = curve_fit(linear, np.array(I), np.array(maxi))
-    plt.plot(I, linear(np.array(I), *popt),label='fit=I*'+str(round(popt[0]*1e-12/1e-3*1e12,3))+'pohm')
+    Rin_tot=popt[0]*1e-12/1e-3*1e12
+    plt.plot(I, linear(np.array(I), *popt),label='fit=I*'+str(round(Rin_tot,3))+'pohm')
     plt.plot(I[-1],maxi[-1],'*',label=str(I[-1])+'pA')
     I_50=[0,I[-1]]
     maxi_50=[0,maxi[-1]]
     popt1, pcov1 = curve_fit(linear, np.array(I_50), np.array(maxi_50))
-    plt.plot(I, linear(np.array(I), *popt1),label='fit=I*'+str(round(popt1[0]*1e-12/1e-3*1e12,3))+'pohm')
+    Rin_50=popt1[0]*1e-12/1e-3*1e12
+    plt.plot(I, linear(np.array(I), *popt1),label='fit=I*'+str(round(Rin_50,3))+'pohm')
     plt.legend()
     plt.savefig(save_file + '/I_V_curve_fit')
     pickle.dump(fig, open(save_file + '/I_V_curve_fit.p', 'wb'))
     plt.close()
     print('The input resistance from I_V cureve is ',round(popt[0]*1e-12/1e-3*1e12,3),'pOhm')
     print('The input resistance from I=-50pA is ', round(popt1[0] * 1e-12 / 1e-3 * 1e12, 3), 'pOhm')
-    return popt1[0]*10e-12/10e-3*pq.ohm
+    with open(save_file + 'Rin_s.p', 'wb') as fr:
+    	pickle.dump({'Rin_50':Rin_50,'Rin_tot':Rin_tot}, fr)
+    return Rin_50,Rin_tot
 
 
 def find_maxi(V,save_folder):
