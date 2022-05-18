@@ -22,7 +22,7 @@ fig, ax = plt.subplots(1, 1)
 timer = fig.canvas.new_timer(interval=3000)
 timer.add_callback(close_event)
 check='again'
-for cell in read_from_pickle('cells_name2.p')[:1]:#[ '2017_03_04_A_6-7(0)(0)','2017_05_08_A_5-4(0)(0)','2017_05_08_A_4-5(0)(0)']:
+for cell in ['2016_04_16_A']:#read_from_pickle('cells_name2.p')[:1]:#[ '2017_03_04_A_6-7(0)(0)','2017_05_08_A_5-4(0)(0)','2017_05_08_A_4-5(0)(0)']:
     base_dir="cells_outputs_data_short/"+cell+"/data/electrophysio_records/short_pulse/"
     print(cell)
     data=read_from_pickle(base_dir+"/clear0_short_pulse.p")
@@ -31,8 +31,8 @@ for cell in read_from_pickle('cells_name2.p')[:1]:#[ '2017_03_04_A_6-7(0)(0)','2
     npV=np.array(data[0])
 
     short_pulse_mean=np.mean(npV,axis=0)
-    start_short_pulse,end_short_pulse=find_short_pulse_edges(short_pulse_mean)
-    start_short_pulse,end_short_pulse,len=find_short_pulse_edges(cell)
+    # start_short_pulse,end_short_pulse=find_short_pulse_edges(short_pulse_mean)
+    start_short_pulse,end_short_pulse,length=short_pulse_edges(cell)
 
     timer = fig.canvas.new_timer(interval=10000)
     timer.add_callback(close_event)
