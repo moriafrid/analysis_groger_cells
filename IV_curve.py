@@ -64,7 +64,7 @@ def I_V_curve(maxi,I,save_file):
     plt.close()
     print('The input resistance from I_V cureve is ',round(popt[0]*1e-12/1e-3*1e12,3),'pOhm')
     print('The input resistance from I=-50pA is ', round(popt1[0] * 1e-12 / 1e-3 * 1e12, 3), 'pOhm')
-    with open(save_file + 'Rin_s.p', 'wb') as fr:
+    with open(save_file + '/Rins.p', 'wb') as fr:
     	pickle.dump({'Rin_50':Rin_50,'Rin_tot':Rin_tot}, fr)
     return Rin_50,Rin_tot
 
