@@ -9,7 +9,6 @@ import sys
 import pickle
 import matplotlib
 from glob import glob
-from open_one_data import find_short_pulse_edges
 from extra_fit_func import short_pulse_edges
 from parameters_short_pulse import *
 matplotlib.rcParams['pdf.fonttype'] = 42
@@ -39,7 +38,7 @@ def calculate_tau_m(cell_name):
     again2='y'
 
     pulse,T=read_from_pickle(short_pulse_path)
-    start_short_pulse,end_short_pulse,length_short_pulse=short_pulse_edges(pulse)
+    start_short_pulse,end_short_pulse,length_short_pulse=short_pulse_edges(cell_name)
     #if i want i ca add one dot in the middle and still i wnt to understand what timegive ne the best fir results
     # need to run the function again (less lan(Vexp(t0)) to find tau1
     pulse=pulse[start_short_pulse+2:3000]
@@ -96,25 +95,11 @@ def calculate_tau_m(cell_name):
     plt.plot(np.exp(+m*np.arange(0,len(pulse))+c),label='tau_m=' + str(taum) + ' 1/s')
     plt.plot(np.exp(+m*np.arange(0,len(pulse))+c)+np.exp(+m1*np.arange(0,len(pulse))+c1),label='tau_1=' + str(tau_1) + ' 1/s')
 
-    # plt.plot(T,ln_pulse,label='ln('+cell_name+')')
-    # plt.plot([T[dot1],T[dot2]],[ln_pulse[dot1],ln_pulse[dot2]],'*',color='red',label=str([dot1,dot2]))
-    # plt.plot(T[dot1:dot2],ln_pulse[dot1:dot2],'yellow')
-    # popt0, pcov0 = curve_fit(linear, T[dot1:dot2], ln_pulse[dot1:dot2])
-    # plt.plot(T, linear(np.array(T), *popt0), lw=1, label='tau_m=' + str(tau_m) + ' 1/s',alpha=0.5)
-    #
-    # plt.plot([T[dot3],T[dot4]],[ln_pulse[dot3],ln_pulse[dot4]],'*',color='red',label=str([dot1,dot2]))
-    # plt.plot(T[dot3:dot4],ln_pulse[dot3:dot4],'yellow')
-    # popt1, pcov1 = curve_fit(linear, T[dot3:dot4], ln_pulse[dot3:dot4])
-    # plt.plot(T, linear(np.array(T), *popt1), lw=1, label='tau_1=' + str(tau_1) + ' 1/s',alpha=0.5)
     plt.legend()
     plt.savefig(folder_save+'/calculate_taus.pdf')
     plt.savefig(folder_save+'/calculate_taus.png')
     pickle.dump(fig, open(folder_save+'/calculate_taus.p', 'wb'))
     plt.show()
-
-    # d={'decay': taum, 'dots2calculate_tau_m': [dot1, dot2],'tau1:':tau_1,'dots2calculate_tau1': [dot3, dot4]}
-    # df=pd.DataFrame(data=d)
-    # df.to_csv('cells_initial_information/'+cell_name+"/taues.csv")
 
     dict_for_records = {}
 
@@ -196,20 +181,37 @@ if __name__=='__main__':
     hz=0.1
     tau_m={}
     all_data=[]
-
-    for cell_name in ['2017_04_03_B']:#cells[10:]:
+    ['2017_04_03_B','2016_05_12_A','2016_04_16_A','2017_03_04_A_6-7']
+    for cell_name in ['2016_04_16_A','2017_03_04_A_6-7']:#cells[10:]:
         print(cell_name)
         dicty=calculate_tau_m(cell_name)
         # tau_m[cell_name]
         dict_for_records = {}
-        dict_for_records['cells_name']=cell_name
+        dict_for_records['cell_name']=cell_name
         dict_for_records.update(dicty)
         all_data.append(dict_for_records)
         output_df = pd.DataFrame.from_records(all_data)
-        output_df.to_excel(folder_+"tau_m_cells2.xlsx", index=False)
-        output_df.to_csv(folder_data+"tau_cells2.csv", index=False)
+        output_df.to_csv(folder_data+"tau_cells_last_changes.csv", index=False)
 
         # print(tau_m)
         # df1 = pd.DataFrame(dicty,index=0)
         # df1.to_excel(folder_+"tau_m_cells.xlsx")
         # print(df1)
+    #if I changed just one cells- corretc the excel files
+    all_data1=[]
+    for cell_name in cells:
+        print(cell_name)
+        path = glob(folder_data+cell_name+"/taues.csv")[0]
+        dict_for_records1={}
+        df=pd.read_csv(path)
+        dicty1=df.to_dict('records')[0]
+
+        dict_for_records1['cell_name']=cell_name
+        dict_for_records1.update(dicty1)
+        all_data1.append(dict_for_records1)
+        output_df1 = pd.DataFrame.from_records(all_data1)
+        output_df1.to_excel(folder_+"tau_m_cells.xlsx", index=False)
+        output_df1.to_csv(folder_data+"tau_cells.csv", index=False)
+
+
+
