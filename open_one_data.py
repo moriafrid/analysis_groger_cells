@@ -6,6 +6,7 @@ import signal
 from scipy.signal import find_peaks
 from extra_function import SIGSEGV_signal_arises
 import matplotlib
+from extra_fit_func import short_pulse_edges
 from parameters_short_pulse import *#start_decey2fit, end_decey2fit,start_full_capacity,end_full_capacity
 matplotlib.rcParams['pdf.fonttype'] = 42
 matplotlib.rcParams['svg.fonttype'] = 'none'
@@ -165,6 +166,8 @@ def phenomena(t1,t2,T,base,x_units='S',Y_units='mV'):
 
 
 	short_pulse_start_temp,short_pulse_end_temp=find_short_pulse_edges(np.mean(t1,axis=0)[short_pulse_place-4000:short_pulse_place+3000])
+
+
 	short_pulse_start_temp+=short_pulse_place-4000
 	short_pulse_end_temp+=short_pulse_place-4000
 
@@ -245,7 +248,12 @@ def phenomena(t1,t2,T,base,x_units='S',Y_units='mV'):
 	# plt.show()
 
 	short_pulse_start,short_pulse_end=find_short_pulse_edges(short_pulse_mean)
-
+	cell_name=base.split('/')[1]
+	try:
+		short_pulse_start_temp2,short_pulse_end_temp2,short_pulse_length=short_pulse_edges(cell_name)
+		short_pulse_start=short_pulse_start_temp2
+		short_pulse_end=short_pulse_end_temp2
+	except: print("the edges.csv isn't found and check_short_pulse_edges.py need to be run")
 	new_short_pulse0,E_pas_short_pulse_0=correct_rest(short_pulse,[short_pulse_start+start_calculate_E_pas,short_pulse_start+end_calculate_E_pas]) #moria not change a lot
 	std_max=1.3
 	index2del_short_pulse2,new_short_pulse1 = clear_phenomena_partial_std(new_short_pulse0, 'short_pulse','decay', base ,std_max=std_max,start=short_pulse_start+start_decey2fit,end=short_pulse_start+end_decey2fit)
