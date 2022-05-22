@@ -15,10 +15,10 @@ import os
 from open_pickle import read_from_pickle
 do_calculate_F_factor=True
 if len(sys.argv) != 7:
-   cell_name= '2017_07_06_C_3-4'
+   cell_name= '2016_08_30_A'
    file_type='z_correct.swc'
-   resize_diam_by=1.0
-   shrinkage_factor=1.0
+   resize_diam_by=1.1
+   shrinkage_factor=1.1
    SPINE_START=20
    double_spine_area=False
 
@@ -171,7 +171,7 @@ if __name__=='__main__':
     h.steps_per_ms = h.dt
     imp = h.Impedance(sec=soma)
     imp.loc(soma(0.5))
-    RA=list(np.arange(1,150,1))+list(np.arange(150, 302, 2))
+    RA=(list(np.arange(1,150,1))+list(np.arange(150, 302, 2)))[:]
     if read_tau_m(cell_name)==[]:
         os.system('calculate_tau_m.py')
         print('tau_m for cell',cell_name, ' needs to be calculate')
@@ -264,7 +264,11 @@ if __name__=='__main__':
     for mini in minimums_arg[:10]:
         plt.plot(RA0[mini], errors[mini], '*',label=' RM=' + str(round(RMs[mini], 2)) + ' RA=' + str(round(RAs[mini], 2)) + ' CM=' + str(
                      round(CMs[mini], 2)) + ' error=' +  str(round(errors[mini], 3)))
-        dict_minimums2['RA_const=' + str(RA0[mini])]={'params': {'RM': RMs[mini], 'RA': RAs[mini], 'CM': CMs[mini]},'error':{key2:error_all[key2][mini] for key2 in error_all.keys()} }
+        err={}
+        for key2 in error_all.keys():
+            if 'Rin' in key2: continue
+            err[key2]=error_all[key2][mini]
+        dict_minimums2['RA_const=' + str(RA0[mini])]={'params': {'RM': RMs[mini], 'RA': RAs[mini], 'CM': CMs[mini]},'error':err }
     pickle.dump(dict_minimums2, open(save_folder1 + "/RA_const_10_minimums.p", "wb"))
     plt.legend(loc='upper left')
     plt.savefig(save_folder1+'/RA const against errors')
