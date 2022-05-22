@@ -17,9 +17,9 @@ for cell_name in read_from_pickle(cells_name_place):
         command="sbatch execute_python_script.sh cell_properties.py"
         # command="python cell_properties.py"
         send_command = " ".join([command,cell_name,file_type])
-        # os.system(send_command)
+        os.system(send_command)
         print(cell_name+'_'+file_type+' :run cell_properties.py')
 print('')
 print('*execute_level1.sh isnt run beacouse empty except SMAQ_analysis.py')
-print('**remainder: calculate_tau_m.py and choose_peelingg.py need to be run from the computer')
+print('**remainder: calculate_tau_m.py and check_short_pulse_edges.py ,choose_peelingg.py need to be run from the computer')
 

@@ -14,7 +14,7 @@ for cell_name in read_from_pickle('cells_name.p'):
     temp_cell=None
     morphology_dirr=glob('cells_initial_information/2017_03_04_A_6-7(0)/morphology_z_correct.swc')[0]
     temp_cell=load_swc(glob(morphology_dirr[:morphology_dirr.rfind('/')]+'/*'+'z_correct.swc')[0])
-    F_factor=calculate_F_factor(temp_cell,'mouse_spine')
+    F_factor=calculate_F_factor(temp_cell)
     print(F_factor)
     for dirr in glob('cells_outputs_data_short/'+cell_name+'/MOO_results/z_correct.swc/F_shrinkage=1.0_dend*1.0/const_param/*/hall*1.p'):
         base_save_folder=dirr[:dirr.rfind('/')]

@@ -830,7 +830,7 @@ if do_calculate_F_factor:
     for sec in temp_cell.dend+temp_cell.apic:
         sec.diam=sec.diam*resize_dend_by
         sec.L=sec.L*shrinkage_by
-    F_factor=calculate_F_factor(temp_cell,'mouse_spine',double_spine=double_spine_area)
+    F_factor=calculate_F_factor(temp_cell,double_spine=double_spine_area)
 else:
     F_factor = 1.9
 temp_cell=None

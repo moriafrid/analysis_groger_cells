@@ -49,7 +49,7 @@ elif file_type=='hoc':
 elif 'swc' in file_type:
     cell =load_swc(cell_file)
 
-F_factor=calculate_F_factor(cell,'mouse_spine')
+F_factor=calculate_F_factor(cell)
 soma = cell.soma
 # h.celsius = 36
 sp = h.PlotShape()

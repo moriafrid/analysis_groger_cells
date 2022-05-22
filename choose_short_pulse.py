@@ -22,6 +22,7 @@ fig, ax = plt.subplots(1, 1)
 timer = fig.canvas.new_timer(interval=3000)
 timer.add_callback(close_event)
 check='again'
+#['2017_04_03_B','2016_05_12_A','2016_04_16_A','2017_03_04_A_6-7']
 for cell in ['2016_04_16_A']:#read_from_pickle('cells_name2.p')[:1]:#[ '2017_03_04_A_6-7(0)(0)','2017_05_08_A_5-4(0)(0)','2017_05_08_A_4-5(0)(0)']:
     base_dir="cells_outputs_data_short/"+cell+"/data/electrophysio_records/short_pulse/"
     print(cell)
@@ -88,39 +89,39 @@ for cell in ['2016_04_16_A']:#read_from_pickle('cells_name2.p')[:1]:#[ '2017_03_
         filterd_traces_first = np.array(filterd_traces_first)
 
 
-        try:(np.savetxt(base_dir+"/peeling.txt", "traces number is "+str(correct_traces)+"\n"+[data[1], np.mean(filterd_traces_first,axis=0).flatten()*data[0].units]))
-        except:"txt not secsseed to save"
-        with open(base_dir+"clear_short_pulse.p", 'wb') as handle:
-            pickle.dump([filterd_traces_first,data[1]], handle, protocol=pickle.HIGHEST_PROTOCOL)
-        with open(base_dir+"mean_short_pulse.p", 'wb') as handle:
-            pickle.dump([np.mean(filterd_traces_first,axis=0),data[1]], handle, protocol=pickle.HIGHEST_PROTOCOL)
-        with open(base_dir+"correct_short_pulse_traces.p", 'wb') as handle:
-            pickle.dump(correct_traces, handle, protocol=pickle.HIGHEST_PROTOCOL)
-        from add_figure import add_figure
-        fig=add_figure('clear_short_pulse','ms','mV')
-        for v in filterd_traces_first:
-            plt.plot(data[1],v,'black',alpha=0.1,lw=0.2)
-
-        plt.plot(data[1],np.mean(filterd_traces_first,axis=0),'black',lw=2,label='mean_short_pulse')
-        plt.savefig(base_dir+"clear_short_pulse_after_peeling.png")
-        plt.savefig(base_dir+"clear_short_pulse_after_peeling.pdf")
-        pickle.dump(fig, open(base_dir+'clear_short_pulse__after_peeling.p', 'wb'))
-        plt.close()
-        plt.figure()
-        plt.title(cell+' have '+str(len(filterd_traces_first))+'traces')
-        timer = fig.canvas.new_timer(interval=10000)
-        timer.add_callback(close_event)
-        for v in filterd_traces_first:
-            plt.plot(v)
-        plt.show()
-        new_dict={}
-        temp_dict=read_from_pickle(glob(base_dir+'mean0_short_pulse_with_parameters.p')[0])
-        new_dict['mean']=[filterd_traces_first,data[1]]
-        new_dict['E_pas']=temp_dict['E_pas']
-        new_dict['points2calsulate_E_pas']=temp_dict['points2calsulate_E_pas']
-        print(new_dict)
-        print(base_dir+'mean_short_pulse_with_parameters.p')
-        with open(base_dir+'mean_short_pulse_with_parameters.p', 'wb') as handle:
-            pickle.dump(new_dict, handle, protocol=pickle.HIGHEST_PROTOCOL)
-        run_again=input("run again? (y/enter)")
+        # try:(np.savetxt(base_dir+"/peeling.txt", "traces number is "+str(correct_traces)+"\n"+[data[1], np.mean(filterd_traces_first,axis=0).flatten()*data[0].units]))
+        # except:"txt not secsseed to save"
+        # with open(base_dir+"clear_short_pulse.p", 'wb') as handle:
+        #     pickle.dump([filterd_traces_first,data[1]], handle, protocol=pickle.HIGHEST_PROTOCOL)
+        # with open(base_dir+"mean_short_pulse.p", 'wb') as handle:
+        #     pickle.dump([np.mean(filterd_traces_first,axis=0),data[1]], handle, protocol=pickle.HIGHEST_PROTOCOL)
+        # with open(base_dir+"correct_short_pulse_traces.p", 'wb') as handle:
+        #     pickle.dump(correct_traces, handle, protocol=pickle.HIGHEST_PROTOCOL)
+        # from add_figure import add_figure
+        # fig=add_figure('clear_short_pulse','ms','mV')
+        # for v in filterd_traces_first:
+        #     plt.plot(data[1],v,'black',alpha=0.1,lw=0.2)
+        #
+        # plt.plot(data[1],np.mean(filterd_traces_first,axis=0),'black',lw=2,label='mean_short_pulse')
+        # plt.savefig(base_dir+"clear_short_pulse_after_peeling.png")
+        # plt.savefig(base_dir+"clear_short_pulse_after_peeling.pdf")
+        # pickle.dump(fig, open(base_dir+'clear_short_pulse__after_peeling.p', 'wb'))
+        # plt.close()
+        # plt.figure()
+        # plt.title(cell+' have '+str(len(filterd_traces_first))+'traces')
+        # timer = fig.canvas.new_timer(interval=10000)
+        # timer.add_callback(close_event)
+        # for v in filterd_traces_first:
+        #     plt.plot(v)
+        # plt.show()
+        # new_dict={}
+        # temp_dict=read_from_pickle(glob(base_dir+'mean0_short_pulse_with_parameters.p')[0])
+        # new_dict['mean']=[np.mean(filterd_traces_first,axis=0),data[1]]
+        # new_dict['E_pas']=temp_dict['E_pas']
+        # new_dict['points2calsulate_E_pas']=temp_dict['points2calsulate_E_pas']
+        # print(new_dict)
+        # print(base_dir+'mean_short_pulse_with_parameters.p')
+        # with open(base_dir+'mean_short_pulse_with_parameters.p', 'wb') as handle:
+        #     pickle.dump(new_dict, handle, protocol=pickle.HIGHEST_PROTOCOL)
+        # run_again=input("run again? (y/enter)")
 

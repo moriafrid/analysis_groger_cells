@@ -47,10 +47,10 @@ def get_F_factor_params(spine_type,i=0):
     parameter_cv=df[df['cell_name']==spine_type].reset_index()
     R_head=get_R_head(spine_type)
     neck_diam=np.mean(parameter_cv['neck_diam'])
-    neck_length=np.mean(parameter_cv['neck_diam'])
+    neck_length=np.mean(parameter_cv['neck_length'])
     spine_density=np.mean(parameter_cv['spine_density'])
     # if spine_density!=None:
-    return R_head,neck_diam,neck_length,spine_density
+    # return R_head,neck_diam,neck_length,spine_density
     return R_head,neck_diam,neck_length
 
 def get_spine_xyz(cell_name,spine_num):

@@ -6,15 +6,16 @@ from calculate_F_factor import calculate_F_factor
 from add_figure import add_figure
 import pickle
 from extra_function import load_ASC,load_hoc,load_swc,SIGSEGV_signal_arises,create_folder_dirr
-from extra_fit_func import find_injection,short_pulse_edges
+from extra_fit_func import find_injection,short_pulse_edges,read_tau_m
 import pandas as pd
 import sys
 from glob import glob
 import signal
 import os
+from open_pickle import read_from_pickle
 do_calculate_F_factor=True
 if len(sys.argv) != 7:
-   cell_name= '2017_05_08_A_5-4'
+   cell_name= '2017_07_06_C_3-4'
    file_type='z_correct.swc'
    resize_diam_by=1.0
    shrinkage_factor=1.0
@@ -44,9 +45,6 @@ create_folder_dirr(initial_folder)
 
 signal.signal(signal.SIGSEGV, SIGSEGV_signal_arises)
 
-def read_tau_m(cell_name,folder='/ems/elsc-labs/segev-i/moria.fridman/project/analysis_groger_cells/cells_outputs_data_short'):
-    df = pd.read_excel(save_dir+'/tau_m_cells.xlsx',index_col=0)
-    return df[cell_name]['tau_m']
 
 def change_model_pas(CM=1, RA = 250, RM = 20000.0, E_PAS = -70.0):
    h.dt = 0.1
@@ -121,7 +119,7 @@ def errors_Rinput(RM,RA,CM,E_PAS):
 
 if __name__=='__main__':
     I = -50
-    short_pulse=read_from_pickle(path_short_pulse)
+    short_pulse=read_from_pickle(path_short_pulse)['mean']
     cell=None
     if file_type=='ASC':
        cell =load_ASC(cell_file)
@@ -145,7 +143,7 @@ if __name__=='__main__':
     hz= 0.1
 
     if do_calculate_F_factor:
-        F_factor=calculate_F_factor(cell,'mouse_spine')
+        F_factor=calculate_F_factor(cell)
     else:
         F_factor = 1.9
     soma=cell.soma
@@ -183,6 +181,7 @@ if __name__=='__main__':
     params_dict=[]
     precent_erors=[]
     ra_error_next=[]
+    Rins=read_from_pickle(glob('cells_outputs_data_short/*/data/electrophysio_records/*_IV/Rins.p')[0])
     for ra in RA:
         RM=6000
         CM=tau_m/RM
@@ -218,13 +217,13 @@ if __name__=='__main__':
             # RM=(Rin*pi)**2/4*d**3*ra
             error_last=error_next
             error_next=errors_Rinput(RM, ra, CM,E_PAS)
-        print('Rinput for Ra='+str(ra)+' is '+str(round(Rin,2)))
+        print('Rinput for Ra='+str(ra)+' is '+str(round(Rin,2))+'in compare to '+str(Rins))
         ra_error2,precent_eror=plot_res(RM, ra, CM, save_folder=initial_folder, save_name="fit RA=" + str(round(ra, 2)))
         ra_error.append(ra_error2)
         precent_erors.append(precent_eror)
         ra_error_next.append(error_next)
         params_dict.append({'RM': RM, 'RA': ra, 'CM': CM})
-        pickle.dump({'RA':RA,'error':{'decay':ra_error,'decay&max':precent_erors},'params':params_dict}, open(initial_folder + '/Ra_const_errors.p', "wb"))
+        pickle.dump({'RA':RA,'error':{'decay':ra_error,'decay&max':precent_erors,'Rin':Rin},'params':params_dict}, open(initial_folder + '/Ra_const_errors.p', "wb"))
 
     fig1=add_figure('RA_errors','RA','errors')
     plt.plot(RA,ra_error)

@@ -2,6 +2,8 @@ from open_pickle import read_from_pickle
 from glob import glob
 import pickle
 new=[]
+
+####i need correct the mean_short_pulse_with_paramaters.p
 for path in glob('cells_outputs_data_short/*/data/electrophysio_records/short_pulse/*_temp.p'):
     # print(path)
     new=[]

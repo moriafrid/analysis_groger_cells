@@ -11,7 +11,7 @@ import sys
 from glob import glob
 import signal
 import os
-from extra_fit_fun import short_pulse_edges
+from extra_fit_func import short_pulse_edges,read_tau_m
 do_calculate_F_factor=True
 if len(sys.argv) != 7:
    cell_name= '2017_05_08_A_4-5(0)(0)'
@@ -46,9 +46,7 @@ create_folder_dirr(initial_folder)
 
 signal.signal(signal.SIGSEGV, SIGSEGV_signal_arises)
 
-def read_tau_m(cell_name,folder='/ems/elsc-labs/segev-i/moria.fridman/project/analysis_groger_cells/cells_outputs_data_short'):
-    df = pd.read_excel(save_dir+'/tau_m_cells.xlsx',index_col=0)
-    return df[cell_name]['tau_m']
+
 
 def change_model_pas(CM=1, RA = 250, RM = 20000.0, E_PAS = -70.0):
    h.dt = 0.1
@@ -148,7 +146,7 @@ if __name__=='__main__':
     hz= 0.1
 
     if do_calculate_F_factor:
-        F_factor=calculate_F_factor(cell,'mouse_spine')
+        F_factor=calculate_F_factor(cell)
     else:
         F_factor = 1.9
     soma=cell.soma

@@ -98,7 +98,7 @@ for sec in cell.all_sec():
     sec.diam = sec.diam*resize_diam_by
 
 if do_calculate_F_factor:
-    F_factor=calculate_F_factor(cell,"mouse_spine",double_spine=double_spine)
+    F_factor=calculate_F_factor(cell,double_spine=double_spine)
 else:
     F_factorF_factor=1.9
 #insert pas to all other section

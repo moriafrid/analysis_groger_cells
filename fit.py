@@ -205,7 +205,7 @@ for sec in cell.all_sec():
     sec.L*=shrinkage_factor
 
 if do_calculate_F_factor:
-    F_factor=calculate_F_factor(cell,'mouse_spine')
+    F_factor=calculate_F_factor(cell)
 else:
     F_factor = 1.9
 print('F_factor=',F_factor)

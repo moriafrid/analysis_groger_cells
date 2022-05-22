@@ -26,6 +26,8 @@ show_total_results=True
 compare_between_change_in_the_morphology_passive_fits=True
 place=["A","B","C","D","E","F","G","H","I","J","K","L","M","N","O","P","Q","R","S","T","U","V","W","X","Y","Z","a","b","c","d","e","f"]
 folder_='cells_outputs_data_short/'+cell_name
+folder_='cells_outputs_data_3_initial_cells/'+cell_name
+
 i=0
 def show_dirr(png_file):
     if png_file.split('.')[-1]=='pdf':  # if only have pdf (no png) => create png and read it later
@@ -78,7 +80,7 @@ if __name__ == '__main__':
         CD""")
         for place,file_type in zip(["A","B","C","D"],file_types):
             show_directory(axs1[place], file_type+' diam-dis',folder_+'/data/cell_properties/diam_dis/'+file_type+'/diam-dis.png')
-            # show_text('cells_outputs_data_short/'+cell_name+'/data/cell_properties/diam_dis/'+file_type+'/cell_propertis.txt')
+            # show_text(folder_+'/data/cell_properties/diam_dis/'+file_type+'/cell_propertis.txt')
     if show_total_results:
         resize_by=str(1.0)
         shrinkage_by=str(1.0)
@@ -172,7 +174,7 @@ if __name__ == '__main__':
     if compare_between_change_in_the_morphology_passive_fits:
         fig=plt.figure()
         # plt.title(cell_name)
-        dirr_len=len(glob('cells_outputs_data_short/'+cell_name+'/fit_short_pulse/*_SPINE_START=*/*/const_param/RA/analysis/RA const against errors2 60.png'))
+        dirr_len=len(glob(folder_+'/fit_short_pulse/*_SPINE_START=*/*/const_param/RA/analysis/RA const against errors2 60.png'))
         if dirr_len<=10:
             ax = fig.subplot_mosaic("""ABC
             DEF
@@ -183,7 +185,7 @@ if __name__ == '__main__':
             IJKL
             """)
         i=0
-        for z,p in enumerate(glob('cells_outputs_data_short/'+cell_name+'/fit_short_pulse/*_SPINE_START=*/*/const_param/RA/analysis/RA const against errors2 60.png')):
+        for z,p in enumerate(glob(folder_+'/fit_short_pulse/*_SPINE_START=*/*/const_param/RA/analysis/RA const against errors2 60.png')):
             show_directory(ax[place[i]],p.split('/')[3]+'\n'+p.split('/')[4],p)
 
     if plot_all_Moo_results:
@@ -203,7 +205,7 @@ if __name__ == '__main__':
         i=0
         # ax = fig.subplot_mosaic("""AB
         # CD""")
-        dirr=glob('cells_outputs_data_short/'+cell_name+'/MOO_results_'+same_diff+'*/z_correct.swc_SPINE_START=20/F_shrinkage*1.0**1.0*/const_param/*best*/fit_transient_RDSM.png')
+        dirr=glob(folder_+'/MOO_results_'+same_diff+'*/z_correct.swc_SPINE_START=20/F_shrinkage*1.0**1.0*/const_param/*best*/fit_transient_RDSM.png')
         dirr_len=len(dirr)
 
         if dirr_len<10:
@@ -268,7 +270,7 @@ if __name__ == '__main__':
                     same_diff='_same'
                 else:
                     same_diff='_relative'
-            for z,p in enumerate(glob('cells_outputs_data_short/'+cell_name+'/MOO_results_*'+same_diff+'*/morphology.swc/F_shrinkage=*/const_param/*/fit_transient_RDSM.png')):
+            for z,p in enumerate(glob(folder_+'/MOO_results_*'+same_diff+'*/morphology.swc/F_shrinkage=*/const_param/*/fit_transient_RDSM.png')):
                 if p.split('/')[6]=='test': continue
                 # RA,CM,RM=get_passive_val(passive_vals_dict[p.split('/')[6]])
                 show_directory(ax[place[i]],p.split('/')[4]+p.split('/')[6],p)
@@ -299,7 +301,7 @@ if __name__ == '__main__':
             # EFGH
             # IJKL
             # MNOP""")
-            # dirr_len=len(glob('cells_outputs_data_short/'+cell_name+'/MOO_results'+same_diff+'*/z_correct.swc_SPINE_START=*/F_shrinkage=*/const_param/*/fit_transient_RDSM.png'))
+            # dirr_len=len(glob(folder_+'/MOO_results'+same_diff+'*/z_correct.swc_SPINE_START=*/F_shrinkage=*/const_param/*/fit_transient_RDSM.png'))
             # if dirr_len<10:
             #     ax = fig.subplot_mosaic("""ABC
             #     DEF
@@ -313,7 +315,7 @@ if __name__ == '__main__':
             #     """)
 
 
-            for z,p in enumerate(glob('cells_outputs_data_short/'+cell_name+'/MOO_results_*_'+same_diff+'*/z_correct.swc_SPINE_START=20/F_shrinkage*/const_param/*120*/*.pdf')):
+            for z,p in enumerate(glob(folder_+'/MOO_results_*_'+same_diff+'*/z_correct.swc_SPINE_START=20/F_shrinkage*/const_param/*120*/*.pdf')):
                 if p.split('/')[6]=='test': continue
                 # if p.split('/')[6]=='RA_min_error': continue
                 # if 'double' in p.split('/')[4]: continue

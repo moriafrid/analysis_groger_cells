@@ -10,16 +10,21 @@ else:
     print("run_execute_level1.py running with sys.argv",sys.argv)
 
 # os.system(" ".join(['sbatch execute_python_script.sh', 'plot_neuron_3D.py',cells_name_place,'ASC']))
-print('plot_neuron_3D.py for all cells in ',cells_name_place,'with file type of','ASC')
+print('plot_neuron_3D.py for all cells in ',cells_name_place,'with file type of','ASC') ##moria - not plot_neuron_3D working
 folder_='/ems/elsc-labs/segev-i/moria.fridman/project/analysis_groger_cells/'
 base_command='sbatch execute_python_script.sh'
 for cell_name in read_from_pickle(cells_name_place):
+    #['2017_04_03_B','2016_05_12_A','2016_04_16_A','2017_03_04_A_6-7'] איק פוךדקד כןמג־קגעקד מםא בשאבי בםררקבאךט
+    print(cell_name)
+
     for file_type in ['z_correct.swc','morphology.swc'][0:1]:
         for SPINE_START in [20,60,10][0:1]:#SPINE_STARTs:
-            for resize_diam_by ,shrinkage_by in zip([1.0,1.1,1.2,1.5],[1.0,1.1,1.0,1.0]):
+            for resize_diam_by ,shrinkage_by in zip([1.0,1.1,1.2,1.0,1.5],[1.0,1.1,1.0,1.1,1.0]):
                 if cell_name!='2017_05_08_A_4-5' and resize_diam_by==1.5: continue
-                for double_spine_area in ['True','False'][1:2]:
-                    if cell_name!='2017_05_08_A_4-5' or cell_name!='' and double_spine_area=='True': continue
+                # if cell_name!='2017_05_08_A_4-5' and resize_diam_by==1.0 and shrinkage_by==1.1: continue
+
+                for double_spine_area in ['True','False']:
+                    if cell_name!='2017_05_08_A_4-5' and double_spine_area=='True': continue
                     # for Ra_min in [5,100]:
                         # command="fit_influnce_by_initial_condition.py"
                         # send_command = " ".join([base_command,command, cell_name,file_type,str(Ra_min),resize_diam_by,shrinkage_factor,str(SPINE_START),folder_])
@@ -27,9 +32,9 @@ for cell_name in read_from_pickle(cells_name_place):
                         # # time.sleep(5)
                         # print(cell_name+ ' .'+file_type+': fit_influance_by_initial_condition.py with ra_min='+str(Ra_min))
                     command2="sbatch execute_fit_const.sh"
-                    # command2="sbatch execute_python_script.sh fit_best_with_const_param.py"
+                    command2="sbatch execute_python_script.sh fit_best_with_const_param.py"
 
-                    command2="python fit_best_with_const_param.py"
+                    # command2="python fit_best_with_const_param.py"
                     send_command = " ".join([command2, cell_name,file_type,str(resize_diam_by),str(shrinkage_by),str(SPINE_START),double_spine_area])
                     os.system(send_command)
                     # time.sleep(10)

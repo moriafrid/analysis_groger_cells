@@ -164,7 +164,7 @@ class Dendogram():
             sec.insert('pas')
             sec.nseg = max(int(sec.L), 1)
         if do_calculate_F_factor:
-           F_factor=calculate_F_factor(self.cell,'mouse_spine',double_spine=double_spine)
+           F_factor=calculate_F_factor(self.cell,double_spine=double_spine)
         else:
            F_factor = 1.9
         self.cell=change_model_pas(self.cell, CM=passive_val['CM'], RA = passive_val['RA'], RM = passive_val['RM'], E_PAS = E_PAS,F_factor=F_factor)

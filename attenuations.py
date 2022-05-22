@@ -223,7 +223,7 @@ elif file_type=='hoc':
 elif 'swc' in file_type:
     cell =load_swc(cell_file)
 if do_calculate_F_factor:
-   F_factor=calculate_F_factor(cell,'mouse_spine',double_spine=double_spine)
+   F_factor=calculate_F_factor(cell,double_spine=double_spine)
 else:
    F_factor = 1.9
 

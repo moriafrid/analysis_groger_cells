@@ -49,7 +49,10 @@ def find_short_pulse_edges(signal,prominence=0.5,height=0.1):
     arregment_peaks1=np.argsort(parameters1['peak_heights'])
     short_pulse_start=peak1[arregment_peaks1[0]]
     return short_pulse_start,short_pulse_end
-
+def read_tau_m(cell_name,tau_path='cells_outputs_data_short/tau_m_cells.xlsx'):
+    tau_path='cells_initial_information/tau_cells.csv'
+    df = pd.read_csv(tau_path,index_col=0)
+    return df['decay'][cell_name]
 
 def initiate_simulation(self):
     clamp = h.IClamp(self.soma(0.5))  # insert clamp(constant potentientiol) at the soma's center

@@ -207,7 +207,7 @@ if __name__=='__main__':
         sec.diam = sec.diam*resize_diam_by
         sec.L*=shrinkage_factor
     if do_calculate_F_factor:
-       F_factor=calculate_F_factor(cell,'mouse_spine')
+       F_factor=calculate_F_factor(cell)
     else:
        F_factor = 1.9
 
