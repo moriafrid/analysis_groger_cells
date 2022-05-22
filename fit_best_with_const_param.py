@@ -119,7 +119,7 @@ def errors_Rinput(RM,RA,CM,E_PAS):
 
 if __name__=='__main__':
     I = -50
-    short_pulse=read_from_pickle(path_short_pulse)['mean']
+    short_pulse=read_from_pickle(path_short_pulse)
     cell=None
     if file_type=='ASC':
        cell =load_ASC(cell_file)
