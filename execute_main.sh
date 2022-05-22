@@ -9,7 +9,7 @@
 #SBATCH --mem 6000
 #SBATCH -c 1
 #SBATCH -t 1-0
-#SBATCH --exclude=ielsc-48,ielsc-49,ielsc-85,ielsc-84
+#SBATCH --exclude=ielsc-48,ielsc-49
 # check if script is started via SLURM or bash
 # if with SLURM: there variable '$SLURM_JOB_ID' will exist
 
