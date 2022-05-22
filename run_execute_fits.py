@@ -14,16 +14,16 @@ print('plot_neuron_3D.py for all cells in ',cells_name_place,'with file type of'
 folder_='/ems/elsc-labs/segev-i/moria.fridman/project/analysis_groger_cells/'
 base_command='sbatch execute_python_script.sh'
 for cell_name in read_from_pickle(cells_name_place):
-    #['2017_04_03_B','2016_05_12_A','2016_04_16_A','2017_03_04_A_6-7'] איק פוךדקד כןמג־קגעקד מםא בשאבי בםררקבאךט
+    if cell_name in read_from_pickle('cells_without_xyz.p'):continue
+    #['2017_04_03_B','2016_05_12_A','2016_04_16_A','2017_03_04_A_6-7']
     print(cell_name)
 
     for file_type in ['z_correct.swc','morphology.swc'][0:1]:
         for SPINE_START in [20,60,10][0:1]:#SPINE_STARTs:
-            for resize_diam_by ,shrinkage_by in zip([1.0,1.1,1.2,1.0,1.5],[1.0,1.1,1.0,1.1,1.0]):
+            for resize_diam_by ,shrinkage_by in zip([1.0,1.1,1.0,1.5],[1.0,1.1,1.1,1.0]):
                 if cell_name!='2017_05_08_A_4-5' and resize_diam_by==1.5: continue
                 # if cell_name!='2017_05_08_A_4-5' and resize_diam_by==1.0 and shrinkage_by==1.1: continue
-
-                for double_spine_area in ['True','False']:
+                for double_spine_area in ['True','False'][1:]:
                     if cell_name!='2017_05_08_A_4-5' and double_spine_area=='True': continue
                     # for Ra_min in [5,100]:
                         # command="fit_influnce_by_initial_condition.py"
