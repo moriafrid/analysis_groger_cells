@@ -15,7 +15,7 @@ if len(sys.argv) != 4:
     print("sys.argv not running and with length",len(sys.argv))
     cells= read_from_pickle('cells_name2.p')
     file_type='.ASC'
-    with_plot=True
+    with_plot=False
 else:
     print("sys.argv is correct and running")
     cells = read_from_pickle(sys.argv[1])
@@ -180,6 +180,7 @@ if __name__=='__main__':
     dict2={}
     dict3,dict4={},{}
     name2save=''
+    cell_withou_xyz=[]
     for cell_name in cells:
         xyz,dend_part=[],[]
         if len(glob(folder_data+cell_name+'/*'+file_type))<1:continue
@@ -188,6 +189,10 @@ if __name__=='__main__':
             print('one syn dict:',dict)
             xyz.append(list(get_spine_xyz(cell_name,i)))
             dend_part.append(get_spine_part(cell_name,i))
+        if np.isnan(xyz[0][0]):
+            print(cell_name+' dont had xyz')
+            cell_withou_xyz.append(cell_name)
+            continue
         dict1,dict2=synaptic_loc(dir,xyz, part='all', save_place=folder_save+cell_name+'/synapses',with_plot=with_plot)
         dict3[cell_name]=dict1
         for key in dict2.keys():
@@ -195,3 +200,5 @@ if __name__=='__main__':
         print('more then one syn dict',cell_name,[xyz])
     try_save_dict(dict3,folder_save,'synaptic_location')
     try_save_dict(dict4,folder_save,'synaptic_location_seperate')
+    with open("cells_without_xyz.p", 'wb') as handle:
+        pickle.dump(cell_withou_xyz, handle, protocol=pickle.HIGHEST_PROTOCOL)
