@@ -7,7 +7,6 @@ from add_figure import add_figure
 import pickle
 from extra_function import load_ASC,load_hoc,load_swc,SIGSEGV_signal_arises,create_folder_dirr
 from extra_fit_func import find_injection,short_pulse_edges,read_tau_m
-import pandas as pd
 import sys
 from glob import glob
 import signal
@@ -15,7 +14,7 @@ import os
 from open_pickle import read_from_pickle
 do_calculate_F_factor=True
 if len(sys.argv) != 7:
-   cell_name= '2016_08_30_A'
+   cell_name= '2017_03_04_A_6-7'
    file_type='z_correct.swc'
    resize_diam_by=1.1
    shrinkage_factor=1.1
