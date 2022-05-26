@@ -181,8 +181,13 @@ if __name__=='__main__':
     hz=0.1
     tau_m={}
     all_data=[]
-    # ['2017_04_03_B','2016_05_12_A','2016_04_16_A','2017_03_04_A_6-7']
-    for cell_name in ['2016_04_16_A','2017_03_04_A_6-7']:#cells[10:]:
+    # ['2017_04_03_B','2016_05_12_A','2016_04_16_A','2017_03_04_A_6-7','2017_07_06_C_3-4']
+    #['2016_04_16_A','2017_03_04_A_6-7','2017_07_06_C_3-4'] - cells with problem to find tau
+    #'2016_04_16_A' is too short and too straigth
+    #'2017_03_04_A_6-7' had problems with the aligment
+    #'2017_07_06_C_3-4' not look good
+
+    for cell_name in ['2017_04_03_B','2016_05_12_A','2016_04_16_A','2017_03_04_A_6-7','2017_07_06_C_3-4'][-3:]:#cells[10:]:
         print(cell_name)
         dicty=calculate_tau_m(cell_name)
         # tau_m[cell_name]

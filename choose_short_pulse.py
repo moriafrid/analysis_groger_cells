@@ -22,11 +22,13 @@ fig, ax = plt.subplots(1, 1)
 timer = fig.canvas.new_timer(interval=3000)
 timer.add_callback(close_event)
 check='again'
-#['2017_04_03_B','2016_05_12_A','2016_04_16_A','2017_03_04_A_6-7','2017_07_06_C_3-4']
-for cell in ['2017_04_03_B','2016_05_12_A','2016_04_16_A','2017_03_04_A_6-7','2017_07_06_C_3-4']:#read_from_pickle('cells_name2.p')[:1]:#[ '2017_03_04_A_6-7(0)(0)','2017_05_08_A_5-4(0)(0)','2017_05_08_A_4-5(0)(0)']:
+#['2016_04_16_A','2017_03_04_A_6-7','2017_07_06_C_3-4']# cells with problems so I change the diarection to run on all the pulses
+for cell in ['2016_04_16_A','2017_07_06_C_3-4','2017_03_04_A_6-7']:#read_from_pickle('cells_name2.p')[:1]:#[ '2017_03_04_A_6-7(0)(0)','2017_05_08_A_5-4(0)(0)','2017_05_08_A_4-5(0)(0)']:
+
     base_dir="cells_outputs_data_short/"+cell+"/data/electrophysio_records/short_pulse/"
     print(cell)
     data=read_from_pickle(base_dir+"/clear0_short_pulse.p")
+    data=read_from_pickle(base_dir+"/short_pulse.p")
 
     dt = data[1][1]-data[1][0]
     npV=np.array(data[0])
@@ -58,7 +60,7 @@ for cell in ['2017_04_03_B','2016_05_12_A','2016_04_16_A','2017_03_04_A_6-7','20
             timer.add_callback(close_event)
             check='again'
 
-            while check=='again':
+            while check=='again' or check=='a':
 
                 add_figure(cell+'\ntrace_number '+str(int(i))+ ' out of '+str(len(npV)),'dots','mV')
                 for trace1 in npV:
@@ -75,7 +77,7 @@ for cell in ['2017_04_03_B','2016_05_12_A','2016_04_16_A','2017_03_04_A_6-7','20
 
                 plt.show()
 
-                check = input('is the trace good bad or ugly? (good=enter,bad=b or again)')
+                check = input('is the trace good bad or ugly? (good=enter,bad=b or again,a)')
                 pas = np.mean(trace[start_short_pulse+start_calculate_E_pas:start_short_pulse+end_calculate_E_pas])
 
             if check == '':
