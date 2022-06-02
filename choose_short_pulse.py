@@ -23,7 +23,8 @@ timer = fig.canvas.new_timer(interval=3000)
 timer.add_callback(close_event)
 check='again'
 #['2016_04_16_A','2017_03_04_A_6-7','2017_07_06_C_3-4']# cells with problems so I change the diarection to run on all the pulses
-for cell in ['2016_04_16_A','2017_07_06_C_3-4','2017_03_04_A_6-7']:#read_from_pickle('cells_name2.p')[:1]:#[ '2017_03_04_A_6-7(0)(0)','2017_05_08_A_5-4(0)(0)','2017_05_08_A_4-5(0)(0)']:
+#['2016_04_16_A','2017_07_06_C_3-4','2017_03_04_A_6-7']
+for cell in read_from_pickle('cells_run_tau_from_excel.p'):
 
     base_dir="cells_outputs_data_short/"+cell+"/data/electrophysio_records/short_pulse/"
     print(cell)
@@ -118,7 +119,7 @@ for cell in ['2016_04_16_A','2017_07_06_C_3-4','2017_03_04_A_6-7']:#read_from_pi
         plt.show()
         new_dict={}
         temp_dict=read_from_pickle(glob(base_dir+'mean0_short_pulse_with_parameters.p')[0])
-        new_dict['mean']=[np.mean(filterd_traces_first,axis=0),data[1]]
+        new_dict['mean']=[np.mean(filterd_traces_first,axis=0),data[1]]+temp_dict['E_pas']
         new_dict['E_pas']=temp_dict['E_pas']
         new_dict['points2calsulate_E_pas']=temp_dict['points2calsulate_E_pas']
         print(new_dict)
