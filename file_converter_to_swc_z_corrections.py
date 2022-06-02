@@ -110,7 +110,7 @@ for child in cell.soma[0].children():
     elif child in cell.apic:
         type=4
 
-    if cell_name=="2017_03_04_A_6-7(0)":
+    if "2017_03_04_A_6-7" in cell_name:
         if child==cell.dend[56]:
             type=2
         elif child==cell.axon[0]:
