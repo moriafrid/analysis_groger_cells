@@ -4,7 +4,7 @@ from read_passive_parameters_csv import get_passive_parameter
 import sys
 from open_pickle import read_from_pickle
 if len(sys.argv) != 2:
-    cells_name_place="cells_name.p"
+    cells_name_place="cells_name2.p"
     print("run_execute_level1.py not running with sys.argv",len(sys.argv))
 else:
     cells_name_place=sys.argv[1]
@@ -16,29 +16,29 @@ file_type2read=['z_correct.swc','morphology.swc']
 os.system('python csv_for_passive_val_results.py')
 i=0
     # os.system('python run_analysis_fit_after_run.py')
-for cell_name in cells:
+for cell_name in cells[0:1]:
     print(cell_name)
     all_data = []
     dict_fit_condition={}
     for fit_condition in ['const_param']:
         print(fit_condition)
 
-        for resize_diam_by ,shrinkage_by in zip([1.0,1.1,1.2,1.5],[1.0,1.1,1.0,1.0]):
+        for resize_diam_by ,shrinkage_by in zip([1.0,1.1,1.0,1.5],[1.0,1.1,1.1,1.0]):
             print('shrinkage_factor:',shrinkage_by,'reasize_dend_factor:',resize_diam_by)
             # if shrinkage_by!=1.0:continue
-            if resize_diam_by==1.0 and shrinkage_by==1.0:
+            if resize_diam_by==1.0 and shrinkage_by==1.0 and cell_name=='2017_05_08_A_4-5':
                 do_double_spine_area=['True','False']
             else:
                 do_double_spine_area=['False']
 
             for double_spine_area in do_double_spine_area:
-                if resize_diam_by==1.0 and shrinkage_by==1.0 and double_spine_area=='False':
+                if resize_diam_by==1.0 and shrinkage_by==1.0 and double_spine_area=='False' and cell_name=='2017_05_08_A_4-5':
                     file_types=['z_correct.swc','morphology.swc','ASC']
                 else:
                     file_types=['z_correct.swc']
 
                 for file_type in file_types:
-                    if resize_diam_by==1.0 and shrinkage_by==1.0 and double_spine_area=='False' and file_type=='z_correct.swc' and cell_name=='2017_05_08_A_4-5(0)(0)':
+                    if resize_diam_by==1.0 and shrinkage_by==1.0 and double_spine_area=='False' and file_type=='z_correct.swc' and cell_name=='2017_05_08_A_4-5':
                         SPINE_STARTs=[str(20),str(60)]
                     else:
                         SPINE_STARTs=[str(20)]
