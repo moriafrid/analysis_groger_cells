@@ -14,10 +14,10 @@ import os
 from open_pickle import read_from_pickle
 do_calculate_F_factor=True
 if len(sys.argv) != 7:
-   cell_name= '2017_03_04_A_6-7'
+   cell_name= '2017_07_06_C_3-4'
    file_type='z_correct.swc'
-   resize_diam_by=1.1
-   shrinkage_factor=1.1
+   resize_diam_by=1.0
+   shrinkage_factor=1.0
    SPINE_START=20
    double_spine_area=False
 
@@ -171,8 +171,8 @@ if __name__=='__main__':
     imp = h.Impedance(sec=soma)
     imp.loc(soma(0.5))
     RA=(list(np.arange(1,150,1))+list(np.arange(150, 302, 2)))[:]
-    if read_tau_m(cell_name)==[]:
-        os.system('calculate_tau_m.py')
+    if read_tau_m(cell_name)==None:
+        # os.system('calculate_tau_m.py')
         print('tau_m for cell',cell_name, ' needs to be calculate')
     tau_m=read_tau_m(cell_name)#25716 in cell4-5#ms*10^3=micro
     d=soma.diam
@@ -189,7 +189,8 @@ if __name__=='__main__':
         error_last=errors_Rinput(RM, ra, CM,E_PAS)
         error_next=error_last
         while error_next<=error_last:
-            RM+=20
+            # print(error_next)
+            RM+=50
             CM=tau_m/RM
             change_model_pas(CM=CM, RA = ra, RM = RM, E_PAS = E_PAS)
             imp.compute(0)
@@ -199,6 +200,26 @@ if __name__=='__main__':
             error_last=error_next
             error_next=errors_Rinput(RM, ra, CM,E_PAS)
         print(RM)
+        RM-=100
+        CM = tau_m / RM
+        change_model_pas(CM=CM, RA=ra, RM=RM, E_PAS=E_PAS)
+        imp.compute(0)
+        Rin = imp.input(0)
+        error_last = errors_Rinput(RM, ra, CM, E_PAS)
+        error_next = errors_Rinput(RM, ra, CM, E_PAS)
+        while error_next<=error_last:
+            # print(error_next)
+            RM+=20
+            CM=tau_m/RM
+            change_model_pas(CM=CM, RA = ra, RM = RM, E_PAS = E_PAS)
+            imp.compute(0)
+            Rin=imp.input(0)
+            # print('Rin='+str(round(rin,3)))
+            # RM=(Rin*pi)**2/4*d**3*ra
+            error_last=error_next
+            error_next=errors_Rinput(RM, ra, CM,E_PAS)
+
+
         RM-=35
         CM = tau_m / RM
         change_model_pas(CM=CM, RA=ra, RM=RM, E_PAS=E_PAS)
@@ -207,6 +228,7 @@ if __name__=='__main__':
         error_last = errors_Rinput(RM, ra, CM, E_PAS)
         error_next = errors_Rinput(RM, ra, CM, E_PAS)
         while error_next<=error_last:
+            # print(error_next)
             RM+=1
             CM=tau_m/RM
             change_model_pas(CM=CM, RA = ra, RM = RM, E_PAS = E_PAS)
