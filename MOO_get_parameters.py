@@ -53,7 +53,6 @@ if len(sys.argv) != 15:
     num_of_genarations = 2
     double_spine_area=True
     same_strengh=True
-
 else:
     print("the sys.argv len is correct",flush=True)
     cpu_node = int(sys.argv[1])
@@ -639,7 +638,7 @@ def run(cell, seed=0):
         pickle.dump(fig, open(base_save_folder + 'before_fit_transient_RDSM.p', 'wb'))
 
         plt.close()
-    final_pop, hall_of_fame, logs, hist = optimisation.run(max_ngen=num_of_genarations)
+    final_pop, hall_of_fame, logs, hist = optimisation.run(max_ngen=num_of_genarations, cp_filename=base_save_folder+'cp', continue_cp=True, cp_frequency=1)
 
     print(cell)
     print('hall of fame:')
