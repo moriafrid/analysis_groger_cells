@@ -13,13 +13,12 @@ else:
     print("creat csv for passive_val running with sys.argv",sys.argv)
 folder_=""
 folder_data="cells_initial_information/"
-folder_save="cells_outputs_short/"
+folder_save="cells_outputs_data_short/"
 cells=read_from_pickle(cells_name_place)
 file_type2read=['z_correct.swc','morphology.swc','hoc','ASC']
 resize_diam_by=1.0
 shrinkage_factor=1.0
-SPINE_STARTs=[str(20)]#[str(10),str(20),str(60)]
-i=0
+
 # os.system('python run_analysis_fit_after_run.py')
 
 for cell_name in cells:
@@ -29,7 +28,8 @@ for cell_name in cells:
     for fit_condition in ['const_param','different_initial_conditions'][:1]:
         # print(fit_condition)
         for file_type in ['z_correct.swc','morphology.swc','ASC']:
-            for shrinkage_factor,resize_diam_by in zip([1.0,1.1,1.0,1.0],[1.0,1.1,1.2,1.5]):
+
+            for resize_diam_by ,shrinkage_factor in zip([1.0,1.1,1.0,1.2,1.5],[1.0,1.1,1.1,1.0,1.0]):
                 for SPINE_START in [str(20),str(10),str(60)]:
                     for double_spine_area in ['True','False']:
                         passive_vals_dict= {}
@@ -44,7 +44,7 @@ for cell_name in cells:
                                 passive_val_total=read_from_pickle(glob(initial_folder+'/RA/analysis/RA_total_errors_minimums.p')[0])
                             elif fit_condition=='different_initial_conditions':
                                 passive_val_total=read_from_pickle(glob(initial_folder+'/RA_min'+str(5)+'/analysis/RA_total_errors_minimums.p')[0])
-                            # print('is founde ',initial_folder)
+                            print('is founde ',initial_folder)
                         except:
                             # print("there isn't have RA_total_errors_minimums in spine strart=" +SPINE_START+" "+initial_folder)
                             continue
