@@ -1,0 +1,19 @@
+fit_condition,file_type,parameter_type,spine_start,shrinkage&resize_factors,double_spine_area,RM,RA,CM,error
+const_param,z_correct.swc,RA=120,20,"[1.0, 1.0]",False,12990.0,120.0,1.0332337828166447,0.00020750705843397554
+const_param,z_correct.swc,RA=150,20,"[1.0, 1.0]",False,11719.0,150.0,1.145294550626181,0.00019286144365082691
+const_param,z_correct.swc,RA_min_error,20,"[1.0, 1.0]",False,21994.0,4.0,0.6102440137668552,6.169343500062041e-05
+const_param,z_correct.swc,min_CM,20,"[1.0, 1.0]",False,22327.0,1.0,0.6011424212293731,8.65833059151555e-05
+const_param,z_correct.swc,RA_best_fit,20,"[1.0, 1.0]",False,8249.0,300.0,1.6270707769169854,0.00027766333441547886
+const_param,z_correct.swc,mean_best_10,20,"[1.0, 1.0]",False,18623.1,40.1,0.7347987689806436,6.836342549263464e-05
+const_param,z_correct.swc,RA=120,20,"[1.1, 1.1]",False,16110.0,120.0,0.8331289161258978,0.0001108981232817996
+const_param,z_correct.swc,RA=150,20,"[1.1, 1.1]",False,14591.0,150.0,0.9198620271940383,0.0001784250719794045
+const_param,z_correct.swc,RA_min_error,20,"[1.1, 1.1]",False,22566.0,37.0,0.5947756287684222,5.256538534581523e-05
+const_param,z_correct.swc,min_CM,20,"[1.1, 1.1]",False,26565.0,1.0,0.5052402348499233,0.00012765648838808374
+const_param,z_correct.swc,RA_best_fit,20,"[1.1, 1.1]",False,10328.0,300.0,1.2995455885736071,0.00010960783079383418
+const_param,z_correct.swc,mean_best_10,20,"[1.1, 1.1]",False,20494.1,60.9,0.6624922856929871,5.797936674696302e-05
+const_param,z_correct.swc,RA=120,20,"[1.1, 1.0]",False,13687.0,120.0,0.9806171431861046,9.15143359634385e-05
+const_param,z_correct.swc,RA=150,20,"[1.1, 1.0]",False,12309.0,150.0,1.0903978258825424,0.00010253943132454424
+const_param,z_correct.swc,RA_min_error,20,"[1.1, 1.0]",False,23749.0,7.0,0.5651482941929434,5.4546457590731734e-05
+const_param,z_correct.swc,min_CM,20,"[1.1, 1.0]",False,24548.0,1.0,0.5467535782462202,0.0001498968121609323
+const_param,z_correct.swc,RA_best_fit,20,"[1.1, 1.0]",False,8626.0,300.0,1.5559595222337368,0.0002532306193927525
+const_param,z_correct.swc,mean_best_10,20,"[1.1, 1.0]",False,20044.9,42.4,0.6902319617053515,6.15001267505022e-05

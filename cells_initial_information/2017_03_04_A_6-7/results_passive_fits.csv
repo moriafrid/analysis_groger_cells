@@ -1,0 +1,19 @@
+fit_condition,file_type,parameter_type,spine_start,shrinkage&resize_factors,double_spine_area,RM,RA,CM,error
+const_param,z_correct.swc,RA=120,20,"[1.0, 1.0]",False,12464.0,120.0,1.5642641856283939,0.06835686446674111
+const_param,z_correct.swc,RA=150,20,"[1.0, 1.0]",False,12002.0,150.0,1.624478321085844,0.04672733111489448
+const_param,z_correct.swc,RA_min_error,20,"[1.0, 1.0]",False,11540.0,182.0,1.6895137616700433,0.03674773547076664
+const_param,z_correct.swc,min_CM,20,"[1.0, 1.0]",False,14670.0,1.0,1.3290380920022018,0.22437437599769383
+const_param,z_correct.swc,RA_best_fit,20,"[1.0, 1.0]",False,10059.0,300.0,1.9382631285090268,0.09468514330794886
+const_param,z_correct.swc,mean_best_10,20,"[1.0, 1.0]",False,11527.0,183.0,1.691500800504015,0.03714048650393379
+const_param,z_correct.swc,RA=120,20,"[1.1, 1.1]",False,14967.0,120.0,1.3026651172360728,0.07820080554389551
+const_param,z_correct.swc,RA=150,20,"[1.1, 1.1]",False,14456.0,150.0,1.3487125629269716,0.055619396206739176
+const_param,z_correct.swc,RA_min_error,20,"[1.1, 1.1]",False,13638.0,202.0,1.4296076264607933,0.036784696608618175
+const_param,z_correct.swc,min_CM,20,"[1.1, 1.1]",False,17369.0,1.0,1.1225164839468191,0.2245461877859574
+const_param,z_correct.swc,RA_best_fit,20,"[1.1, 1.1]",False,12287.0,300.0,1.5867981451674371,0.07726878190426573
+const_param,z_correct.swc,mean_best_10,20,"[1.1, 1.1]",False,13654.0,201.0,1.4279892579909923,0.03712739046665469
+const_param,z_correct.swc,RA=120,20,"[1.1, 1.0]",False,13526.0,120.0,1.4414452764802825,0.058979967607014426
+const_param,z_correct.swc,RA=150,20,"[1.1, 1.0]",False,12983.0,150.0,1.5017321735864053,0.04001401091284967
+const_param,z_correct.swc,RA_min_error,20,"[1.1, 1.0]",False,12708.0,166.0,1.5342295254699638,0.03675541645540352
+const_param,z_correct.swc,min_CM,20,"[1.1, 1.0]",False,16156.0,1.0,1.206795544050031,0.2242695517119129
+const_param,z_correct.swc,RA_best_fit,20,"[1.1, 1.0]",False,10963.0,282.0,1.7784355386000457,0.10071777534729508
+const_param,z_correct.swc,mean_best_10,20,"[1.1, 1.0]",False,12692.0,167.0,1.5362525831767897,0.03716747313761833

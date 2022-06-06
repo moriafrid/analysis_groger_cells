@@ -1,0 +1,19 @@
+fit_condition,file_type,parameter_type,spine_start,shrinkage&resize_factors,double_spine_area,RM,RA,CM,error
+const_param,z_correct.swc,RA=120,20,"[1.0, 1.0]",False,6884.0,120.0,3.155471436686395,0.06285534817011217
+const_param,z_correct.swc,RA=150,20,"[1.0, 1.0]",False,6640.0,150.0,3.271425507552582,0.08135471320681084
+const_param,z_correct.swc,RA_min_error,20,"[1.0, 1.0]",False,7386.0,69.0,2.9410053303749177,0.039647094429594645
+const_param,z_correct.swc,min_CM,20,"[1.0, 1.0]",False,8371.0,1.0,2.594942703398536,0.1372310926775938
+const_param,z_correct.swc,RA_best_fit,20,"[1.0, 1.0]",False,6408.0,182.0,3.389866630797307,0.10127442705220742
+const_param,z_correct.swc,mean_best_10,20,"[1.0, 1.0]",False,7415.1,66.5,2.9295213133326308,0.040004841376652375
+const_param,z_correct.swc,RA=120,20,"[1.1, 1.1]",False,8383.0,120.0,2.5912281247941245,0.0560307030400907
+const_param,z_correct.swc,RA=150,20,"[1.1, 1.1]",False,8102.0,150.0,2.6810991570166802,0.07245237598747782
+const_param,z_correct.swc,RA_min_error,20,"[1.1, 1.1]",False,8883.0,75.0,2.4453749150229815,0.03944104172008564
+const_param,z_correct.swc,min_CM,20,"[1.1, 1.1]",False,10066.0,1.0,2.157983843646845,0.13745963866476874
+const_param,z_correct.swc,RA_best_fit,20,"[1.1, 1.1]",False,7696.0,200.0,2.8225396790734334,0.10062205287256046
+const_param,z_correct.swc,mean_best_10,20,"[1.1, 1.1]",False,8890.0,74.5,2.4434895698967996,0.03981962963379927
+const_param,z_correct.swc,RA=120,20,"[1.1, 1.0]",False,7461.0,120.0,2.911441545389243,0.07013010062051257
+const_param,z_correct.swc,RA=150,20,"[1.1, 1.0]",False,7180.0,150.0,3.025385149045842,0.08994148645599605
+const_param,z_correct.swc,RA_min_error,20,"[1.1, 1.0]",False,8162.0,60.0,2.6613900232968812,0.03948906036413702
+const_param,z_correct.swc,min_CM,20,"[1.1, 1.0]",False,9206.0,1.0,2.359576946572794,0.13690081103061627
+const_param,z_correct.swc,RA_best_fit,20,"[1.1, 1.0]",False,7044.0,166.0,3.0837969009297477,0.10143077687005987
+const_param,z_correct.swc,mean_best_10,20,"[1.1, 1.0]",False,8140.7,61.6,2.6684244312259686,0.03991758126631707

@@ -1,0 +1,19 @@
+fit_condition,file_type,parameter_type,spine_start,shrinkage&resize_factors,double_spine_area,RM,RA,CM,error
+const_param,z_correct.swc,RA=120,20,"[1.0, 1.0]",False,6778.0,120.0,2.75359676174865,0.24989607043245257
+const_param,z_correct.swc,RA=150,20,"[1.0, 1.0]",False,6262.0,150.0,2.980498059906156,0.3070083135501827
+const_param,z_correct.swc,RA_min_error,20,"[1.0, 1.0]",False,8820.0,27.0,2.11608603754335,0.027946916557579488
+const_param,z_correct.swc,min_CM,20,"[1.0, 1.0]",False,9554.0,1.0,1.9535146379665425,0.11495356722811383
+const_param,z_correct.swc,RA_best_fit,20,"[1.0, 1.0]",False,8096.0,56.0,2.30532100433947,0.10148561970650861
+const_param,z_correct.swc,mean_best_10,20,"[1.0, 1.0]",False,8834.2,26.5,2.112843916995336,0.030031678377347486
+const_param,z_correct.swc,RA=120,20,"[1.1, 1.1]",False,8257.0,120.0,2.260370455508338,0.22511128710289968
+const_param,z_correct.swc,RA=150,20,"[1.1, 1.1]",False,7683.0,150.0,2.429243635446095,0.278542289606679
+const_param,z_correct.swc,RA_min_error,20,"[1.1, 1.1]",False,10430.0,29.0,1.7894418840970612,0.027901553143822366
+const_param,z_correct.swc,min_CM,20,"[1.1, 1.1]",False,11271.0,1.0,1.6559204020168883,0.11534537507580694
+const_param,z_correct.swc,RA_best_fit,20,"[1.1, 1.1]",False,9553.0,62.0,1.953719130234727,0.10068826167636244
+const_param,z_correct.swc,mean_best_10,20,"[1.1, 1.1]",False,10416.1,29.5,1.7919387622146616,0.029469820774339378
+const_param,z_correct.swc,RA=120,20,"[1.1, 1.0]",False,7269.0,120.0,2.5675992366394755,0.2710234603243383
+const_param,z_correct.swc,RA=150,20,"[1.1, 1.0]",False,6673.0,150.0,2.7969247491581517,0.33126149749691397
+const_param,z_correct.swc,RA_min_error,20,"[1.1, 1.0]",False,9763.0,24.0,1.9116950579875394,0.027834483576826673
+const_param,z_correct.swc,min_CM,20,"[1.1, 1.0]",False,10547.0,1.0,1.7695912440629893,0.11437957659093599
+const_param,z_correct.swc,RA_best_fit,20,"[1.1, 1.0]",False,8948.0,51.0,2.0858156963715184,0.10034904402116714
+const_param,z_correct.swc,mean_best_10,20,"[1.1, 1.0]",False,9747.7,24.5,1.9148672560051878,0.03024868912257377

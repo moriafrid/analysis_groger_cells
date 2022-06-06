@@ -1,0 +1,19 @@
+fit_condition,file_type,parameter_type,spine_start,shrinkage&resize_factors,double_spine_area,RM,RA,CM,error
+const_param,z_correct.swc,RA=120,20,"[1.0, 1.0]",False,5936.0,120.0,2.55661915534276,2.1982681061041043
+const_param,z_correct.swc,RA=150,20,"[1.0, 1.0]",False,5936.0,150.0,2.55661915534276,2.4331241557085974
+const_param,z_correct.swc,RA_min_error,20,"[1.0, 1.0]",False,5936.0,1.0,2.55661915534276,1.2307266323657378
+const_param,z_correct.swc,min_CM,20,"[1.0, 1.0]",False,5936.0,1.0,2.55661915534276,1.2307266323657378
+const_param,z_correct.swc,RA_best_fit,20,"[1.0, 1.0]",False,5936.0,1.0,2.55661915534276,1.2307266323657378
+const_param,z_correct.swc,mean_best_10,20,"[1.0, 1.0]",False,5936.0,5.5,2.5566191553427595,1.2681043992535659
+const_param,z_correct.swc,RA=120,20,"[1.1, 1.1]",False,5936.0,120.0,2.55661915534276,1.1435073920076808
+const_param,z_correct.swc,RA=150,20,"[1.1, 1.1]",False,5936.0,150.0,2.55661915534276,1.355072336321915
+const_param,z_correct.swc,RA_min_error,20,"[1.1, 1.1]",False,5936.0,1.0,2.55661915534276,0.2964474992408255
+const_param,z_correct.swc,min_CM,20,"[1.1, 1.1]",False,5936.0,1.0,2.55661915534276,0.2964474992408255
+const_param,z_correct.swc,RA_best_fit,20,"[1.1, 1.1]",False,5936.0,1.0,2.55661915534276,0.2964474992408255
+const_param,z_correct.swc,mean_best_10,20,"[1.1, 1.1]",False,5936.0,5.5,2.5566191553427595,0.32443793427092754
+const_param,z_correct.swc,RA=120,20,"[1.1, 1.0]",False,5936.0,120.0,2.55661915534276,1.7230639171019517
+const_param,z_correct.swc,RA=150,20,"[1.1, 1.0]",False,5936.0,150.0,2.55661915534276,1.9770613100145535
+const_param,z_correct.swc,RA_min_error,20,"[1.1, 1.0]",False,5936.0,1.0,2.55661915534276,0.6743795814796036
+const_param,z_correct.swc,min_CM,20,"[1.1, 1.0]",False,5936.0,1.0,2.55661915534276,0.6743795814796036
+const_param,z_correct.swc,RA_best_fit,20,"[1.1, 1.0]",False,5936.0,1.0,2.55661915534276,0.6743795814796036
+const_param,z_correct.swc,mean_best_10,20,"[1.1, 1.0]",False,5936.0,5.5,2.5566191553427595,0.7141791103509889

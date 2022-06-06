@@ -1,0 +1,19 @@
+fit_condition,file_type,parameter_type,spine_start,shrinkage&resize_factors,double_spine_area,RM,RA,CM,error
+const_param,z_correct.swc,RA=120,20,"[1.0, 1.0]",False,8432.0,120.0,2.2175269046363875,0.02621821093758527
+const_param,z_correct.swc,RA=150,20,"[1.0, 1.0]",False,8149.0,150.0,2.294537594783902,0.032620987166952636
+const_param,z_correct.swc,RA_min_error,20,"[1.0, 1.0]",False,8422.0,121.0,2.2201599216212324,0.026210223929925277
+const_param,z_correct.swc,min_CM,20,"[1.0, 1.0]",False,9854.0,1.0,1.8975225147040815,0.10643246118478708
+const_param,z_correct.swc,RA_best_fit,20,"[1.0, 1.0]",False,6963.0,300.0,2.6853636162421397,0.09697629639309925
+const_param,z_correct.swc,mean_best_10,20,"[1.0, 1.0]",False,8456.9,117.5,2.2110224902590696,0.026305511944527106
+const_param,z_correct.swc,RA=120,20,"[1.1, 1.1]",False,10153.0,120.0,1.8416415699688782,0.026452129285892696
+const_param,z_correct.swc,RA=150,20,"[1.1, 1.1]",False,9837.0,150.0,1.900801754589206,0.028273181547757473
+const_param,z_correct.swc,RA_min_error,20,"[1.1, 1.1]",False,10045.0,130.0,1.861442196106921,0.025825156251457496
+const_param,z_correct.swc,min_CM,20,"[1.1, 1.1]",False,11733.0,1.0,1.593640744898493,0.1065162102026955
+const_param,z_correct.swc,RA_best_fit,20,"[1.1, 1.1]",False,8508.0,300.0,2.1977182486946427,0.08472508923163276
+const_param,z_correct.swc,mean_best_10,20,"[1.1, 1.1]",False,10040.0,130.5,1.8623865136772282,0.025916479587763865
+const_param,z_correct.swc,RA=120,20,"[1.1, 1.0]",False,9172.0,120.0,2.0386160989853925,0.027504560244069765
+const_param,z_correct.swc,RA=150,20,"[1.1, 1.0]",False,8840.0,150.0,2.115179509037785,0.03794133690471674
+const_param,z_correct.swc,RA_min_error,20,"[1.1, 1.0]",False,9288.0,110.0,2.013155346672483,0.026185104470417785
+const_param,z_correct.swc,min_CM,20,"[1.1, 1.0]",False,10859.0,1.0,1.721906884602083,0.10624081357588477
+const_param,z_correct.swc,RA_best_fit,20,"[1.1, 1.0]",False,7607.0,282.0,2.45802377545603,0.10037007262535852
+const_param,z_correct.swc,mean_best_10,20,"[1.1, 1.0]",False,9306.2,108.5,2.00924536652517,0.026279075024204852

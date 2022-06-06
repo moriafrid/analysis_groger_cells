@@ -1,0 +1,19 @@
+fit_condition,file_type,parameter_type,spine_start,shrinkage&resize_factors,double_spine_area,RM,RA,CM,error
+const_param,z_correct.swc,RA=120,20,"[1.0, 1.0]",False,9961.0,120.0,2.3122294240537786,0.2406702376097675
+const_param,z_correct.swc,RA=150,20,"[1.0, 1.0]",False,9439.0,150.0,2.4401014189002743,0.3024911108205445
+const_param,z_correct.swc,RA_min_error,20,"[1.0, 1.0]",False,11701.0,41.0,1.9683887952311503,0.07098197503772713
+const_param,z_correct.swc,min_CM,20,"[1.0, 1.0]",False,12892.0,1.0,1.786543382950643,0.2207300702918896
+const_param,z_correct.swc,RA_best_fit,20,"[1.0, 1.0]",False,11196.0,61.0,2.057173748928161,0.10225362447915101
+const_param,z_correct.swc,mean_best_10,20,"[1.0, 1.0]",False,11715.2,40.5,1.9660871786442164,0.0720087114502557
+const_param,z_correct.swc,RA=120,20,"[1.1, 1.1]",False,11941.0,120.0,1.9288265047315711,0.21475547112052557
+const_param,z_correct.swc,RA=150,20,"[1.1, 1.1]",False,11360.0,150.0,2.0274751138203952,0.27288205121128895
+const_param,z_correct.swc,RA_min_error,20,"[1.1, 1.1]",False,13769.0,44.0,1.6727516372285345,0.0708844071525257
+const_param,z_correct.swc,min_CM,20,"[1.1, 1.1]",False,15134.0,1.0,1.5218790335007064,0.22116391676259284
+const_param,z_correct.swc,RA_best_fit,20,"[1.1, 1.1]",False,13150.0,67.0,1.7514918093535885,0.10139692833647686
+const_param,z_correct.swc,mean_best_10,20,"[1.1, 1.1]",False,13755.8,44.5,1.674415381235752,0.0717509753441891
+const_param,z_correct.swc,RA=120,20,"[1.1, 1.0]",False,10719.0,120.0,2.14871884438844,0.2655587147429872
+const_param,z_correct.swc,RA=150,20,"[1.1, 1.0]",False,10118.0,150.0,2.276350789978226,0.33191082165930286
+const_param,z_correct.swc,RA_min_error,20,"[1.1, 1.0]",False,12880.0,37.0,1.78820786436333,0.07100292926698765
+const_param,z_correct.swc,min_CM,20,"[1.1, 1.0]",False,14177.0,1.0,1.6246115040558433,0.21996128503344245
+const_param,z_correct.swc,RA_best_fit,20,"[1.1, 1.0]",False,12329.0,55.0,1.8681253380647003,0.10118840397085285
+const_param,z_correct.swc,mean_best_10,20,"[1.1, 1.0]",False,12864.9,37.5,1.790399279300766,0.07222913762391019
