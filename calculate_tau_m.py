@@ -187,7 +187,7 @@ if __name__=='__main__':
     #'2017_03_04_A_6-7' had problems with the aligment
     #'2017_07_06_C_3-4' not look good
 
-    for cell_name in ['2017_04_03_B','2016_05_12_A','2016_04_16_A','2017_03_04_A_6-7','2017_07_06_C_3-4'][-3:]:#cells[10:]:
+    for cell_name in read_from_pickle('cells_run_tau_from_excel.p'):#cells[10:]:
         print(cell_name)
         dicty=calculate_tau_m(cell_name)
         # tau_m[cell_name]
