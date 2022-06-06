@@ -17,7 +17,7 @@ if len(sys.argv) != 7:
    cell_name= '2017_07_06_C_3-4'
    file_type='z_correct.swc'
    resize_diam_by=1.0
-   shrinkage_factor=1.0
+   shrinkage_factor=1.1
    SPINE_START=20
    double_spine_area=False
 
