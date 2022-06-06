@@ -23,8 +23,7 @@ timer = fig.canvas.new_timer(interval=3000)
 timer.add_callback(close_event)
 check='again'
 #['2016_04_16_A','2017_03_04_A_6-7','2017_07_06_C_3-4']# cells with problems so I change the diarection to run on all the pulses
-#['2016_04_16_A','2017_07_06_C_3-4','2017_03_04_A_6-7']
-for cell in read_from_pickle('cells_run_tau_from_excel.p'):
+for cell in ['2016_04_16_A','2017_07_06_C_3-4','2017_03_04_A_6-7']:#read_from_pickle('cells_name2.p')[:1]:#[ '2017_03_04_A_6-7(0)(0)','2017_05_08_A_5-4(0)(0)','2017_05_08_A_4-5(0)(0)']:
 
     base_dir="cells_outputs_data_short/"+cell+"/data/electrophysio_records/short_pulse/"
     print(cell)
