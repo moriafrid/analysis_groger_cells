@@ -300,7 +300,7 @@ if __name__=='__main__':
     plt.plot(RA0,errors)
     RA0120= find_nearest(RA0,120)
     RA0150= find_nearest(RA0,150)
-    RA_min= RA0[minimums_arg[0]]
+    RA_min= minimums_arg[0]
     RA0_best_fit=find_nearest(errors[RA_min:],0.1)+RA_min
     for mini,name in zip([RA0120,RA0150,RA_min,RA0_best_fit],['RA=120', 'RA=150','Ra_min','RA0_best_fit']):
         plt.plot(RA0[mini], errors[mini], '*',label=name+' RM=' + str(round(RMs[mini], 2)) + ' RA=' + str(round(RAs[mini], 2)) + ' CM=' + str(
