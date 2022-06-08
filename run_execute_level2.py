@@ -55,6 +55,7 @@ for cell_name in cells:
                             if float(RA)<50:continue
                             print(name,RA,CM,RM)
                             command="sbatch execute_level2.sh"
+                            # command ="python dendogram.py"
                             send_command = " ".join([command,cell_name,file_type,fit_condition,name,str(resize_diam_by),str(shrinkage_by),str(SPINE_START),double_spine_area])
                             os.system(send_command)
                             print(cell_name+ ' .'+file_type+': execute level2.py, dendogram.py, Rin_Rm.py','attenuations.py')
