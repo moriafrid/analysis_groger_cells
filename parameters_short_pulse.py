@@ -15,3 +15,4 @@ end_not_very_clear=-5 #from end short_pulse
 start_calculate_E_pas=-700 # from start short_pulse
 end_calculate_E_pas=-10 # from start short_pulse
 
+decay_length=750
