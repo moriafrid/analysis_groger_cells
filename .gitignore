@@ -150,7 +150,7 @@ cells_initial_information/.~lock.Data2.xlsx#
 */*/.nfs000000017684af760000202c
 */.~lock.short_pulse_edges.csv#
 
-
+cells_initial_information/*/.taues.csv.swp
 
 #function
 correct_pickle_temp.py
