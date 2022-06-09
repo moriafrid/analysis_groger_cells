@@ -17,7 +17,6 @@ from open_pickle import read_from_pickle
 do_calculate_F_factor=True
 if len(sys.argv) != 7:
    cell_name= '2016_04_16_A'
-
    file_type='z_correct.swc'
    resize_diam_by=1.0
    shrinkage_factor=1.0
