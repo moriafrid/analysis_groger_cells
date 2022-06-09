@@ -11,13 +11,16 @@ import sys
 from glob import glob
 import signal
 import os
+from parameters_short_pulse import decay_length
+
 from open_pickle import read_from_pickle
 do_calculate_F_factor=True
 if len(sys.argv) != 7:
-   cell_name= '2017_07_06_C_3-4'
+   cell_name= '2016_04_16_A'
+
    file_type='z_correct.swc'
    resize_diam_by=1.0
-   shrinkage_factor=1.1
+   shrinkage_factor=1.0
    SPINE_START=20
    double_spine_area=False
 
@@ -72,8 +75,8 @@ def plot_res(RM, RA, CM, save_folder="data/fit/",save_name= "fit"):
     npVec = np.array(Vvec)
     fig=add_figure(cell_name+" fit "+save_folder.split('/')[-2]+"\nRM="+str(round(RM,1))+",RA="+str(round(RA,1))+",CM="+str(round(CM,2)),'mS','mV')
     plt.plot(T, V, color = 'black',alpha=0.3,label='data',lw=2)
-    plt.plot(T[start_fit:end_fit], V[start_fit:end_fit], color = 'b',alpha=0.3,label='fit decay')
-    plt.plot(T[max2fit-1200:max2fit], V[max2fit-1200:max2fit],color = 'yellow',label='fit maxV')
+    plt.plot(T[decay_start:decay_end], V[decay_start:decay_end], color = 'b',alpha=0.3,label='fit decay')
+    plt.plot(T[max2fit_start:max2fit_end], V[max2fit_start:max2fit_end],color = 'yellow',label='fit maxV')
     plt.plot(npTvec, npVec, color = 'r', linestyle ="--",alpha=0.3,label='NEURON simulation')
 
 
@@ -81,9 +84,9 @@ def plot_res(RM, RA, CM, save_folder="data/fit/",save_name= "fit"):
     npVec = npVec
     npVec = npVec[:len(exp_V)]
     error_1 = np.sqrt(np.sum(np.power(np.mean(exp_V[:start]) - np.mean(npVec[:start]), 2)))  # error from mean rest
-    error_2 = np.sqrt(np.sum(np.power(exp_V[start_fit:end_fit] - npVec[start_fit:end_fit], 2))/(end_fit-start_fit))  #  error for the decay
+    error_2 = np.sqrt(np.sum(np.power(exp_V[decay_start:decay_end] - npVec[decay_start:decay_end], 2))/(decay_end-decay_start))  #  error for the decay
     # error_2 = np.sqrt(np.sum(np.power(exp_V[start_fit:end_fit] - npVec[start_fit:end_fit], 2))) #/(end_fit-start_fit)  #  error for the decay
-    error_3 = np.sqrt(np.sum(np.power(np.mean(exp_V[max2fit-1200:max2fit]) - np.mean(npVec[max2fit-1200:max2fit]), 2)))  # error for maximal voltage
+    error_3 = np.sqrt(np.sum(np.power(np.mean(exp_V[max2fit_start:max2fit_end]) - np.mean(npVec[max2fit_start:max2fit_end]), 2)))  # error for maximal voltage
     error_tot = np.sqrt(np.sum(np.power(exp_V - npVec, 2))/len(exp_V)) # mean square error
 
     print('error_total=',round(error_tot,3))
@@ -112,7 +115,7 @@ def errors_Rinput(RM,RA,CM,E_PAS):
     exp_V = V
     npVec = npVec
     npVec = npVec[:len(exp_V)]
-    error_3 = np.sqrt(np.sum(np.power(np.mean(exp_V[max2fit-1200:max2fit]) - np.mean(npVec[max2fit-1200:max2fit]), 2)))  # error for maximal voltage
+    error_3 = np.sqrt(np.sum(np.power(np.mean(exp_V[max2fit_start:max2fit_end]) - np.mean(npVec[max2fit_start:max2fit_end]), 2)))  # error for maximal voltage
     # print('error_mean_max_voltage=', round(error_3,3))
     return error_3
 
@@ -156,9 +159,13 @@ if __name__=='__main__':
     E_PAS = short_pulse['E_pas']
     # start,end=find_injection(V, E_PAS,duration=int(200/hz))
     start,end,length=short_pulse_edges(cell_name)
-    start_fit= start-100
-    end_fit=end-1200
-    max2fit=end-10
+    decay_start= start
+    decay_end=start+decay_length
+    max2fit_start=start+decay_length
+    if cell_name=='2017_04_03_B':
+        max2fit_end=end-500
+    else:
+        max2fit_end=end-10
     clamp = h.IClamp(soma(0.5)) # insert clamp(constant potentientiol) at the soma's center
     clamp.amp = I/1000 #pA
     clamp.delay = T[start]#296
@@ -180,27 +187,35 @@ if __name__=='__main__':
     params_dict=[]
     precent_erors=[]
     ra_error_next=[]
-    Rins=read_from_pickle(glob('cells_outputs_data_short/*/data/electrophysio_records/*_IV/Rins.p')[0])
+    Rins=read_from_pickle(glob('cells_outputs_data_short/'+cell_name+'/data/electrophysio_records/*_IV/Rins.p')[0])
+    RM=6000
+    CM=tau_m/RM
+    ra=1
+    error_last=errors_Rinput(RM, 1, CM,E_PAS)
+    imp.compute(0)
+    Rin = imp.input(0)
+    # print('Rin='+str(round(Rin,3)),'error=',error_last)
+
+    if error_last>0.6:
+       RM=2000
+    error_next=error_last
     for ra in RA:
-        RM=6000
-        CM=tau_m/RM
-        imp.compute(0)
-        Rin = imp.input(0)
-        error_last=errors_Rinput(RM, ra, CM,E_PAS)
-        error_next=error_last
+        RM-=1000
         while error_next<=error_last:
             # print(error_next)
-            RM+=50
+            RM+=100
             CM=tau_m/RM
             change_model_pas(CM=CM, RA = ra, RM = RM, E_PAS = E_PAS)
             imp.compute(0)
             Rin=imp.input(0)
-            # print('Rin='+str(round(rin,3)))
+            # print('Rin='+str(round(Rin,3)),'error=',error_last)
             # RM=(Rin*pi)**2/4*d**3*ra
             error_last=error_next
             error_next=errors_Rinput(RM, ra, CM,E_PAS)
-        print(RM)
-        RM-=100
+
+        # print('Rin=',Rin,Rins)
+
+        RM-=300
         CM = tau_m / RM
         change_model_pas(CM=CM, RA=ra, RM=RM, E_PAS=E_PAS)
         imp.compute(0)
@@ -214,7 +229,7 @@ if __name__=='__main__':
             change_model_pas(CM=CM, RA = ra, RM = RM, E_PAS = E_PAS)
             imp.compute(0)
             Rin=imp.input(0)
-            # print('Rin='+str(round(rin,3)))
+            # print('Rin='+str(round(Rin,3)),'error=',error_last)
             # RM=(Rin*pi)**2/4*d**3*ra
             error_last=error_next
             error_next=errors_Rinput(RM, ra, CM,E_PAS)

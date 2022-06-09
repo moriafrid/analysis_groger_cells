@@ -49,12 +49,17 @@ def calculate_tau_m(cell_name):
     # T.rescale('ms')
     # T = np.arange(0, len(pulse), 1) #* 0.1
     np_pulse=np.array(pulse)
+    if cell_name=='2016_04_16_A':
+        np_pulse+=0.1
+        print('add the pulse 0.2mv')
     ln_pulse=np.log(np_pulse)
     plt.plot(pulse)
     plt.scatter(0,pulse[0])
     plt.scatter(np.arange(len(pulse))[np.where(pulse==0)],0)
     plt.plot(ln_pulse)
     plt.show()
+    if cell_name=='2016_04_16_A':
+        pulse+=0.1
     while again=="y":
         fig=add_figure(cell_name,'ms','ln(mV)')
         dot1=int(input("put the begining dot for the decay"))
@@ -187,7 +192,7 @@ if __name__=='__main__':
     #'2017_03_04_A_6-7' had problems with the aligment
     #'2017_07_06_C_3-4' not look good
 
-    for cell_name in read_from_pickle('cells_run_tau_from_excel.p'):#cells[10:]:
+    for cell_name in ['2016_04_16_A']:#read_from_pickle('cells_run_tau_from_excel.p'):#cells[10:]:
         print(cell_name)
         dicty=calculate_tau_m(cell_name)
         # tau_m[cell_name]
