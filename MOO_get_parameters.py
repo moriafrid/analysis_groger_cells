@@ -394,10 +394,10 @@ def run(cell, seed=0):
             locations=[NMDA_param_locs[i]]))
 
 
-        rec.append(ephys.recordings.CompRecording(
-            name='syn'+str(i)+'.v',
-            location=syn_locations[0],
-            variable='v'))
+        # rec.append(ephys.recordings.CompRecording(
+        #     name='syn'+str(i)+'.v',
+        #     location=syn_locations[0],
+        #     variable='v'))
             # reletive_strength = [get_parameter(cell_name,'PSD',spine_num=i)])) #[1, 0.1,0.01]))
 
     syn_params.append(NrnNetstimWeightParameter(
@@ -470,9 +470,9 @@ def run(cell, seed=0):
         locations=NMDA_param_locs))
 
     protocol = ephys.protocols.SweepProtocol('netstim_protocol', netstims + netstims_NMDA, [rec[-1]], cvode_active=False)
-    protocol_spine_head=[]
-    for i in range(len(synapses_locations)):
-        protocol_spine_head.append(ephys.protocols.SweepProtocol('netstim_protocol', netstims+ netstims_NMDA , [rec[i]], cvode_active=False))
+    protocol_spine_head=[ephys.protocols.SweepProtocol('netstim_protocol', netstims+ netstims_NMDA , rec, cvode_active=False)]
+    # for i in range(len(synapses_locations)):
+    #     protocol_spine_head.append(ephys.protocols.SweepProtocol('netstim_protocol', netstims+ netstims_NMDA , [rec[i]], cvode_active=False))
 
     ##################################################################################
 
