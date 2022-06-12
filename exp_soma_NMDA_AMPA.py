@@ -44,7 +44,7 @@ for curr_i, model_place in tqdm(enumerate(glob(folder_data+'*'))):
     model=None
     model=loader.get_model()
     RDSM_objective_file = folder_+'cells_initial_information/'+cell_name+"/mean_syn.p"
-    T_data,V_data=read_from_pickle(RDSM_objective_file)
+    V_data,T_data=read_from_pickle(RDSM_objective_file)
     T_with_units=T_data-T_data[0]
     T_with_units=T_with_units*1000
     T_base = np.array(T_with_units)
