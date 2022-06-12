@@ -32,7 +32,7 @@ for model_place in tqdm(glob(folder_data+'/*')):
 
     short_pulse_parameters_file=folder_+'cells_outputs_data_short/'+cell_name+'/data/electrophysio_records/short_pulse_parameters.p'
     RDSM_objective_file = folder_+'cells_initial_information/'+cell_name+"/mean_syn.p"
-    T_data,V_data=read_from_pickle(RDSM_objective_file)
+    V_data,T_data=read_from_pickle(RDSM_objective_file)
     E_PAS=read_from_pickle(short_pulse_parameters_file)['E_pas']
     T_with_units=T_data-T_data[0]
     T_with_units=T_with_units*1000
