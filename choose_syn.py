@@ -6,11 +6,7 @@ from add_figure import add_figure
 from scipy.signal import find_peaks
 import matplotlib
 from open_pickle import read_from_pickle
-from parameters_short_pulse import *
-from open_one_data import find_short_pulse_edges
-from extra_fit_func import short_pulse_edges
-from glob import glob
-
+from parameters_syn import *
 
 matplotlib.rcParams['pdf.fonttype'] = 42
 matplotlib.rcParams['svg.fonttype'] = 'none'
@@ -22,41 +18,55 @@ fig, ax = plt.subplots(1, 1)
 timer = fig.canvas.new_timer(interval=3000)
 timer.add_callback(close_event)
 check='again'
-#['2016_04_16_A','2017_03_04_A_6-7','2017_07_06_C_3-4']# cells with problems so I change the diarection to run on all the pulses
-#['2016_04_16_A','2017_07_06_C_3-4','2017_03_04_A_6-7']
-for cell in read_from_pickle('cells_name2.p')[3:]:#[ '2017_03_04_A_6-7(0)(0)','2017_05_08_A_5-4(0)(0)','2017_05_08_A_4-5(0)(0)']:
-    if cell in read_from_pickle('cells_old.p'):continue
+problematic_cells=['2017_04_03_B','2017_02_20_B','2016_08_30_A']
+for cell in read_from_pickle('cells_problematic_morphology.p')[:]:#[ '2017_03_04_A_6-7(0)(0)','2017_05_08_A_5-4(0)(0)','2017_05_08_A_4-5(0)(0)']:
+    # if cell in '2016_05_12_A':continue
+    # if cell!='2017_05_08_A_4-5':continue
+    # if cell in problematic_cells:continue
     base_dir="cells_outputs_data_short/"+cell+"/data/electrophysio_records/syn/"
+
     print(cell)
     data=read_from_pickle(base_dir+"/syn.p")
+    if cell in read_from_pickle('cells_name2.p')[:4] or cell in read_from_pickle('cells_name2.p')[7:9]:
+        data=read_from_pickle(base_dir+"/clear_syn.p")
+    if cell in read_from_pickle('cells_old.p'):
+
+        data=[]
+        data1=read_from_pickle("cells_initial_information/"+cell+"(0)/clear_syn.p")
+        data.append(data1[1])
+        data.append(data1[0])
 
 
     dt = data[1][1]-data[1][0]
     npV=np.array(data[0])
-
-    # syn_time2clear1=np.argmax(syn_mean)-100
-    # syn_time2clear2=np.argmax(syn_mean)+40
+    syn_mean=np.mean(npV,axis=0)
     rest=[]
     for i,v in enumerate(npV):
         spike_place,_=find_peaks(v,prominence=3)
         if len(spike_place)>0:
-            base_line = v[740:980].mean()
+            base_line = v[pas_start:pas_end].mean()
             for spike_peak in spike_place:
-                if spike_peak<940 :
+                if spike_peak<pas_end-40 :
                     npV[i][:spike_peak+400]=base_line
                     print('spike in trace '+str(i)+' is remove from place '+ str(spike_peak)+ ' to the begining')
                 else:
                     npV[i][spike_peak-20:]=base_line
                     print('spike in trace '+str(i)+' is remove from place '+ str(spike_peak)+ ' to the end')
-    syn_mean=np.mean(npV,axis=0)
-
-    # # start_short_pulse,end_short_pulse=find_short_pulse_edges(short_pulse_mean)
-    # start_short_pulse,end_short_pulse,length=short_pulse_edges(cell)
+        if np.max(v)>6:
+            print(i)
+            npV[i][:]=base_line
 
     timer = fig.canvas.new_timer(interval=10000)
     timer.add_callback(close_event)
+    tot_base=[]
     for v in npV:
-        plt.plot(v)
+        base_line = v[pas_start:pas_end].mean()
+        plt.plot(v-base_line)
+        tot_base.append(base_line)
+
+    len_E_pas=pas_end-pas_start
+    plt.plot(np.mean(npV,axis=0),'black',lw=2)
+    plt.plot(np.arange(pas_start,pas_end),np.mean(tot_base)*np.ones(len_E_pas),color="r",lw=1)
     plt.title(cell+' have '+str(len(npV))+' traces')
     plt.show()
     timer = fig.canvas.new_timer(interval=2000)
@@ -71,7 +81,7 @@ for cell in read_from_pickle('cells_name2.p')[3:]:#[ '2017_03_04_A_6-7(0)(0)','2
         correct_traces=[]
 
         for i,trace in enumerate(npV):
-            if i >2 : continue
+            # if i >2 : continue
             timer = fig.canvas.new_timer(interval=2000)
             timer.add_callback(close_event)
             check='again'
@@ -80,24 +90,23 @@ for cell in read_from_pickle('cells_name2.p')[3:]:#[ '2017_03_04_A_6-7(0)(0)','2
 
                 add_figure(cell+'\ntrace_number '+str(int(i))+ ' out of '+str(len(npV)),'dots','mV')
                 for trace1 in npV:
-                    base_line = trace1[start_short_pulse+start_calculate_E_pas:start_short_pulse+end_calculate_E_pas].mean()
+                    base_line = trace1[pas_start:pas_end].mean()
                     plt.plot(trace1-base_line,alpha=0.3, color="k")
                     # plt.plot(np.array(data[1]), trace1-base_line, color="k")
 
                 plt.plot(syn_mean,color='g')
-                base_line = trace[start_short_pulse+start_calculate_E_pas:start_short_pulse+end_calculate_E_pas].mean()
-                len_E_pas=(start_short_pulse+end_calculate_E_pas)-(start_short_pulse+start_calculate_E_pas)
-                plt.plot(np.arange(start_short_pulse+start_calculate_E_pas,start_short_pulse+end_calculate_E_pas),base_line*np.ones(len_E_pas),color="r")
-                plt.plot(trace-base_line, color="r")
+                base_line = trace[pas_start:pas_end].mean()
+                len_E_pas=pas_end-pas_start
+                plt.plot(np.arange(pas_start,pas_end),base_line*np.ones(len_E_pas),color="b",lw=1)
+                plt.plot(trace-base_line, color="r",lw=1)
                 timer.start()
 
                 plt.show()
 
                 check = input('is the trace good bad or ugly? (good=enter,bad=b or again,a)')
-                pas = np.mean(trace[start_short_pulse+start_calculate_E_pas:start_short_pulse+end_calculate_E_pas])
 
             if check == '':
-                filterd_traces_first.append(trace-pas)
+                filterd_traces_first.append(trace-base_line)
                 correct_traces.append(i)
 
             elif check=='end':
@@ -109,7 +118,7 @@ for cell in read_from_pickle('cells_name2.p')[3:]:#[ '2017_03_04_A_6-7(0)(0)','2
 
         try:(np.savetxt(base_dir+"/peeling.txt", "traces number is "+str(correct_traces)+"\n"+[data[1], np.mean(filterd_traces_first,axis=0).flatten()*data[0].units]))
         except:"txt not secsseed to save"
-        with open(base_dir+"clear_short_pulse.p", 'wb') as handle:
+        with open(base_dir+"clear_syn.p", 'wb') as handle:
             pickle.dump([filterd_traces_first,data[1]], handle, protocol=pickle.HIGHEST_PROTOCOL)
         with open(base_dir+"mean_syn.p", 'wb') as handle:
             pickle.dump([np.mean(filterd_traces_first,axis=0),data[1]], handle, protocol=pickle.HIGHEST_PROTOCOL)
@@ -120,10 +129,10 @@ for cell in read_from_pickle('cells_name2.p')[3:]:#[ '2017_03_04_A_6-7(0)(0)','2
         for v in filterd_traces_first:
             plt.plot(data[1],v,'black',alpha=0.1,lw=0.2)
 
-        plt.plot(data[1],np.mean(filterd_traces_first,axis=0),'black',lw=2,label='mean_short_pulse')
+        plt.plot(data[1],np.mean(filterd_traces_first,axis=0),'black',lw=2,label='mean_syn')
         plt.savefig(base_dir+"clear_syn_after_peeling.png")
         plt.savefig(base_dir+"clear_syn_after_peeling.pdf")
-        pickle.dump(fig, open(base_dir+'clear_short_pulse__after_peeling.p', 'wb'))
+        pickle.dump(fig, open(base_dir+'clear_syn_after_peeling.p', 'wb'))
         plt.close()
         plt.figure()
         plt.title(cell+' have '+str(len(filterd_traces_first))+'traces')
