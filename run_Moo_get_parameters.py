@@ -10,6 +10,7 @@ from read_spine_properties import get_n_spinese
 
 if len(sys.argv) != 3:
     cells_name_place="cells_name2.p"
+
     in_parallel=False
     print("run_Moo_get_parameters not running with sys.argv",len(sys.argv))
 else:
@@ -24,6 +25,7 @@ os.system('python csv_for_passive_val_results.py' 'cells_name2.p')
 
 # file_types=['z_correct.swc','morphology.swc','ASC']
 for cell_name in read_from_pickle(cells_name_place):
+    if cell_name in read_from_pickle('cells_problematic_morphology.p'):continue
     passive_vals_dict= {}
     # p='cells_initiall_information/'+cell_name+'/results_passive_fits.csv'
     p='cells_outputs_data_short/'+cell_name+'/fit_short_pulse/results_passive_fits.csv'
@@ -44,7 +46,8 @@ for cell_name in read_from_pickle(cells_name_place):
                         file_types=['z_correct.swc']
                     for file_type in file_types:
                         passive_vals_dict=get_passive_parameter(cell_name,double_spine_area=double_spine_area,shrinkage_resize=[shrinkage_by,resize_diam_by],fit_condition=fit_condition,spine_start=SPINE_START,file_type=file_type)
-                        for i, passive_val_name in enumerate(['RA=120','RA=150','RA_min_error','RA_best_fit']):
+                        for i, passive_val_name in enumerate(['RA_min_error','RA_best_fit','RA=120','RA=150',][:2]):
+
                             # if i!=2: continue
                             try: passive_vals_dict[passive_val_name]
                             except:
