@@ -6,15 +6,10 @@ import pickle
 from open_one_data import phenomena
 import os
 from add_figure import add_figure
-import quantities as pq
 from tqdm import tqdm
-from IV_curve import I_V_curve, sepereat_by_current, find_maxi
-from check_dynamics import check_dynamics
 from extra_function import create_folder_dirr, create_folders_list
 from read_spine_properties import get_parameter
-from open_pickle import read_from_pickle
 
-from spine_classes import channel2take
 
 def split2phenomena(cell_name,inputs_folder, outputs_folder):
 	"""
