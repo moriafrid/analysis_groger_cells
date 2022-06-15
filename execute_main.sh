@@ -21,6 +21,9 @@ if [[ $# -ne 3 ]] ; then
 fi
 
 cell_name=$1
+data_dir=$2
+save_dir=$3
+
 shift $#
 
 # `if [ -n $SLURM_JOB_ID ]` checks if $SLURM_JOB_ID is not an empty string
@@ -36,7 +39,7 @@ path=$(dirname $SCRIPT_PATH)
 
 # put your script here - example script is sitting with this bash script
 echo python3 $path/main_cell_data.py $cell_name
-python3 $path/main_cell_data.py $cell_name
+python3 $path/main_cell_data.py $cell_name $data_dir $save_dir
 
 echo python3 $path/file_converter_to_swc.py $cell_name
 python3 $path/file_converter_to_swc.py $cell_name
