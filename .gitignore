@@ -135,6 +135,7 @@ cells_outputs_data_short/
 cells_outputs_data/
 cells_outputs_data_3_initial_cells/
 cells_outputs_data_old_runs/
+cells_outputs_data_wrong_traces/
 drivesync/
 
 fit_short_pulse_temp/
