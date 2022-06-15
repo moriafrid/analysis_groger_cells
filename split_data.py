@@ -92,7 +92,7 @@ def split2phenomena(cell_name,inputs_folder, outputs_folder):
 			presnaptic_channel=eval('t'+str(int(get_parameter(cell_name,'channel2take_presynaptic')[0])))
 			postsynaptic_channel=eval('t'+str(int(get_parameter(cell_name,'channel2take_postsynaptic')[0])))
 			#here nedd to be choose what channel is the presynaptic channel and what is the post_synaptic channels
-			REST, short_pulse, T_short_pulse = phenomena(np.array(presnaptic_channel) * t_i.units,postsynaptic_channel, T, base_folder, x_units=T[0].units, Y_units=t_i.units)
+			REST, short_pulse, T_short_pulse = phenomena(np.array(postsynaptic_channel) * t_i.units,presnaptic_channel, T, base_folder, x_units=T[0].units, Y_units=t_i.units)
 		elif f.endswith("stable_conc.abf"):
 			print(f, 'correct one_data')
 			base_folder_unaligment = ''.join([outputs_folder,'/data/',  'electrophysio_records/',f.split('/')[-1],'/'])
@@ -102,7 +102,7 @@ def split2phenomena(cell_name,inputs_folder, outputs_folder):
 			presnaptic_channel=eval('t'+str(int(get_parameter(cell_name,'channel2take_presynaptic')[0])))
 			postsynaptic_channel=eval('t'+str(int(get_parameter(cell_name,'channel2take_postsynaptic')[0])))
 			#here need to be choose what channel is the presynaptic channel and what is the post_synaptic channels
-			try:REST, short_pulse, T_short_pulse = phenomena(np.array(presnaptic_channel) * t_i.units,postsynaptic_channel, T, base_folder_unaligment, x_units=T[0].units,Y_units=t_i.units)
+			try:REST, short_pulse, T_short_pulse = phenomena(np.array(postsynaptic_channel ) * t_i.units,presnaptic_channel, T, base_folder_unaligment, x_units=T[0].units,Y_units=t_i.units)
 			except:
 				pass
 		elif f.endswith("IV.abf"):  # moria: check name?
