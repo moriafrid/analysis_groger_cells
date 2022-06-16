@@ -160,6 +160,11 @@ def clear_phenomena(phenomena,phenomena_name,base,std_mean=3,std_max=6,bymax=Fal
 def phenomena(t1,t2,T,base,x_units='S',Y_units='mV'):
 	# this function get two channel and sperete them to the phnomenas : spike, syn, and short_plse
 	# its save them in the base folder and clear short pulse from the initial noises
+	if '2016_04_16_A' in base:
+		end_short_pulse_trace=1950
+	else:
+		end_short_pulse_trace=2000
+
 	spike_place,_=find_places(np.mean(t1,axis=0),two_peak=False)
 	spike_place2,short_pulse_place=find_places(np.mean(abs(t1),axis=0))
 	if not spike_place2 is None:
@@ -167,7 +172,7 @@ def phenomena(t1,t2,T,base,x_units='S',Y_units='mV'):
 			short_pulse_place=spike_place2
 
 
-	short_pulse_start_temp,short_pulse_end_temp=find_short_pulse_edges(np.mean(t1,axis=0)[short_pulse_place-4000:short_pulse_place+2000])
+	short_pulse_start_temp,short_pulse_end_temp=find_short_pulse_edges(np.mean(t1,axis=0)[short_pulse_place-4000:short_pulse_place+end_short_pulse_trace])
 
 
 	short_pulse_start_temp+=short_pulse_place-4000
@@ -175,14 +180,17 @@ def phenomena(t1,t2,T,base,x_units='S',Y_units='mV'):
 
 
 	syn_place,_= find_places(np.mean(t2,axis=0),two_peak=False)
+	if syn_place is None:
+		_,syn_place= find_places(np.mean(t2,axis=0),two_peak=False)
 
 	V,short_pulse,spike,syn,noise1,noise2,noise3,rest4list,mean_V =[], [], [],[], [],[],[],[],[]
 	syn0,short_pulse0,spike0=[],[],[]
+
 	for v in np.array(t1):
 		if short_pulse_end_temp>spike_place:
 			noise1_temp=(v[spike_place+1000:short_pulse_end_temp-2000])
 		else:
-			noise1_temp=(v[short_pulse_end_temp+2000:spike_place-1000])
+			noise1_temp=(v[short_pulse_end_temp+end_short_pulse_trace:spike_place-1000])
 		first_phen=min(syn_place,short_pulse_place,spike_place)
 		noise2_temp=(v[first_phen-1500:])
 		last_phen=max(syn_place,short_pulse_place,spike_place)
@@ -195,11 +203,11 @@ def phenomena(t1,t2,T,base,x_units='S',Y_units='mV'):
 		rest4list.append(initial_rest)
 
 		V.append(v-initial_rest)
-		short_pulse.append(v[short_pulse_start_temp-2000:short_pulse_end_temp+2000]-initial_rest)
+		short_pulse.append(v[short_pulse_start_temp-2000:short_pulse_end_temp+end_short_pulse_trace]-initial_rest)
 		if short_pulse_start_temp>spike_place:
 			noise1.append(v[spike_place+1000:short_pulse_start_temp-2000]-initial_rest)
 		else:
-			noise1.append(v[short_pulse_end_temp+2000:spike_place-1000]-initial_rest)
+			noise1.append(v[short_pulse_end_temp+end_short_pulse_trace:spike_place-1000]-initial_rest)
 		spike.append(v[spike_place-1000:spike_place+1000]-initial_rest)
 		syn.append(v[syn_place-1000:syn_place+1500]-initial_rest)
 		first_phen=min(syn_place,short_pulse_place,spike_place)
@@ -208,12 +216,12 @@ def phenomena(t1,t2,T,base,x_units='S',Y_units='mV'):
 		noise3.append(v[last_phen+1500:]-initial_rest)
 		mean_V.append(np.mean(v)-initial_rest)
 
-		short_pulse0.append(v[short_pulse_start_temp-2000:short_pulse_end_temp+2000])
+		short_pulse0.append(v[short_pulse_start_temp-2000:short_pulse_end_temp+end_short_pulse_trace])
 		spike0.append(v[spike_place-1000:spike_place+1000])
 		syn0.append(v[syn_place-1000:syn_place+1500])
 
 
-	T_short_pulse=T[0][short_pulse_start_temp-2000:short_pulse_end_temp+2000]
+	T_short_pulse=T[0][short_pulse_start_temp-2000:short_pulse_end_temp+end_short_pulse_trace]
 	T_spike=T[0][spike_place-1000:spike_place+1000]
 	T_syn=T[0][syn_place-1000:syn_place+1500]
 	T_V=T[0]
