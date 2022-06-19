@@ -39,7 +39,7 @@ for f in abf_files[:]:
 	I = [-200, -160, -120, -80, -40, -0, 40, 80, 120, 160]
 	# print(f,'correct IV_curve')
 	maxi = sepereat_by_current(np.array(t1) * t1.units, T, I, save_folder_IV_curve)
-	REST=read_from_pickle('cells_outputs_data_short/'+cell_name+'/data/electrophysio_records/short_pulse_parameters.p')['E_pas']
+	REST=read_from_pickle('cells_outputs_data_short/'+cell_name+'/data/electrophysio_records/short_pulse_parameters0.p')['E_pas']
 	short_pulse,T_short_pulse=read_from_pickle('cells_outputs_data_short/'+cell_name+'/data/electrophysio_records/short_pulse/mean_short_pulse.p')
 	maxi = np.append(maxi, find_maxi(np.array(short_pulse), save_folder_IV_curve)[0])
 	I.append(-50)

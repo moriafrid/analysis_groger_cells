@@ -141,6 +141,8 @@ drivesync/
 fit_short_pulse_temp/
 x86_64/
 cells_initial_information/.~lock.Data2.xlsx#
+*/.~lock.*
+
 /*/*.~lock.Data.xlsx#
 */.~lock.*.xlsx#
 */*.xlsx#

@@ -17,7 +17,7 @@ SPINE_START=20
 
 
 for cell_name in read_from_pickle(cells_name_place):
-    if cell_name!='2017_05_08_A_4-5':continue
+    # if cell_name!='2017_05_08_A_4-5':continue
     print(cell_name)
     for resize_diam_by ,shrinkage_by in zip([1.0,1.1,1.0,1.5],[1.0,1.1,1.1,1.0]):
         if cell_name!='2017_05_08_A_4-5' and resize_diam_by==1.5:continue
