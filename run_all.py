@@ -14,17 +14,21 @@ cells_name_place='cells_name2.p'
 commet_main=" ".join(["python run_execute_main.py", cells_name_place ])
 os.system(commet_main)
 
+commet_level1=" ".join(["python run_execute_level1.py", cells_name_place ])
+os.system(commet_level1)
+
 os.system('python choose_short_pulse.py')
 
 os.system('python check_short_pulse_edges.py')
 
 os.system('python calculate_tau_m.py')
 
-commet_level1=" ".join(["python run_execute_level1.py", cells_name_place ])
-os.system(commet_level1)
-
 commet_level1=" ".join(["python run_fits.py", cells_name_place ])
 os.system(commet_level1)
+
+commet_level1=" ".join(["python run_execute_level2.py", cells_name_place ])
+os.system(commet_level1)
+
 os.system('python choose_syn.py')
 
 
