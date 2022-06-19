@@ -29,9 +29,8 @@ for cell_name in read_from_pickle('cells_name2.p'):
     dict_for_records['cell_name']=cell_name
     dict_for_records.update(dicty)
     all_data.append(dict_for_records)
-    ## if i want to run again i need tore turn the next lines:
-    # output_df = pd.DataFrame.from_records(all_data)
-    # output_df.to_csv(folder_+"short_pulse_edges.csv", index=False)
+    output_df = pd.DataFrame.from_records(all_data)
+    output_df.to_csv(folder_+"short_pulse_edges.csv", index=False)
 
 
 
