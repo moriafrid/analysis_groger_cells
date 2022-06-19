@@ -22,7 +22,7 @@ print("the number of parameters that sys loaded in Rin_Rm_plot.py is ",len(sys.a
 print(len(sys.argv), sys.argv)
 if len(sys.argv) != 9:
     print("the function doesn't run with sys.argv",flush=True)
-    cell_name= '2017_05_08_A_5-4(0)(0)'
+    cell_name= '2017_05_08_A_5-4'
     file_type2read='z_correct.swc'
     fit_condition='const_param'
     passive_val={'RA':100.0,'CM':1.0,'RM':10000.0}
@@ -57,7 +57,7 @@ folder_save=folder_+save_dir+cell_name+"/data/cell_properties/"+file_type2read+'
 folder_save+="/dend*"+str(round(resize_diam_by,2))+'&F_shrinkage='+str(round(shrinkage_factor,2))
 folder_save+='/'+name+'/Rin_Rm/'
 create_folder_dirr(folder_save)
-parameters=read_from_pickle(folder_data+'/data/electrophysio_records/short_pulse_parameters.p')
+parameters=read_from_pickle(folder_data+'/data/electrophysio_records/short_pulse/mean_short_pulse_with_parameters.p')
 def change_model_pas(CM=1, RA = 250, RM = 20000.0, E_PAS = -70.0, F_factor ={}):
     #input the neuron property
     h.dt = 0.1

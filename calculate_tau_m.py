@@ -29,7 +29,7 @@ def calculate_tau_m(cell_name):
     #show the chooseing pulses
     read_from_pickle(glob(folder_+cell_name+'/data/electrophysio_records/short_pulse/clear_short_pulse__after_peeling.p')[0])
     plt.show()
-    short_pulse_path=glob(folder_+cell_name+'/data/electrophysio_records/short_pulse/mean_short_pulse.p')[0]
+    short_pulse_path=glob(folder_+cell_name+'/data/electrophysio_records/short_pulse/mean_short_pulse_with_parameters.p')[0]
     short_pulse_par=read_from_pickle(glob(folder_+cell_name+'/data/electrophysio_records/short_pulse_parameters0.p')[0])
     folder_save=folder_+cell_name+'/fit_short_pulse/tau_m_calculation/'
     create_folder_dirr(folder_save)

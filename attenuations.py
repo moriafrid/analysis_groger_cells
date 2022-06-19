@@ -27,7 +27,7 @@ print(len(sys.argv), sys.argv)
 do_resize_dend=True
 if len(sys.argv) != 10:
     print("the function doesn't run with sys.argv",flush=True)
-    cell_name= '2017_05_08_A_5-4(0)(0)'
+    cell_name= '2017_05_08_A_5-4'
     file_type='z_correct.swc'
     fit_condition='const_param'
     passive_val={'RA':100.0,'CM':1.0,'RM':10000.0}
@@ -323,7 +323,7 @@ if norm_Rin:
     imp.loc(0.5, sec=soma)
     imp.compute(freq)  # check if you need at 10 Hz
     Rin_soma_resize_dend = imp.input(0.5, sec=soma)
-E_PAS=read_from_pickle(folder_+save_dir+cell_name+'/data/electrophysio_records/short_pulse_parameters.p')['E_pas']
+E_PAS=read_from_pickle(folder_+save_dir+cell_name+'/data/electrophysio_records/short_pulse/mean_short_pulse_with_parameters.p')['E_pas']
 h.v_init=E_PAS
 h.dt = 0.1 #=hz
 h.steps_per_ms = h.dt

@@ -329,7 +329,7 @@ save_folder_M = folder_save+'/M_dendogram/'
 create_folders_list([save_folder_E,save_folder_M])
 
 
-E_PAS=read_from_pickle(folder_+save_dir+cell_name+'/data/electrophysio_records/short_pulse_parameters.p')['E_pas']
+E_PAS=read_from_pickle(folder_+save_dir+cell_name+'/data/electrophysio_records/short_pulse/mean_short_pulse_with_parameters.p')['E_pas']
 # for i in [1,2,3,5,8,9,10,11,12]:
 # path = "05_08_A_01062017_Splice_shrink_FINISHED_LABEL_Bluecell_spinec91.ASC"
 # syn_poses['05_08_A_01062017_Splice_shrink_FINISHED_LABEL_Bluecell_spinec91']=[(-5.56, -325.88, -451.42)]

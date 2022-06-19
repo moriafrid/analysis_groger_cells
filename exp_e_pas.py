@@ -87,7 +87,7 @@ for curr_i, model_place in tqdm(enumerate(glob(folder_data+'*'))):
         syn_objs.append(syn_obj)
         num+=1
     fig=add_figure('fit_transient_RDSM\n','time[ms]','Voltage[mV]')
-    short_pulse_parameters_file=folder_+'cells_outputs_data_short/'+cell_name+'/data/electrophysio_records/short_pulse_parameters.p'
+    short_pulse_parameters_file=folder_+'cells_outputs_data_short/'+cell_name+'/data/electrophysio_records/short_pulse/mean_short_pulse_with_parameters.p.p'
     RDSM_objective_file = folder_+'cells_initial_information/'+cell_name+"/mean_syn.p"
     E_PAS=read_from_pickle(short_pulse_parameters_file)['E_pas']
     T_data,V_data=read_from_pickle(RDSM_objective_file)
