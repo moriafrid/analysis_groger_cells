@@ -7,7 +7,7 @@ from open_pickle import read_from_pickle
 if __name__ == '__main__':
     print(len(sys.argv))
     if len(sys.argv) != 4:
-        cell_name= '2016_04_16_A' #'2017_03_04_A_6-7'
+        cell_name= '2017_04_03_B'#2017_07_06_C_3-4'#2016_05_12_A'#'2016_04_16_A'##'2017_03_04_A_6-7'
         data_dir= "cells_initial_information"
         save_dir = "cells_outputs_data_short"
         print('main dont run with sys.argv len is '+str(len(sys.argv)))
@@ -17,8 +17,8 @@ if __name__ == '__main__':
         data_dir=sys.argv[2]
         save_dir=sys.argv[3]
     folder_=""
-    # split2phenomena(cell_name,inputs_folder=os.path.join(folder_, data_dir, cell_name),
-    #             outputs_folder=os.path.join(folder_, save_dir, cell_name))
-    for cell_name in read_from_pickle('cells_name2.p'):
-        split2phenomena(cell_name,inputs_folder=os.path.join(folder_, data_dir, cell_name),
-                        outputs_folder=os.path.join(folder_, save_dir, cell_name))
+    split2phenomena(cell_name,inputs_folder=os.path.join(folder_, data_dir, cell_name),
+                outputs_folder=os.path.join(folder_, save_dir, cell_name))
+    # for cell_name in read_from_pickle('cells_name2.p'):
+    #     split2phenomena(cell_name,inputs_folder=os.path.join(folder_, data_dir, cell_name),
+    #                     outputs_folder=os.path.join(folder_, save_dir, cell_name))
