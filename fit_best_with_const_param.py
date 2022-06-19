@@ -16,7 +16,7 @@ from parameters_short_pulse import decay_length
 from open_pickle import read_from_pickle
 do_calculate_F_factor=True
 if len(sys.argv) != 7:
-   cell_name= '2017_04_03_B'
+   cell_name= '2016_04_16_A'
    file_type='z_correct.swc'
    resize_diam_by=1.0
    shrinkage_factor=1.0
@@ -187,7 +187,7 @@ if __name__=='__main__':
     params_dict=[]
     precent_erors=[]
     ra_error_next=[]
-    # Rins=read_from_pickle(glob('cells_outputs_data_short/'+cell_name+'/data/electrophysio_records/*_IV/Rins.p')[0])
+    Rins=read_from_pickle(glob('cells_outputs_data_short/'+cell_name+'/data/electrophysio_records/*_IV/Rins.p')[0])
     RM=6000
     CM=tau_m/RM
     ra=1
@@ -213,7 +213,7 @@ if __name__=='__main__':
             error_last=error_next
             error_next=errors_Rinput(RM, ra, CM,E_PAS)
 
-        # print('Rin=',Rin,Rins)
+        print('Rin=',Rin,Rins)
 
         RM-=300
         CM = tau_m / RM
@@ -253,7 +253,7 @@ if __name__=='__main__':
             # RM=(Rin*pi)**2/4*d**3*ra
             error_last=error_next
             error_next=errors_Rinput(RM, ra, CM,E_PAS)
-        # print('Rinput for Ra='+str(ra)+' is '+str(round(Rin,2))+'in compare to '+str(Rins))
+        print('Rinput for Ra='+str(ra)+' is '+str(round(Rin,2))+'in compare to '+str(Rins))
         ra_error2,precent_eror=plot_res(RM, ra, CM, save_folder=initial_folder, save_name="fit RA=" + str(round(ra, 2)))
         ra_error.append(ra_error2)
         precent_erors.append(precent_eror)
