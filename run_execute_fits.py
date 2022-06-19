@@ -3,11 +3,11 @@ import time
 import sys
 from open_pickle import read_from_pickle
 if len(sys.argv) != 2:
-    cells_name_place="cells_name2.p"
-    print("run_execute_level1.py not running with sys.argv",len(sys.argv))
+    cells_name_place="cells_correct_swc.p"
+    print("run_execute_fits.py not running with sys.argv",len(sys.argv))
 else:
     cells_name_place=sys.argv[1]
-    print("run_execute_level1.py running with sys.argv",sys.argv)
+    print("run_execute_fits.py running with sys.argv",sys.argv)
 
 # os.system(" ".join(['sbatch execute_python_script.sh', 'plot_neuron_3D.py',cells_name_place,'ASC']))
 print('plot_neuron_3D.py for all cells in ',cells_name_place,'with file type of','ASC') ##moria - not plot_neuron_3D working
