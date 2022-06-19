@@ -107,7 +107,7 @@ if __name__ == '__main__':
         #show short pulse
         show_directory(axs[place[i]], 'short_pulse clean',folder_+'/data/electrophysio_records/short_pulse/clear_short_pulse.png')
         show_directory(axs[place[i]], 'check dynamic',folder_+'/data/check_dynamic/check_dynamics.png')
-        read_from_pickle(folder_+'/data/electrophysio_records/short_pulse_parameters.p')
+        read_from_pickle(folder_+'/data/electrophysio_records/short_pulse_parameters0.p')
         #cells best result for passive parameters:
         #### show pussive_val_results
         show_directory(axs[place[i]], 'passive best fit '+passive_val_name,folder_+'/fit_short_pulse/morphology.swc_SPINE_START=20/dend*1.0&F_shrinkage=1.0/const_param/RA/fit '+passive_val_name+'.png')
