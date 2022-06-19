@@ -30,7 +30,7 @@ def calculate_tau_m(cell_name):
     read_from_pickle(glob(folder_+cell_name+'/data/electrophysio_records/short_pulse/clear_short_pulse__after_peeling.p')[0])
     plt.show()
     short_pulse_path=glob(folder_+cell_name+'/data/electrophysio_records/short_pulse/mean_short_pulse.p')[0]
-    short_pulse_par=read_from_pickle(glob(folder_+cell_name+'/data/electrophysio_records/short_pulse_parameters.p')[0])
+    short_pulse_par=read_from_pickle(glob(folder_+cell_name+'/data/electrophysio_records/short_pulse_parameters0.p')[0])
     folder_save=folder_+cell_name+'/fit_short_pulse/tau_m_calculation/'
     create_folder_dirr(folder_save)
 
@@ -50,7 +50,8 @@ def calculate_tau_m(cell_name):
     # T = np.arange(0, len(pulse), 1) #* 0.1
     np_pulse=np.array(pulse)
     if cell_name=='2016_04_16_A':
-        np_pulse+=0.1
+        pass
+        np_pulse+=0 #0.1
         print('add the pulse 0.2mv')
     ln_pulse=np.log(np_pulse)
     plt.plot(pulse)
@@ -59,7 +60,8 @@ def calculate_tau_m(cell_name):
     plt.plot(ln_pulse)
     plt.show()
     if cell_name=='2016_04_16_A':
-        pulse+=0.1
+        pass
+        pulse+=0 #0.1
     while again=="y":
         fig=add_figure(cell_name,'ms','ln(mV)')
         dot1=int(input("put the begining dot for the decay"))
@@ -192,7 +194,8 @@ if __name__=='__main__':
     #'2017_03_04_A_6-7' had problems with the aligment
     #'2017_07_06_C_3-4' not look good
 
-    for cell_name in ['2016_04_16_A']:#read_from_pickle('cells_run_tau_from_excel.p'):#cells[10:]:
+    for cell_name in read_from_pickle('cells_name2.p')[:]:#read_from_pickle('cells_run_tau_from_excel.p'):#cells[10:]:
+        if not cell_name in ['2016_04_16_A','2017_04_03_B','2017_02_20_B','2016_05_12_A'][0:2]:continue #problematic cells
         print(cell_name)
         dicty=calculate_tau_m(cell_name)
         # tau_m[cell_name]
@@ -211,7 +214,8 @@ if __name__=='__main__':
     all_data1=[]
     for cell_name in cells:
         print(cell_name)
-        path = glob(folder_data+cell_name+"/taues.csv")[0]
+        try:path = glob(folder_data+cell_name+"/taues.csv")[0]
+        except:continue
         dict_for_records1={}
         df=pd.read_csv(path)
         dicty1=df.to_dict('records')[0]
