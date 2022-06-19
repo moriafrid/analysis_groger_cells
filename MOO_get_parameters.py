@@ -1,6 +1,5 @@
 #!/ems/elsc-labs/segev-i/moria.fridman/anaconda3/envs/project/bin/python
 # from __future__ import print_function
-import binstar_client.utils
 import bluepyopt as bpopt
 import bluepyopt.ephys as ephys
 import pprint
@@ -39,13 +38,13 @@ print(sys.argv,flush=True)
 if len(sys.argv) != 15:
     print("the function doesn't run with sys.argv",len(sys.argv),flush=True)
     cpu_node = 1
-    cell_name= '2017_03_04_A_6-7'
+    cell_name= '2017_07_06_C_3-4'#'2017_07_06_C_3-4'
     file_type='z_correct.swc'  #file type is just used to calculate F_factor
     passive_val={'RA':float(120),'CM':1.6713,'RM':12075}
     passive_fit_condition='const_param'
     passive_val_name='test'
-    resize_dend_by=1.0
-    shrinkage_by=1.0
+    resize_dend_by=1.1
+    shrinkage_by=1.1
     SPINE_START=20
     profile = '_'
     RA=float(100)
@@ -95,8 +94,9 @@ base_save_folder=base2 + '/'+passive_fit_condition+'/'+passive_val_name+'/'
 print('base_save_folder:',base_save_folder)
 create_folder_dirr(base_save_folder)
 RDSM_objective_file = folder_+save_dir+cell_name+"/data/electrophysio_records/syn/mean_syn.p"
-RDSM_objective_file = folder_+data_dir+cell_name+"/mean_syn.p"
+RDSM_objective_file = data_dir+cell_name+"/mean_syn_split.p"
 short_pulse_parameters_file=folder_+save_dir+cell_name+'/data/electrophysio_records/short_pulse_parameters.p'
+short_pulse_parameters_file=data_dir+cell_name+'/mean_short_pulse_with_parameters.p'
 morphology_dirr =glob(folder_+data_dir+cell_name+'/*'+file_type)[0]
 # morphology_dirr =glob( folder_+data_dir+cell_name+'/*z_correct.swc')[0]
 
@@ -137,6 +137,8 @@ pp = pprint.PrettyPrinter(indent=2)
 #
 def create_spine(sim, icell, sec, seg, number=0, neck_diam=0.25, neck_length=1.35,
                  head_diam=0.944):  # np.sqrt(2.8/(4*np.pi))
+    if neck_diam == 0 or head_diam == 0:
+        return [sec, seg]
     neck = sim.neuron.h.Section(name="spineNeck" + str(number))
     head = sim.neuron.h.Section(name="spineHead" + str(number))
     # icell.add_sec(neck)#?# moria why add twice??
@@ -195,8 +197,10 @@ def add_morph(sim, icell, syns, spine_properties):#,spine_property=self.spine_pr
             sec = icell.apic[num]
         else:
             sec = list(icell.soma)[0]
-        all.append(create_spine(sim, icell, sec, syn[1], i, neck_diam=spine_properties[i]['NECK_DIAM'], neck_length=spine_properties[i]['NECK_LENGHT'],
-                            head_diam=spine_properties[i]['HEAD_DIAM']))
+        if spine_properties[i]['NECK_DIAM']>0 and spine_properties[i]['NECK_LENGHT']>0 and spine_properties[i]['HEAD_DIAM']>0:
+            all.append(create_spine(sim, icell, sec, syn[1], i, neck_diam=spine_properties[i]['NECK_DIAM'], neck_length=spine_properties[i]['NECK_LENGHT'],head_diam=spine_properties[i]['HEAD_DIAM']))
+        # else:
+        #     all.append(syns)
     return all
 
 
@@ -346,11 +350,18 @@ def run(cell, seed=0):
         seclist_name='somatic',
         sec_index=0,
         comp_x=0.5)
-    for i, syn in enumerate(synapses_locations):
-        syn_locations.append(ephys.locations.NrnSectionCompLocation(
+    for i, syn in enumerate(synapses_locations): # spine_properties
+        if spine_properties[0]['NECK_LENGHT'] == 0 or spine_properties[0]['HEAD_DIAM']==0 or spine_properties[0]['NECK_DIAM']==0:
+            syn_locations.append(ephys.locations.NrnSectionCompLocation(
             name='syn' + str(i),
-            sec_name="spineHead" + str(i),#@#??
-            comp_x=1)) #segx (0..1) of segment inside section
+            sec_name = syn[0],#@#??
+            comp_x = syn[1])) #segx (0..1) of segment inside section
+
+        else:
+            syn_locations.append(ephys.locations.NrnSectionCompLocation(
+                name='syn' + str(i),
+                sec_name="spineHead" + str(i),#@#??
+                comp_x=1)) #segx (0..1) of segment inside section
 
 
         # insert AMPA
