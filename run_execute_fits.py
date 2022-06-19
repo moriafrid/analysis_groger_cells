@@ -3,7 +3,7 @@ import time
 import sys
 from open_pickle import read_from_pickle
 if len(sys.argv) != 2:
-    cells_name_place="cells_correct_swc.p"
+    cells_name_place="cells2_name.p"
     print("run_execute_fits.py not running with sys.argv",len(sys.argv))
 else:
     cells_name_place=sys.argv[1]
