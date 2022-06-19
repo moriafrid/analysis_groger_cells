@@ -7,6 +7,7 @@ from scipy.signal import find_peaks
 import matplotlib
 from open_pickle import read_from_pickle
 from parameters_syn import *
+from add_figure import add_figure
 
 matplotlib.rcParams['pdf.fonttype'] = 42
 matplotlib.rcParams['svg.fonttype'] = 'none'
@@ -19,22 +20,22 @@ timer = fig.canvas.new_timer(interval=3000)
 timer.add_callback(close_event)
 check='again'
 problematic_cells=['2017_04_03_B','2017_02_20_B','2016_08_30_A']
-for cell in read_from_pickle('cells_problematic_morphology.p')[:]:#[ '2017_03_04_A_6-7(0)(0)','2017_05_08_A_5-4(0)(0)','2017_05_08_A_4-5(0)(0)']:
-    # if cell in '2016_05_12_A':continue
+for cell in read_from_pickle('cells_name2.p'):#[ '2017_03_04_A_6-7(0)(0)','2017_05_08_A_5-4(0)(0)','2017_05_08_A_4-5(0)(0)']:
+    if cell in '2016_05_12_A':continue
     # if cell!='2017_05_08_A_4-5':continue
     # if cell in problematic_cells:continue
     base_dir="cells_outputs_data_short/"+cell+"/data/electrophysio_records/syn/"
 
     print(cell)
     data=read_from_pickle(base_dir+"/syn.p")
-    if cell in read_from_pickle('cells_name2.p')[:4] or cell in read_from_pickle('cells_name2.p')[7:9]:
-        data=read_from_pickle(base_dir+"/clear_syn.p")
-    if cell in read_from_pickle('cells_old.p'):
-
-        data=[]
-        data1=read_from_pickle("cells_initial_information/"+cell+"(0)/clear_syn.p")
-        data.append(data1[1])
-        data.append(data1[0])
+    # if cell in read_from_pickle('cells_name2.p')[:4] or cell in read_from_pickle('cells_name2.p')[7:9]:
+    #     data=read_from_pickle(base_dir+"/clear_syn.p")
+    # if cell in read_from_pickle('cells_old.p'):
+    #
+    #     data=[]
+    #     data1=read_from_pickle("cells_initial_information/"+cell+"(0)/clear_syn.p")
+    #     data.append(data1[1])
+    #     data.append(data1[0])
 
 
     dt = data[1][1]-data[1][0]
@@ -119,12 +120,11 @@ for cell in read_from_pickle('cells_problematic_morphology.p')[:]:#[ '2017_03_04
         try:(np.savetxt(base_dir+"/peeling.txt", "traces number is "+str(correct_traces)+"\n"+[data[1], np.mean(filterd_traces_first,axis=0).flatten()*data[0].units]))
         except:"txt not secsseed to save"
         with open(base_dir+"clear_syn.p", 'wb') as handle:
-            pickle.dump([filterd_traces_first,data[1]], handle, protocol=pickle.HIGHEST_PROTOCOL)
+            pickle.dump([filterd_traces_first*data[0].units,data[1]], handle, protocol=pickle.HIGHEST_PROTOCOL)
         with open(base_dir+"mean_syn.p", 'wb') as handle:
-            pickle.dump([np.mean(filterd_traces_first,axis=0),data[1]], handle, protocol=pickle.HIGHEST_PROTOCOL)
+            pickle.dump([np.mean(filterd_traces_first,axis=0)*data[0].units,data[1]], handle, protocol=pickle.HIGHEST_PROTOCOL)
         with open(base_dir+"correct_syn_traces.p", 'wb') as handle:
             pickle.dump(correct_traces, handle, protocol=pickle.HIGHEST_PROTOCOL)
-        from add_figure import add_figure
         fig=add_figure('clear_syn','ms','mV')
         for v in filterd_traces_first:
             plt.plot(data[1],v,'black',alpha=0.1,lw=0.2)

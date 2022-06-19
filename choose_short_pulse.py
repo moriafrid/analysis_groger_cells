@@ -107,9 +107,9 @@ for cell in ['2017_04_03_B']:#read_from_pickle('cells_name2.p')[:]:#['2016_05_12
         try:(np.savetxt(base_dir+"/peeling.txt", "traces number is "+str(correct_traces)+"\n"+[data[1], np.mean(filterd_traces_first,axis=0).flatten()*data[0].units]))
         except:"txt not secsseed to save"
         with open(base_dir+"clear_short_pulse.p", 'wb') as handle:
-            pickle.dump([filterd_traces_first,data[1]], handle, protocol=pickle.HIGHEST_PROTOCOL)
+            pickle.dump([filterd_traces_first*data[0].units,data[1]], handle, protocol=pickle.HIGHEST_PROTOCOL)
         with open(base_dir+"mean_short_pulse.p", 'wb') as handle:
-            pickle.dump([np.mean(filterd_traces_first,axis=0),data[1]], handle, protocol=pickle.HIGHEST_PROTOCOL)
+            pickle.dump([np.mean(filterd_traces_first,axis=0)*data[0].units,data[1]], handle, protocol=pickle.HIGHEST_PROTOCOL)
         with open(base_dir+"correct_short_pulse_traces.p", 'wb') as handle:
             pickle.dump(correct_traces, handle, protocol=pickle.HIGHEST_PROTOCOL)
         from add_figure import add_figure
@@ -131,7 +131,7 @@ for cell in ['2017_04_03_B']:#read_from_pickle('cells_name2.p')[:]:#['2016_05_12
         plt.show()
         new_dict={}
         temp_dict=read_from_pickle(glob(base_dir+'mean0_short_pulse_with_parameters.p')[0])
-        new_dict['mean']=[np.mean(filterd_traces_first,axis=0)*data[0][0].units+temp_dict['E_pas'],data[1]]
+        new_dict['mean']=[np.mean(filterd_traces_first,axis=0)*data[0].units+temp_dict['E_pas'],data[1]]
         new_dict['E_pas']=temp_dict['E_pas']
         new_dict['points2calsulate_E_pas']=temp_dict['points2calsulate_E_pas']
         print(new_dict)
