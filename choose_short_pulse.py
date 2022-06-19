@@ -22,19 +22,31 @@ fig, ax = plt.subplots(1, 1)
 timer = fig.canvas.new_timer(interval=3000)
 timer.add_callback(close_event)
 check='again'
-#['2016_04_16_A','2017_03_04_A_6-7','2017_07_06_C_3-4']# cells with problems so I change the diarection to run on all the pulses
-#['2016_04_16_A','2017_07_06_C_3-4','2017_03_04_A_6-7']
-for cell in ['2016_04_16_A']:#read_from_pickle('cells_name2.p')[:1]:#[ '2017_03_04_A_6-7(0)(0)','2017_05_08_A_5-4(0)(0)','2017_05_08_A_4-5(0)(0)']:
+#['2016_04_16_A','2017_03_04_A_6-7','2017_07_06_C_3-4']# cells with problems so I change the diarection to run on all the pulses wrong postsynaptic measerments
+# run on full trace: #['2017_05_08_A_4-5,'2017_07_06_C_4-3','2017_02_20_B','2016_05_12_A, '2016_04_16_A','2017_03_04_A_6-7']
+#maybe run again ['2017_04_03_B
+# problem with check pro-post channels '2016_05_12_A' (split it) (and in sespicies '2017_07_06_C_4-3' (not split it))
 
+for cell in ['2017_04_03_B']:#read_from_pickle('cells_name2.p')[:]:#['2016_05_12_A','2016_04_16_A']:#
     base_dir="cells_outputs_data_short/"+cell+"/data/electrophysio_records/short_pulse/"
+    if cell in ['2017_05_08_A_4-5','2017_07_06_C_4-3','2017_02_20_B', '2016_04_16_A','2017_03_04_A_6-7','2017_04_03_B','2017_07_06_C_3-4']:
+        data=read_from_pickle(base_dir+"/short_pulse.p")
+    if cell in ['2017_04_03_B']:#['2017_02_20_B']:
+        data=read_from_pickle(base_dir+"/clear_short_pulse.p")
+    else:
+        data=read_from_pickle(base_dir+"/clear0_short_pulse.p")
+        continue
+    # data=read_from_pickle(base_dir+"/clear0_short_pulse.p")
+
     print(cell)
-    data=read_from_pickle(base_dir+"/clear0_short_pulse.p")
-    data=read_from_pickle(base_dir+"/short_pulse.p")
+
+    # data=read_from_pickle(base_dir+"/short_pulse.p")
 
     dt = data[1][1]-data[1][0]
     npV=np.array(data[0])
 
     short_pulse_mean=np.mean(npV,axis=0)
+
     # start_short_pulse,end_short_pulse=find_short_pulse_edges(short_pulse_mean)
     start_short_pulse,end_short_pulse,length=short_pulse_edges(cell)
 
@@ -119,7 +131,7 @@ for cell in ['2016_04_16_A']:#read_from_pickle('cells_name2.p')[:1]:#[ '2017_03_
         plt.show()
         new_dict={}
         temp_dict=read_from_pickle(glob(base_dir+'mean0_short_pulse_with_parameters.p')[0])
-        new_dict['mean']=[np.mean(filterd_traces_first,axis=0),data[1]]+temp_dict['E_pas']
+        new_dict['mean']=[np.mean(filterd_traces_first,axis=0)*data[0][0].units+temp_dict['E_pas'],data[1]]
         new_dict['E_pas']=temp_dict['E_pas']
         new_dict['points2calsulate_E_pas']=temp_dict['points2calsulate_E_pas']
         print(new_dict)
@@ -128,3 +140,15 @@ for cell in ['2016_04_16_A']:#read_from_pickle('cells_name2.p')[:1]:#[ '2017_03_
             pickle.dump(new_dict, handle, protocol=pickle.HIGHEST_PROTOCOL)
         run_again=input("run again? (y/enter)")
 
+unmV=read_from_pickle(glob('cells_outputs_data_old_runs/2017_05_08_A_5-4/data/electrophysio_records/syn/mean_syn.p')[0])[1].units
+uns=read_from_pickle(glob('cells_outputs_data_old_runs/2017_05_08_A_5-4/data/electrophysio_records/syn/mean_syn.p')[0])[0].units
+for path in glob('cells_outputs_data_short/*/data/electrophysio_records/short_pulse/mean_short_pulse_with_parameters.p'):
+    cell=path.split('/')[1]
+    data=read_from_pickle(path)
+    data1={}
+    data1['mean']=[data['mean'][0]*unmV,data['mean'][1]*uns]
+    data1['E_pas']=data['E_pas']
+    data1['points2calsulate_E_pas']=data['points2calsulate_E_pas']
+
+    with open(base_dir+'mean_short_pulse_with_parameters.p', 'wb') as handle:
+        pickle.dump(data1, handle, protocol=pickle.HIGHEST_PROTOCOL)
