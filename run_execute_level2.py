@@ -13,7 +13,7 @@ cells=read_from_pickle(cells_name_place)
 file_type2read=['z_correct.swc','morphology.swc']
 # SPINE_START=str(20)
 
-os.system('python csv_for_passive_val_results.py' 'cells_name2.p')
+os.system('python csv_for_passive_val_results.py cells_name2.p')
 i=0
     # os.system('python run_analysis_fit_after_run.py')
 for cell_name in cells:
