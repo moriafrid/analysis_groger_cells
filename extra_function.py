@@ -64,6 +64,7 @@ class Cell:
         self.insert_sec=[]
 
 def load_ASC(ASC_dir,delete_axon=True):
+    if '2017_07_06_C_4-3' in ASC_dir or '2017_07_06_C_3-4' in ASC_dir: delete_axon=True
     h.load_file("import3d.hoc")
     h.load_file("nrngui.hoc")
     h.load_file('stdlib.hoc')
@@ -125,6 +126,7 @@ class hoc_cell:
         self.insert_sec=[]
 
 def load_hoc(hoc_dir,delete_axon=True):
+    if '2017_07_06_C_4-3' in hoc_dir or  '2017_07_06_C_3-4' in hoc_dir: delete_axon=True
     cell=hoc_cell(hoc_dir)
     if delete_axon:
         cell.delete_axon()
@@ -161,10 +163,15 @@ def instantiate_swc(filename):
 class swc_cell:
     def __init__(self, swc_dir):
         self.cell=instantiate_swc(swc_dir)
-        self.dend = list(self.cell.dend)
+
         self.soma = self.cell.soma[0]
         if len(self.cell.axon)>1:
             self.axon = list(self.cell.axon)
+            if  '2016_04_16_A' in swc_dir:
+                self.axon.append(self.cell.dend[0])
+        self.dend = list(self.cell.dend)
+        if '2016_04_16_A' in swc_dir:
+            self.dend.remove(self.cell.dend[0])
         else:
             print('no axon in this cell')
             self.axon=[]
@@ -195,9 +202,12 @@ class swc_cell:
         self.axon =[]
         self.insert_sec=[]
 def load_swc(swc_dir,delete_axon=True):
+    if '2017_07_06_C_4-3' in swc_dir or '2017_07_06_C_3-4' in swc_dir: delete_axon=True
     cell=swc_cell(swc_dir)
     if delete_axon:
         cell.delete_axon()
+        # if '2016_04_16_A' in swc_dir:
+        #     cell.dend[0].delete
     return cell
 
 if __name__=='__main__':
