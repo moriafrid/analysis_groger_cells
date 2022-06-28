@@ -20,16 +20,16 @@ timer = fig.canvas.new_timer(interval=3000)
 timer.add_callback(close_event)
 check='again'
 problematic_cells=['2017_04_03_B','2017_02_20_B','2016_08_30_A']
-for cell in read_from_pickle('cells_name2.p'):#[ '2017_03_04_A_6-7(0)(0)','2017_05_08_A_5-4(0)(0)','2017_05_08_A_4-5(0)(0)']:
-    if cell in '2016_05_12_A':continue
+for cell in read_from_pickle('cells_name2.p'):
+    if cell != '2016_05_12_A':continue
     # if cell!='2017_05_08_A_4-5':continue
     # if cell in problematic_cells:continue
     base_dir="cells_outputs_data_short/"+cell+"/data/electrophysio_records/syn/"
 
     print(cell)
     data=read_from_pickle(base_dir+"/syn.p")
-    # if cell in read_from_pickle('cells_name2.p')[:4] or cell in read_from_pickle('cells_name2.p')[7:9]:
-    #     data=read_from_pickle(base_dir+"/clear_syn.p")
+    # if cell in ['2017_07_06_C_3-4','2017_04_03_B']:
+    data=read_from_pickle(base_dir+"/clear_syn0.p")
     # if cell in read_from_pickle('cells_old.p'):
     #
     #     data=[]
