@@ -1,5 +1,4 @@
 import os
-import time
 import sys
 from open_pickle import read_from_pickle
 if len(sys.argv) != 2:
