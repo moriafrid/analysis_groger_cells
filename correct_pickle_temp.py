@@ -12,15 +12,20 @@ path2=glob('cells_initial_information/*/mean_short_pulse_with_parameters.p')
 path3=glob('cells_outputs_data_old_runs/*/data/electrophysio_records/short_pulse/short_pulse.p')
 for path in path2:
     cell_name=path.split('/')[1]
-    path3=glob('cells_outputs_data_short/'+cell_name+'/data/electrophysio_records/short_pulse/short_pulse.p')[0]
+    if cell_name!='2016_05_12_A':continue
+    path3=glob('cells_outputs_data_short/'+cell_name+'/data/electrophysio_records/syn/clear_syn0.p')[0]
     time=read_from_pickle(path3)[1]
-    data=read_from_pickle(path)
-    data1={}
-    data1['mean']=[data['mean'][0][:len(time)]*unmV,time]
-    data1['E_pas']=data['E_pas']
-    data1['points2calsulate_E_pas']=data['points2calsulate_E_pas']
-    print(len(data1['mean'][0]),len(data1['mean'][1]))
-    with open('cells_initial_information/'+cell_name+'/mean_short_pulse_with_parameters.p', 'wb') as handle:
+    data=read_from_pickle(path3)
+    data1=[]
+    data1.append(data[0]*unmV)
+    data1.append(data[1])
+    # data1={}
+    # data1['mean']=[data['mean'][0][:len(time)]*unmV,time]
+    # data1['E_pas']=data['E_pas']
+    # data1['points2calsulate_E_pas']=data['points2calsulate_E_pas']
+    # print(len(data1['mean'][0]),len(data1['mean'][1]))
+    print(data1)
+    with open('cells_initial_information/'+cell_name+'/clear_syn0.p', 'wb') as handle:
         pickle.dump(data1, handle, protocol=pickle.HIGHEST_PROTOCOL)
 
     #
