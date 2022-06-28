@@ -11,8 +11,6 @@ from open_pickle import read_from_pickle
 from calculate_F_factor import calculate_F_factor
 import sys
 from read_spine_properties import *
-from bluepyopt.ephys.parameters import NrnParameter, NrnRangeParameter
-from bluepyopt.ephys.parameterscalers import *
 import logging
 import signal
 from extra_function import SIGSEGV_signal_arises, load_hoc,load_ASC,load_swc,create_folder_dirr
@@ -35,7 +33,7 @@ runnum2compare = '13'
 # spine_type="mouse_spine" #"groger_spine"
 
 print(sys.argv,flush=True)
-if len(sys.argv) != 15:
+if len(sys.argv) != 16:
     print("the function doesn't run with sys.argv",len(sys.argv),flush=True)
     cpu_node = 1
     cell_name= '2017_07_06_C_3-4'#'2017_07_06_C_3-4'
@@ -52,6 +50,7 @@ if len(sys.argv) != 15:
     num_of_genarations = 2
     double_spine_area=True
     same_strengh=True
+    fit_until_point=-1
 else:
     print("the sys.argv len is correct",flush=True)
     cpu_node = int(sys.argv[1])
@@ -64,8 +63,9 @@ else:
     shrinkage_by =float(sys.argv[10]) #how much srinkage the cell get between electrophysiology record and LM
     SPINE_START=int(sys.argv[11])
     double_spine_area=eval(sys.argv[12])
-    same_strengh=eval(sys.argv[13])
-    profile = sys.argv[14]
+    fit_until_point=int(sys.argv[13])
+    same_strengh=eval(sys.argv[14])
+    profile = sys.argv[15]
     RA=float(sys.argv[4])
     generation_size = 100
     num_of_genarations = 1000
@@ -82,19 +82,22 @@ folder_=''
 data_dir= "cells_initial_information/"
 save_dir = "cells_outputs_data_short/"
 if same_strengh:
-    base2 = folder_+save_dir+cell_name+'/MOO_results_syn_par_corrrection_correction_same_strange/'+file_type+'_SPINE_START='+str(SPINE_START)+'/'  # folder name  _RA_free
+    base2 = folder_+save_dir+cell_name+'/MOO_results_syn_par_same_strange/'+file_type+'_SPINE_START='+str(SPINE_START)+'/'  # folder name  _RA_free
 else:
-    base2 = folder_+save_dir+cell_name+'/MOO_results_syn_par_corrrection_relative_strange/'+file_type+'_SPINE_START='+str(SPINE_START)+'/'  # folder name  _RA_free
+    base2 = folder_+save_dir+cell_name+'/MOO_results_syn_par_relative_strange/'+file_type+'_SPINE_START='+str(SPINE_START)+'/'  # folder name  _RA_free
 
 base2+='F_shrinkage='+str(round(shrinkage_by,2))+'_dend*'+str(round(resize_dend_by,2))
 if double_spine_area:
     base2+='_double_spine_area'
-base_save_folder=base2 + '/'+passive_fit_condition+'/'+passive_val_name+'/'
+if fit_until_point==-1:
+    base_save_folder=base2 + '/'+passive_fit_condition+'/'+passive_val_name+'_full_trace/'
+else:
+    base_save_folder=base2 + '/'+passive_fit_condition+'/'+passive_val_name+'/'
 
 print('base_save_folder:',base_save_folder)
 create_folder_dirr(base_save_folder)
-RDSM_objective_file = folder_+save_dir+cell_name+"/data/electrophysio_records/syn/mean_syn.p"
-RDSM_objective_file = data_dir+cell_name+"/mean_syn_split.p"
+RDSM_objective_file = folder_+save_dir+cell_name+"/data/electrophysio_records/syn/mean_syn0.p"
+# RDSM_objective_file = data_dir+cell_name+"/mean_syn_split.p"
 short_pulse_parameters_file=folder_+save_dir+cell_name+'/data/electrophysio_records/short_pulse_parameters.p'
 short_pulse_parameters_file=data_dir+cell_name+'/mean_short_pulse_with_parameters.p'
 morphology_dirr =glob(folder_+data_dir+cell_name+'/*'+file_type)[0]
@@ -231,8 +234,8 @@ def run(cell, seed=0):
     T_with_units=T_with_units-T_with_units[0]
     T_with_units=T_with_units.rescale('ms')
     V_with_units=M[0]
-    T_base = np.array(T_with_units)
-    V_base = np.array(V_with_units)
+    T_base = np.array(T_with_units)[:fit_until_point]
+    V_base = np.array(V_with_units)[:fit_until_point]
     # syn_place=np.argmax(np.array(V_base))
 
     dt =T_with_units.units
@@ -315,7 +318,7 @@ def run(cell, seed=0):
                                                       shrinckage_factor=shrinkage_by)#the shrinkage factor is unused in that function
     parameters_list.append(
         ephys.parameters.NrnSectionParameter(name="Ra", param_name="Ra", value=passive_val["RA"],
-                                             bounds=[60, 350], locations=sec_list, frozen=RA_FROZEN)) #@# in the paper they said bound of 70-100 ohm*cm
+                                             bounds=[50, 350], locations=sec_list, frozen=RA_FROZEN)) #@# in the paper they said bound of 70-100 ohm*cm
     parameters_list.append(
         ephys.parameters.NrnSectionParameter(name="g_pas", param_name="g_pas", value=1.0 / passive_val["RM"],
                                              locations=sec_list, frozen=True, value_scaler=F_FACTOR_DISTANCE))
