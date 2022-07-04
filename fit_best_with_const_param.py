@@ -78,6 +78,7 @@ def plot_res(RM, RA, CM, save_folder="data/fit/",save_name= "fit"):
     plt.plot(T[decay_start:decay_end], V[decay_start:decay_end], color = 'b',alpha=0.3,label='fit decay')
     plt.plot(T[max2fit_start:max2fit_end], V[max2fit_start:max2fit_end],color = 'yellow',label='fit maxV')
     plt.plot(npTvec, npVec, color = 'r', linestyle ="--",alpha=0.3,label='NEURON simulation')
+    # plt.show()
 
 
     exp_V = V

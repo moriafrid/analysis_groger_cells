@@ -2,7 +2,7 @@ import os
 import sys
 from open_pickle import read_from_pickle
 if len(sys.argv) != 2:
-    cells_name_place="cells2_name.p"
+    cells_name_place="cells_name2.p"
     print("run_execute_fits.py not running with sys.argv",len(sys.argv))
 else:
     cells_name_place=sys.argv[1]
@@ -16,7 +16,7 @@ SPINE_START=20
 
 
 for cell_name in read_from_pickle(cells_name_place):
-    # if cell_name!='2017_05_08_A_4-5':continue
+    if cell_name!='2016_04_16_A':continue
     print(cell_name)
     for resize_diam_by ,shrinkage_by in zip([1.0,1.1,1.0,1.5],[1.0,1.1,1.1,1.0]):
         if cell_name!='2017_05_08_A_4-5' and resize_diam_by==1.5:continue
@@ -39,7 +39,7 @@ for cell_name in read_from_pickle(cells_name_place):
                     # print(cell_name+ ' .'+file_type+': fit_influance_by_initial_condition.py with ra_min='+str(Ra_min))
                 command2="sbatch execute_fit_const.sh"
                 command2="sbatch execute_python_script.sh fit_best_with_const_param.py"
-
+                command2= "python fit_best_with_const_param.py"
                 # command2="python fit_best_with_const_param.py"
                 send_command = " ".join([command2, cell_name,file_type,str(resize_diam_by),str(shrinkage_by),str(SPINE_START),double_spine_area])
                 os.system(send_command)
