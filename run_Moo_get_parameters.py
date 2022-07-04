@@ -25,7 +25,7 @@ fits_until_point=str(-1)
 
 
 for cell_name in read_from_pickle(cells_name_place):
-    # if not cell_name in ['2017_02_20_B']:continue
+    if not cell_name in ['2016_04_16_A']:continue
     passive_vals_dict= {}
     # p='cells_initiall_information/'+cell_name+'/results_passive_fits.csv'
     p='cells_outputs_data_short/'+cell_name+'/fit_short_pulse/results_passive_fits.csv'
