@@ -137,8 +137,9 @@ cells_outputs_data_3_initial_cells/
 cells_outputs_data_old_runs/
 cells_outputs_data_wrong_traces/
 drivesync/
-
+final_data/
 fit_short_pulse_temp/
+
 x86_64/
 cells_initial_information/.~lock.Data2.xlsx#
 */.~lock.*
@@ -165,3 +166,5 @@ test_tau.p
 txt for lost git/*.txt
 
 *temp*
+
+#final data
