@@ -23,7 +23,7 @@ print(len(sys.argv), sys.argv)
 
 if len(sys.argv) != 9:
     print("the function doesn't run with sys.argv",flush=True)
-    cell_name= '2017_02_20_B'
+    cell_name= '2016_04_16_A'
     file_type2read='z_correct.swc'
     fit_condition='const_param'
     passive_val={'RA':100.0,'CM':1.0,'RM':10000.0}
@@ -159,7 +159,6 @@ class Dendogram():
             self.cell = load_func(morph_path,delete_axon=False)
             if len(self.cell.axon)==0:
                 self.does_axon_inside_cell=False
-                print("cell "+cell_name+ " don't have axons inside")
         for sec in self.cell.all_sec():
             sec.insert('pas')
             sec.nseg = max(int(sec.L), 1)
@@ -342,19 +341,21 @@ dendogram = Dendogram('dend_only', morph_path, add_sec2,load_func=load_func)
 dendogram.cumpute_distances(dendogram.cell.soma)
 max_y=dendogram.plot(save_folder_M,title=save_folder_M.split('/')[-2],ylabel="distance from soma (um)")
 
-dendogram=None
-dendogram = Dendogram('all', morph_path, add_sec2, load_func=load_func,del_axon=False)
-dendogram.cumpute_distances(dendogram.cell.soma)
-max_y = dendogram.plot(save_folder_M,title=save_folder_M.split('/')[-2],ylabel="distance from soma (um)")
+if len(cell.axon)>1:
+    dendogram=None
+    dendogram = Dendogram('all', morph_path, add_sec2, load_func=load_func,del_axon=False)
+    dendogram.cumpute_distances(dendogram.cell.soma)
+    max_y = dendogram.plot(save_folder_M,title=save_folder_M.split('/')[-2],ylabel="distance from soma (um)")
 
 dendogram=None
-dendogram = Dendogram('dend_only_with_syn', morph_path, add_sec,load_func=load_func, del_axon=False)
+dendogram = Dendogram('dend_only_with_syn', morph_path, add_sec,load_func=load_func)
 dendogram.cumpute_distances(dendogram.cell.soma)
 max_y = dendogram.plot(save_folder_E,title=save_folder_E.split('/')[-2],ylabel="distance from soma (lamda)")
 
-dendogram=None
-dendogram = Dendogram('all_with_syn', morph_path, add_sec,load_func=load_func)
-dendogram.cumpute_distances(dendogram.cell.soma)
-max_y = dendogram.plot(save_folder_E,title=save_folder_E.split('/')[-2],ylabel="distance from soma (lamda)")
-dendogram=None
+if len(cell.axon)>1:
+    dendogram=None
+    dendogram = Dendogram('all_with_syn', morph_path, add_sec,load_func=load_func, del_axon=False)
+    dendogram.cumpute_distances(dendogram.cell.soma)
+    max_y = dendogram.plot(save_folder_E,title=save_folder_E.split('/')[-2],ylabel="distance from soma (lamda)")
+    dendogram=None
 print('dendogram.py is complete to run for '+cell_name)

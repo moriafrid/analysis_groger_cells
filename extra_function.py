@@ -165,21 +165,37 @@ class swc_cell:
         self.cell=instantiate_swc(swc_dir)
 
         self.soma = self.cell.soma[0]
-        if len(self.cell.axon)>1:
-            self.axon = list(self.cell.axon)
-            if  '2016_04_16_A' in swc_dir:
-                self.axon.append(self.cell.dend[0])
-        self.dend = list(self.cell.dend)
-        if '2016_04_16_A' in swc_dir:
-            self.dend.remove(self.cell.dend[0])
-        else:
-            print('no axon in this cell')
-            self.axon=[]
         if len(self.cell.apic)>1:
             self.apic = list(self.cell.apic)
         else:
             self.apic=[]
             print('no apical dendrite in this cell')
+        if len(self.cell.axon)>1:
+            self.axon = list(self.cell.axon)
+            if '2016_04_16_A' in swc_dir:
+                self.axon.append(self.cell.dend[0])
+        elif len(self.cell.axon)==1:
+            try:
+                h.axon
+                print('there is one axon in this cell and it wwill be deleted')
+                # if self.cell.axon.children()==0:
+                for sec in self.cell.axon:
+                    h.delete_section(sec=sec)
+                self.axon = []
+            except:
+                print('no axon in this cell')
+                self.axon=[]
+
+
+        else:
+            print('no axon in this cell')
+            self.axon=[]
+
+        self.dend = list(self.cell.dend)
+        if '2016_04_16_A' in swc_dir:
+            self.dend.remove(self.cell.dend[0])
+
+
         self.insert_sec=[]
 
     def add_sec(self,sec):
