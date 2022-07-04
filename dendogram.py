@@ -23,7 +23,7 @@ print(len(sys.argv), sys.argv)
 
 if len(sys.argv) != 9:
     print("the function doesn't run with sys.argv",flush=True)
-    cell_name= '2016_04_16_A'
+    cell_name= '2017_02_20_B'
     file_type2read='z_correct.swc'
     fit_condition='const_param'
     passive_val={'RA':100.0,'CM':1.0,'RM':10000.0}
@@ -110,15 +110,6 @@ def add_sec2(self, sec):
     """
     h.distance(0, 0.5, sec=self.cell.soma)
     self.tree_dendogram_dist[sec] = h.distance(1, sec=sec)
-
-# def get_spine_area():
-#     neck_length=0.78
-#     neck_diam = 1.64
-#     head_volume = 0.14
-#     head_r = (head_volume*3/4/np.pi)**(1/3)
-#     head_area = 4*np.pi*head_r**3
-#     neck_area = np.pi * neck_diam * neck_length
-#     return head_area +neck_area
 
 
 def change_model_pas(cell,CM=1, RA = 250, RM = 20000.0, E_PAS = -70.0,F_factor=1.9):

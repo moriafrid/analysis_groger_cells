@@ -17,39 +17,8 @@ file_type2read=['z_correct.swc','morphology.swc']
 os.system('python csv_for_passive_val_results.py cells_name2.p')
 i=0
     # os.system('python run_analysis_fit_after_run.py')
-# for cell_name in cells:
-#     print(cell_name)
-#     all_data = []
-#     dict_fit_condition={}
-#     for fit_condition in ['const_param']:
-#         print(fit_condition)
-#
-#         for resize_diam_by ,shrinkage_by in zip([1.0,1.1,1.0,1.5],[1.0,1.1,1.1,1.0]):
-#             print('shrinkage_factor:',shrinkage_by,'reasize_dend_factor:',resize_diam_by)
-#             # if shrinkage_by!=1.0:continue
-#             if resize_diam_by==1.0 and shrinkage_by==1.0 and cell_name=='2017_05_08_A_4-5':
-#                 do_double_spine_area=['True','False']
-#             else:
-#                 do_double_spine_area=['False']
-#
-#             for double_spine_area in do_double_spine_area:
-#                 if resize_diam_by==1.0 and shrinkage_by==1.0 and double_spine_area=='False' and cell_name=='2017_05_08_A_4-5':
-#                     file_types=['z_correct.swc','morphology.swc','ASC']
-#                 else:
-#                     file_types=['z_correct.swc']
-#
-#                 for file_type in file_types:
-#                     if resize_diam_by==1.0 and shrinkage_by==1.0 and double_spine_area=='False' and file_type=='z_correct.swc' and cell_name=='2017_05_08_A_4-5':
-#                         SPINE_STARTs=[str(20),str(60)]
-#                     else:
-#                         SPINE_STARTs=[str(20)]
-#                     for SPINE_START in SPINE_STARTs:
-#                         passive_vals_dict=get_passive_parameter(cell_name,double_spine_area=double_spine_area,shrinkage_resize=[shrinkage_by,resize_diam_by],fit_condition=fit_condition,spine_start=SPINE_START,file_type=file_type)
-#                         for name in ['RA=120','RA=150','RA_min_error','RA_best_fit']:
-#                             # if i>1: continue
-#                             i+=1
 for cell_name in read_from_pickle(cells_name_place):
-    # if not cell_name in ['2017_02_20_B']:continue
+    if not cell_name in ['2017_02_20_B','2017_07_06_C_3-4']:continue
     passive_vals_dict= {}
     # p='cells_initiall_information/'+cell_name+'/results_passive_fits.csv'
     p='cells_outputs_data_short/'+cell_name+'/fit_short_pulse/results_passive_fits.csv'

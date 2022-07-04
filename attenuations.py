@@ -27,7 +27,7 @@ print(len(sys.argv), sys.argv)
 do_resize_dend=True
 if len(sys.argv) != 10:
     print("the function doesn't run with sys.argv",flush=True)
-    cell_name= '2017_05_08_A_5-4'
+    cell_name= '2017_07_06_C_3-4'
     file_type='z_correct.swc'
     fit_condition='const_param'
     passive_val={'RA':100.0,'CM':1.0,'RM':10000.0}
@@ -94,16 +94,21 @@ def plot_records(RM, RA, CM,cell, syns,spines=None,save_name= "lambda"):
         Vvec_dend[i].record(syn[0](syn[1])._ref_v)
 
     for i,spine in enumerate(spines):
+        if type(spine) is float:
+            seg_t=spine
+            spine=spines_sec[i]
+        else:
+            seg_t=1
         Vvec_spine.append(h.Vector())
         if clamp_injection:
             Ivec.append(h.Vector())
             Ivec[i].record(clamp[i]._ref_i)
             if spines!=None:
-                Vvec_spine[i].record(spine(1)._ref_v)
+                Vvec_spine[i].record(spine(seg_t)._ref_v)
 
         if syn_injection:
             if spines!=None:
-                Vvec_spine[i].record(spine(1)._ref_v)
+                Vvec_spine[i].record(spine(seg_t)._ref_v)
                 Ivec=Vvec_spine
             else:
                 h.run()
@@ -159,9 +164,57 @@ def plot_records(RM, RA, CM,cell, syns,spines=None,save_name= "lambda"):
 
     plt.show()
 
-
-
-def create_spine( icell, sec, seg, number=0, neck_diam=0.25, neck_length=1.35,head_diam=0.944):
+#
+# def create_spine(sim, icell, sec, seg, number=0, neck_diam=0.25, neck_length=1.35,
+#                  head_diam=0.944):  # np.sqrt(2.8/(4*np.pi))
+#     if neck_diam == 0 or head_diam == 0:
+#         return [sec, seg]
+#     neck = sim.neuron.h.Section(name="spineNeck" + str(number))
+#     head = sim.neuron.h.Section(name="spineHead" + str(number))
+#     # icell.add_sec(neck)#?# moria why add twice??
+#     # icell.add_sec(head)
+#     neck.L = neck_length
+#     neck.diam = neck_diam
+#     head.L = head.diam = head_diam
+#     head.connect(neck(1))
+#     neck.connect(sec(seg))
+#     sim.neuron.h("access " + str(neck.hoc_internal_name()))
+#     try: icell.add_sec(neck)
+#     except:
+#         icell.all.append(neck)
+#         if sec.name().find('apic') > -1:
+#             icell.apical.append(neck)
+#         else:
+#             icell.basal.append(neck)
+#     # if sec.name().find('dend') > -1:
+#     #     icell.dend.append(neck)
+#     # else:
+#     #     icell.apical.append(neck)
+#     sim.neuron.h.pop_section()
+#     sim.neuron.h("access " + str(head.hoc_internal_name()))
+#     try:icell.add_sec(head) #if using in hoc or ASC file (load_hoc,load_ASC
+#     except:
+#         icell.all.append(head) #if using in swc
+#         if sec.name().find('apic') > -1:
+#             icell.apical.append(head)
+#         else:
+#             icell.basal.append(head)
+#     # if sec.name().find('dend') > -1:
+#     #     icell.dend.append(head)
+#     # else:
+#     #     icell.apical.append(head)
+#     sim.neuron.h.pop_section()
+#     for sec in [neck, head]:
+#         sec.insert("pas")
+#     neck.g_pas = 1.0 / passive_val["RM"]
+#     neck.cm= passive_val["CM"]
+#     neck.Ra=passive_val["RA"]#int(Rneck)
+#     # neck.e_pas=E_pas
+#     # head.e_pas=icell.soma[0].e_pas
+#     return [neck, head]
+def create_spine(icell, sec, seg, number=0, neck_diam=0.25, neck_length=1.35,head_diam=0.944):
+    if neck_diam == 0 or head_diam == 0:
+        return icell,[sec, seg]
     neck = h.Section(name="spineNeck" + str(number))
     head = h.Section(name="spineHead" + str(number))
     neck.L = neck_length
@@ -260,16 +313,22 @@ syn_shape=[]
 Rin_dend,Rin_syn=[],[]
 netcon=[]
 for i,spine_head in enumerate(spines_head):
+    if type(spine_head) is float:
+        seg_t=spine_head
+        spine_head=spines_sec[i]
+    else:
+        seg_t=1
     if clamp_injection:
         pulse_size=200
-        clamp.append(h.IClamp(spine_head(1))) # insert clamp(constant potentientiol) at the soma's center
+
+        clamp.append(h.IClamp(spine_head(seg_t))) # insert clamp(constant potentientiol) at the soma's center
         clamp[i].amp = -0.05 #nA
         clamp[i].delay = 100 #ms
         clamp[i].dur = pulse_size  # ms
         h.tstop = 500
 
     elif syn_injection: #@# replace in my specipic synapse
-        syn_shape.append(h.Exp2Syn(spine_head(1)))
+        syn_shape.append(h.Exp2Syn(spine_head(seg_t)))
         # if put_syn_on_spine_head:
         #     syn_shape.append(h.Exp2Syn(spine_head(1)))
         # else:
@@ -290,9 +349,9 @@ for i,spine_head in enumerate(spines_head):
         h.tstop = 500
 
     imp=h.Impedance(sec=spine_head)
-    imp.loc(1, sec=spine_head)
+    imp.loc(seg_t, sec=spine_head)
     imp.compute(freq)  # check if you need at 10 Hz
-    Rin_syn.append(imp.input(1, spine_head))
+    Rin_syn.append(imp.input(seg_t, spine_head))
 
     imp=h.Impedance(sec=spines_sec[i])
     imp.loc(spines_seg[i], sec=spines_sec[i])
@@ -309,10 +368,15 @@ for sec in cell.dend:
 if norm_Rin:
     Rin_syn_resize_dend,Rin_dend_resize_dend=[],[]
     for i,spine_head in enumerate(spines_head):
+        if type(spine_head) is float:
+            seg_t=spine_head
+            spine_head=spines_sec[i]
+        else:
+            seg_t=1
         imp=h.Impedance(sec=spine_head)
         imp.loc(1, sec=spine_head)
         imp.compute(freq)  # check if you need at 10 Hz
-        Rin_syn_resize_dend.append( imp.input(1, spine_head))
+        Rin_syn_resize_dend.append( imp.input(seg_t, spine_head))
 
         imp=h.Impedance(sec=spines_sec[i])
         imp.loc(spines_seg[i], sec=spines_sec[i])
@@ -341,4 +405,3 @@ if put_syn_on_spine_head:
 else:
     plot_records(RM, RA, CM,cell,syns,save_name= "lambda for syn "+str(i))
 print('attenuation.py is complete to run for '+cell_name)
-a=1
