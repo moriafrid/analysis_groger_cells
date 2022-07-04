@@ -1,7 +1,6 @@
 import pandas as pd
 def get_passive_parameter(cell_name,double_spine_area='False',shrinkage_resize=[1.0,1.0],
                           spine_start=20,fit_condition='const_param',file_type='z_correct.swc',passive_param_name=None):
-    print(shrinkage_resize)
     p='cells_outputs_data_short/'+cell_name+'/fit_short_pulse/results_passive_fits.csv'
     # p='cells_initial_information/'+cell_name+'/results_passive_fits.csv'
     df = pd.read_csv(p)
