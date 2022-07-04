@@ -174,9 +174,8 @@ class swc_cell:
             self.axon = list(self.cell.axon)
             if '2016_04_16_A' in swc_dir:
                 self.axon.append(self.cell.dend[0])
-        elif len(self.cell.axon)==1:
+        elif len(self.cell.axon)==1 and '2017_02_20_B' in swc_dir:
             try:
-                h.axon
                 print('there is one axon in this cell and it wwill be deleted')
                 # if self.cell.axon.children()==0:
                 for sec in self.cell.axon:
