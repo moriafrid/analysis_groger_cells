@@ -17,8 +17,13 @@ def check_dynamics(short_pulse,x_short_pulse,save_folder):
     part1=short_pulse[short_pulse_start:short_pulse_end]-short_pulse[0]
     part2=-short_pulse[short_pulse_end:]+short_pulse[short_pulse_end]
     x_part1=x_short_pulse[short_pulse_start:short_pulse_end]
+    x_part1-=x_part1[0]
     plt.plot(x_part1*1000, part1,label='beginigng')
-    plt.plot(x_part1*1000,part2[:len(x_part1)],label='flip end')
+    if len(part2)<len(part1):
+        plt.plot(x_part1[:len(part2)]*1000,part2[:len(x_part1)],label='flip end')
+    else:
+        plt.plot(x_part1*1000,part2[:len(x_part1)],label='flip end')
+
     plt.legend()
     plt.savefig(save_folder+'/check_dynamics.png')
     plt.savefig(save_folder+'/check_dynamics.pdf')
