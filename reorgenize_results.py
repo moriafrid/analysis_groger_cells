@@ -22,7 +22,7 @@ def copy_file(copy,paste,extra_name=''):
         plt.savefig(paste+'/'+copy.split('/')[-1].split('.p')[0]+extra_name+'.svg')
         plt.close()
 for cell_name in read_from_pickle('cells_name2.p'):
-    if cell_name in read_from_pickle('cells_name2.p'):continue
+    # if cell_name in read_from_pickle('cells_name2.p'):continue
     print(cell_name)
 
     shrinkage_by=1.1
@@ -59,8 +59,9 @@ for cell_name in read_from_pickle('cells_name2.p'):
                 next_continue=True
         copy_file(glob(data_file+'/fit_short_pulse/z_correct.swc_SPINE_START=20/dend*'+str(resize_diam_by)+'&F_shrinkage='+str(shrinkage_by)+'/const_param/RA/fit RA='+RA+'.png')[0],save_file_resize,extra_name=passive_val_name)
 
-        # copy_file(glob(folder_+'/data/cell_properties/'+file_type+'/SPINE_START=20/dend*1.0&F_shrinkage=1.0/'+passive_val_name+'/E_dendogram/dend_only_with_syn.pdf'))
-        # copy_file(folder_+'/data/cell_properties/'+file_type+'/SPINE_START=20/dend*1.0&F_shrinkage=1.0/'+passive_val_name+'/M_dendogram/dend_only.pdf')
+        copy_file(glob(data_file+'/data/cell_properties/z_correct.swc/SPINE_START=20/dend*'+str(resize_diam_by)+'&F_shrinkage='+str(shrinkage_by)+'/'+passive_val_name+'/E_dendogram/dend_only_with_syn.p')[0],save_file_resize)
+        copy_file(glob(data_file+'/data/cell_properties/z_correct.swc/SPINE_START=20/dend*'+str(resize_diam_by)+'&F_shrinkage='+str(shrinkage_by)+'/'+passive_val_name+'/M_dendogram/dend_only.p')[0],save_file_resize)
+
         try:
             copy_file(glob(data_file+'/MOO_results_syn_par_same_strange/z_correct.swc_SPINE_START=20/'+resize+'/const_param/'+passive_val_name+'_full_trace/fit_transient_RDSM.p')[0],save_file_resize,extra_name='full_same_'+passive_val_name)
             copy_file(glob(data_file+'/MOO_results_syn_par_same_strange/z_correct.swc_SPINE_START=20/'+resize+'/const_param/'+passive_val_name+'/fit_transient_RDSM.p')[0],save_file_resize,extra_name='same_'+passive_val_name)
@@ -99,15 +100,15 @@ for p in files:
         passive_vals_dict=get_passive_parameter(cell_name,double_spine_area=double_spine_area,shrinkage_resize=[shrinkage_by,resize_diam_by],fit_condition='const_param',spine_start=20,file_type='z_correct.swc')
         RA,CM,RM=get_passive_val(passive_vals_dict[passive_val_name])
         RA=str(int(float(RA)))
-        if float(RA)<50:
+        if float(RA)<70:
             continue
         else:
             if float(RA)>70:
                 next_continue=True
         copy_file(glob(data_file+'/fit_short_pulse/z_correct.swc_SPINE_START=20/dend*'+str(resize_diam_by)+'&F_shrinkage='+str(shrinkage_by)+'/const_param/RA/fit RA='+RA+'.png')[0],save_file_resize,extra_name=passive_val_name)
 
-        # copy_file(glob(folder_+'/data/cell_properties/'+file_type+'/SPINE_START=20/dend*1.0&F_shrinkage=1.0/'+passive_val_name+'/E_dendogram/dend_only_with_syn.pdf'))
-        # copy_file(folder_+'/data/cell_properties/'+file_type+'/SPINE_START=20/dend*1.0&F_shrinkage=1.0/'+passive_val_name+'/M_dendogram/dend_only.pdf')
+        # copy_file(glob(data_file+'/data/cell_properties/'+file_type+'/SPINE_START=20/dend*'+str(resize_diam_by)+'&F_shrinkage='+str(shrinkage_by)+'/'+passive_val_name+'/E_dendogram/dend_only_with_syn.p')[0],save_file_resize)
+        # copy_file(glob(data_file+'/data/cell_properties/'+file_type+'/SPINE_START=20/dend*'+str(resize_diam_by)+'&F_shrinkage='+str(shrinkage_by)+'/'+passive_val_name+'/M_dendogram/dend_only.p')[0],save_file_resize)
         try:
             copy_file(glob(data_file+'/MOO_results_syn_par_same_strange/z_correct.swc_SPINE_START=20/'+resize+'/const_param/'+passive_val_name+'_full_trace/fit_transient_RDSM.p')[0],save_file_resize,extra_name='full_same_'+passive_val_name)
             copy_file(glob(data_file+'/MOO_results_syn_par_same_strange/z_correct.swc_SPINE_START=20/'+resize+'/const_param/'+passive_val_name+'/fit_transient_RDSM.p')[0],save_file_resize,extra_name='same_'+passive_val_name)
