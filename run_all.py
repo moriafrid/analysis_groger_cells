@@ -11,6 +11,8 @@ import os
 #fontsize as parameter for xlabel etc (for everything, title...)
 
 cells_name_place='cells_name2.p'
+# for cell_name in read_from_pickle('cells_name2.p'):
+#     os.system('python fiel_convert_to_swc_z_corrections.py '+cell_name)
 commet_main=" ".join(["python run_execute_main.py", cells_name_place ])
 os.system(commet_main)
 

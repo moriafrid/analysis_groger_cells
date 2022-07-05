@@ -2,6 +2,7 @@ from neuron import h, gui
 import numpy as np
 import sys
 from glob import glob
+import pickle
 if len(sys.argv) != 2:
     # cell_name="2017_05_08_A_5-4(0)"
     # cell_name="2017_05_08_A_4-5(0)"
@@ -44,6 +45,7 @@ def instantiate_swc(filename):
 pass
 max_dz = 40
 def run(id, prev_id,sec,type, parent_point=np.array([0, 0, 0]), print_=True):
+    global morphology_dict,sec_num
     sec_points = np.array([list(i) for i in sec.psection()['morphology']['pts3d']])[:,:3]
     sec_diams = np.array([list(i) for i in sec.psection()['morphology']['pts3d']])[:,3]
     if print_:
@@ -60,12 +62,20 @@ def run(id, prev_id,sec,type, parent_point=np.array([0, 0, 0]), print_=True):
                 sec_points[i][2]-= sec_points[i][2]-sec_points[i-1][2]+max_dz
 
     sec_points -= sec_points[0] - parent_point
+    x,y,z,diam=[],[],[],[]
     for i, point in enumerate(sec_points):
         swc_file.write(str(id)+' '+str(type)+' '+
                        ' '.join(point[:3].round(4).astype(str).tolist()) +
                        ' ' + str(round(sec_diams[i]/ 2.0, 4))+' '+str(prev_id)+'\n')
+        x.append(point[0].round(4))
+        y.append(point[1].round(4))
+        z.append(point[2].round(4))
+        diam.append(round(sec_diams[i],4))
         prev_id=id
         id+=1
+    sec_num+=1
+    morphology_dict[sec_num]={'sec name':sec.name().split('.')[-1],'x':x,'y':y,'z':z,'d':diam}
+
     for child in sec.children():
         id=run(id,prev_id,child, type, parent_point = sec_points[-1] ,print_=print_)
     return id
@@ -75,6 +85,7 @@ def run(id, prev_id,sec,type, parent_point=np.array([0, 0, 0]), print_=True):
 ######################################################
 
 fname = glob(folder_+cell_name+'/*.ASC')[0]
+morphology_dict={}
 cell=mkcell(fname)
 sp2 = h.PlotShape()
 sp2.color_all(3)
@@ -87,6 +98,8 @@ swc_file.write('# id,type,x,y,z,r,pid\n')
 swc_file.write('1 1 '+
                ' '.join(soma_points[:3].round(4).astype(str).tolist())+
                ' '+str(round(cell.soma[0].diam/2.0, 4))+' -1\n')
+sec_num=1
+morphology_dict[1]={'sec name':cell.soma[0].name().split('.')[-1],'x':soma_points[0].round(4),'y':soma_points[1].round(4),'z':soma_points[2].round(4),'d':cell.soma[0].diam}
 
 def get_closest_z(soma_point, sec_point, soma_r):
     # dists = [[np.linalg.norm(point[:3]- sec_point[:3]), point[:3]] for point in soma_points]
@@ -123,12 +136,15 @@ for child in cell.soma[0].children():
     id=run(id,1,child,type, print_=type==2, parent_point=parent_point)
 
 swc_file.close()
-cell=None
-cell=instantiate_swc(folder_+cell_name+'/morphology_z_correct.swc')
-print (cell)
-sp = h.PlotShape()
-sp.show(0)  # show diameters
-a=1
+with open(folder_+cell_name+"/morphology_dict.pickle", 'wb') as handle:
+    pickle.dump(morphology_dict, handle, protocol=pickle.HIGHEST_PROTOCOL)
+# cell=None
+#
+# cell=instantiate_swc(folder_+cell_name+'/morphology_z_correct.swc')
+# print (cell)
+# sp = h.PlotShape()
+# sp.show(0)  # show diameters
+# a=1
 
 
 
