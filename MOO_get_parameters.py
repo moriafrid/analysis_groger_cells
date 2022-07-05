@@ -1,5 +1,7 @@
 #!/ems/elsc-labs/segev-i/moria.fridman/anaconda3/envs/project/bin/python
 # from __future__ import print_function
+import shutil
+
 import bluepyopt as bpopt
 import bluepyopt.ephys as ephys
 import pprint
@@ -15,6 +17,7 @@ import logging
 import signal
 from extra_function import SIGSEGV_signal_arises, load_hoc,load_ASC,load_swc,create_folder_dirr
 from glob import glob
+import os
 matplotlib.rcParams['pdf.fonttype'] = 42
 matplotlib.rcParams['svg.fonttype'] = 'none'
 
@@ -36,13 +39,13 @@ print(sys.argv,flush=True)
 if len(sys.argv) != 16:
     print("the function doesn't run with sys.argv",len(sys.argv),flush=True)
     cpu_node = 1
-    cell_name= '2017_07_06_C_3-4'#'2017_07_06_C_3-4'
+    cell_name= '2016_04_16_A'#'2017_07_06_C_3-4'
     file_type='z_correct.swc'  #file type is just used to calculate F_factor
     passive_val={'RA':float(120),'CM':1.6713,'RM':12075}
     passive_fit_condition='const_param'
     passive_val_name='test'
-    resize_dend_by=1.1
-    shrinkage_by=1.1
+    resize_dend_by=1.0
+    shrinkage_by=1.0
     SPINE_START=20
     profile = '_'
     RA=float(100)
@@ -69,6 +72,8 @@ else:
     RA=float(sys.argv[4])
     generation_size = 100
     num_of_genarations = 1000
+from_the_begin=True
+
 # same_strengh=False
 
 if same_strengh:
@@ -96,6 +101,11 @@ else:
 
 print('base_save_folder:',base_save_folder)
 create_folder_dirr(base_save_folder)
+if from_the_begin:
+    try:
+        os.remove(base_save_folder+'/cp')
+        os.remove(base_save_folder+'/cp.tmp')
+    except:pass
 RDSM_objective_file = folder_+save_dir+cell_name+"/data/electrophysio_records/syn/mean_syn0.p"
 # RDSM_objective_file = data_dir+cell_name+"/mean_syn_split.p"
 short_pulse_parameters_file=folder_+save_dir+cell_name+'/data/electrophysio_records/short_pulse_parameters.p'
