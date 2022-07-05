@@ -10,21 +10,21 @@ data_dir = '/kaggle/input/fiter-and-fire-paper'
 #results_summary = pd.read_pickle(os.path.join(data_dir, "sim_results_excitatory.p"))
 #results_summary = pd.read_pickle(os.path.join(data_dir, "sim_results.p"))
 
-with open(os.path.join(data_dir, "sim_results_excitatory.p"), "rb") as fh:
-    results_summary = pickle.load(fh)
+# with open(os.path.join(data_dir, "sim_results_excitatory.p"), "rb") as fh:
+#     results_summary = pickle.load(fh)
+#
+# #%% gather necessary fields from data
+#
+# sim_results = results_summary.iloc[5,:]
+# print(list(sim_results.index))
+#
+# recording_time_sec = sim_results['recordingTimeHighRes']
+# soma_voltage_traces = sim_results['somaVoltageHighRes']
+# nexus_voltage_traces = sim_results['nexusVoltageHighRes']
+#
+# num_segments = soma_voltage_traces.shape[0]
 
-#%% gather necessary fields from data
-
-sim_results = results_summary.iloc[5,:]
-print(list(sim_results.index))
-
-recording_time_sec = sim_results['recordingTimeHighRes']
-soma_voltage_traces = sim_results['somaVoltageHighRes']
-nexus_voltage_traces = sim_results['nexusVoltageHighRes']
-
-num_segments = soma_voltage_traces.shape[0]
-
-def get_morphology(morphology_filename="./morphology_dict.p", experiment_dict={'Params': {}},
+def get_morphology(morphology_filename="./morphology_dict.pickle", experiment_dict={'Params': {}},
                    experiment_table=None):
     morphology_dict = pickle.load(open(morphology_filename, "rb"), encoding='latin1')
     # allSectionsLength                  = morphology_dict['all_sections_length']
@@ -49,8 +49,8 @@ def get_morphology(morphology_filename="./morphology_dict.p", experiment_dict={'
         section_index = np.array(experiment_dict['Params']['allSegments_SectionInd'])
         distance_from_soma = np.array(experiment_dict['Params']['allSegments_SecDistFromSoma'])
         is_basal = np.array([x == 'basal' for x in experiment_dict['Params']['allSegmentsType']])
-    else:
-        return
+    # else:
+    #     return
 
     seg_ind_to_xyz_coords_map = {}
     seg_ind_to_sec_ind_map = {}
@@ -68,7 +68,8 @@ def get_morphology(morphology_filename="./morphology_dict.p", experiment_dict={'
             print('error!')
 
     return seg_ind_to_xyz_coords_map, seg_ind_to_sec_ind_map, section_index, distance_from_soma, is_basal
-
+# plot_morphology(ax_morphology, segment_colors_selected, width_mult_factors=segment_widths_selected,
+#                 seg_ind_to_xyz_coords_map=seg_ind_to_xyz_coords_map, names=[])
 def plot_morphology(ax, segment_colors, names=[], width_mult_factors=None, seg_ind_to_xyz_coords_map={}):
     if width_mult_factors is None:
         width_mult_factor = 1.2
@@ -106,11 +107,14 @@ def plot_morphology(ax, segment_colors, names=[], width_mult_factors=None, seg_i
     ax.set_xlim(-180, 235)
     ax.set_ylim(-210, 1200);
 
-data_dir=glob('cells_inintia_data/*4-5/*')
-morphology_filename = os.path.join(data_dir, 'morphology_dict.p')
-seg_ind_to_xyz_coords_map, seg_ind_to_sec_ind_map, section_index, distance_from_soma, is_basal = \
-    get_morphology(morphology_filename=morphology_filename, experiment_dict={"Params": {}}, experiment_table=sim_results)
+data_dir=glob('cells_inintial_data/*4-5/*')
+data_dir='David_kaggel_data/'
+morphology_filename = os.path.join(data_dir, 'morphology_dict.pickle')
 
+# sim_results=None
+# seg_ind_to_xyz_coords_map, seg_ind_to_sec_ind_map, section_index, distance_from_soma, is_basal = \
+#     get_morphology(morphology_filename=morphology_filename, experiment_dict={"Params": {}}, experiment_table=sim_results)
+seg_ind_to_xyz_coords_map, seg_ind_to_sec_ind_map, section_index, distance_from_soma, is_basal = get_morphology(morphology_filename=morphology_filename)
 
 plt.close('all')
 fig = plt.figure(figsize=(17,16))
@@ -125,11 +129,15 @@ ax_explained_var = plt.subplot(gs_figure[6: ,3: ])
 
 
 # plot the morphology with a few selected segments highlighted
-chosen_PSP_segment_inds = [1, 49, 132, 200, 344, 468, 530]
-chosen_PSP_segment_colors = 0.5 + np.arange(len(chosen_PSP_segment_inds)) / len(chosen_PSP_segment_inds)
 
+##creat the basic color
 segment_colors_selected = np.zeros(num_segments)
 segment_widths_selected = 1.2 * np.ones(segment_colors_selected.shape)
+
+##highlith the selected part
+chosen_PSP_segment_inds = []
+chosen_PSP_segment_inds = [1, 49, 132, 200, 344, 468, 530]
+chosen_PSP_segment_colors = 0.5 + np.arange(len(chosen_PSP_segment_inds)) / len(chosen_PSP_segment_inds)
 for curr_selected_segment_index, color in zip(chosen_PSP_segment_inds, chosen_PSP_segment_colors):
     segment_colors_selected[curr_selected_segment_index] = color
     segment_widths_selected[curr_selected_segment_index] = 30.0
