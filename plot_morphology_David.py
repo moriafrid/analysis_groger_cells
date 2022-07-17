@@ -1,28 +1,18 @@
-import os
+# import sys
 import pickle
 from glob import glob
 import numpy as np
 from matplotlib import pyplot as plt, gridspec
 import pickle5 as pickle
+from open_pickle import read_from_pickle
+import sys
 #%% load simulation data
-
+without_axons=True
 data_dir = '/kaggle/input/fiter-and-fire-paper'
-#results_summary = pd.read_pickle(os.path.join(data_dir, "sim_results_excitatory.p"))
-#results_summary = pd.read_pickle(os.path.join(data_dir, "sim_results.p"))
-
-# with open(os.path.join(data_dir, "sim_results_excitatory.p"), "rb") as fh:
-#     results_summary = pickle.load(fh)
-#
-# #%% gather necessary fields from data
-#
-# sim_results = results_summary.iloc[5,:]
-# print(list(sim_results.index))
-#
-# recording_time_sec = sim_results['recordingTimeHighRes']
-# soma_voltage_traces = sim_results['somaVoltageHighRes']
-# nexus_voltage_traces = sim_results['nexusVoltageHighRes']
-#
-# num_segments = soma_voltage_traces.shape[0]
+if len(sys.argv) != 2:
+    cell_name="2017_05_08_A_4-5"
+else:
+    cell_name=sys.argv[1]
 
 def get_morphology(morphology_filename="./morphology_dict.pickle", experiment_dict={'Params': {}},
                    experiment_table=None):
@@ -68,14 +58,14 @@ def get_morphology(morphology_filename="./morphology_dict.pickle", experiment_di
             print('error!')
 
     return seg_ind_to_xyz_coords_map, seg_ind_to_sec_ind_map, section_index, distance_from_soma, is_basal
-# plot_morphology(ax_morphology, segment_colors_selected, width_mult_factors=segment_widths_selected,
-#                 seg_ind_to_xyz_coords_map=seg_ind_to_xyz_coords_map, names=[])
+
 def plot_morphology(ax, segment_colors, names=[], width_mult_factors=None, seg_ind_to_xyz_coords_map={}):
     if width_mult_factors is None:
         width_mult_factor = 1.2
         width_mult_factors = width_mult_factor * np.ones((segment_colors.shape))
 
-    segment_colors = segment_colors / segment_colors.max()
+    if segment_colors.max()!=0:
+        segment_colors = segment_colors / segment_colors.max()
     colors = plt.cm.jet(segment_colors)
 
     all_seg_inds = seg_ind_to_xyz_coords_map.keys()
@@ -89,6 +79,10 @@ def plot_morphology(ax, segment_colors, names=[], width_mult_factors=None, seg_i
 
     # plot the cell morphology
     for key in all_seg_inds:
+        if without_axons:
+            if 'axon' in seg_ind_to_xyz_coords_map[key]['sec name']:
+                print(seg_ind_to_xyz_coords_map[key]['sec name'])
+                continue
         seg_color = colors_per_segment[key]
         # seg_line_width = width_mult_factor * np.array(seg_ind_to_xyz_coords_map[key]['d']).mean()
         seg_line_width = min(6, widths_per_segment[key] * np.array(seg_ind_to_xyz_coords_map[key]['d']).mean())
@@ -96,47 +90,49 @@ def plot_morphology(ax, segment_colors, names=[], width_mult_factors=None, seg_i
         seg_x_coords = seg_ind_to_xyz_coords_map[key]['x']
         seg_y_coords = seg_ind_to_xyz_coords_map[key]['y']
 
-        ax.plot(seg_x_coords, seg_y_coords, lw=seg_line_width, color=seg_color)
+        if np.isscalar(seg_ind_to_xyz_coords_map[key]['x']):
+            ax.scatter(seg_x_coords, seg_y_coords,s=40, color=seg_color)
+        else:
+            ax.plot(seg_x_coords, seg_y_coords, lw=seg_line_width, color=seg_color)
     if names != []:
         for ind in all_seg_inds:
             ax.text(np.max(seg_ind_to_xyz_coords_map[key]['x']), np.max(seg_ind_to_xyz_coords_map[key]['y']),
                     names[ind])
 
     # add black soma
-    ax.scatter(x=45.5, y=19.8, s=120, c='k')
-    ax.set_xlim(-180, 235)
-    ax.set_ylim(-210, 1200);
+    # ax.scatter(x=45.5, y=19.8, s=120, c='k')
+    # ax.set_xlim(-180, 235)
+    # ax.set_ylim(-210, 1200);
+    plt.show()
 
-data_dir=glob('cells_inintial_data/*4-5/*')
-data_dir='David_kaggel_data/'
-morphology_filename = os.path.join(data_dir, 'morphology_dict.pickle')
+# morphology_filename=glob('cells_initial_information/2017_03_04_A_6-7/morphology_dict.pickle')
+morphology_filename=glob('cells_initial_information/'+cell_name+'/dict_morphology.pickle')
 
+seg_ind_to_xyz_coords_map=read_from_pickle(morphology_filename[0])
 # sim_results=None
 # seg_ind_to_xyz_coords_map, seg_ind_to_sec_ind_map, section_index, distance_from_soma, is_basal = \
 #     get_morphology(morphology_filename=morphology_filename, experiment_dict={"Params": {}}, experiment_table=sim_results)
-seg_ind_to_xyz_coords_map, seg_ind_to_sec_ind_map, section_index, distance_from_soma, is_basal = get_morphology(morphology_filename=morphology_filename)
+
+# data_dir='David_kaggel_data/'
+# morphology_filename = os.path.join(data_dir, 'morphology_dict.pickle')
+# seg_ind_to_xyz_coords_map, seg_ind_to_sec_ind_map, section_index, distance_from_soma, is_basal = get_morphology(morphology_filename=morphology_filename)
 
 plt.close('all')
 fig = plt.figure(figsize=(17,16))
 gs_figure = gridspec.GridSpec(nrows=8,ncols=5)
 gs_figure.update(left=0.04, right=0.95, bottom=0.05, top=0.95, wspace=0.5, hspace=0.9)
-
-ax_morphology    = plt.subplot(gs_figure[ :9, :3])
-ax_chosen_PSPs   = plt.subplot(gs_figure[ :2,3: ])
-ax_PSP_traces    = plt.subplot(gs_figure[2:4,3: ])
-ax_NMF_trance    = plt.subplot(gs_figure[4:6,3: ])
-ax_explained_var = plt.subplot(gs_figure[6: ,3: ])
-
+ax_morphology=fig.gca()
 
 # plot the morphology with a few selected segments highlighted
 
 ##creat the basic color
+num_segments=len(seg_ind_to_xyz_coords_map)
 segment_colors_selected = np.zeros(num_segments)
 segment_widths_selected = 1.2 * np.ones(segment_colors_selected.shape)
 
 ##highlith the selected part
 chosen_PSP_segment_inds = []
-chosen_PSP_segment_inds = [1, 49, 132, 200, 344, 468, 530]
+# chosen_PSP_segment_inds = [1, 49, 132, 200, 344, 468, 530]
 chosen_PSP_segment_colors = 0.5 + np.arange(len(chosen_PSP_segment_inds)) / len(chosen_PSP_segment_inds)
 for curr_selected_segment_index, color in zip(chosen_PSP_segment_inds, chosen_PSP_segment_colors):
     segment_colors_selected[curr_selected_segment_index] = color
