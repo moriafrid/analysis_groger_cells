@@ -145,7 +145,6 @@ David_kaggel_data/
 x86_64/
 cells_initial_information/.~lock.Data2.xlsx#
 */.~lock.*
-
 /*/*.~lock.Data.xlsx#
 */.~lock.*.xlsx#
 */*.xlsx#
@@ -170,3 +169,8 @@ txt for lost git/*.txt
 *temp*
 
 #final data
+
+
+#cells_initial_information
+cells_initial_information/*/neuron_morphology.png
+cells_initial_information/*/morphology_z_correct_after_shrink.swc
