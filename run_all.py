@@ -18,11 +18,12 @@ commet_main=" ".join(["python run_execute_main.py", cells_name_place ])
 os.system(commet_main)
 
 for cell_name in read_from_pickle(cells_name_place):
-    os.system('python creat_morphology_dict.py '+cell_name)
-    os.system('python file_converter_to_swc.py '+cell_name)
+    os.system('python file_converter_to_swc_z_corrections.py '+cell_name)
+    # os.system('python creat_morphology_dict.py '+cell_name)
+    os.systen('python plot_morphology_David.py '+cell_name)
 
 
-commet_level1=" ".join(["python run_execute_level1.py", cells_name_place ])
+commet_level1=" ".join(["python plot_morphology_David.py", cells_name_place ])
 os.system(commet_level1)
 
 os.system('python choose_short_pulse.py')
