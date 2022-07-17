@@ -1,4 +1,5 @@
 import os
+from open_pickle import read_from_pickle
 #set invisible top and right, for the 1st column (can remove the if)
 # for ax in fig.get_axes():  #show only specific spines
 #     if not ax.get_subplotspec().is_first_col():
@@ -11,10 +12,15 @@ import os
 #fontsize as parameter for xlabel etc (for everything, title...)
 
 cells_name_place='cells_name2.p'
-# for cell_name in read_from_pickle('cells_name2.p'):
-#     os.system('python file_convert_to_swc_z_corrections.py '+cell_name)
+
+
 commet_main=" ".join(["python run_execute_main.py", cells_name_place ])
 os.system(commet_main)
+
+for cell_name in read_from_pickle(cells_name_place):
+    os.system('python creat_morphology_dict.py '+cell_name)
+    os.system('python file_converter_to_swc.py '+cell_name)
+
 
 commet_level1=" ".join(["python run_execute_level1.py", cells_name_place ])
 os.system(commet_level1)
