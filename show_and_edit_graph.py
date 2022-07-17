@@ -16,6 +16,9 @@ from mpl_toolkits.axes_grid1.anchored_artists import AnchoredSizeBar
 #         ax.spines['right'].set_visible(False)
 import matplotlib
 import numpy as np
+from matplotlib_scalebar.scalebar import ScaleBar
+# ax.add_artist(ScaleBar(1, "um", fixed_value=100, location="lower left"))
+ #sapir scaller bar
 matplotlib.rcParams['pdf.fonttype'] = 42
 matplotlib.rcParams['svg.fonttype'] = 'none'
 class Graph_edit:
