@@ -34,6 +34,7 @@ for cell_name in read_from_pickle('cells_name2.p'):
     try: shutil.rmtree(save_file)
     except:pass
     create_folder_dirr(save_file)
+    copy_file(glob(data_file+'/neuron_morphology_fig.p')[0],save_file)
     copy_file(glob(data_file+'/data/electrophysio_records/syn/clear_syn_after_peeling.p')[0],save_file)
     copy_file(glob(data_file+'/data/electrophysio_records/short_pulse/clear_short_pulse_after_peeling.p')[0],save_file)
     copy_file(glob(data_file+'/data/electrophysio_records/*/I_V_curve_fit.p')[0],save_file)
