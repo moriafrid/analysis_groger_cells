@@ -25,7 +25,7 @@ for cell_name in read_from_pickle('cells_name2.p'):
     # if cell_name in read_from_pickle('cells_name2.p'):continue
     print(cell_name)
 
-    shrinkage_by=1.1
+    shrinkage_by=1.0
     resize_diam_by=1.0
 
     data_file='cells_outputs_data_short/'+cell_name
