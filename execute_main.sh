@@ -41,11 +41,17 @@ path=$(dirname $SCRIPT_PATH)
 echo python3 $path/main_cell_data.py $cell_name
 python3 $path/main_cell_data.py $cell_name $data_dir $save_dir
 
+echo python3 $path/file_converter_to_swc_z_corrections.py $cell_name
+python3 $path/file_converter_to_swc_z_corrections.py $cell_name
+
 echo python3 $path/file_converter_to_swc.py $cell_name
 python3 $path/file_converter_to_swc.py $cell_name
 
-echo python3 $path/file_converter_to_swc_z_corrections.py $cell_name
-python3 $path/file_converter_to_swc_z_corrections.py $cell_name
+echo python3 $path/creat_morphology_dict.py $cell_name
+python3 $path/creat_morphology_dict.py $cell_name
+
+echo python3 $path/plot_morphology_David.py $cell_name
+python3 $path/plot_morphology_David.py $cell_name
 
 #echo python3 $path/clear_syn.py $cell_name
 #echo "before run the execute_level1 remaind to choose the correct syn from the diraction" $folder $save_dir
