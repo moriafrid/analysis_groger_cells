@@ -13,7 +13,7 @@ else:
 cells=read_from_pickle(cells_name_place)
 print("Remaind to choose the right syn")
 folder_data="cells_initial_information"
-folder_save="cells_outputs_data_temp"
+folder_save="cells_outputs_data"
 for cell_name in cells:
     command="sbatch execute_main.sh"
     # command ="sbatch execute_python_script.sh main_cell_data.py"
