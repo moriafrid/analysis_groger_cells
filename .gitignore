@@ -138,6 +138,7 @@ cells_outputs_data_old_runs/
 cells_outputs_data_wrong_traces/
 cells_outputs_data_short_before_10_shrinkage/
 cells_outputs_data_after_10_shrinkage/
+cells_outputs_data_after_10_shrink/
 drivesync/
 final_data/
 fit_short_pulse_temp/
@@ -174,3 +175,5 @@ txt for lost git/*.txt
 #cells_initial_information
 cells_initial_information/*/neuron_morphology.png
 cells_initial_information/*/morphology_z_correct_after_shrink.swc
+cells_initial_information/*last_changes.csv
+cells_initial_information/tau_cells_last_changes.csv

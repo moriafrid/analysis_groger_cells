@@ -26,18 +26,36 @@ check='again'
 # run on full trace: #['2017_05_08_A_4-5,'2017_07_06_C_4-3','2017_02_20_B','2016_05_12_A, '2016_04_16_A','2017_03_04_A_6-7']
 #maybe run again ['2017_04_03_B
 # problem with check pro-post channels '2016_05_12_A' (split it) (and in sespicies '2017_07_06_C_4-3' (not split it))
-
-for cell in ['2017_04_03_B']:#read_from_pickle('cells_name2.p')[:]:#['2016_05_12_A','2016_04_16_A']:#
+from matplotlib import cm
+cmap = 'viridis'
+rgb = cm.get_cmap(cmap)
+for cell in ['2017_07_06_C_4-3','2016_08_30_A']:#read_from_pickle('cells_name2.p')[:]:#['2016_05_12_A','2016_04_16_A']:#
     base_dir="cells_outputs_data_short/"+cell+"/data/electrophysio_records/short_pulse/"
     if cell in ['2017_05_08_A_4-5','2017_07_06_C_4-3','2017_02_20_B', '2016_04_16_A','2017_03_04_A_6-7','2017_04_03_B','2017_07_06_C_3-4']:
         data=read_from_pickle(base_dir+"/short_pulse.p")
-    if cell in ['2017_04_03_B']:#['2017_02_20_B']:
-        data=read_from_pickle(base_dir+"/clear_short_pulse.p")
     else:
         data=read_from_pickle(base_dir+"/clear0_short_pulse.p")
-        continue
-    # data=read_from_pickle(base_dir+"/clear0_short_pulse.p")
+    if cell in ['2016_08_30_A','2017_07_06_C_4-3']:#remove the last pulse befor e they start to divargnce:
+        mv=data[0].units
 
+        before_divrgense,number_before_divrgense=[],[]
+
+        for i,v in enumerate(data[0]):
+            # start_short_pulse,end_short_pulse,length=short_pulse_edges(cell)
+            # if np.mean(v[start_short_pulse:end_short_pulse])>np.mean(np.mean(data[0],axis=0)[start_short_pulse:end_short_pulse]):
+            #     before_divrgense.append(v)
+            #     number_before_divrgense.append(i)
+            if i<len(data[0])/2:
+                before_divrgense.append(v)
+
+        data[0]=before_divrgense*mv
+
+    # if cell in ['2017_04_03_B']:#['2017_02_20_B']:
+    #     data=read_from_pickle(base_dir+"/clear_short_pulse.p")
+    # else:
+    #     data=read_from_pickle(base_dir+"/clear0_short_pulse.p")
+    #     continue
+    # data=read_from_pickle(base_dir+"/clear0_short_pulse.p")
     print(cell)
 
     # data=read_from_pickle(base_dir+"/short_pulse.p")
@@ -52,8 +70,9 @@ for cell in ['2017_04_03_B']:#read_from_pickle('cells_name2.p')[:]:#['2016_05_12
 
     timer = fig.canvas.new_timer(interval=10000)
     timer.add_callback(close_event)
-    for v in npV:
-        plt.plot(v)
+    factor=int(len(rgb.colors)/len(npV)/2)
+    for i,v in enumerate(npV):
+        plt.plot(v,color=rgb.colors[i+i*factor],alpha=0.2)
     plt.title(cell+' have '+str(len(npV))+' traces')
     plt.show()
     timer = fig.canvas.new_timer(interval=2000)
@@ -76,9 +95,9 @@ for cell in ['2017_04_03_B']:#read_from_pickle('cells_name2.p')[:]:#['2016_05_12
             while check=='again' or check=='a':
 
                 add_figure(cell+'\ntrace_number '+str(int(i))+ ' out of '+str(len(npV)),'dots','mV')
-                for trace1 in npV:
+                for i,trace1 in enumerate(npV):
                     base_line = trace1[start_short_pulse+start_calculate_E_pas:start_short_pulse+end_calculate_E_pas].mean()
-                    plt.plot(trace1-base_line,alpha=0.3, color="k")
+                    plt.plot(trace1-base_line,alpha=0.3, color=rgb.colors[i*2])
                     # plt.plot(np.array(data[1]), trace1-base_line, color="k")
 
                 plt.plot(short_pulse_mean,color='g')
@@ -107,9 +126,9 @@ for cell in ['2017_04_03_B']:#read_from_pickle('cells_name2.p')[:]:#['2016_05_12
         try:(np.savetxt(base_dir+"/peeling.txt", "traces number is "+str(correct_traces)+"\n"+[data[1], np.mean(filterd_traces_first,axis=0).flatten()*data[0].units]))
         except:"txt not secsseed to save"
         with open(base_dir+"clear_short_pulse.p", 'wb') as handle:
-            pickle.dump([filterd_traces_first*data[0].units,data[1]], handle, protocol=pickle.HIGHEST_PROTOCOL)
+            pickle.dump([filterd_traces_first*mv,data[1]], handle, protocol=pickle.HIGHEST_PROTOCOL)
         with open(base_dir+"mean_short_pulse.p", 'wb') as handle:
-            pickle.dump([np.mean(filterd_traces_first,axis=0)*data[0].units,data[1]], handle, protocol=pickle.HIGHEST_PROTOCOL)
+            pickle.dump([np.mean(filterd_traces_first,axis=0)*mv,data[1]], handle, protocol=pickle.HIGHEST_PROTOCOL)
         with open(base_dir+"correct_short_pulse_traces.p", 'wb') as handle:
             pickle.dump(correct_traces, handle, protocol=pickle.HIGHEST_PROTOCOL)
         from add_figure import add_figure
@@ -120,7 +139,7 @@ for cell in ['2017_04_03_B']:#read_from_pickle('cells_name2.p')[:]:#['2016_05_12
         plt.plot(data[1],np.mean(filterd_traces_first,axis=0),'black',lw=2,label='mean_short_pulse')
         plt.savefig(base_dir+"clear_short_pulse_after_peeling.png")
         plt.savefig(base_dir+"clear_short_pulse_after_peeling.pdf")
-        pickle.dump(fig, open(base_dir+'clear_short_pulse__after_peeling.p', 'wb'))
+        pickle.dump(fig, open(base_dir+'clear_short_pulse_after_peeling.p', 'wb'))
         plt.close()
         plt.figure()
         plt.title(cell+' have '+str(len(filterd_traces_first))+'traces')
@@ -131,7 +150,11 @@ for cell in ['2017_04_03_B']:#read_from_pickle('cells_name2.p')[:]:#['2016_05_12
         plt.show()
         new_dict={}
         temp_dict=read_from_pickle(glob(base_dir+'mean0_short_pulse_with_parameters.p')[0])
-        new_dict['mean']=[np.mean(filterd_traces_first,axis=0)*data[0].units+temp_dict['E_pas'],data[1]]
+        try:
+            new_dict['mean']=[np.mean(filterd_traces_first,axis=0)*mv+temp_dict['E_pas']*mv,data[1]]
+        except:
+            new_dict['mean']=[np.mean(filterd_traces_first,axis=0)*mv+temp_dict['E_pas'],data[1]]
+
         new_dict['E_pas']=temp_dict['E_pas']
         new_dict['points2calsulate_E_pas']=temp_dict['points2calsulate_E_pas']
         print(new_dict)

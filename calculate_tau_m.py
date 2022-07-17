@@ -27,7 +27,7 @@ def linear(x, m,c):
 def calculate_tau_m(cell_name):
     global folder_save
     #show the chooseing pulses
-    read_from_pickle(glob(folder_+cell_name+'/data/electrophysio_records/short_pulse/clear_short_pulse__after_peeling.p')[0])
+    read_from_pickle(glob(folder_+cell_name+'/data/electrophysio_records/short_pulse/clear_short_pulse_after_peeling.p')[0])
     plt.show()
     short_pulse_path=glob(folder_+cell_name+'/data/electrophysio_records/short_pulse/mean_short_pulse_with_parameters.p')[0]
     short_pulse_par=read_from_pickle(glob(folder_+cell_name+'/data/electrophysio_records/short_pulse_parameters0.p')[0])
@@ -37,7 +37,7 @@ def calculate_tau_m(cell_name):
     again='y'
     again2='y'
 
-    pulse,T=read_from_pickle(short_pulse_path)
+    pulse,T=read_from_pickle(short_pulse_path)['mean']
     start_short_pulse,end_short_pulse,length_short_pulse=short_pulse_edges(cell_name)
     #if i want i ca add one dot in the middle and still i wnt to understand what timegive ne the best fir results
     # need to run the function again (less lan(Vexp(t0)) to find tau1
@@ -45,7 +45,7 @@ def calculate_tau_m(cell_name):
     pulse-=min(pulse)
 
     T=T[start_short_pulse+2:3000]
-    E_PAS=short_pulse_par['E_pas']
+    E_PAS=read_from_pickle(short_pulse_path)['E_pas']
     # T.rescale('ms')
     # T = np.arange(0, len(pulse), 1) #* 0.1
     np_pulse=np.array(pulse)
@@ -194,8 +194,8 @@ if __name__=='__main__':
     #'2017_03_04_A_6-7' had problems with the aligment
     #'2017_07_06_C_3-4' not look good
 
-    for cell_name in read_from_pickle('cells_name2.p')[:]:#read_from_pickle('cells_run_tau_from_excel.p'):#cells[10:]:
-        if not cell_name in ['2016_04_16_A','2017_04_03_B','2017_02_20_B','2016_05_12_A'][0:2]:continue #problematic cells
+    for cell_name in ['2017_07_06_C_4-3']:#read_from_pickle('cells_name2.p')[:]:#read_from_pickle('cells_run_tau_from_excel.p'):#cells[10:]
+        # if not cell_name in ['2016_04_16_A','2017_04_03_B','2017_02_20_B','2016_05_12_A'][0:2]:continue #problematic cells
         print(cell_name)
         dicty=calculate_tau_m(cell_name)
         # tau_m[cell_name]
