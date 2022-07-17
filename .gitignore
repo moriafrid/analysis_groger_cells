@@ -137,6 +137,7 @@ cells_outputs_data_3_initial_cells/
 cells_outputs_data_old_runs/
 cells_outputs_data_wrong_traces/
 cells_outputs_data_short_before_10_shrinkage/
+cells_outputs_data_after_10_shrinkage/
 drivesync/
 final_data/
 fit_short_pulse_temp/
