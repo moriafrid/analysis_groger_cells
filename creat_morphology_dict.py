@@ -51,16 +51,16 @@ cell=load_swc(fname)
 
 sec_num=0
 soma_points = np.array([list(i) for i in cell.soma.psection()['morphology']['pts3d']]).mean(axis=0)
-# morphology_dict[sec_num]={'sec name':cell.soma.name().split('.')[-1],'x':round(soma_points[0],4),'y':round(soma_points[1],4),'z':round(soma_points[2],4),'d':round(soma_points[3],4)}
+morphology_dict[sec_num]={'sec name':cell.soma.name().split('.')[-1],'x':round(soma_points[0],4),'y':round(soma_points[1],4),'z':round(soma_points[2],4),'d':round(soma_points[3],4)}
 
 
-x,y,z,diam=[],[],[],[]
-for i, point in enumerate(cell.soma.psection()['morphology']['pts3d']):
-    x.append(point[0])
-    y.append(point[1])
-    z.append(point[2])
-    diam.append(point[3])
-morphology_dict[sec_num]={'sec name':cell.soma.name().split('.')[-1],'x':x,'y':y,'z':z,'d':diam}
+# x,y,z,diam=[],[],[],[]
+# for i, point in enumerate(cell.soma.psection()['morphology']['pts3d']):
+#     x.append(point[0])
+#     y.append(point[1])
+#     z.append(point[2])
+#     diam.append(point[3])
+# morphology_dict[sec_num]={'sec name':cell.soma.name().split('.')[-1],'x':x,'y':y,'z':z,'d':diam}
 
 
 
