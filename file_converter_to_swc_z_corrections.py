@@ -6,7 +6,7 @@ import pickle
 if len(sys.argv) != 2:
     # cell_name="2017_05_08_A_5-4(0)"
     cell_name="2017_05_08_A_4-5"
-    # cell_name="2017_03_04_A_6-7"
+    # cell_name="2017_07_06_C_4-3"
 else:
     cell_name=sys.argv[1]
 folder_="cells_initial_information/"
@@ -85,6 +85,9 @@ def run(id, prev_id,sec,type, parent_point=np.array([0, 0, 0]), print_=True):
 ######################################################
 
 fname = glob(folder_+cell_name+'/*.ASC')[0]
+if 'shrinkXYZ' in fname:
+    fname = glob(folder_+cell_name+'/*.ASC')[1]
+
 morphology_dict={}
 cell=mkcell(fname)
 sp2 = h.PlotShape()
@@ -108,7 +111,8 @@ swc_file.write('1 1 '+
 sec_num=0
 # morphology_dict[sec_num]={'sec name':cell.soma[0].name().split('.')[-1],'x':soma_points[0].round(4),'y':soma_points[1].round(4),'z':soma_points[2].round(4),'d':cell.soma[0].diam}
 morphology_dict[sec_num]={'sec name':cell.soma[0].name().split('.')[-1],'x':x,'y':y,'z':z,'d':d}
-
+# with open(folder_+cell_name+"/soma_dict.p", 'wb') as handle:
+#     pickle.dump(morphology_dict, handle, protocol=pickle.HIGHEST_PROTOCOL)
 def get_closest_z(soma_point, sec_point, soma_r):
     # dists = [[np.linalg.norm(point[:3]- sec_point[:3]), point[:3]] for point in soma_points]
     # dists.sort()
@@ -144,8 +148,9 @@ for child in cell.soma[0].children():
     id=run(id,1,child,type, print_=type==2, parent_point=parent_point)
 
 swc_file.close()
-with open(folder_+cell_name+"/morphology_dict_ASC.p", 'wb') as handle:
-    pickle.dump(morphology_dict, handle, protocol=pickle.HIGHEST_PROTOCOL)
+# with open(folder_+cell_name+"/morphology_dict_shrink_ASC.p", 'wb') as handle:
+#     pickle.dump(morphology_dict, handle, protocol=pickle.HIGHEST_PROTOCOL)
+
 # cell=None
 #
 # cell=instantiate_swc(folder_+cell_name+'/morphology_z_correct.swc')
@@ -153,6 +158,8 @@ with open(folder_+cell_name+"/morphology_dict_ASC.p", 'wb') as handle:
 # sp = h.PlotShape()
 # sp.show(0)  # show diameters
 # a=1
+import os
+os.system('python creat_morphology_dict.py '+cell_name)
 
 
 
