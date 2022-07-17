@@ -4,13 +4,18 @@ from glob import glob
 import numpy as np
 from matplotlib import pyplot as plt, gridspec
 import pickle5 as pickle
+from read_spine_properties import get_spine_xyz, get_n_spinese
 from open_pickle import read_from_pickle
 import sys
+from matplotlib_scalebar.scalebar import ScaleBar
+
 #%% load simulation data
 without_axons=True
 data_dir = '/kaggle/input/fiter-and-fire-paper'
 if len(sys.argv) != 2:
     cell_name="2017_05_08_A_4-5"
+    cell_name="2016_04_16_A"
+
 else:
     cell_name=sys.argv[1]
 
@@ -59,7 +64,7 @@ def get_morphology(morphology_filename="./morphology_dict.pickle", experiment_di
 
     return seg_ind_to_xyz_coords_map, seg_ind_to_sec_ind_map, section_index, distance_from_soma, is_basal
 
-def plot_morphology(ax, segment_colors, names=[], width_mult_factors=None, seg_ind_to_xyz_coords_map={}):
+def plot_morphology(ax, segment_colors, names=[], width_mult_factors=None, seg_ind_to_xyz_coords_map={},synapse=[]):
     if width_mult_factors is None:
         width_mult_factor = 1.2
         width_mult_factors = width_mult_factor * np.ones((segment_colors.shape))
@@ -99,14 +104,17 @@ def plot_morphology(ax, segment_colors, names=[], width_mult_factors=None, seg_i
             ax.text(np.max(seg_ind_to_xyz_coords_map[key]['x']), np.max(seg_ind_to_xyz_coords_map[key]['y']),
                     names[ind])
 
-    # add black soma
-    # ax.scatter(x=45.5, y=19.8, s=120, c='k')
+    # add synapses
+    for syn in synapse:
+        ax.scatter(x=syn[0], y=syn[1], s=5, c='r')
     # ax.set_xlim(-180, 235)
     # ax.set_ylim(-210, 1200);
-    plt.show()
+    ax.add_artist(ScaleBar(1, "um", fixed_value=50, location="center right",rotation="vertical"))
+    ax_morphology.set_axis_off()
+
 
 # morphology_filename=glob('cells_initial_information/2017_03_04_A_6-7/morphology_dict.pickle')
-morphology_filename=glob('cells_initial_information/'+cell_name+'/dict_morphology.pickle')
+morphology_filename=glob('cells_initial_information/'+cell_name+'/dict_morphology_swc.pickle')
 
 seg_ind_to_xyz_coords_map=read_from_pickle(morphology_filename[0])
 # sim_results=None
@@ -131,13 +139,21 @@ segment_colors_selected = np.zeros(num_segments)
 segment_widths_selected = 1.2 * np.ones(segment_colors_selected.shape)
 
 ##highlith the selected part
+
 chosen_PSP_segment_inds = []
-# chosen_PSP_segment_inds = [1, 49, 132, 200, 344, 468, 530]
+# chosen_PSP_segment_inds = [1, 49]
 chosen_PSP_segment_colors = 0.5 + np.arange(len(chosen_PSP_segment_inds)) / len(chosen_PSP_segment_inds)
 for curr_selected_segment_index, color in zip(chosen_PSP_segment_inds, chosen_PSP_segment_colors):
     segment_colors_selected[curr_selected_segment_index] = color
-    segment_widths_selected[curr_selected_segment_index] = 30.0
-
+    segment_widths_selected[curr_selected_segment_index] = 10.0
+choosen_synpase=[]
+for spine_num in np.arange(get_n_spinese(cell_name)):
+    choosen_synpase.append(get_spine_xyz(cell_name,spine_num))
 plot_morphology(ax_morphology, segment_colors_selected, width_mult_factors=segment_widths_selected,
-                seg_ind_to_xyz_coords_map=seg_ind_to_xyz_coords_map, names=[])
-ax_morphology.set_axis_off()
+                seg_ind_to_xyz_coords_map=seg_ind_to_xyz_coords_map,synapse=choosen_synpase, names=[])
+
+plt.savefig('cells_initial_information/'+cell_name+'/neuron_morphology.png')
+# pickle.dump(fig, open('cells_initial_information/'+cell_name+'/morphology_fig.p', 'wb'))
+plt.savefig('cells_outputs_data_short/'+cell_name+'/neuron_morphology.png')
+pickle.dump(fig, open('cells_outputs_data_short/'+cell_name+'/neuron_morphology_fig.p', 'wb'))
+# plt.show()
