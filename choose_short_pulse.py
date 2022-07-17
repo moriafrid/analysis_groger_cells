@@ -72,7 +72,8 @@ for cell in ['2017_07_06_C_4-3','2016_08_30_A']:#read_from_pickle('cells_name2.p
     timer.add_callback(close_event)
     factor=int(len(rgb.colors)/len(npV)/2)
     for i,v in enumerate(npV):
-        plt.plot(v,color=rgb.colors[i+i*factor],alpha=0.2)
+        if i>len(rgb.colors):continue
+        plt.plot(v,color=rgb.colors[i],alpha=0.2)
     plt.title(cell+' have '+str(len(npV))+' traces')
     plt.show()
     timer = fig.canvas.new_timer(interval=2000)
@@ -97,7 +98,7 @@ for cell in ['2017_07_06_C_4-3','2016_08_30_A']:#read_from_pickle('cells_name2.p
                 add_figure(cell+'\ntrace_number '+str(int(i))+ ' out of '+str(len(npV)),'dots','mV')
                 for i,trace1 in enumerate(npV):
                     base_line = trace1[start_short_pulse+start_calculate_E_pas:start_short_pulse+end_calculate_E_pas].mean()
-                    plt.plot(trace1-base_line,alpha=0.3, color=rgb.colors[i*2])
+                    plt.plot(trace1-base_line,alpha=0.3, color=rgb.colors[i])
                     # plt.plot(np.array(data[1]), trace1-base_line, color="k")
 
                 plt.plot(short_pulse_mean,color='g')
