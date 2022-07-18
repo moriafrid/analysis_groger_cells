@@ -106,7 +106,7 @@ if from_the_begin:
         os.remove(base_save_folder+'/cp')
         os.remove(base_save_folder+'/cp.tmp')
     except:pass
-RDSM_objective_file = folder_+save_dir+cell_name+"/data/electrophysio_records/syn/mean_syn0.p"
+RDSM_objective_file = folder_+save_dir+cell_name+"/data/electrophysio_records/syn/mean_syn.p"
 # RDSM_objective_file = data_dir+cell_name+"/mean_syn_split.p"
 short_pulse_parameters_file=folder_+save_dir+cell_name+'/data/electrophysio_records/short_pulse_parameters.p'
 short_pulse_parameters_file=data_dir+cell_name+'/mean_short_pulse_with_parameters.p'
