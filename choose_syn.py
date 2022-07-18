@@ -21,15 +21,16 @@ timer.add_callback(close_event)
 check='again'
 problematic_cells=['2017_04_03_B','2017_02_20_B','2016_08_30_A']
 for cell in read_from_pickle('cells_name2.p'):
-    if cell != '2016_05_12_A':continue
-    # if cell!='2017_05_08_A_4-5':continue
+    if cell != '2017_07_06_C_3-4':continue#,'2017_02_20_B'?,2016_08_30_A?
     # if cell in problematic_cells:continue
     base_dir="cells_outputs_data_short/"+cell+"/data/electrophysio_records/syn/"
 
     print(cell)
     data=read_from_pickle(base_dir+"/syn.p")
-    # if cell in ['2017_07_06_C_3-4','2017_04_03_B']:
-    data=read_from_pickle(base_dir+"/clear_syn0.p")
+    # data=read_from_pickle(base_dir+"/clear_syn0.p")
+
+    if cell in ['2017_07_06_C_3-4','2017_04_03_B']:
+        data=read_from_pickle(base_dir+"/clear_syn.p")
     # if cell in read_from_pickle('cells_old.p'):
     #
     #     data=[]
