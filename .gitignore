@@ -141,6 +141,7 @@ cells_outputs_data_after_10_shrinkage/
 cells_outputs_data_after_10_shrink/
 drivesync/
 final_data/
+final_data_with_mean_syn0.p/
 fit_short_pulse_temp/
 David_kaggel_data/
 x86_64/
