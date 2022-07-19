@@ -20,3 +20,9 @@ def get_passive_parameter(cell_name,double_spine_area='False',shrinkage_resize=[
         for name in curr.parameter_type:
             passive_vals_dict[name]= curr.loc[df.parameter_type == name,:].to_dict('records')[0]
         return passive_vals_dict
+
+def get_passive_from_Ra(cell_name,RA):
+    p='cells_outputs_data_short/'+cell_name+'/fit_short_pulse/results_passive_fits.csv'
+    df = pd.read_csv(p)
+    curr = df.loc[(df["RA"] == RA), ]
+
