@@ -94,7 +94,7 @@ def plot_res(RM, RA, CM, save_folder="data/fit/",save_name= "fit"):
     print('error_decay=', round(error_2,3))
     print('error_mean_max_voltage=', round(error_3,3))
     print('error_from_rest=', round(error_1,3))
-    plt.plot(T[0],exp_V[0],'white',label='error_decay&max='+str(error_2 + error_3))
+    plt.plot(T[0],exp_V[0],'white',label='error_decay&max='+str(round(error_2 + error_3,3)))
     plt.legend(loc='best')
     plt.savefig(save_folder+'/'+save_name+".png")
     pickle.dump(fig, open(save_folder+'/'+save_name+'.p', 'wb'))
