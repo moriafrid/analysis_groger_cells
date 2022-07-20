@@ -32,19 +32,23 @@ os.system('python check_short_pulse_edges.py')
 
 os.system('python calculate_tau_m.py')
 
-commet_level1=" ".join(["python run_fits.py", cells_name_place ])
+commet_level1=" ".join(["python run_execute_fits.py", cells_name_place ])
 os.system(commet_level1)
+
+os.syatem("csv_for_passive_val_results.py")
 
 commet_level1=" ".join(["python run_execute_level2.py", cells_name_place ])
 os.system(commet_level1)
 
 os.system('python choose_syn.py')
 
+os.system('python run_Moo_get_parameters.py')
+
+os.system("python run_analysis_Moo.py")
+
 
 # os.system("python run_execute_fits.py")
-# os.syatem("csv_for_passive_val_results.py")
 # os.system("python run_execute_level2.py")
 # os.system("python run_Moo_get_parameters.py")
-# os.system("python run_analysis_Moo.py")
 
 
