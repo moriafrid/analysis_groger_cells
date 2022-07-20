@@ -44,7 +44,7 @@ def show_dirr(png_file):
     img = mpimg.imread(png_file)
     imgplot = plt.imshow(img)
 
-def show_directory(ax, title,png_file):
+def show_directory(ax, title="",png_file=""):
     global i
     if png_file.split('.')[-1]=='pdf':  # if only have pdf (no png) => create png and read it later
         if len(glob(png_file.replace(".pdf", ".png")))>0:
