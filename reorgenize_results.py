@@ -8,7 +8,7 @@ import shutil
 from read_passive_parameters_csv import get_passive_parameter
 from passive_val_function import get_passive_val
 from read_spine_properties import get_parameter,get_n_spinese
-
+from show_result import show_directory,place
 data_file='cells_outputs_data_short/'
 from extra_function import create_folder_dirr
 
@@ -28,6 +28,7 @@ def copy_file(copy,paste,extra_name=''):
         except:
             print('')
 for cell_name in read_from_pickle('cells_name2.p'):
+    # if cell_name!='2017_05_08_A_4-5':continue
     # if cell_name in read_from_pickle('cells_name2.p'):continue
     # if cell_name in ['2017_07_06_C_4-3','2016_04_16_A','2017_07_06_C_3-4']:continue (until I can change the run to be not on folder syn_par for the Moo)
     print(cell_name)
@@ -35,14 +36,17 @@ for cell_name in read_from_pickle('cells_name2.p'):
     shrinkage_by=1.0
     resize_diam_by=1.0
 
-    data_file='cells_outputs_data_short/'+cell_name
+    data_file='cells_outputs_data_short/'+cell_name+'/'
     save_file='final_data/'+cell_name+'/'
 
     try: shutil.rmtree(save_file)
     except:pass
     create_folder_dirr(save_file)
     copy_file(glob(data_file+'/neuron_morphology_fig.p')[0],save_file)
+    copy_file(glob(data_file+'/neuron_morphology_fig.p')[0],save_file)
+    copy_file(glob(data_file+'data/cell_properties/z_correct.swc/diam_dis/diam-dis.p')[0],save_file)
     copy_file(glob(data_file+'/data/electrophysio_records/syn/clear_syn_after_peeling.p')[0],save_file)
+
     copy_file(glob(data_file+'/data/electrophysio_records/short_pulse/clear_short_pulse_after_peeling.p')[0],save_file)
     copy_file(glob(data_file+'/data/electrophysio_records/*/I_V_curve_fit.p')[0],save_file)
     copy_file(glob(data_file+'/fit_short_pulse/tau_m_calculation/calculate_taus.p')[0],save_file)
@@ -65,31 +69,22 @@ for cell_name in read_from_pickle('cells_name2.p'):
         else:
             if float(RA)>70:
                 next_continue=True
-        copy_file(glob(data_file+'/fit_short_pulse/z_correct.swc_SPINE_START=20/dend*'+str(resize_diam_by)+'&F_shrinkage='+str(shrinkage_by)+'/const_param/RA/fit RA='+RA+'.png')[0],save_file_resize,extra_name=passive_val_name)
-        copy_file(glob(data_file+'/data/electrophysio_records/*IV*/-50pA.png')[0],save_file_resize,extra_name=passive_val_name)
-
+        copy_file(glob(data_file+'/fit_short_pulse/z_correct.swc_SPINE_START=20/dend*'+str(resize_diam_by)+'&F_shrinkage='+str(shrinkage_by)+'/const_param/RA/fit RA='+RA+'.p')[0],save_file_resize,extra_name=passive_val_name)
+        copy_file(glob(data_file+'/data/electrophysio_records/*IV*/-50pA.p')[0],save_file_resize,extra_name=passive_val_name)
         copy_file(glob(data_file+'/data/cell_properties/z_correct.swc/SPINE_START=20/dend*'+str(resize_diam_by)+'&F_shrinkage='+str(shrinkage_by)+'/'+passive_val_name+'/E_dendogram/dend_only_with_syn.p')[0],save_file_resize)
         copy_file(glob(data_file+'/data/cell_properties/z_correct.swc/SPINE_START=20/dend*'+str(resize_diam_by)+'&F_shrinkage='+str(shrinkage_by)+'/'+passive_val_name+'/M_dendogram/dend_only.p')[0],save_file_resize)
 
 
         if get_n_spinese(cell_name)>1:
-            try:
-                copy_file(glob(data_file+'/MOO_results_relative_strange/z_correct.swc_SPINE_START=20/'+resize+'/const_param/'+passive_val_name+'_full_trace/fit_transient_RDSM.p')[0],save_file_resize,extra_name='full_relative_'+passive_val_name)
-                copy_file(glob(data_file+'/MOO_results_relative_strange/z_correct.swc_SPINE_START=20/'+resize+'/const_param/'+passive_val_name+'_full_trace/data.txt')[0],save_file_resize,extra_name='full_relative_'+passive_val_name)
-                copy_file(glob(data_file+'/MOO_results_relative_strange/z_correct.swc_SPINE_START=20/'+resize+'/const_param/'+passive_val_name+'_full_trace/final_pop.p')[0],save_file_resize,extra_name='full_relative_'+passive_val_name)
-                copy_file(glob(data_file+'/MOO_results_relative_strange/z_correct.swc_SPINE_START=20/'+resize+'/const_param/'+passive_val_name+'/fit_transient_RDSM.p')[0],save_file_resize,extra_name='relative_'+passive_val_name)
+            for MOO_file in glob(data_file+'/MOO_results_relative_strange/z_correct.swc_SPINE_START=20/'+resize+'/const_param/'+passive_val_name+'_full_trace/*.p'):
+                if 'before' in MOO_file:continue
+                copy_file(MOO_file,save_file_resize,extra_name='full_relative_'+passive_val_name)
+            copy_file(glob(data_file+'/MOO_results_relative_strange/z_correct.swc_SPINE_START=20/'+resize+'/const_param/'+passive_val_name+'_full_trace/data.txt')[0],save_file_resize,extra_name='full_relative_'+passive_val_name)
 
-            except:
-                print(cell_name,"don't finish to MOO, relative_syn")
         else:
-            try:
-                copy_file(glob(data_file+'/MOO_results_same_strange/z_correct.swc_SPINE_START=20/'+resize+'/const_param/'+passive_val_name+'_full_trace/fit_transient_RDSM.p')[0],save_file_resize,extra_name='full_same_'+passive_val_name)
-                copy_file(glob(data_file+'/MOO_results_same_strange/z_correct.swc_SPINE_START=20/'+resize+'/const_param/'+passive_val_name+'_full_trace/data.txt')[0],save_file_resize,extra_name='full_same_'+passive_val_name)
-                copy_file(glob(data_file+'/MOO_results_same_strange/z_correct.swc_SPINE_START=20/'+resize+'/const_param/'+passive_val_name+'_full_trace/final_pop.p')[0],save_file_resize,extra_name='full_same_'+passive_val_name)
-                copy_file(glob(data_file+'/MOO_results_same_strange/z_correct.swc_SPINE_START=20/'+resize+'/const_param/'+passive_val_name+'/fit_transient_RDSM.p')[0],save_file_resize,extra_name='same_'+passive_val_name)
-            except:
-                print(cell_name,"don't finish to MOO, same_syn")
-        # copy_file(glob(data_file+'/MOO_results_syn_par__same_strange/ASC_SPINE_START=20/F_shrinkage=1.0_dend*1.0/const_param/RA_best_fit/befor_simulation.txt'))
+            for MOO_file in glob(data_file+'/MOO_results_same_strange/z_correct.swc_SPINE_START=20/'+resize+'/const_param/'+passive_val_name+'_full_trace/*.p'):
+                copy_file(MOO_file,save_file_resize,extra_name='full_same_'+passive_val_name)
+            copy_file(glob(data_file+'/MOO_results_same_strange/z_correct.swc_SPINE_START=20/'+resize+'/const_param/'+passive_val_name+'_full_trace/data.txt')[0],save_file_resize,extra_name='full_same_'+passive_val_name)
 
 
 
@@ -120,24 +115,10 @@ for p in files:
         else:
             if float(RA)>70:
                 next_continue=True
-        copy_file(glob(data_file+'/fit_short_pulse/z_correct.swc_SPINE_START=20/dend*'+str(resize_diam_by)+'&F_shrinkage='+str(shrinkage_by)+'/const_param/RA/fit RA='+RA+'.png')[0],save_file_resize,extra_name=passive_val_name)
+        copy_file(glob(data_file+'/fit_short_pulse/z_correct.swc_SPINE_START=20/dend*'+str(resize_diam_by)+'&F_shrinkage='+str(shrinkage_by)+'/const_param/RA/fit RA='+RA+'.p')[0],save_file_resize,extra_name=passive_val_name)
 
         # copy_file(glob(data_file+'/data/cell_properties/'+file_type+'/SPINE_START=20/dend*'+str(resize_diam_by)+'&F_shrinkage='+str(shrinkage_by)+'/'+passive_val_name+'/E_dendogram/dend_only_with_syn.p')[0],save_file_resize)
         # copy_file(glob(data_file+'/data/cell_properties/'+file_type+'/SPINE_START=20/dend*'+str(resize_diam_by)+'&F_shrinkage='+str(shrinkage_by)+'/'+passive_val_name+'/M_dendogram/dend_only.p')[0],save_file_resize)
-        try:
-            copy_file(glob(data_file+'/MOO_results_same_strange/z_correct.swc_SPINE_START=20/'+resize+'/const_param/'+passive_val_name+'_full_trace/fit_transient_RDSM.p')[0],save_file_resize,extra_name='full_same_'+passive_val_name)
-            copy_file(glob(data_file+'/MOO_results_same_strange/z_correct.swc_SPINE_START=20/'+resize+'/const_param/'+passive_val_name+'_full_trace/data.txt')[0],save_file_resize,extra_name='full_same_'+passive_val_name)
-            copy_file(glob(data_file+'/MOO_results_same_strange/z_correct.swc_SPINE_START=20/'+resize+'/const_param/'+passive_val_name+'_full_trace/final_pop.p')[0],save_file_resize,extra_name='full_same_'+passive_val_name)
-            copy_file(glob(data_file+'/MOO_results_same_strange/z_correct.swc_SPINE_START=20/'+resize+'/const_param/'+passive_val_name+'/fit_transient_RDSM.p')[0],save_file_resize,extra_name='same_'+passive_val_name)
-        except:
-            print(cell_name,"don't finish to MOO, same_syn")
-
-        # if get_parameter(cell_name,'n_syn')[0]>1:
-        #     try:
-        #         copy_file(glob(data_file+'/MOO_results_relative_strange/z_correct.swc_SPINE_START=20/'+resize+'/const_param/'+passive_val_name+'_full_trace/fit_transient_RDSM.p')[0],save_file_resize,extra_name='full_relative_'+passive_val_name)
-        #         copy_file(glob(data_file+'/MOO_results_relative_strange/z_correct.swc_SPINE_START=20/'+resize+'/const_param/'+passive_val_name+'_full_trace/data.txt')[0],save_file_resize,extra_name='full_relative_'+passive_val_name)
-        #
-        #         copy_file(glob(data_file+'/MOO_results_relative_strange/z_correct.swc_SPINE_START=20/'+resize+'/const_param/'+passive_val_name+'*/fit_transient_RDSM.p')[0],save_file_resize,extra_name='relative_'+passive_val_name)
-        #     except:
-        #         print(cell_name,"don't finish to MOO, relative_syn")
-        # copy_file(glob(data_file+'/MOO_results_same_strange/ASC_SPINE_START=20/F_shrinkage=1.0_dend*1.0/const_param/RA_best_fit/befor_simulation.txt'))
+        for MOO_file in glob(data_file+'/MOO_results_same_strange/z_correct.swc_SPINE_START=20/'+resize+'/const_param/'+passive_val_name+'_full_trace/*.p'):
+            copy_file(MOO_file,save_file_resize,extra_name='full_relative_'+passive_val_name)
+        copy_file(glob(data_file+'/MOO_results_same_strange/z_correct.swc_SPINE_START=20/'+resize+'/const_param/'+passive_val_name+'_full_trace/data.txt')[0],save_file_resize,extra_name='full_same_'+passive_val_name)
