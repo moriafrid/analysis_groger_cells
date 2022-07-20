@@ -103,15 +103,24 @@ class OPEN_RES():
                                   neck_diam=self.hall['spine'][number]["NECK_DIAM"],
                                   neck_length=self.hall['spine'][number]["NECK_LENGHT"],
                                   head_diam=self.hall['spine'][number]["HEAD_DIAM"])
+        if self.hall['spine'][number]["NECK_LENGHT"]==0:
+            position=spine[0]
+            # spine_temp=[spine[1],spine[0]]
+
+        else:
+            position=1
+            # spine_temp=spine
 
         if not ignore_netstim:
-            syn_obj = self._add_syn_on_sec(spine[1], weight, pos=1, hall_of_fame_num=hall_of_fame_num, netstim=netstim)
+            syn_obj = self._add_syn_on_sec(spine[1], weight, pos=position, hall_of_fame_num=hall_of_fame_num, netstim=netstim)
         else:
             syn_obj = None
         return spine, syn_obj
 
     def create_spine(self, sec, pos, number=0, neck_diam=0.25, neck_length=1.35,
                      head_diam=0.944):  # np.sqrt(2.8/(4*np.pi))
+        if  head_diam== 0 or neck_diam== 0:
+            return [pos,sec]
         neck = self.sim.neuron.h.Section(name="spineNeck" + str(number))
         head = self.sim.neuron.h.Section(name="spineHead" + str(number))
         # self.hoc_model.all.append(neck)
