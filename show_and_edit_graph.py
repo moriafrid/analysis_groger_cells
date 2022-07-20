@@ -34,21 +34,57 @@ def get_Moo_label(dirr):
     NMDA_tau2=str(round(data['mean_final_pop'][data['parameters'].index('NMDA_tau_d_NMDA')],3))
     return 'g_AMPA='+g_AMPA+'\n'+'tau1='+tau1+' tau2='+tau2+'\n'+'gmax_NMDA='+g_NMDA+'\n'+'tau1='+NMDA_tau1+' tau2='+NMDA_tau2
 class Graph_edit:
-    def __init__(self,dirr,ax_tot=None):
+    def __init__(self,dirr,ax_tot=None,remove_axis=True,change_title_size=True,change_lw=False,remove_title='True',fig=None):
         self.fig1=pickle.load(open(dirr, 'rb'))
+        plt.gcf()
         self.cell_name=dirr[dirr.rfind('201'):].split('/')[0]
-        self.ax=self.fig1.gca()
+        if ax_tot is None:
+            self.ax=self.fig1.gca()
+        else:
+            self.ax=self.fig1.gca()
+            move_axes(self.ax,self.fig)
+        # plt.close(self.fig1)
         self.dirr=dirr
+
+        #the function runing:
+        if 'IV' in self.dirr:
+            self.change_axis_place()
+        elif remove_axis:
+            self.remove_axis()
+            # self.add_scalebar()
+        if change_title_size:
+            self.change_axis_name()
+        if change_lw:
+            self.change_lw()
+        self.figure_shape()
+        self.savefig()
+        if remove_title:
+            self.change_axis_name(title='remove')
+
+    def plot_again(self):
+        pass
+    def get_figure(self):
+        return self.fig1.get_figure()
     def remove_axis(self):
         # self.ax.set_axis_off()
         self.ax.spines['top'].set_visible(False)
         self.ax.spines['right'].set_visible(False)
-        self.ax.spines['bottom'].set_visible(False)
-        self.ax.spines['left'].set_visible(False)
-        self.ax.set_axis_off()
+        # self.ax.spines['bottom'].set_visible(False)
+        # self.ax.spines['left'].set_visible(False)
+        # self.ax.set_axis_off()
+
+    def change_axis_place(self):
+        ax.spines['bottom'].set_position('zero')
+        ax.spines['left'].set_position('zero')
+        self.ax.spines['top'].set_visible(False)
+        self.ax.spines['right'].set_visible(False)
+
     def change_axis_name(self,title='',xlabel='',ylabel=''):
         if title!='':
-            self.ax.set_title(title,fontsize = 10)
+            if title=='remove':
+                self.ax.set_title('')
+            else:
+                self.ax.set_title(title,fontsize = 10)
         if xlabel!='':
             self.ax.set_xlabel(xlabel,fontsize=5)
         if ylabel!='':
@@ -57,7 +93,14 @@ class Graph_edit:
         plt.show()
     def add_scalebar(self,units="um",length=100,location="lower left",orientation="horizontal"):
         #orientation can be vertical or horizontal
-        self.ax.add_artist(ScaleBar(1, units, fixed_value=length, location=location,rotation=orientation))
+        if units=="um":
+            self.ax.add_artist(ScaleBar(1, units, fixed_value=length, location=location,rotation=orientation))
+        else:
+            # scel=AnchoredScaleBar(self.ax.transData,200/0.1,1,'200ms','1mV','lower left')
+            scel2=AnchoredHScaleBar(ax=self.ax,size_x=200*0.1, size_y=1, linekw=dict(color="crimson"), x_to_ms=lambda x: x/0.1)
+            # scel=AnchoredHScaleBar(ax=ax,size_x=1.2, linekw=dict(color="crimson"))
+            # self.ax.add_artist(scel)
+            self.ax.add_artist(scel2)
     def change_lw(self,multipule_lw=2):
         for line in self.ax.lines:
             line.set_linewidth(line.get_lw()*multipule_lw)
@@ -72,16 +115,22 @@ class Graph_edit:
         if not file_type=='':file_type='.'+file_type
         plt.savefig(dirr_save)
         pickle.dump(self.fig1, open(dirr_save+'.p', 'wb'))
+        plt.close(self.fig1)
+        return dirr_save+'.png'
     def add_text(self,text='',x=0.25,y=0.25,color='black',fontsize=20):
         if text=='short_pulse':
-            text=self.ax.get_title()
-            Ra=int(re.findall(r'\b\d+\b',self.dirr))[0]
-            RA,CM,RM=get_passive_from_Ra(cell_name,Ra)
+            title=self.ax.get_title()
+            RM,RA,CM=re.findall(r"[-+]?(?:\d*\.\d+|\d+)",title[title.find('RM='):])
+            # Ra=int(re.findall(r"[-+]?(?:\d*\.\d+|\d+)",self.dirr))[0]
+            # RA,CM,RM=get_passive_from_Ra(cell_name,Ra)
             text='RA='+RA+'\n'+'CM='+CM+'\n'+'RM='+RM+'\n'
         elif 'final_pop' in text:
             text=get_Moo_label(text)
             # text='g_AMPA='+CM+'nS\n'+'tau1='+RA+' tau2='+'\n'+'gmax_NMDA='+CM+'\n'+'RM='+RM+'\n'
         plt.text(x,y,text,fontsize=fontsize, color=color)
+    def figure_shape(self,hight=10,widght=10):
+        self.fig1.set_figheight(hight)
+        self.fig1.set_figwidth(widght)
     def first_edition(self):
         self.remove_axis()
         self.change_axis_name()
