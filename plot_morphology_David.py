@@ -109,7 +109,7 @@ def plot_morphology(ax, segment_colors, names=[], width_mult_factors=None, seg_i
         ax.scatter(x=syn[0], y=syn[1], s=5, c='r')
     # ax.set_xlim(-180, 235)
     # ax.set_ylim(-210, 1200);
-    ax.add_artist(ScaleBar(1, "um", fixed_value=50, location="center right",rotation="vertical"))
+    ax.add_artist(ScaleBar(1, "um", fixed_value=50, location="lower center",rotation="horizontal"))
     ax_morphology.set_axis_off()
 
 
