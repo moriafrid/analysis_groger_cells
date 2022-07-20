@@ -14,15 +14,16 @@ matplotlib.rcParams['pdf.fonttype'] = 42
 matplotlib.rcParams['svg.fonttype'] = 'none'
 import sys
 if len(sys.argv) != 3:
-    specipic_cell='5-4'
-    specipc_moo_file='_syn_par_corrrection'
+    specipic_cell='*'
+    specipc_moo_file='_same_strange'
+
 else:
     print("the sys.argv len is correct",flush=True)
     specipic_cell = sys.argv[1]
     specipc_moo_file=sys.argv[2]
 
 folder_= ''
-folder_data=folder_+'cells_outputs_data_short/*'+specipic_cell+'/MOO_results'+specipc_moo_file+'*/*/F_shrinkage=*/const_param/'
+folder_data=folder_+'cells_outputs_data_short/*'+specipic_cell+'/MOO_results'+specipc_moo_file+'/*/F_shrinkage=*/const_param/'
 save_name='/g_max'
 
 for curr_i, model_place in tqdm(enumerate(glob(folder_data+'*'))):
