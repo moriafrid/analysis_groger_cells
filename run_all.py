@@ -44,7 +44,7 @@ os.system('python choose_syn.py')
 
 os.system('python run_Moo_get_parameters.py')
 
-os.system("python run_analysis_Moo.py")
+os.system("python run_analysis_MOO.py")
 
 
 # os.system("python run_execute_fits.py")

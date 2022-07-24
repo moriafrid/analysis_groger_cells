@@ -14,7 +14,7 @@ matplotlib.rcParams['pdf.fonttype'] = 42
 matplotlib.rcParams['svg.fonttype'] = 'none'
 if len(sys.argv) != 3:
     specipic_cell='*'
-    specipc_moo_file='_same_strange'
+    specipc_moo_file='_strange'
 
 else:
     print("the sys.argv len is correct",flush=True)
@@ -22,11 +22,12 @@ else:
     specipc_moo_file=sys.argv[2]
 
 folder_= ''
-folder_data=folder_+'cells_outputs_data_short/*'+specipic_cell+'/MOO_results'+specipc_moo_file+'/*/F_shrinkage=*/const_param/'
+folder_data1=folder_+'cells_outputs_data_short/*'+specipic_cell+'/MOO_results_same'+specipc_moo_file+'/*/F_shrinkage=*/const_param/'
+folder_data2=folder_+'cells_outputs_data_short/*'+specipic_cell+'/MOO_results_relative'+specipc_moo_file+'/*/F_shrinkage=*/const_param/'
 save_name='/Voltage Spine&Soma'
 
 
-for curr_i, model_place in tqdm(enumerate(glob(folder_data+'*'))):
+for curr_i, model_place in tqdm(enumerate(glob(folder_data1+'*')+glob(folder_data2+'*'))):
     type=model_place.split('/')[-1]
     cell_name=model_place.split('/')[1]
     if type=='test': continue

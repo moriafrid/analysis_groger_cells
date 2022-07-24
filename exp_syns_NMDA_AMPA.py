@@ -14,7 +14,7 @@ matplotlib.rcParams['svg.fonttype'] = 'none'
 import sys
 if len(sys.argv) != 3:
     specipic_cell='*'
-    specipc_moo_file='_same_strange'
+    specipc_moo_file='_strange'
 
     print("sys.argv isn't run")
 else:
@@ -24,10 +24,10 @@ else:
     print('run with sys.argv', sys.argv)
 
 folder_= ''
-folder_data=folder_+'cells_outputs_data_short/*'+specipic_cell+'/MOO_results'+specipc_moo_file+'/*/F_shrinkage=*/const_param/'
-
+folder_data1=folder_+'cells_outputs_data_short/*'+specipic_cell+'/MOO_results_same'+specipc_moo_file+'/*/F_shrinkage=*/const_param/'
+folder_data2=folder_+'cells_outputs_data_short/*'+specipic_cell+'/MOO_results_relative'+specipc_moo_file+'/*/F_shrinkage=*/const_param/'
 save_name='/AMPA&NMDA_syns'
-for curr_i, model_place in tqdm(enumerate(glob(folder_data+'*'))):
+for curr_i, model_place in tqdm(enumerate(glob(folder_data1+'*')+glob(folder_data2+'*'))):
     print(model_place)
     type=model_place.split('/')[-1]
     cell_name=model_place.split('/')[1]
