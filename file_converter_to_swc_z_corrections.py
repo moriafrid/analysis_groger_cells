@@ -84,9 +84,9 @@ def run(id, prev_id,sec,type, parent_point=np.array([0, 0, 0]), print_=True):
 # build the model
 ######################################################
 
-fname = glob(folder_+cell_name+'/*.ASC')[0]
-if 'shrinkXYZ' in fname:
-    fname = glob(folder_+cell_name+'/*.ASC')[1]
+fname = glob(folder_+cell_name+'/*shrinkXYZ.ASC')[0]
+# if 'shrinkXYZ' in fname:
+#     fname = glob(folder_+cell_name+'/*.ASC')[1]
 
 morphology_dict={}
 cell=mkcell(fname)
