@@ -254,7 +254,7 @@ if __name__=='__main__':
             # print('Rin='+str(round(rin,3)))
             # RM=(Rin*pi)**2/4*d**3*ra
             error_last=error_next
-            error_next=Rins-Rin
+            # error_next=Rins-Rin
             error_next=errors_Rinput(RM, ra, CM,E_PAS)
         print('Rinput for Ra='+str(ra)+' is '+str(round(Rin,2))+'in compare to '+str(Rins))
         ra_error2,precent_eror=plot_res(RM, ra, CM, save_folder=initial_folder, save_name="fit RA=" + str(round(ra, 2)))
