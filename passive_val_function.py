@@ -7,6 +7,8 @@ def get_passive_val(passive_val_dict,what_return='string'):
         return str(RA),str(CM),str(RM)
     elif what_return=='nice_results':
         return 'RA:'+str(round(RA,2))+' CM:'+str(round(CM,2))+ ' RM: '+str(round(RM,2))
+    elif what_return=='full_result':
+        return RA,CM,RM
     else: raise "what return isn't possible"
 
 
