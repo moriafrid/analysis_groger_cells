@@ -226,7 +226,7 @@ if __name__ == '__main__':
             MNOP
             """)
 
-        # passive_vals_dict=get_passive_parameter(cell_name,shrinkage_resize=[shrinkage_by,resize_diam_by],fit_condition=fit_condition,spine_start=int(SPINE_START),file_type=file_type)
+        # passive_vals_dict=get_passive_parameter(cell_name,befor_after,shrinkage_resize=[shrinkage_by,resize_diam_by],fit_condition=fit_condition,spine_start=int(SPINE_START),file_type=file_type)
         # ax = fig.subplot_mosaic("""ABC""")
 
         for z,p in enumerate(dirr):
@@ -242,7 +242,7 @@ if __name__ == '__main__':
                 double_spine_area='False'
             spine_start=int(re.findall(r"[-+]?\d*\.\d+|\d+", p.split('/')[3])[0])
             from read_passive_parameters_csv import get_passive_parameter
-            passive_vals_dict=get_passive_parameter(cell_name,double_spine_area=double_spine_area,shrinkage_resize=shrinkage_resize,spine_start=spine_start,fit_condition=p.split('/')[5],file_type='z_correct.swc')
+            passive_vals_dict=get_passive_parameter(cell_name,befor_after,double_spine_area=double_spine_area,shrinkage_resize=shrinkage_resize,spine_start=spine_start,fit_condition=p.split('/')[5],file_type='z_correct.swc')
             RA_CM_RM=get_passive_val(passive_vals_dict[p.split('/')[6]],what_return='nice_results')
             show_directory(ax[place[i]],p.split('/')[4]+p.split('/')[6]+'\n'+RA_CM_RM,p)
 
@@ -262,7 +262,7 @@ if __name__ == '__main__':
                 """)
             i=0
 
-            # passive_vals_dict=get_passive_parameter(cell_name,shrinkage_resize=[shrinkage_by,resize_diam_by],fit_condition=fit_condition,spine_start=int(SPINE_START),file_type=file_type)
+            # passive_vals_dict=get_passive_parameter(cell_name,befor_after,shrinkage_resize=[shrinkage_by,resize_diam_by],fit_condition=fit_condition,spine_start=int(SPINE_START),file_type=file_type)
             if '4-5' in cell_name:
                 same_diff=""
             else:
@@ -331,7 +331,7 @@ if __name__ == '__main__':
                 print(p)
                 spine_start=int(re.findall(r"[-+]?\d*\.\d+|\d+", p.split('/')[3])[0])
                 from read_passive_parameters_csv import get_passive_parameter
-                passive_vals_dict=get_passive_parameter(cell_name,double_spine_area=double_spine_area,shrinkage_resize=shrinkage_resize,spine_start=spine_start,fit_condition=p.split('/')[5],file_type='z_correct.swc')
+                passive_vals_dict=get_passive_parameter(cell_name,before_after,double_spine_area=double_spine_area,shrinkage_resize=shrinkage_resize,spine_start=spine_start,fit_condition=p.split('/')[5],file_type='z_correct.swc')
                 RA_CM_RM=get_passive_val(passive_vals_dict[p.split('/')[6]],what_return='nice_results')
                 show_directory(ax[place[i]],p.split('/')[4]+p.split('/')[6]+'\n'+RA_CM_RM,p)
 

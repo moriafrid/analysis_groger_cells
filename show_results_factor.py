@@ -64,7 +64,7 @@ def read_data(cell_name="*", same_diff="relative",passive_val_name='120',SPINE_S
             double_spine_area='False'
         print(p)
         spine_start=int(re.findall(r"[-+]?\d*\.\d+|\d+", p.split('/')[3])[0])
-        passive_vals_dict=get_passive_parameter(cell_name,double_spine_area=double_spine_area,shrinkage_resize=shrinkage_resize,spine_start=spine_start,fit_condition=p.split('/')[5],file_type='z_correct.swc')
+        passive_vals_dict=get_passive_parameter(cell_name,before_after,double_spine_area=double_spine_area,shrinkage_resize=shrinkage_resize,spine_start=spine_start,fit_condition=p.split('/')[5],file_type='z_correct.swc')
         RA_CM_RM=get_passive_val(passive_vals_dict[p.split('/')[6]],what_return='nice_results')
         title=p.split('/')[4]+p.split('/')[6]+'\n'+RA_CM_RM
         new_data = DataForFig()  # todo change me
