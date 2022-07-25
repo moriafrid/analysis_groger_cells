@@ -49,7 +49,8 @@ double_spine=eval(double_spine)
 data_dir= "cells_initial_information/"
 save_dir = "cells_outputs_data_short/"
 cell_file=glob(folder_+data_dir+cell_name+'/*'+file_type2read)[0]
-folder_save=folder_+save_dir+cell_name+"/data/cell_properties/"+file_type2read+'/SPINE_START='+str(SPINE_START)+'/'
+# folder_save=folder_+save_dir+cell_name+"/data/cell_properties/"+file_type2read+'/SPINE_START='+str(SPINE_START)+'/'
+folder_save=folder_+save_dir+cell_name+"/fit_short_pulse/"+file_type2read+'_SPINE_START='+str(SPINE_START)+'/'
 folder_save+="/dend*"+str(round(resize_diam_by,2))+'&F_shrinkage='+str(round(shrinkage_factor,2))
 folder_save+='/'+name+'/'
 create_folder_dirr(folder_save)
