@@ -12,7 +12,7 @@ else:
     print("run_execute_level2.py running with sys.argv",sys.argv)
 cells=read_from_pickle(cells_name_place)
 
-befor_after='_before_shrink'
+before_after='_before_shrink'
 
 file_type2read=['z_correct.swc','morphology.swc']
 # SPINE_START=str(20)
