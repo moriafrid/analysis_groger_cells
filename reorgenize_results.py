@@ -7,11 +7,11 @@ from read_passive_parameters_csv import get_passive_parameter
 from passive_val_function import get_passive_val
 from read_spine_properties import get_n_spinese
 from extra_function import create_folder_dirr
-befor_after='_before_shrink'
+before_after='_before_shrink'
 data_file='cells_outputs_data_short/'
-MOO_relative='MOO_results_relative_strange'+befor_after+'/z_correct.swc_SPINE_START=20/'
-MOO_same='MOO_results_same_strange'+befor_after+'/z_correct.swc_SPINE_START=20/'
-short_pulse='/fit_short_pulse'+befor_after+'/'
+MOO_relative='MOO_results_relative_strange'+before_after+'/z_correct.swc_SPINE_START=20/'
+MOO_same='MOO_results_same_strange'+before_after+'/z_correct.swc_SPINE_START=20/'
+short_pulse='/fit_short_pulse'+before_after+'/'
 
 
 def copy_file(copy,paste,extra_name=''):
@@ -67,7 +67,7 @@ for cell_name in read_from_pickle('cells_name2.p')[:]:
     next_continue=[]
     for passive_val_name in ['RA_min_error','RA_best_fit','RA=120','RA=150']:
         if next_continue: continue
-        passive_vals_dict=get_passive_parameter(cell_name,double_spine_area='False',shrinkage_resize=[shrinkage_by,resize_diam_by],fit_condition='const_param',spine_start=20,file_type='z_correct.swc')
+        passive_vals_dict=get_passive_parameter(cell_name,before_after,double_spine_area='False',shrinkage_resize=[shrinkage_by,resize_diam_by],fit_condition='const_param',spine_start=20,file_type='z_correct.swc')
         RA,CM,RM=get_passive_val(passive_vals_dict[passive_val_name],what_return='full_result')
         if RA<50:
             continue
@@ -123,7 +123,7 @@ for p in files:
     next_continue=[]
     for passive_val_name in ['RA_min_error','RA_best_fit','RA=120','RA=150']:
         if next_continue: continue
-        passive_vals_dict=get_passive_parameter(cell_name,double_spine_area=double_spine_area,shrinkage_resize=[shrinkage_by,resize_diam_by],fit_condition='const_param',spine_start=20,file_type='z_correct.swc')
+        passive_vals_dict=get_passive_parameter(cell_name,before_after,double_spine_area=double_spine_area,shrinkage_resize=[shrinkage_by,resize_diam_by],fit_condition='const_param',spine_start=20,file_type='z_correct.swc')
         RA,CM,RM=get_passive_val(passive_vals_dict[passive_val_name])
         RA=str(int(float(RA)))
         if float(RA)<70:
