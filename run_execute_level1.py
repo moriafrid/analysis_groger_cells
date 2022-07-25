@@ -23,3 +23,22 @@ print('')
 print('*execute_level1.sh isnt run beacouse empty except SMAQ_analysis.py')
 print('**remainder: calculate_tau_m.py and check_short_pulse_edges.py ,choose_peelingg.py need to be run from the computer')
 
+# #if I want to look on the results of cell_properties:
+# from show_result import show_directory
+# import matplotlib.pyplot as plt
+# from glob import glob
+#
+# i=0
+# #run multiple time fro the cunsule:
+# plt.close('all')
+#
+# i+=1
+# folder_='cells_outputs_data_short/'+read_from_pickle('cells_name2.p')[i]
+# fig1 = plt.figure(figsize=(10,10))
+# axs1 = fig1.subplot_mosaic("""ABC
+# DEF""")
+# # show_directory()
+# for place,file in zip(["A","B","C","D","E"],glob(folder_+'/data/cell_properties/*/diam_dis/diam-dis.png')):
+#     print(place,file)
+#     file_type=file.split('/')[-2]
+#     show_directory(axs1[place], title=file_type,png_file=file)
