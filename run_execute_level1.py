@@ -9,13 +9,13 @@ else:
     print("run_execute_level1.py running with sys.argv",sys.argv)
 os.system("sbatch execute_python_script.sh run_check_dinamic_and_IV.py")
 file_type='.ASC'
-os.system(" ".join(['sbatch execute_python_script.sh', 'calculate_synaptic_loc.py',cells_name_place,file_type,'True']))
+os.system(" ".join(['sbatch execute_python_script.sh', 'calculate_synaptic_loc.py',cells_name_place,'.ASC','True']))
 print('calculate_synaptic_loc.py for all cells in ',cells_name_place )
 
 for cell_name in read_from_pickle(cells_name_place):
-    for file_type in ['z_correct.swc','morphology.swc','ASC']:
+    for file_type in ['morphology_z_correct.swc','morphology.swc','morphology_z_correct_before_shrink.swc','*.ASC','*XYZ.ASC']:
         command="sbatch execute_python_script.sh cell_properties.py"
-        # command="python cell_properties.py"
+        command="python cell_properties.py"
         send_command = " ".join([command,cell_name,file_type])
         os.system(send_command)
         print(cell_name+'_'+file_type+' :run cell_properties.py')
