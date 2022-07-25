@@ -14,18 +14,18 @@ matplotlib.rcParams['svg.fonttype'] = 'none'
 import sys
 if len(sys.argv) != 3:
     specipic_cell='*'
-    specipc_moo_file='_strange'
+    before_after='_before_shrink'
 
     print("sys.argv isn't run")
 else:
     print("the sys.argv len is correct",flush=True)
     specipic_cell = sys.argv[1]
-    specipc_moo_file=sys.argv[2]
+    before_after=sys.argv[2]
     print('run with sys.argv', sys.argv)
 
 folder_= ''
-folder_data1=folder_+'cells_outputs_data_short/*'+specipic_cell+'/MOO_results_same'+specipc_moo_file+'/*/F_shrinkage=*/const_param/'
-folder_data2=folder_+'cells_outputs_data_short/*'+specipic_cell+'/MOO_results_relative'+specipc_moo_file+'/*/F_shrinkage=*/const_param/'
+folder_data1=folder_+'cells_outputs_data_short/*'+specipic_cell+'/MOO_results_same_starnge'+before_after+'/*/F_shrinkage=*/const_param/'
+folder_data2=folder_+'cells_outputs_data_short/*'+specipic_cell+'/MOO_results_relative'+before_after+'/*/F_shrinkage=*/const_param/'
 save_name='/AMPA&NMDA_soma'
 for curr_i, model_place in tqdm(enumerate(glob(folder_data1+'*')+glob(folder_data2+'*'))):
     if '3-4' in model_place: continue

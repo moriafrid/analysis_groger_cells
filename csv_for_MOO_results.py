@@ -7,17 +7,20 @@ import pickle
 import sys
 from read_passive_parameters_csv import get_passive_parameter
 import re
-if len(sys.argv) != 2:
+if len(sys.argv) != 3:
     cells_name_place="cells_name2.p"
+    before_after='_before_shrink'
+
     print("creat csv for passive_val not running with sys.argv",len(sys.argv))
 else:
     cells_name_place=sys.argv[1]
+    before_after=sys.argv[2]
+
     print("creat csv for passive_val running with sys.argv",sys.argv)
 folder_=""
 folder_data="cells_initial_information/"
 folder_save="cells_outputs_data_short/"
 cells=read_from_pickle(cells_name_place)
-before_after='_before_shrink'
 data_file='cells_outputs_data_short/'
 MOO_relative='/MOO_results_relative_strange'+before_after
 MOO_same='/MOO_results_same_strange'+before_after
