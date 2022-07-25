@@ -23,8 +23,8 @@ for cell_name in read_from_pickle(cells_name_place):
     os.systen('python plot_morphology_David.py '+cell_name)
 
 
-commet_level1=" ".join(["python plot_morphology_David.py", cells_name_place ])
-os.system(commet_level1)
+# commet_level1=" ".join(["python plot_morphology_David.py", cells_name_place ])
+# os.system(commet_level1)
 
 os.system('python choose_short_pulse.py')
 
@@ -45,6 +45,8 @@ os.system('python choose_syn.py')
 os.system('python run_Moo_get_parameters.py')
 
 os.system("python run_analysis_MOO.py")
+
+
 
 
 # os.system("python run_execute_fits.py")
