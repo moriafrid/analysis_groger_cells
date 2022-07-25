@@ -3,6 +3,12 @@ from glob import glob
 from plot_morphology_Yoni import plot_morph
 from matplotlib_scalebar.scalebar import ScaleBar
 import matplotlib.pyplot as plt
+from open_pickle import read_from_pickle
+
+# cell_name = '2017_05_08_A_4-5'
+cell_name = read_from_pickle('cells_name2.p')[9]
+base_dir='final_data/'+cell_name+'/'
+
 def clear_short_pulse(ax, dir):
     # d = '/ems/elsc-labs/segev-i/moria.fridman/project/analysis_groger_cells/cells_initial_information/2017_05_08_A_4-5/clear_short_pulse.p'
     data = pickle.load(open(dir, 'rb'))
@@ -34,7 +40,6 @@ def clear_syn_mean(ax, dir):
     ax.text(210, 0.8, '50 ms')
     ax.set_axis_off()
     return ax
-from open_pickle import read_from_pickle
 def find_RA(file_dirr):
     for passive_params in ['RA_min_error','RA_best_fit','RA=120','RA=150']:
         try_find=glob(file_dirr+'fit RA=*_'+passive_params+'.p')
@@ -157,8 +162,7 @@ def add_scale_bar(ax,type):
     plt.rcParams.update({'font.size': 12})
     ax.set_axis_off()
 
-# cell_name = '2017_05_08_A_4-5'
-cell_name = read_from_pickle('cells_name2.p')[9]
+
 fig = plt.figure(figsize=(20, 20))
 fig.suptitle(cell_name, fontsize=20)# fig.set_figheight(6)
 # fig.set_figwidth(6)
@@ -169,7 +173,7 @@ ax3 = plt.subplot2grid(shape=shapes, loc=(0, 3), colspan=1, rowspan=1)
 ax4 = plt.subplot2grid(shape=shapes, loc=(1, 2), colspan=1, rowspan=1)
 ax5 = plt.subplot2grid(shape=shapes, loc=(1, 3), colspan=1, rowspan=1)
 # plt.subplots_adjust(hspace=0.3, wspace=0.3)
-base_dir='final_data/'+cell_name+'/'
+
 decided_passive_params=find_RA(base_dir)
 plot_morph(ax1, cell_name, without_axons=True)
 plot_short_pulse_model(ax3,glob(base_dir+decided_passive_params+'_results.p')[0])

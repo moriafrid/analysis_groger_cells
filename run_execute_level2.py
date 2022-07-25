@@ -11,6 +11,9 @@ else:
     cells_name_place=sys.argv[1]
     print("run_execute_level2.py running with sys.argv",sys.argv)
 cells=read_from_pickle(cells_name_place)
+
+befor_after='_before_shrink'
+
 file_type2read=['z_correct.swc','morphology.swc']
 # SPINE_START=str(20)
 
@@ -39,7 +42,7 @@ for cell_name in read_from_pickle(cells_name_place):
                     # else:
                     #     file_types=['z_correct.swc']
                     for file_type in ['z_correct.swc']:
-                        passive_vals_dict=get_passive_parameter(cell_name,double_spine_area=double_spine_area,shrinkage_resize=[shrinkage_by,resize_diam_by],fit_condition=fit_condition,spine_start=SPINE_START,file_type=file_type)
+                        passive_vals_dict=get_passive_parameter(cell_name,before_after,double_spine_area=double_spine_area,shrinkage_resize=[shrinkage_by,resize_diam_by],fit_condition=fit_condition,spine_start=SPINE_START,file_type=file_type)
                         next_continue=False
                         for i, name in enumerate(['RA_min_error','RA_best_fit','RA=120','RA=150']):
 
@@ -57,7 +60,7 @@ for cell_name in read_from_pickle(cells_name_place):
                             print(name,RA,CM,RM)
                             command="sbatch execute_level2.sh"
                             # command ="python dendogram.py"
-                            send_command = " ".join([command,cell_name,file_type,fit_condition,name,str(resize_diam_by),str(shrinkage_by),str(SPINE_START),double_spine_area])
+                            send_command = " ".join([command,cell_name,file_type,fit_condition,name,str(resize_diam_by),str(shrinkage_by),str(SPINE_START),double_spine_area,before_after])
                             os.system(send_command)
                             print(cell_name+ ' .'+file_type+': execute level2.py, dendogram.py, Rin_Rm.py','attenuations.py')
 

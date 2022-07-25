@@ -25,7 +25,7 @@ clamp_injection=False
 print("the number of parameters that sys loaded in attenuation.py is ",len(sys.argv),flush=True)
 print(len(sys.argv), sys.argv)
 do_resize_dend=True
-if len(sys.argv) != 10:
+if len(sys.argv) != 11:
     print("the function doesn't run with sys.argv",flush=True)
     cell_name= '2017_07_06_C_3-4'
     file_type='z_correct.swc'
@@ -37,7 +37,7 @@ if len(sys.argv) != 10:
     shrinkage_factor=1.0
     SPINE_START=20
     double_spine='False'
-
+    befor_after='_before_shrink'
 else:
     print("the sys.argv len is correct",flush=True)
     cell_name = sys.argv[1]
@@ -49,7 +49,8 @@ else:
     shrinkage_factor =float(sys.argv[7]) #how much srinkage the cell get between electrophysiology record and LM
     SPINE_START=int(sys.argv[8])
     double_spine=sys.argv[9]
-    passive_val=get_passive_parameter(cell_name,double_spine_area=double_spine,shrinkage_resize=[shrinkage_factor,resize_diam_by],fit_condition=fit_condition,spine_start=SPINE_START,file_type=file_type)[name]
+    before_after=sys.argv[10]
+    passive_val=get_passive_parameter(cell_name,before_after,double_spine_area=double_spine,shrinkage_resize=[shrinkage_factor,resize_diam_by],fit_condition=fit_condition,spine_start=SPINE_START,file_type=file_type)[name]
 folder_=''
 double_spine=eval(double_spine)
 if not syn_injection:
