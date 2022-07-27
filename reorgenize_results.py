@@ -1,8 +1,10 @@
+import os
 import re
 from matplotlib import pyplot as plt
 from open_pickle import read_from_pickle
 from glob import glob
 import shutil
+from plot_fit_short_pulse import plot_res_short_pusle
 from read_passive_parameters_csv import get_passive_parameter
 from passive_val_function import get_passive_val
 from read_spine_properties import get_n_spinese
@@ -30,7 +32,7 @@ def copy_file(copy,paste,extra_name=''):
         except:
             print('')
 #need to run again with 3,5,8 if os.system is runing
-for cell_name in read_from_pickle('cells_name2.p')[:]:
+for cell_name in read_from_pickle('cells_name2.p'):
     # if cell_name!='2017_05_08_A_4-5':continue
     # if cell_name in read_from_pickle('cells_name2.p'):continue
     # if cell_name in ['2017_07_06_C_4-3','2016_04_16_A','2017_07_06_C_3-4']:continue (until I can change the run to be not on folder syn_par for the Moo)
@@ -40,10 +42,10 @@ for cell_name in read_from_pickle('cells_name2.p')[:]:
     resize_diam_by=1.0
 
     data_file='cells_outputs_data_short/'+cell_name+'/'
-    save_file='final_data/'+cell_name+'/'
+    save_file='final_data'+before_after+'/'+cell_name+'/'
 
-    try: shutil.rmtree(save_file)
-    except:pass
+    # try: shutil.rmtree(save_file)
+    # except:pass
     create_folder_dirr(save_file)
     copy_file(glob(data_file+'/neuron_morphology_fig.p')[0],save_file)
     copy_file(glob(data_file+'/neuron_morphology_fig.p')[0],save_file)
@@ -75,10 +77,10 @@ for cell_name in read_from_pickle('cells_name2.p')[:]:
             if RA>70:
                 next_continue=True
         dirr_passive_result=glob(data_file+short_pulse+'z_correct.swc_SPINE_START=20/dend*'+str(resize_diam_by)+'&F_shrinkage='+str(shrinkage_by)+'/const_param/RA/')[0]
-        # os.system(" ".join(["python plot_fit_short_pulse.py",cell_name,str(RM), str(RA), str(CM),str(resize_diam_by),str(shrinkage_by),str(passive_val_name)]))
+        # os.system(" ".join(["python plot_fit_short_pulse.py",cell_name,str(RM), str(RA), str(CM),str(resize_diam_by),str(shrinkage_by),str(passive_val_name),before_after]))
 
-        # dict_passive_results_file=plot_res_short_pusle(glob(data_file+short_pulse+'z_correct.swc_SPINE_START=20/dend*'+str(resize_diam_by)+'&F_shrinkage='+str(shrinkage_by)+'/const_param/RA/')[0] ,float(RM), float(RA), float(CM),resize_diam_by=resize_diam_by,shrinkage_factor=shrinkage_by,passive_val_name=passive_val_name)
-        copy_file( dirr_passive_result+passive_val_name+'_results.p',save_file_resize)
+        dict_passive_results_file=plot_res_short_pusle(glob(data_file+short_pulse+'z_correct.swc_SPINE_START=20/dend*'+str(resize_diam_by)+'&F_shrinkage='+str(shrinkage_by)+'/const_param/RA/')[0] ,float(RM), float(RA), float(CM),resize_diam_by=resize_diam_by,shrinkage_factor=shrinkage_by,passive_val_name=passive_val_name)
+        copy_file(dirr_passive_result+passive_val_name+'_results.p',save_file_resize)
 
         RA=str(int(float(RA)))
         copy_file(glob(data_file+short_pulse+'z_correct.swc_SPINE_START=20/dend*'+str(resize_diam_by)+'&F_shrinkage='+str(shrinkage_by)+'/const_param/RA/fit RA='+RA+'.p')[0],save_file_resize,extra_name=passive_val_name)
@@ -111,7 +113,7 @@ files=glob(data_file+MOO_same+'/*')
 for p in files:
     resize=p.split('/')[-1]
     file_type=p.split('/')[-2]
-    save_file_resize='final_data/'+cell_name+'/'+resize+'/'
+    save_file_resize='final_data'+before_after+'/'+cell_name+'/'+resize+'/'
     create_folder_dirr(save_file_resize)
     shrinkage_by,resize_diam_by=[float(par) for par in re.findall("\d+\.\d+", resize)]
     double_spine_area='False'
