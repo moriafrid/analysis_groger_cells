@@ -5,10 +5,14 @@ from glob import glob
 import pickle
 from extra_function import load_swc
 
-if len(sys.argv) != 2:
+if len(sys.argv) != 3:
     cell_name="2017_05_08_A_4-5"
+    before_after='_after_shrink'
+    print('before or after need to be choose')
 else:
     cell_name=sys.argv[1]
+    before_after=sys.argv[2]
+
 folder_="cells_initial_information/"
 def run(id, prev_id,sec,type, parent_point=np.array([0, 0, 0]), print_=True):
     global morphology_dict,sec_num
@@ -72,7 +76,7 @@ for child in cell.soma.children():
     id=run(id,1,child,type, print_=type==2, parent_point=parent_point)
 
 
-with open(folder_+cell_name+"/dict_morphology_swc_after_shrink.pickle", 'wb') as handle:
+with open(folder_+cell_name+"/dict_morphology_swc"+before_after+".pickle", 'wb') as handle:
     pickle.dump(morphology_dict, handle, protocol=pickle.HIGHEST_PROTOCOL)
 cell=None
 
