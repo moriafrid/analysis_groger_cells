@@ -11,14 +11,15 @@ from open_pickle import read_from_pickle
 import pickle
 import sys
 # dirr,str(RM), str(RA), str(CM),str(resize_diam_by),str(shrinkage_by),str(passive_val_name)
-if len(sys.argv) != 8:
+if len(sys.argv) != 9:
    cell_name = "2017_04_03_B"
-   RM=10000
-   RA=100
-   CM=1
+   RM=5333.0
+   RA=134.0
+   CM=2.7290710058870435
    resize_diam_by = 1.0 #how much the cell sweel during the electrophisiology records
    shrinkage_by =1.0 #how much srinkage the cell get between electrophysiology record and LM
-   passive_val_name='RA=120'
+   passive_val_name='RA_min_error'
+   before_after='_before_shrink'
 else:
    cell_name = sys.argv[1]
    RM=float(sys.argv[2])
@@ -27,6 +28,7 @@ else:
    resize_diam_by = float(sys.argv[5]) #how much the cell sweel during the electrophisiology records
    shrinkage_by =float(sys.argv[6]) #how much srinkage the cell get between electrophysiology record and LM
    passive_val_name=sys.argv[7]
+   before_after=sys.argv[8]
 
 def change_model_pas(cell,CM=1, RA = 250, RM = 20000.0, E_PAS = -70.0,F_factor=1.9,SPINE_START=20):
    h.dt = 0.1
@@ -120,6 +122,6 @@ def plot_res_short_pusle(dirr ,RM, RA, CM,resize_diam_by=1.0,shrinkage_factor=1.
 
 if __name__=='__main__':
     data_file='cells_outputs_data_short/'+cell_name+'/'
-    dirr=glob(data_file+'/fit_short_pulse/z_correct.swc_SPINE_START=20/dend*'+str(resize_diam_by)+'&F_shrinkage='+str(shrinkage_by)+'/const_param/RA/')[0]
+    dirr=glob(data_file+'/fit_short_pulse'+before_after+'/z_correct.swc_SPINE_START=20/dend*'+str(resize_diam_by)+'&F_shrinkage='+str(shrinkage_by)+'/const_param/RA/')[0]
     plot_res_short_pusle(dirr ,float(RM), float(RA), float(CM),resize_diam_by=resize_diam_by,shrinkage_factor=shrinkage_by,passive_val_name=passive_val_name)
     cell=None
