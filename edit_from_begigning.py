@@ -6,9 +6,10 @@ import matplotlib.pyplot as plt
 from open_pickle import read_from_pickle
 
 # cell_name = '2017_05_08_A_4-5'
-cell_name = read_from_pickle('cells_name2.p')[9]
-base_dir='final_data/'+cell_name+'/'
-
+cell_name = read_from_pickle('cells_name2.p')[0]
+before_after='_before_shrink'
+base_dir='final_data'+before_after+'/'+cell_name+'/'
+print(cell_name)
 def clear_short_pulse(ax, dir):
     # d = '/ems/elsc-labs/segev-i/moria.fridman/project/analysis_groger_cells/cells_initial_information/2017_05_08_A_4-5/clear_short_pulse.p'
     data = pickle.load(open(dir, 'rb'))
@@ -175,11 +176,11 @@ ax5 = plt.subplot2grid(shape=shapes, loc=(1, 3), colspan=1, rowspan=1)
 # plt.subplots_adjust(hspace=0.3, wspace=0.3)
 
 decided_passive_params=find_RA(base_dir)
-plot_morph(ax1, cell_name, without_axons=True)
+plot_morph(ax1, cell_name, before_after,without_axons=True)
 plot_short_pulse_model(ax3,glob(base_dir+decided_passive_params+'_results.p')[0])
 plot_pickle(ax2,base_dir+'clear_short_pulse_after_peeling.p','clear_short_pulse')
 plot_pickle(ax4,base_dir+'clear_syn_after_peeling.p','clear_syn')
-plot_syn_model(ax5,glob(base_dir+'AMPA&NMDA_soma_data_*'+decided_passive_params+'.p',)[0])
+plot_syn_model(ax5,glob(base_dir+'AMPA&NMDA_soma_data_*'+decided_passive_params+'.p')[0])
 
 plt.savefig(base_dir+'figure1.pdf')
 plt.savefig(base_dir+'figure1.svg')

@@ -4,10 +4,13 @@ from glob import glob
 import numpy as np
 from matplotlib import pyplot as plt, gridspec
 import pickle5 as pickle
-from read_spine_properties import get_spine_xyz, get_n_spinese
+from read_spine_properties import get_spine_xyz, get_n_spinese,get_sec_and_seg,get_parameter
 from open_pickle import read_from_pickle
 from matplotlib_scalebar.scalebar import ScaleBar
-
+def find_xy(sec_dots,find_seg):
+    dots_number=len(sec_dots[0])
+    places=[int(find_seg/dots_number),int(find_seg/dots_number)]
+    return sec_dots[0][places[0]],sec_dots[1][places[1]]
 def plot_morphology(ax, segment_colors, names=[], width_mult_factors=None, seg_ind_to_xyz_coords_map={},synapse=[], without_axons=True):
     if width_mult_factors is None:
         width_mult_factor = 1.2
@@ -24,7 +27,14 @@ def plot_morphology(ax, segment_colors, names=[], width_mult_factors=None, seg_i
     for seg_ind in all_seg_inds:
         colors_per_segment[seg_ind] = colors[seg_ind]
         widths_per_segment[seg_ind] = width_mult_factors[seg_ind]
-
+        # add synapses
+        if seg_ind_to_xyz_coords_map[seg_ind]['sec name'] in synapse[0]:
+        # for i,syn in enumerate(synapse):
+            sec_dots=[seg_ind_to_xyz_coords_map[seg_ind]['x'],seg_ind_to_xyz_coords_map[seg_ind]['y']]
+            syn_num=synapse[0].index(seg_ind_to_xyz_coords_map[seg_ind]['sec name'])
+            syn_x,syn_y=find_xy(sec_dots,synapse[1][syn_num])
+            ax.scatter(x=syn_x, y=syn_y, s=200, c='r',zorder=0,alpha=0.8,label='syn_'+str(syn_num)+'='+str(synapse[2][syn_num]))
+            ax.text(syn_x,syn_y,syn_num,color='black')
     # plot the cell morphology
     for key in all_seg_inds:
         if without_axons:
@@ -48,26 +58,28 @@ def plot_morphology(ax, segment_colors, names=[], width_mult_factors=None, seg_i
             ax.text(np.max(seg_ind_to_xyz_coords_map[key]['x']), np.max(seg_ind_to_xyz_coords_map[key]['y']),
                     names[ind])
 
-    # add synapses
-    for i,syn in enumerate(synapse):
-        ax.scatter(x=syn[0], y=syn[1], s=200, c='r',zorder=1,alpha=0.8)
-        # ax.text(syn[0]+2,syn[1]+2,str(i),color='r')
+
+
+
+    plt.legend(handlelength=0)
     # ax.set_xlim(-180, 235)
     # ax.set_ylim(-210, 1200);
     ax.add_artist(ScaleBar(1, "um", fixed_value=50, location="lower center",rotation="horizontal"))
     ax.set_axis_off()
 
-def plot_morph(ax, cell_name, without_axons=True):
-    morphology_filename=glob('cells_initial_information/'+cell_name+'/dict_morphology_swc.pickle')
+def plot_morph(ax, cell_name, before_after,without_axons=True):
+    morphology_filename=glob('cells_initial_information/'+cell_name+'/dict_morphology_swc'+before_after+'.pickle')
     seg_ind_to_xyz_coords_map=read_from_pickle(morphology_filename[0])
 
     num_segments=len(seg_ind_to_xyz_coords_map)
     segment_colors_selected = np.zeros(num_segments)
     segment_widths_selected = 6 * np.ones(segment_colors_selected.shape)
-    choosen_synpase=[]
-    for spine_num in np.arange(get_n_spinese(cell_name)):
-        choosen_synpase.append(get_spine_xyz(cell_name,spine_num))
+    synapses=list(get_sec_and_seg(cell_name))+[get_parameter(cell_name,'PSD')]
+
+    # choosen_synpase=[]
+    # for spine_num in np.arange(get_n_spinese(cell_name)):
+    #     choosen_synpase.append(get_spine_xyz(cell_name,spine_num))
     plot_morphology(ax, segment_colors_selected, width_mult_factors=segment_widths_selected,
-                    seg_ind_to_xyz_coords_map=seg_ind_to_xyz_coords_map,synapse=choosen_synpase, names=[], without_axons=without_axons)
+                    seg_ind_to_xyz_coords_map=seg_ind_to_xyz_coords_map,synapse=synapses, names=[], without_axons=without_axons)
     return ax
 
