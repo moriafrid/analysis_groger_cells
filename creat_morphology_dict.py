@@ -72,7 +72,7 @@ for child in cell.soma.children():
     id=run(id,1,child,type, print_=type==2, parent_point=parent_point)
 
 
-with open(folder_+cell_name+"/dict_morphology_swc.pickle", 'wb') as handle:
+with open(folder_+cell_name+"/dict_morphology_swc_after_shrink.pickle", 'wb') as handle:
     pickle.dump(morphology_dict, handle, protocol=pickle.HIGHEST_PROTOCOL)
 cell=None
 
