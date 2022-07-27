@@ -23,8 +23,8 @@ else:
     before_after=sys.argv[2]
 
 folder_= ''
-folder_data1=folder_+'cells_outputs_data_short/*'+specipic_cell+'/MOO_results_same_strange'+before_after+'/*/F_shrinkage=*/const_param/'
-folder_data2=folder_+'cells_outputs_data_short/*'+specipic_cell+'/MOO_results_relative_strange'+before_after+'/*/F_shrinkage=*/const_param/'
+folder_data1=folder_+'cells_outputs_data_short/'+specipic_cell+'/MOO_results_same_strange'+before_after+'/*/F_shrinkage=*/const_param/'
+folder_data2=folder_+'cells_outputs_data_short/'+specipic_cell+'/MOO_results_relative_strange'+before_after+'/*/F_shrinkage=*/const_param/'
 save_name='/g_max'
 
 for curr_i, model_place in tqdm(enumerate(glob(folder_data1+'*')+glob(folder_data2+'*'))):
