@@ -1,5 +1,7 @@
 import os
 import pandas as pd
+from tqdm import tqdm
+
 from open_pickle import read_from_pickle
 from glob import glob
 from passive_val_function import *
@@ -9,7 +11,7 @@ from read_passive_parameters_csv import get_passive_parameter
 import re
 if len(sys.argv) != 3:
     cells_name_place="cells_name2.p"
-    before_after='_before_shrink'
+    before_after='_after_shrink'
 
     print("creat csv for passive_val not running with sys.argv",len(sys.argv))
 else:
@@ -34,7 +36,7 @@ for cell_name in cells:
     files1= glob(folder_save+cell_name+MOO_relative+'/*_SPINE_START=*/F_shrinkage=*/const_param/*/hall_of_fame.p')
     files2= glob(folder_save+cell_name+MOO_same+'/*_SPINE_START=*/F_shrinkage=*/const_param/*/hall_of_fame.p')
 
-    for loc in files1+files2:
+    for loc in tqdm(files1+files2):
         # df = pd.read_csv('cells_initial_information/'+cell_name+'/results_passive_fits.csv')
         if loc.split('/')[6]=='test': continue
         file_type=loc.split('/')[3][:loc.split('/')[3].rfind('.')+4]
@@ -79,14 +81,11 @@ for cell_name in cells:
         all_data.append(dict_for_records)
         output_df = pd.DataFrame.from_records(all_data)
 
-
-
-
-    # save_pickle_folder=folder_+folder_save+cell_name+'/'
-    # output_df = pd.DataFrame.from_records(all_data)
-    # output_df.to_csv(save_pickle_folder+"/results_MOO"+before_after+".csv", index=False)
-
-    save_pickle_folder2=folder_+folder_data+cell_name
+    save_pickle_folder=folder_+folder_save+cell_name+'/'
     output_df = pd.DataFrame.from_records(all_data)
-    output_df.to_csv(save_pickle_folder2+"/results_MOO"+before_after+".csv", index=False)
+    output_df.to_csv(save_pickle_folder+"/results_MOO"+before_after+".csv", index=False)
+
+    # save_pickle_folder2=folder_+folder_data+cell_name
+    # output_df = pd.DataFrame.from_records(all_data)
+    # output_df.to_csv(save_pickle_folder2+"/results_MOO"+before_after+".csv", index=False)
     # pickle.dump(dict_fit_condition, open(save_pickle_folder2+"/results_MOO.p", "wb"))
