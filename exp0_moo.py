@@ -102,8 +102,8 @@ for model_place in tqdm(glob(folder_data+'/*')):
     frozen_NMDA_weigth=True
     rec = []
     neuron_start_time = 300
-    spike_timeing=T_data[np.argmax(np.array(V_data))-65]
-
+    # spike_timeing=T_data[np.argmax(np.array(V_data))-65]
+    spike_timeing=T_base[read_from_pickle('syn_onset.p')[cell_name]]
     for i, syn in enumerate(loader.synapses_locations):
         syn_locations.append(ephys.locations.NrnSectionCompLocation(
             name='syn' + str(i),

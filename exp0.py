@@ -39,7 +39,8 @@ for model_place in tqdm(glob(folder_data+'/*')):
     T_base = np.array(T_with_units)
     V_base = np.array(V_data)
     # T_with_units=T_data.rescale('ms')
-    spike_timeing=T_base[np.argmax(np.array(V_base))-65]
+    # spike_timeing=T_base[np.argmax(np.array(V_base))-65]
+    spike_timeing=T_base[read_from_pickle('syn_onset.p')[cell_name]]
     total_duration=T_base[-1] + neuron_start_time
     # V_base=V_base+E_PAS
 

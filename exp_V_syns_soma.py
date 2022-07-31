@@ -48,7 +48,8 @@ for curr_i, model_place in tqdm(enumerate(glob(folder_data1+'*')+glob(folder_dat
     T_base = np.array(T_with_units)
     V_base = np.array(V_data)
     # T_with_units=T_data.rescale('ms')
-    spike_timeing=T_base[np.argmax(np.array(V_base))-65]
+    # spike_timeing=T_base[np.argmax(np.array(V_base))-65]
+    spike_timeing=T_base[read_from_pickle('syn_onset.p')[cell_name]]
     total_duration=T_base[-1] + neuron_start_time
     # V_base=V_base+E_PAS
     model=None
