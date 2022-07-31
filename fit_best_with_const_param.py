@@ -15,13 +15,14 @@ from parameters_short_pulse import decay_length
 
 from open_pickle import read_from_pickle
 do_calculate_F_factor=True
-if len(sys.argv) != 7:
-   cell_name= '2017_07_06_C_4-3'
+if len(sys.argv) != 8:
+   cell_name= '2017_07_06_C_3-4'
    file_type='z_correct.swc'
    resize_diam_by=1.0
    shrinkage_factor=1.0
    SPINE_START=20
    double_spine_area=False
+   before_after='_before_shrink'
 
 else:
    cell_name = sys.argv[1]
@@ -30,15 +31,16 @@ else:
    shrinkage_factor =float(sys.argv[4]) #how much srinkage the cell get between electrophysiology record and LM
    SPINE_START=int(sys.argv[5])
    double_spine_area=eval(sys.argv[6])
+   before_after=sys.argv[7]
 
 folder_=''
 data_dir= "cells_initial_information/"
 save_dir = "cells_outputs_data_short/"
 path_short_pulse=glob(folder_+save_dir+cell_name+'/data/electrophysio_records/short_pulse/mean_short_pulse_with_parameters.p')[0]
 path_short_pulse=glob(data_dir+cell_name+'/mean_short_pulse_with_parameters.p')[0]
-cell_file=glob(folder_+data_dir+cell_name+'/*'+file_type)[0]
+cell_file=glob(folder_+data_dir+cell_name+'/*'+file_type[:-4]+before_after+file_type[-4:])[0]
 
-initial_folder=folder_+save_dir+cell_name+'/fit_short_pulse/'+file_type+'_SPINE_START='+str(SPINE_START)+'/'
+initial_folder=folder_+save_dir+cell_name+'/fit_short_pulse'+before_after+'/'+file_type+'_SPINE_START='+str(SPINE_START)+'/'
 initial_folder+="/dend*"+str(round(resize_diam_by,2))+'&F_shrinkage='+str(round(shrinkage_factor,2))
 if double_spine_area:
     initial_folder+='_double_spine_area'
@@ -130,12 +132,7 @@ if __name__=='__main__':
        cell =load_hoc(cell_file)
     elif 'swc' in file_type:
         cell =load_swc(cell_file)
-    sp = h.PlotShape()
-    sp.show(0)  # show diameters
 
-    # ## delete all the axons
-    # for sec in cell.axon:
-    #     h.delete_section(sec=sec)
     for sec in cell.all_sec():
         sec.insert('pas') # insert passive property
         sec.nseg = int(sec.L/10)+1  #decide that the number of segment will be 21 with the same distances

@@ -12,14 +12,15 @@ import pickle
 import sys
 # dirr,str(RM), str(RA), str(CM),str(resize_diam_by),str(shrinkage_by),str(passive_val_name)
 if len(sys.argv) != 9:
-   cell_name = "2017_04_03_B"
-   RM=5333.0
-   RA=134.0
-   CM=2.7290710058870435
+   cell_name = "2017_07_06_C_3-4"
+   RM=12282.0
+   RA=206.0
+   CM=1.3955201031182711
    resize_diam_by = 1.0 #how much the cell sweel during the electrophisiology records
    shrinkage_by =1.0 #how much srinkage the cell get between electrophysiology record and LM
    passive_val_name='RA_min_error'
    before_after='_before_shrink'
+   print("plot_fit_short_pulse don't run with sys.srgv")
 else:
    cell_name = sys.argv[1]
    RM=float(sys.argv[2])
@@ -29,6 +30,7 @@ else:
    shrinkage_by =float(sys.argv[6]) #how much srinkage the cell get between electrophysiology record and LM
    passive_val_name=sys.argv[7]
    before_after=sys.argv[8]
+   print(sys.argv, 'sys.argv correct and run')
 
 def change_model_pas(cell,CM=1, RA = 250, RM = 20000.0, E_PAS = -70.0,F_factor=1.9,SPINE_START=20):
    h.dt = 0.1
@@ -49,7 +51,8 @@ def plot_res_short_pusle(dirr ,RM, RA, CM,resize_diam_by=1.0,shrinkage_factor=1.
     data_dir="cells_initial_information/"
     cell_name=dirr.split('/')[1]
     file_type=dirr.split('/')[4][:dirr.split('/')[4].rfind('_SPINE_START')]
-    cell_file=glob(data_dir+cell_name+'/*'+file_type)[0]
+    # before_after=dirr.split('/')[3].replace('fit_short_pulse','')
+    cell_file=glob(data_dir+cell_name+'/*'+file_type[:-4]+before_after+file_type[-4:])[0]
     path_short_pulse=glob(data_dir+cell_name+'/mean_short_pulse_with_parameters.p')[0]
 
     cell=None
@@ -112,10 +115,14 @@ def plot_res_short_pusle(dirr ,RM, RA, CM,resize_diam_by=1.0,shrinkage_factor=1.
     plt.legend(loc='best')
     dict_result={'parameter':{'RA':RA,'CM':CM,'RM':RM,'E_PAS':E_PAS},'passive_val_name':passive_val_name,'experiment':{'T':T,'V':V},'model':{'T':npTvec,'V':npVec,'error':error_2+error_3},'fit_decay':{'T':T[decay_start:decay_end],'V':V[decay_start:decay_end],'error':error_2},'fit_Rin':{'T':T[max2fit_start:max2fit_end], 'V':V[max2fit_start:max2fit_end],'error':error_3}}
     save_dirr=dirr+passive_val_name+'_results.p'
-    # plt.plot(T, V, color = 'black',alpha=0.3,label='data',lw=2)
-    # plt.plot(T[decay_start:decay_end], V[decay_start:decay_end], color = 'b',alpha=0.3,label='fit decay')
-    # plt.plot(T[max2fit_start:max2fit_end], V[max2fit_start:max2fit_end],color = 'yellow',label='fit maxV')
-    # plt.plot(npTvec, npVec, color = 'r', linestyle ="--",alpha=0.3,label='NEURON simulation')
+    plt.plot(T, V, color = 'black',alpha=0.3,label='data',lw=2)
+    plt.plot(T[decay_start:decay_end], V[decay_start:decay_end], color = 'b',alpha=0.3,label='fit decay')
+    plt.plot(T[max2fit_start:max2fit_end], V[max2fit_start:max2fit_end],color = 'yellow',label='fit maxV')
+    if len(npTvec)>len(npVec):
+        npTvec=npTvec[:len(npVec)]
+    plt.plot(npTvec, npVec, color = 'r', linestyle ="--",alpha=0.3,label='NEURON simulation')
+    plt.title(cell_name)
+    plt.show()
     with open(save_dirr, 'wb') as fr:
     	pickle.dump(dict_result, fr)
     return save_dirr
@@ -124,4 +131,5 @@ if __name__=='__main__':
     data_file='cells_outputs_data_short/'+cell_name+'/'
     dirr=glob(data_file+'/fit_short_pulse'+before_after+'/z_correct.swc_SPINE_START=20/dend*'+str(resize_diam_by)+'&F_shrinkage='+str(shrinkage_by)+'/const_param/RA/')[0]
     plot_res_short_pusle(dirr ,float(RM), float(RA), float(CM),resize_diam_by=resize_diam_by,shrinkage_factor=shrinkage_by,passive_val_name=passive_val_name)
+
     cell=None
