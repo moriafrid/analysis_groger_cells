@@ -157,7 +157,7 @@ class OPEN_RES():
             return self.fixed_params_res[param_name]
         elif param_name in self.optimization_params_res.keys():
             return self.optimization_params_res[param_name][hall_num]
-        raise Exception('parameter name isnt correct: ' + str(param_name))
+        raise Exception('parameter name isnt from: ' +self.optimization_params_res.keys()+" or "+ self.fixed_params_res.keys())
 
     def _add_syn_on_sec(self, sec, weight, pos=1, netstim=None, hall_of_fame_num=0):
         if netstim == None:
