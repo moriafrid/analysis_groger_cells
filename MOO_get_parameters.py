@@ -34,12 +34,11 @@ do_compare2result = False
 frozen_NMDA_weigth=False
 runnum2compare = '13'
 # spine_type="mouse_spine" #"groger_spine"
-
 print(sys.argv,flush=True)
 if len(sys.argv) != 17:
     print("the function doesn't run with sys.argv",len(sys.argv),flush=True)
     cpu_node = 1
-    cell_name= '2016_04_16_A'#'2017_07_06_C_3-4'
+    cell_name= read_from_pickle('cells_name2.p')[0]
     file_type='z_correct.swc'  #file type is just used to calculate F_factor
     passive_val={'RA':float(120),'CM':1.6713,'RM':12075}
     passive_fit_condition='const_param'
@@ -51,9 +50,10 @@ if len(sys.argv) != 17:
     RA=float(100)
     generation_size = 5
     num_of_genarations = 2
-    double_spine_area=True
-    same_strengh=True
+    double_spine_area=False
+    same_strengh=False
     fit_until_point=-1
+    before_after='_before_shrink'
 else:
     print("the sys.argv len is correct",flush=True)
     cpu_node = int(sys.argv[1])
@@ -112,7 +112,7 @@ RDSM_objective_file = folder_+save_dir+cell_name+"/data/electrophysio_records/sy
 # RDSM_objective_file = data_dir+cell_name+"/mean_syn_split.p"
 short_pulse_parameters_file=folder_+save_dir+cell_name+'/data/electrophysio_records/short_pulse_parameters.p'
 short_pulse_parameters_file=data_dir+cell_name+'/mean_short_pulse_with_parameters.p'
-morphology_dirr =glob(folder_+data_dir+cell_name+'/*'+file_type)[0]
+morphology_dirr =glob(folder_+data_dir+cell_name+'/*'+file_type[:-4]+before_after+file_type[-4:])[0]
 # morphology_dirr =glob( folder_+data_dir+cell_name+'/*z_correct.swc')[0]
 
 print('profile=',profile)
@@ -206,6 +206,7 @@ def add_morph(sim, icell, syns, spine_properties):#,spine_property=self.spine_pr
     for i, syn in enumerate(syns):
         num = syn[0]
         num = int(num[num.find("[") + 1:num.find("]")])
+        print(num)
         if syn[0].find("dend") > -1:
             sec = icell.dend[num]
         elif syn[0].find("apic") > -1 :
@@ -251,8 +252,8 @@ def run(cell, seed=0):
     # syn_place=np.argmax(np.array(V_base))
 
     dt =T_with_units.units
-
-    spike_timeing=T_base[np.argmax(np.array(V_base))-65]
+    spike_timeing=T_base[read_from_pickle('syn_onset.p')[cell_name]]
+    # spike_timeing=T_base[np.argmax(np.array(V_base))-65]
     # syn_place=np.argmax(np.array(V_base))
     E_PAS=read_from_pickle(short_pulse_parameters_file)['E_pas']
     V_base=V_base+E_PAS
@@ -662,7 +663,6 @@ def run(cell, seed=0):
         plt.legend()
         plt.savefig(base_save_folder + 'before_fit_transient_RDSM.png')
         pickle.dump(fig, open(base_save_folder + 'before_fit_transient_RDSM.p', 'wb'))
-
         plt.close()
     final_pop, hall_of_fame, logs, hist = optimisation.run(max_ngen=num_of_genarations, cp_filename=base_save_folder+'cp', continue_cp=True, cp_frequency=1)
 
