@@ -4,7 +4,6 @@ from matplotlib import pyplot as plt
 from open_pickle import read_from_pickle
 from glob import glob
 import shutil
-from plot_fit_short_pulse import plot_res_short_pusle
 from read_passive_parameters_csv import get_passive_parameter
 from passive_val_function import get_passive_val
 from read_spine_properties import get_n_spinese
@@ -33,7 +32,7 @@ def copy_file(copy,paste,extra_name=''):
             print('')
 #need to run again with 3,5,8 if os.system is runing
 for cell_name in read_from_pickle('cells_name2.p'):
-    # if cell_name!='2017_05_08_A_4-5':continue
+    # if '4-5'  in cell_name:continue
     # if cell_name in read_from_pickle('cells_name2.p'):continue
     # if cell_name in ['2017_07_06_C_4-3','2016_04_16_A','2017_07_06_C_3-4']:continue (until I can change the run to be not on folder syn_par for the Moo)
     print(cell_name)
@@ -69,17 +68,16 @@ for cell_name in read_from_pickle('cells_name2.p'):
     next_continue=[]
     for passive_val_name in ['RA_min_error','RA_best_fit','RA=120','RA=150']:
         if next_continue: continue
-        passive_vals_dict=get_passive_parameter(cell_name,before_after,double_spine_area='False',shrinkage_resize=[shrinkage_by,resize_diam_by],fit_condition='const_param',spine_start=20,file_type='z_correct.swc')
-        RA,CM,RM=get_passive_val(passive_vals_dict[passive_val_name],what_return='full_result')
+        passive_vals_dict=get_passive_parameter(cell_name,before_after,double_spine_area='False',shrinkage_resize=[shrinkage_by,resize_diam_by],fit_condition='const_param',spine_start=20,file_type='z_correct.swc',passive_param_name=passive_val_name)
+        RA,CM,RM=get_passive_val(passive_vals_dict,what_return='full_result')
         if RA<50:
             continue
         else:
             if RA>70:
                 next_continue=True
         dirr_passive_result=glob(data_file+short_pulse+'z_correct.swc_SPINE_START=20/dend*'+str(resize_diam_by)+'&F_shrinkage='+str(shrinkage_by)+'/const_param/RA/')[0]
-        # os.system(" ".join(["python plot_fit_short_pulse.py",cell_name,str(RM), str(RA), str(CM),str(resize_diam_by),str(shrinkage_by),str(passive_val_name),before_after]))
+        os.system(" ".join(["python plot_fit_short_pulse.py",cell_name,str(RM), str(RA), str(CM),str(resize_diam_by),str(shrinkage_by),str(passive_val_name),before_after]))
 
-        dict_passive_results_file=plot_res_short_pusle(glob(data_file+short_pulse+'z_correct.swc_SPINE_START=20/dend*'+str(resize_diam_by)+'&F_shrinkage='+str(shrinkage_by)+'/const_param/RA/')[0] ,float(RM), float(RA), float(CM),resize_diam_by=resize_diam_by,shrinkage_factor=shrinkage_by,passive_val_name=passive_val_name)
         copy_file(dirr_passive_result+passive_val_name+'_results.p',save_file_resize)
 
         RA=str(int(float(RA)))
@@ -94,13 +92,13 @@ for cell_name in read_from_pickle('cells_name2.p'):
         try:
             if get_n_spinese(cell_name)>1:
                 for MOO_file in glob(data_file+MOO_relative+resize+'/const_param/'+passive_val_name+'_full_trace/*.p'):
-                    if 'before' in MOO_file:continue
+                    # if 'before' in MOO_file:continue
                     copy_file(MOO_file,save_file_resize,extra_name='full_relative_'+passive_val_name)
                 copy_file(glob(data_file+MOO_relative+resize+'/const_param/'+passive_val_name+'_full_trace/data.txt')[0],save_file_resize,extra_name='full_relative_'+passive_val_name)
 
             else:
                 for MOO_file in glob(data_file+MOO_same+resize+'/const_param/'+passive_val_name+'_full_trace/*.p'):
-                    if 'before' in MOO_file:continue
+                    # if 'before' in MOO_file:continue
                     copy_file(MOO_file,save_file_resize,extra_name='full_same_'+passive_val_name)
                 copy_file(glob(data_file+MOO_same+resize+'/const_param/'+passive_val_name+'_full_trace/data.txt')[0],save_file_resize,extra_name='full_same_'+passive_val_name)
 
@@ -126,7 +124,7 @@ for p in files:
     for passive_val_name in ['RA_min_error','RA_best_fit','RA=120','RA=150']:
         if next_continue: continue
         passive_vals_dict=get_passive_parameter(cell_name,before_after,double_spine_area=double_spine_area,shrinkage_resize=[shrinkage_by,resize_diam_by],fit_condition='const_param',spine_start=20,file_type='z_correct.swc')
-        RA,CM,RM=get_passive_val(passive_vals_dict[passive_val_name])
+        RA,CM,RM=get_passive_val(passive_vals_dict[passive_val_name],what_return='full_result')
         RA=str(int(float(RA)))
         if float(RA)<70:
             continue
@@ -134,7 +132,7 @@ for p in files:
             if float(RA)>70:
                 next_continue=True
         # dirr_passive_result=glob(data_file+short_pulse+'z_correct.swc_SPINE_START=20/dend*'+str(resize_diam_by)+'&F_shrinkage='+str(shrinkage_by)+'/const_param/RA/')[0]
-        # os.system(" ".join(["python plot_fit_short_pulse.py",cell_name,str(RM), str(RA), str(CM),str(resize_diam_by),str(shrinkage_by),str(passive_val_name)]))
+        os.system(" ".join(["python plot_fit_short_pulse.py",cell_name,str(RM), str(RA), str(CM),str(resize_diam_by),str(shrinkage_by),str(passive_val_name),before_after]))
 
         # dict_passive_results_file=plot_res_short_pusle(glob(data_file+short_pulse+'/z_correct.swc_SPINE_START=20/dend*'+str(resize_diam_by)+'&F_shrinkage='+str(shrinkage_by)+'/const_param/RA/')[0] ,float(RM), float(RA), float(CM),resize_diam_by=resize_diam_by,shrinkage_factor=shrinkage_by,passive_val_name=passive_val_name)
         # copy_file( dirr_passive_result+passive_val_name+'_results.p',save_file_resize)
@@ -144,6 +142,6 @@ for p in files:
         # copy_file(glob(data_file+'/data/cell_properties/'+file_type+'/SPINE_START=20/dend*'+str(resize_diam_by)+'&F_shrinkage='+str(shrinkage_by)+'/'+passive_val_name+'/E_dendogram/dend_only_with_syn.p')[0],save_file_resize)
         # copy_file(glob(data_file+'/data/cell_properties/'+file_type+'/SPINE_START=20/dend*'+str(resize_diam_by)+'&F_shrinkage='+str(shrinkage_by)+'/'+passive_val_name+'/M_dendogram/dend_only.p')[0],save_file_resize)
         for MOO_file in glob(data_file+MOO_same+resize+'/const_param/'+passive_val_name+'_full_trace/*.p'):
-            if 'before' in MOO_file:continue
+            # if 'before' in MOO_file:continue
             copy_file(MOO_file,save_file_resize,extra_name='full_relative_'+passive_val_name)
         copy_file(glob(data_file+MOO_same+resize+'/const_param/'+passive_val_name+'_full_trace/data.txt')[0],save_file_resize,extra_name='full_same_'+passive_val_name)
