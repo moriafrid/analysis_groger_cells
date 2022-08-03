@@ -208,7 +208,8 @@ def run(cell, seed=0):
 
     dt =T_with_units.units
 
-    spike_timeing=T_base[np.argmax(np.array(V_base))-65]
+    # spike_timeing=T_base[np.argmax(np.array(V_base))-65]
+    spike_timeing=T_base[read_from_pickle('syn_onset.p')[cell_name]]
     # syn_place=np.argmax(np.array(V_base))
     E_PAS=syn_pickle['E_pas']
     # E_PAS=np.mean(V_base[:syn_place-10])
