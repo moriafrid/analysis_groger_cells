@@ -5,11 +5,15 @@ from glob import glob
 from passive_val_function import *
 import pickle
 import sys
-if len(sys.argv) != 2:
+if len(sys.argv) != 3:
     cells_name_place="cells_name2.p"
+    before_after="_before_shrink"
+
     print("creat csv for passive_val not running with sys.argv",len(sys.argv))
 else:
     cells_name_place=sys.argv[1]
+    before_after=sys.argv[2]
+
     print("creat csv for passive_val running with sys.argv",sys.argv)
 folder_=""
 folder_data="cells_initial_information/"
@@ -33,7 +37,7 @@ for cell_name in cells:
                 for SPINE_START in [str(20),str(10),str(60)]:
                     for double_spine_area in ['True','False']:
                         passive_vals_dict= {}
-                        initial_folder=folder_+folder_save+cell_name+'/fit_short_pulse/'+file_type+'_SPINE_START='+str(SPINE_START)+'/'
+                        initial_folder=folder_+folder_save+cell_name+'/fit_short_pulse'+before_after+'/'+file_type+'_SPINE_START='+str(SPINE_START)+'/'
                         # initial_folder=folder_+folder_save+cell_name+'/fit_short_pulse/'+file_type+'_SPINE_START='+str(SPINE_START)+'/'
                         initial_folder+="/dend*"+str(round(resize_diam_by,2))+'&F_shrinkage='+str(round(shrinkage_factor,2))
                         if eval(double_spine_area):
@@ -75,14 +79,14 @@ for cell_name in cells:
                                 dict_for_records.update(value)
                             all_data.append(dict_for_records)
 
-                save_pickle_folder=folder_+folder_save+cell_name+'/fit_short_pulse/'
+                save_pickle_folder=folder_+folder_save+cell_name+'/fit_short_pulse'+before_after+'/'
                 output_df = pd.DataFrame.from_records(all_data)
                 # print(output_df.columns)
                 # print(output_df)
                 output_df.to_csv(save_pickle_folder+"/results_passive_fits.csv", index=False)
                 pickle.dump(dict_fit_condition, open(save_pickle_folder+"/results_passive_fits.p", "wb"))
 
-                save_pickle_folder2=folder_+folder_data+cell_name
-                output_df = pd.DataFrame.from_records(all_data)
-                output_df.to_csv(save_pickle_folder2+"/results_passive_fits.csv", index=False)
-                pickle.dump(dict_fit_condition, open(save_pickle_folder2+"/results_passive_fits.p", "wb"))
+                # save_pickle_folder2=folder_+folder_data+cell_name
+                # output_df = pd.DataFrame.from_records(all_data)
+                # output_df.to_csv(save_pickle_folder2+"/results_passive_fits"+before_after+".csv", index=False)
+                # pickle.dump(dict_fit_condition, open(save_pickle_folder2+"/results_passive_fits"+before_after+".p", "wb"))
