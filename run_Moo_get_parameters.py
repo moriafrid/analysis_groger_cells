@@ -22,14 +22,14 @@ folder_data="cells_initial_information/"
 folder_save="cells_outputs_data_short/"
 before_after='_before_shrink'
 
-os.system('python csv_for_passive_val_results.py cells_name2.p')
+os.system('python csv_for_passive_val_results.py cells_name2.p '+before_after)
 
 
 for cell_name in read_from_pickle(cells_name_place):
-    # if not cell_name in ['2016_04_16_A','2017_07_06_C_4-3']:continue #,'2017_02_20_B'? after  clear more noise?,'2017_07_06_C_3-4'
+    if not cell_name in ['2017_07_06_C_3-4','2017_07_06_C_4-3']:continue #,'2017_02_20_B'? after  clear more noise?,'2017_07_06_C_3-4'
     passive_vals_dict= {}
     # p='cells_initiall_information/'+cell_name+'/results_passive_fits.csv'
-    p='cells_outputs_data_short/'+cell_name+'/fit_short_pulse/results_passive_fits.csv'
+    p='cells_outputs_data_short/'+cell_name+'/fit_short_pulse'+before_after+'/results_passive_fits.csv'
     print(cell_name)
     df = pd.read_csv(p)
     for resize_diam_by ,shrinkage_by in zip([1.0,1.0,1.1,1.5][:2],[1.0,1.1,1.1,1.0][:2]):#zip([1.0],[1.0]):
