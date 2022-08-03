@@ -10,8 +10,8 @@ from scalbar_sapir import AnchoredHScaleBar
 import math
 
 L_widgh=5
-text_size=16
-label_size=9
+text_size=15
+label_size=8
 def clear_short_pulse(ax, dir):
     # d = '/ems/elsc-labs/segev-i/moria.fridman/project/analysis_groger_cells/cells_initial_information/2017_05_08_A_4-5/clear_short_pulse.p'
     data = pickle.load(open(dir, 'rb'))
@@ -53,7 +53,6 @@ def plot_syn_model(ax,dirr):
     add_scale_bar(ax,'fit_syn')
 
 def plot_short_pulse_model(ax,dirr):
-    # plt.rc('font', size=text_size)
     global  E_PAS
     dict_result=read_from_pickle(dirr)
     experiment=dict_result['experiment']
