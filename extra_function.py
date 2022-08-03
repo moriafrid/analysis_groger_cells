@@ -1,5 +1,6 @@
-import os
+
 from neuron import h,gui
+import os
 def create_folders_list(folders_list):
     for curr in folders_list:
         try:
