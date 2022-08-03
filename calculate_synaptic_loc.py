@@ -13,7 +13,7 @@ signal.signal(signal.SIGSEGV, SIGSEGV_signal_arises)
 
 if len(sys.argv) != 4:
     print("sys.argv not running and with length",len(sys.argv))
-    cells= read_from_pickle('cells_name2.p')
+    cells= read_from_pickle('cells_name2.p')#['2016_05_12_A']#
     file_type='.ASC'
     with_plot=False
 else:
@@ -26,13 +26,16 @@ folder_data='cells_initial_information/'
 folder_save='cells_outputs_data_short/'
 
 def synaptic_loc(cell_dir,syn_poses_list,with_plot=False, part='all', save_place=''):
+
     dict2={}
     cell=None
     cell=load_ASC(cell_dir)
+    h.distance(0,0.5, sec=cell.soma)
+
     #syn_pose should be (x,y,z) coordinates
     # h.load_file("import3d.hoc")
-    h.load_file("nrngui.hoc")
-    secs,dends,dists,dends_name,dis_from_soma,sec_name,sec_num,seg_num=[],[],[],[],[],[],[],[]
+    # h.load_file("nrngui.hoc")
+    secs,dends,dists,dends_name,dis_from_soma,sec_name,sec_num,seg_num,best_dend_pos=[],[],[],[],[],[],[],[],[]
     for i in range(len(syn_poses_list)):
         secs.append(None)
         dends.append(None)
@@ -42,6 +45,7 @@ def synaptic_loc(cell_dir,syn_poses_list,with_plot=False, part='all', save_place
         dists.append(10000)
         dends_name.append(None)
         dis_from_soma.append(None)
+        best_dend_pos.append(None)
 
     if part == 'all':
         relevant_sections = cell.all_sec()
@@ -56,20 +60,21 @@ def synaptic_loc(cell_dir,syn_poses_list,with_plot=False, part='all', save_place
         raise BaseException('the part is not good '+str(part))
     all_points = []
     for sec in relevant_sections:
+        #calculate the section len
         lens = []
         initial_point = np.array([sec.x3d(0), sec.y3d(0), sec.z3d(0)])
         for i in range(sec.n3d()):
             lens.append(np.linalg.norm(initial_point - np.array([sec.x3d(i), sec.y3d(i), sec.z3d(i)])))
             initial_point = np.array([sec.x3d(i), sec.y3d(i), sec.z3d(i)])
         total_len = np.sum(lens)
-        accumalate_len = 0
+        #add number_of_step dots between the initial point and the next point for all segment
         initial_point = np.array([sec.x3d(0), sec.y3d(0), sec.z3d(0)])
         points = [initial_point]
         for i in range(1,sec.n3d()):
             dend_pos = np.array([sec.x3d(i), sec.y3d(i), sec.z3d(i)])
-            points_diffrance = dend_pos-initial_point
-            distance = np.linalg.norm(initial_point - dend_pos)
-            number_of_steps =int(np.ceil(distance))
+            points_diffrance = dend_pos-initial_point #between the start of the dendrite and the next point
+            distance = np.linalg.norm(initial_point - dend_pos) #distance between dots
+            number_of_steps =int(np.ceil(distance))*2
             for step_number in range(1, number_of_steps, 1):
                 intermideate_point = initial_point.copy() + points_diffrance*step_number/number_of_steps
                 points.append(intermideate_point)
@@ -77,6 +82,8 @@ def synaptic_loc(cell_dir,syn_poses_list,with_plot=False, part='all', save_place
             initial_point = dend_pos
         initial_point = points[0]
         all_points+=points
+        accumalate_len = 0
+        #test if the synapse is inside this section
         for point in points[1:]:
             dend_pos = point
             accumalate_len += np.linalg.norm(initial_point - dend_pos)
@@ -90,6 +97,11 @@ def synaptic_loc(cell_dir,syn_poses_list,with_plot=False, part='all', save_place
                     sec_name[j]=str(sec)[str(sec).find('>')+2:]
                     seg_num[j]=round(accumalate_len / total_len,3)
                     sec_num[j]=int(str(sec)[str(sec).find('[')+1:-1])
+                    best_dend_pos[j]=dend_pos
+                    dis_from_soma[j]=h.distance(sec(seg_num[j]))
+    for j in range(get_n_spinese(cell_name)):
+        print(sec_name[j],dists[j],best_dend_pos[j])
+
     if with_plot:
         fig=plt.figure()
         for p in all_points:
@@ -141,12 +153,12 @@ def synaptic_loc(cell_dir,syn_poses_list,with_plot=False, part='all', save_place
         pickle.dump({"all_point":all_points,"synaptic_dend":dend_pos_dict,"syn_pos":xyz,"syn_sec_pos":dends_name}, f)
 
     dict = {'sec_name':sec_name,'sec_num':sec_num,'seg_num':seg_num,'place_name':dends_name,'dist_from_soma':dis_from_soma,'dist':dists, 'part':part}
-    print(dict)
+    # print(dict)
 
     try_save_dict(dict,folder_save+cell_name+'/','synaptic_location')
     for i in range(len(syn_poses_list)):
-        dict2[str(i)] = {'sec_name':sec_name[i],'sec_num':sec_num[i],'seg_num':seg_num[i],'place_name':dends_name[i],'dist_from_soma':dis_from_soma[i],'dist':dists[i], 'part':part}
-        print(dict2)
+        dict2[str(i)] = {'sec_name':sec_name[i],'sec_num':sec_num[i],'seg_num':seg_num[i],'place_name':dends_name[i],'dist_from_soma':dis_from_soma[i],'dist':dists[i], 'part':part,'best_found_location':best_dend_pos}
+        # print(dict2)
 
     try_save_dict(dict2,folder_save+cell_name+'/','synaptic_location_seperate')
     return dict,dict2
@@ -185,14 +197,15 @@ if __name__=='__main__':
         xyz,dend_part=[],[]
         if len(glob(folder_data+cell_name+'/*'+file_type))<1:continue
         dir=glob(folder_data+cell_name+'/*'+file_type)[0]
+        if 'shrinkXYZ' in dir:
+            dir=glob(folder_data+cell_name+'/*'+file_type)[1]
+        if cell_name in ['2017_07_06_C_3-4','2017_07_06_C_4-3']:
+            dir=glob(folder_data+cell_name+'/*/'+cell_name+file_type)[0]
         for i in range(get_n_spinese(cell_name)):
             print('one syn dict:',dict)
             xyz.append(list(get_spine_xyz(cell_name,i)))
             dend_part.append(get_spine_part(cell_name,i))
-        if np.isnan(xyz[0][0]):
-            print(cell_name+' dont had xyz')
-            cell_withou_xyz.append(cell_name)
-            continue
+
         dict1,dict2=synaptic_loc(dir,xyz, part='all', save_place=folder_save+cell_name+'/synapses',with_plot=with_plot)
         dict3[cell_name]=dict1
         for key in dict2.keys():
