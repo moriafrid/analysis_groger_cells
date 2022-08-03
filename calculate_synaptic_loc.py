@@ -213,5 +213,5 @@ if __name__=='__main__':
         print('more then one syn dict',cell_name,[xyz])
     try_save_dict(dict3,folder_save,'synaptic_location')
     try_save_dict(dict4,folder_save,'synaptic_location_seperate')
-    with open("cells_without_xyz.p", 'wb') as handle:
-        pickle.dump(cell_withou_xyz, handle, protocol=pickle.HIGHEST_PROTOCOL)
+    # with open("cells_without_xyz.p", 'wb') as handle:
+    #     pickle.dump(cell_withou_xyz, handle, protocol=pickle.HIGHEST_PROTOCOL)
