@@ -1,10 +1,8 @@
 from neuron import h,gui
-from read_passive_parameters_csv import get_passive_parameter
 from glob import glob
 from extra_function import load_swc, load_ASC,load_hoc
 from calculate_F_factor import calculate_F_factor
-import pandas as pd
-from read_spine_properties import get_n_spinese,get_building_spine
+from read_spine_properties import get_n_spinese, get_building_spine, get_sec_and_seg
 
 folder_=''
 data_dir='cells_initial_information/'
@@ -54,12 +52,11 @@ soma = cell.soma
 # h.celsius = 36
 sp = h.PlotShape()
 
-dict_syn=pd.read_excel(folder_+save_dir+"synaptic_location_seperate.xlsx",index_col=0)
 syns,spines,spines_sec,spines_seg,spines_head=[],[],[],[],[]
 number_of_spine= get_n_spinese(cell_name)
 for spine_num in range(number_of_spine):
-    spine_seg=dict_syn[cell_name+str(spine_num)]['seg_num']
-    spine_sec=eval('cell.'+dict_syn[cell_name+str(spine_num)]['sec_name'])
+    sec,spine_seg=get_sec_and_seg(cell_name,spine_num)
+    spine_sec=eval('cell.'+sec)
     syns.append([spine_sec,spine_seg])
     spines_sec.append(spine_sec)
     spines_seg.append(spine_seg)

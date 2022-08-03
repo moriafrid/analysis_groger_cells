@@ -59,17 +59,7 @@ for model_place in tqdm(glob(folder_data+'/*')):
     netstim.start = spike_timeing + neuron_start_time
     netstim.noise = 0
 
-    # secs,segs=get_sec_and_seg(cell_name)
-    secs=[]
-    segs=[]
-    import pandas as pd
-    synapses_dict=pd.read_excel(folder_+'cells_outputs_data_short/'+"synaptic_location_seperate.xlsx",index_col=0)
-    for i in range(get_n_spinese(cell_name)):
-        sec=synapses_dict[cell_name+str(i)]['sec_name']
-        seg=float(synapses_dict[cell_name+str(i)]['seg_num'])
-        print(sec, seg)
-        secs.append(sec)
-        segs.append(seg)
+    secs,segs=get_sec_and_seg(cell_name)
     num=0
     V_spine=[]
     spines=[]
