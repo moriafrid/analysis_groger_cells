@@ -2,11 +2,8 @@ from neuron import h, gui
 import numpy as np
 import sys
 from glob import glob
-import pickle
 if len(sys.argv) != 3:
-    # cell_name="2017_05_08_A_5-4(0)"
-    cell_name="2017_05_08_A_4-5"
-    cell_name="2017_07_06_C_3-4"
+    cell_name="2017_03_04_A_6-7"
     before_after="_before_shrink"
 else:
     cell_name=sys.argv[1]
@@ -138,17 +135,23 @@ except: cell.apic=[]
 for child in cell.soma[0].children():
     type=None
     if child in cell.dend:
-        type=3 #2 for dend
+        type=3
     elif child in cell.axon:
         type=2
     elif child in cell.apic:
         type=4
 
     if "2017_03_04_A_6-7" in cell_name:
-        if child==cell.dend[56]:
-            type=2
-        elif child==cell.axon[0]:
-            type=3
+        if "before" in before_after:
+            if child==cell.dend[56]:
+                type=2
+            elif child==cell.axon[0]:
+                type=3
+        # else:
+        #     if child==cell.dend[56]:
+        #         type=2
+        #     elif child==cell.axon[0]:
+        #         type=3
     if type is None:
         raise Exception('no type chosen')
     parent_point = get_closest_z(soma_points[:3],
