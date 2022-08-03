@@ -6,8 +6,8 @@ import pickle
 from extra_function import load_swc
 
 if len(sys.argv) != 3:
-    cell_name="2017_05_08_A_4-5"
-    before_after='_after_shrink'
+    cell_name="2017_03_04_A_6-7"
+    before_after='_before_shrink'
     print('before or after need to be choose')
 else:
     cell_name=sys.argv[1]
@@ -46,7 +46,7 @@ def get_closest_z(soma_point, sec_point, soma_r):
     return soma_point + vec * soma_r
 
 id=2
-fname = glob(folder_+cell_name+'/*z_correct.swc')[0]
+fname = glob(folder_+cell_name+'/*z_correct'+before_after+'.swc')[0]
 
 print(fname.split('/')[1])
 morphology_dict={}
