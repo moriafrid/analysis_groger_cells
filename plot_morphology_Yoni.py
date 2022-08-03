@@ -45,6 +45,7 @@ def plot_morphology(ax, segment_colors, names=[], width_mult_factors=None, seg_i
             ax.scatter(x=syn_x, y=syn_y, s=200, c='r',zorder=2,alpha=0.6,label=''+str(syn_num)+'  '+str(psd_size)+'   '+str(round(synapse[2][syn_num],2)))
             if len(synapse[2])>1:
                 ax.text(syn_x-1,syn_y-2,syn_num,color='black',**{'size':'12'})
+
     # plot the cell morphology
     for key in all_seg_inds:
         if without_axons:
@@ -69,9 +70,6 @@ def plot_morphology(ax, segment_colors, names=[], width_mult_factors=None, seg_i
             ax.text(np.max(seg_ind_to_xyz_coords_map[key]['x']), np.max(seg_ind_to_xyz_coords_map[key]['y']),
                     names[ind])
 
-
-
-
     ax.legend()
     # ax.set_xlim(-180, 235)
     # ax.set_ylim(-210, 1200);
@@ -88,7 +86,7 @@ def plot_morph(ax, cell_name, before_after,without_axons=True):
     segment_colors_selected = np.zeros(num_segments)
     segment_widths_selected = 5 * np.ones(segment_colors_selected.shape)
     synapses=list(get_sec_and_seg(cell_name))+[get_parameter(cell_name,'PSD')]
-
+    # synapses=[get_spine_xyz(cell_name,i) for i in range(get_n_spinese(cell_name))]
     # choosen_synpase=[]
     # for spine_num in np.arange(get_n_spinese(cell_name)):
     #     choosen_synpase.append(get_spine_xyz(cell_name,spine_num))
