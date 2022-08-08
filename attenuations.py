@@ -7,7 +7,7 @@ from extra_function import SIGSEGV_signal_arises,load_ASC,load_hoc,load_swc,crea
 import pandas as pd
 from calculate_F_factor import calculate_F_factor
 import sys
-from read_spine_properties import get_n_spinese,get_building_spine
+from read_spine_properties import get_n_spinese, get_building_spine, get_sec_and_seg
 import json
 from open_pickle import read_from_pickle
 from read_passive_parameters_csv import get_passive_parameter
@@ -37,7 +37,7 @@ if len(sys.argv) != 11:
     shrinkage_factor=1.0
     SPINE_START=20
     double_spine='False'
-    befor_after='_before_shrink'
+    before_after='_after_shrink'
 else:
     print("the sys.argv len is correct",flush=True)
     cell_name = sys.argv[1]
@@ -61,8 +61,9 @@ print(name, passive_val)
 data_dir= "cells_initial_information/"
 save_dir = "cells_outputs_data_short/"
 cell_file=glob(folder_+data_dir+cell_name+'/*'+file_type)[0]
+cell_file=glob(folder_+data_dir+cell_name+'/*'+file_type[:-4]+before_after+file_type[-4:])[0]
 # folder_save=folder_+save_dir+cell_name+"/data/cell_properties/"+file_type+'/SPINE_START='+str(SPINE_START)+'/'
-folder_save=folder_+save_dir+cell_name+"/fit_short_pulse/"+file_type+'_SPINE_START='+str(SPINE_START)+'/'
+folder_save=folder_+save_dir+cell_name+"/fit_short_pulse"+before_after+"/"+file_type+'_SPINE_START='+str(SPINE_START)+'/'
 folder_save+="/dend*"+str(round(resize_diam_by,2))+'&F_shrinkage='+str(round(shrinkage_factor,2))
 folder_save+='/'+name+'/'
 folder_save+="attenuations/"
@@ -290,12 +291,12 @@ soma = cell.soma
 sp = h.PlotShape()
 
 #get spines prameters and creat spine:
-dict_syn=pd.read_excel(folder_+save_dir+"synaptic_location_seperate.xlsx",index_col=0)
 syns,spines,spines_sec,spines_seg,spines_head=[],[],[],[],[]
 number_of_spine= get_n_spinese(cell_name)
 for spine_num in range(number_of_spine):
-    spine_seg=dict_syn[cell_name+str(spine_num)]['seg_num']
-    spine_sec=eval('cell.'+dict_syn[cell_name+str(spine_num)]['sec_name'])
+    sec,seg=get_sec_and_seg(cell_name,spine_num)
+    spine_seg=float(seg)
+    spine_sec=eval('cell.'+sec)
     syns.append([spine_sec,spine_seg])
     spines_sec.append(spine_sec)
     spines_seg.append(spine_seg)

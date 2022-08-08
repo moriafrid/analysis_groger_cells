@@ -6,11 +6,9 @@ from glob import glob
 import signal
 import sys
 from extra_function import load_ASC,load_hoc,load_swc,SIGSEGV_signal_arises,create_folder_dirr
-from read_spine_properties import get_n_spinese,get_spine_xyz
+from read_spine_properties import get_n_spinese, get_spine_xyz, get_sec_and_seg
 from open_pickle import read_from_pickle
-import pandas as pd
 from calculate_F_factor import calculate_F_factor
-import pandas as pd
 from read_passive_parameters_csv import get_passive_parameter
 import pickle
 import matplotlib
@@ -31,7 +29,7 @@ if len(sys.argv) != 10:
     shrinkage_factor=1.0
     SPINE_START=20
     double_spine='False'
-    befor_after='_before_shrink'
+    befor_after='_after_shrink'
 
 else:
     print("the sys.argv len is correct",flush=True)
@@ -53,10 +51,11 @@ print(name,passive_val)
 data_dir= "cells_initial_information/"
 save_dir = "cells_outputs_data_short/"
 folder_data=folder_+save_dir+cell_name
-cell_file = glob(folder_+data_dir+cell_name+"/*"+file_type2read)[0]
+# cell_file = glob(folder_+data_dir+cell_name+"/*"+file_type2read)[0]
+cell_file=glob(folder_+data_dir+cell_name+'/*'+file_type2read[:-4]+before_after+file_type2read[-4:])[0]
 print("cell file is " +cell_file)
-# folder_save=folder_+save_dir+cell_name+"/data/cell_properties/"+file_type2read+'/SPINE_START='+str(SPINE_START)+'/'
-folder_save=folder_+save_dir+cell_name+"/fit_short_pulse/"+file_type2read+'_SPINE_START='+str(SPINE_START)+'/'
+# folder_save=folder_+save_dir+cell_name+"/data/cell_properties/"+file_type+'/SPINE_START='+str(SPINE_START)+'/'
+folder_save=folder_+save_dir+cell_name+"/fit_short_pulse"+before_after+"/"+file_type2read+'_SPINE_START='+str(SPINE_START)+'/'
 folder_save+="/dend*"+str(round(resize_diam_by,2))+'&F_shrinkage='+str(round(shrinkage_factor,2))
 folder_save+='/'+name+'/Rin_Rm/'
 create_folder_dirr(folder_save)
@@ -135,11 +134,10 @@ plt.savefig(folder_save+'/Rin_Rm')
 pickle.dump(fig, open(folder_save+'/Rin_Rm.p', 'wb'))
 
 freqs=np.linspace(0,200,num=100)
-dict_syn=pd.read_excel(folder_+save_dir+"synaptic_location_seperate.xlsx",index_col=0)
 # for spine_sec,spine_seg in zip(spines_sec,spines_seg):
 for spine_num in range(get_n_spinese(cell_name)):
-    spine_seg=dict_syn[cell_name+str(spine_num)]['seg_num']
-    spine_sec=eval('cell.'+dict_syn[cell_name+str(spine_num)]['sec_name'])
+    sec,spine_seg=get_sec_and_seg(cell_name,spine_num)
+    spine_sec=eval('cell.'+sec)
     spine_xyz=get_spine_xyz(cell_name,spine_num=spine_num)
     Rin_syn=[]
     change_model_pas(CM=CM, RA = RA, RM =RM, E_PAS = E_pas,F_factor= F_factor) #moria need to change for good passive value

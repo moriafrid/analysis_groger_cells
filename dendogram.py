@@ -12,7 +12,7 @@ from glob import glob
 import pandas as pd
 from open_pickle import read_from_pickle
 from calculate_F_factor import calculate_F_factor
-from read_spine_properties import get_n_spinese
+from read_spine_properties import get_n_spinese, get_sec_and_seg
 from read_passive_parameters_csv import get_passive_parameter
 import pickle
 matplotlib.rcParams['pdf.fonttype'] = 42
@@ -32,7 +32,7 @@ if len(sys.argv) != 10:
     shrinkage_factor=1.0
     SPINE_START=20
     double_spine='False'
-    befor_after='_before_shrink'
+    before_after='_after_shrink'
 else:
     print("the sys.argv len is correct",flush=True)
     cell_name = sys.argv[1]
@@ -43,16 +43,17 @@ else:
     shrinkage_factor =float(sys.argv[6]) #how much srinkage the cell get between electrophysiology record and LM
     SPINE_START=int(sys.argv[7])
     double_spine=sys.argv[8]
-    befor_after=sys.argv[9]
-    passive_val=get_passive_parameter(cell_name,befor_after,double_spine_area=double_spine,shrinkage_resize=[shrinkage_factor,resize_diam_by],fit_condition=fit_condition,spine_start=SPINE_START,file_type=file_type2read)[name]
+    before_after=sys.argv[9]
+    passive_val=get_passive_parameter(cell_name,before_after,double_spine_area=double_spine,shrinkage_resize=[shrinkage_factor,resize_diam_by],fit_condition=fit_condition,spine_start=SPINE_START,file_type=file_type2read)[name]
 print(name, passive_val)
 folder_=''
 double_spine=eval(double_spine)
 data_dir= "cells_initial_information/"
 save_dir = "cells_outputs_data_short/"
-cell_file=glob(folder_+data_dir+cell_name+'/*'+file_type2read)[0]
-# folder_save=folder_+save_dir+cell_name+"/data/cell_properties/"+file_type2read+'/SPINE_START='+str(SPINE_START)+'/'
-folder_save=folder_+save_dir+cell_name+"/fit_short_pulse/"+file_type2read+'_SPINE_START='+str(SPINE_START)+'/'
+# cell_file=glob(folder_+data_dir+cell_name+'/*'+file_type2read)[0]
+cell_file=glob(folder_+data_dir+cell_name+'/*'+file_type2read[:-4]+before_after+file_type2read[-4:])[0]
+# folder_save=folder_+save_dir+cell_name+"/data/cell_properties/"+file_type+'/SPINE_START='+str(SPINE_START)+'/'
+folder_save=folder_+save_dir+cell_name+"/fit_short_pulse"+before_after+"/"+file_type2read+'_SPINE_START='+str(SPINE_START)+'/'
 folder_save+="/dend*"+str(round(resize_diam_by,2))+'&F_shrinkage='+str(round(shrinkage_factor,2))
 folder_save+='/'+name+'/'
 create_folder_dirr(folder_save)
@@ -167,11 +168,9 @@ class Dendogram():
         self.diam_factor=diam_factor
         try: self.apic=self.cell.apic
         except:self.apic= find_apic(self.cell,self.does_axon_inside_cell)
-        synapses_dict=pd.read_excel(folder_+save_dir+"synaptic_location_seperate.xlsx",index_col=0)
         synapses_locations=[]
         for i in range(get_n_spinese(cell_name)):
-            sec=synapses_dict[cell_name+str(i)]['sec_name']
-            seg=float(synapses_dict[cell_name+str(i)]['seg_num'])
+            sec,seg=get_sec_and_seg(cell_name,i)
             synapses_locations.append([sec,seg])
         self.dots_loc=synapses_locations
         # self.syn = synapses_locations
