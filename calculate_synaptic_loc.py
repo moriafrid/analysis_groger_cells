@@ -14,7 +14,7 @@ signal.signal(signal.SIGSEGV, SIGSEGV_signal_arises)
 if len(sys.argv) != 4:
     print("sys.argv not running and with length",len(sys.argv))
     cells= read_from_pickle('cells_name2.p')#['2016_05_12_A']#
-    file_type='.ASC'
+    file_type='shrinkXYZ.ASC'
     with_plot=False
 else:
     print("sys.argv is correct and running")
@@ -33,8 +33,8 @@ def synaptic_loc(cell_dir,syn_poses_list,with_plot=False, part='all', save_place
     h.distance(0,0.5, sec=cell.soma)
 
     #syn_pose should be (x,y,z) coordinates
-    # h.load_file("import3d.hoc")
-    # h.load_file("nrngui.hoc")
+    h.load_file("import3d.hoc")
+    h.load_file("nrngui.hoc")
     secs,dends,dists,dends_name,dis_from_soma,sec_name,sec_num,seg_num,best_dend_pos=[],[],[],[],[],[],[],[],[]
     for i in range(len(syn_poses_list)):
         secs.append(None)
@@ -155,12 +155,12 @@ def synaptic_loc(cell_dir,syn_poses_list,with_plot=False, part='all', save_place
     dict = {'sec_name':sec_name,'sec_num':sec_num,'seg_num':seg_num,'place_name':dends_name,'dist_from_soma':dis_from_soma,'dist':dists, 'part':part}
     # print(dict)
 
-    try_save_dict(dict,folder_save+cell_name+'/','synaptic_location')
+    try_save_dict(dict,folder_save+cell_name+'/','synaptic_location_test')
     for i in range(len(syn_poses_list)):
         dict2[str(i)] = {'sec_name':sec_name[i],'sec_num':sec_num[i],'seg_num':seg_num[i],'place_name':dends_name[i],'dist_from_soma':dis_from_soma[i],'dist':dists[i], 'part':part,'best_found_location':best_dend_pos}
         # print(dict2)
 
-    try_save_dict(dict2,folder_save+cell_name+'/','synaptic_location_seperate')
+    try_save_dict(dict2,folder_save+cell_name+'/','synaptic_location_seperate_test')
     return dict,dict2
 
 def syn_dis_from_soma(cell,syn_loc):
@@ -195,12 +195,13 @@ if __name__=='__main__':
     cell_withou_xyz=[]
     for cell_name in cells:
         xyz,dend_part=[],[]
-        if len(glob(folder_data+cell_name+'/*'+file_type))<1:continue
+        # if len(glob(folder_data+cell_name+'/*'+file_type))<1:continue
         dir=glob(folder_data+cell_name+'/*'+file_type)[0]
-        if 'shrinkXYZ' in dir:
-            dir=glob(folder_data+cell_name+'/*'+file_type)[1]
-        if cell_name in ['2017_07_06_C_3-4','2017_07_06_C_4-3']:
-            dir=glob(folder_data+cell_name+'/*/'+cell_name+file_type)[0]
+        if not 'shrinkXYZ' in file_type:
+            if 'shrinkXYZ' in dir:
+                dir=glob(folder_data+cell_name+'/*'+file_type)[1]
+            if cell_name in ['2017_07_06_C_3-4','2017_07_06_C_4-3']:
+                dir=glob(folder_data+cell_name+'/*/'+cell_name+file_type)[0]
         for i in range(get_n_spinese(cell_name)):
             print('one syn dict:',dict)
             xyz.append(list(get_spine_xyz(cell_name,i)))
@@ -211,7 +212,7 @@ if __name__=='__main__':
         for key in dict2.keys():
             dict4[cell_name+key]=dict2[key]
         print('more then one syn dict',cell_name,[xyz])
-    try_save_dict(dict3,folder_save,'synaptic_location')
-    try_save_dict(dict4,folder_save,'synaptic_location_seperate')
+    try_save_dict(dict3,folder_save,'synaptic_location_test')
+    try_save_dict(dict4,folder_save,'synaptic_location_seperate_test')
     # with open("cells_without_xyz.p", 'wb') as handle:
     #     pickle.dump(cell_withou_xyz, handle, protocol=pickle.HIGHEST_PROTOCOL)
