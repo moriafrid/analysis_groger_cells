@@ -12,7 +12,7 @@ from matplotlib_scalebar.scalebar import ScaleBar
 L_widgh=5
 def find_xy(sec_dots,find_seg):
     dots_number=len(sec_dots[0])
-    places=[int(find_seg/dots_number),int(find_seg/dots_number)]
+    places=[int(find_seg*dots_number),int(find_seg*dots_number)]
     return sec_dots[0][places[0]],sec_dots[1][places[1]]
 def plot_morphology(ax, segment_colors, names=[], width_mult_factors=None, seg_ind_to_xyz_coords_map={},synapse=[], without_axons=True):
     if width_mult_factors is None:
@@ -32,6 +32,7 @@ def plot_morphology(ax, segment_colors, names=[], width_mult_factors=None, seg_i
         # add synapses
         if seg_ind_to_xyz_coords_map[seg_ind]['sec name'] in synapse[0]:
         # for i,syn in enumerate(synapse):
+            colors_per_segment[seg_ind]=colors[seg_ind]/2
             sec_dots=[seg_ind_to_xyz_coords_map[seg_ind]['x'],seg_ind_to_xyz_coords_map[seg_ind]['y']]
             syn_num=synapse[0].index(seg_ind_to_xyz_coords_map[seg_ind]['sec name'])
             syn_x,syn_y=find_xy(sec_dots,synapse[1][syn_num])
@@ -42,7 +43,7 @@ def plot_morphology(ax, segment_colors, names=[], width_mult_factors=None, seg_i
             else:
                 psd_size=round(psd_size,2)
                 # psd_size=findFraction(str(psd_size))
-            ax.scatter(x=syn_x, y=syn_y, s=200, c='r',zorder=2,alpha=0.6,label=''+str(syn_num)+'  '+str(psd_size)+'   '+str(round(synapse[2][syn_num],2)))
+            ax.scatter(x=syn_x, y=syn_y, s=100, c='r',zorder=2,alpha=0.6,label=''+str(syn_num)+'  '+str(psd_size)+'   '+str(round(synapse[2][syn_num],2)))
             if len(synapse[2])>1:
                 ax.text(syn_x-1,syn_y-2,syn_num,color='black',**{'size':'12'})
 
@@ -86,6 +87,7 @@ def plot_morph(ax, cell_name, before_after,without_axons=True):
     segment_colors_selected = np.zeros(num_segments)
     segment_widths_selected = 5 * np.ones(segment_colors_selected.shape)
     synapses=list(get_sec_and_seg(cell_name))+[get_parameter(cell_name,'PSD')]
+    print(synapses)
     # synapses=[get_spine_xyz(cell_name,i) for i in range(get_n_spinese(cell_name))]
     # choosen_synpase=[]
     # for spine_num in np.arange(get_n_spinese(cell_name)):
@@ -94,3 +96,14 @@ def plot_morph(ax, cell_name, before_after,without_axons=True):
                     seg_ind_to_xyz_coords_map=seg_ind_to_xyz_coords_map,synapse=synapses, names=[], without_axons=without_axons)
     return ax
 
+if __name__=='__main__':
+    cell_name = read_from_pickle('cells_name2.p')[8:10]
+    print(cell_name)
+    fig = plt.figure(figsize=(20, 20))  # , sharex="row", sharey="row"
+    fig.suptitle(cell_name, fontsize=30)# fig.set_figheight(6)
+    shapes = (1, 2)
+    ax1 = plt.subplot2grid(shape=shapes, loc=(0, 0), rowspan=1, colspan=1)
+    ax2 = plt.subplot2grid(shape=shapes, loc=(0, 1), colspan=1, rowspan=1)
+    plot_morph(ax1,cell_name[0],'_after_shrink')
+    plot_morph(ax2,cell_name[1],'_after_shrink')
+    plt.show()

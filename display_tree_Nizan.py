@@ -6,7 +6,7 @@ from dash import html
 from glob import glob
 import pandas as pd
 from extra_function import load_hoc, load_ASC
-from read_spine_properties import get_spine_xyz,get_n_spinese
+from read_spine_properties import get_spine_xyz, get_n_spinese, get_sec_and_seg
 class TreeViewer():
     def __init__(self,cell_name,cell_type,n_steps=2,show_synapse=True,show_axon=False):
         self.cell_name=cell_name
@@ -24,11 +24,10 @@ class TreeViewer():
             self.model=load_ASC(self.cell_file)
         elif cell_type=='hoc':
             self.model=load_hoc(self.cell_file)
-        dict_syn=pd.read_excel("cells_outputs_data_short/synaptic_location_seperate.xlsx",index_col=0)
         self.syn_section=[]
         for i in range(get_n_spinese(self.cell_name)):
-            spine_seg=dict_syn[self.cell_name+str(i)]['seg_num']
-            section=eval('self.model.'+dict_syn[self.cell_name+str(i)]['sec_name'])
+            sec,spine_seg=get_sec_and_seg(cell_name,i)
+            section=eval('self.model.'+sec)
             self.syn_section.append(section)
 
     def display(self,port=7080):

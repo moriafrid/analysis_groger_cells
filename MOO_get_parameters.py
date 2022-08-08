@@ -53,7 +53,7 @@ if len(sys.argv) != 17:
     double_spine_area=False
     same_strengh=False
     fit_until_point=-1
-    before_after='_before_shrink'
+    before_after='_after_shrink'
 else:
     print("the sys.argv len is correct",flush=True)
     cpu_node = int(sys.argv[1])
@@ -206,7 +206,7 @@ def add_morph(sim, icell, syns, spine_properties):#,spine_property=self.spine_pr
     for i, syn in enumerate(syns):
         num = syn[0]
         num = int(num[num.find("[") + 1:num.find("]")])
-        print(num)
+        # print(num)
         if syn[0].find("dend") > -1:
             sec = icell.dend[num]
         elif syn[0].find("apic") > -1 :
@@ -264,12 +264,11 @@ def run(cell, seed=0):
     # make morphology png fig and load morphology to opt
     ###################################################################################
 
-    synapses_dict=pd.read_excel(folder_+save_dir+"synaptic_location_seperate.xlsx",index_col=0)
     synapses_locations=[]
     spine_properties={}
     for i in range(get_n_spinese(cell_name)):
-        sec=synapses_dict[cell_name+str(i)]['sec_name']
-        seg=float(synapses_dict[cell_name+str(i)]['seg_num'])
+        sec,seg=get_sec_and_seg(cell_name,i)
+        seg=float(seg)
         synapses_locations.append([sec,seg])
         spine_properties[i]=get_building_spine(cell_name,i)
         spine_properties[i]['weight']=reletive_strengths[i]
