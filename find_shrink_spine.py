@@ -59,7 +59,7 @@ def section_with_distance_and_children(cell,sec_num,child_num,type,diam):
         round_num-=1
     return with_correct_diam
 if __name__=='__main__':
-    for cell_name in read_from_pickle('cells_name2.p')[0:]:
+    for cell_name in read_from_pickle('cells_name2.p')[9:]:
         print(cell_name)
         fig = plt.figure(figsize=(20, 20))  # , sharex="row", sharey="row"
         fig.suptitle(cell_name, fontsize=30)# fig.set_figheight(6)
