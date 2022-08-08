@@ -8,11 +8,9 @@ from read_passive_parameters_csv import get_passive_parameter
 from passive_val_function import get_passive_val
 from read_spine_properties import get_n_spinese
 from extra_function import create_folder_dirr
-before_after='_before_shrink'
+before_after='_after_shrink'
 data_file='cells_outputs_data_short/'
-MOO_relative='MOO_results_relative_strange'+before_after+'/z_correct.swc_SPINE_START=20/'
-MOO_same='MOO_results_same_strange'+before_after+'/z_correct.swc_SPINE_START=20/'
-short_pulse='/fit_short_pulse'+before_after+'/'
+
 
 
 def copy_file(copy,paste,extra_name=''):
@@ -32,19 +30,23 @@ def copy_file(copy,paste,extra_name=''):
             print('')
 #need to run again with 3,5,8 if os.system is runing
 for cell_name in read_from_pickle('cells_name2.p'):
-    # if '4-5'  in cell_name:continue
-    # if cell_name in read_from_pickle('cells_name2.p'):continue
-    # if cell_name in ['2017_07_06_C_4-3','2016_04_16_A','2017_07_06_C_3-4']:continue (until I can change the run to be not on folder syn_par for the Moo)
+    if cell_name=='2017_07_06_C_4-3':
+        before_after='_before_shrink'
+    else:
+        before_after='_after_shrink'
+        # continue
+    save_file='final_data/'+cell_name+'/'
+    data_file='cells_outputs_data_short/'+cell_name+'/'
+
+    MOO_relative='MOO_results_relative_strange'+before_after+'/z_correct.swc_SPINE_START=20/'
+    MOO_same='MOO_results_same_strange'+before_after+'/z_correct.swc_SPINE_START=20/'
+    short_pulse='/fit_short_pulse'+before_after+'/'
     print(cell_name)
 
     shrinkage_by=1.0
     resize_diam_by=1.0
-
-    data_file='cells_outputs_data_short/'+cell_name+'/'
-    save_file='final_data'+before_after+'/'+cell_name+'/'
-
-    # try: shutil.rmtree(save_file)
-    # except:pass
+    try: shutil.rmtree(save_file)
+    except:pass
     create_folder_dirr(save_file)
     copy_file(glob(data_file+'/neuron_morphology_fig.p')[0],save_file)
     copy_file(glob(data_file+'/neuron_morphology_fig.p')[0],save_file)
@@ -92,13 +94,13 @@ for cell_name in read_from_pickle('cells_name2.p'):
         try:
             if get_n_spinese(cell_name)>1:
                 for MOO_file in glob(data_file+MOO_relative+resize+'/const_param/'+passive_val_name+'_full_trace/*.p'):
-                    # if 'before' in MOO_file:continue
+                    if 'before' in MOO_file.split('/')[-1]:continue
                     copy_file(MOO_file,save_file_resize,extra_name='full_relative_'+passive_val_name)
                 copy_file(glob(data_file+MOO_relative+resize+'/const_param/'+passive_val_name+'_full_trace/data.txt')[0],save_file_resize,extra_name='full_relative_'+passive_val_name)
 
             else:
                 for MOO_file in glob(data_file+MOO_same+resize+'/const_param/'+passive_val_name+'_full_trace/*.p'):
-                    # if 'before' in MOO_file:continue
+                    if 'before' in MOO_file.split('/')[-1]:continue
                     copy_file(MOO_file,save_file_resize,extra_name='full_same_'+passive_val_name)
                 copy_file(glob(data_file+MOO_same+resize+'/const_param/'+passive_val_name+'_full_trace/data.txt')[0],save_file_resize,extra_name='full_same_'+passive_val_name)
 
@@ -142,6 +144,6 @@ for p in files:
         # copy_file(glob(data_file+'/data/cell_properties/'+file_type+'/SPINE_START=20/dend*'+str(resize_diam_by)+'&F_shrinkage='+str(shrinkage_by)+'/'+passive_val_name+'/E_dendogram/dend_only_with_syn.p')[0],save_file_resize)
         # copy_file(glob(data_file+'/data/cell_properties/'+file_type+'/SPINE_START=20/dend*'+str(resize_diam_by)+'&F_shrinkage='+str(shrinkage_by)+'/'+passive_val_name+'/M_dendogram/dend_only.p')[0],save_file_resize)
         for MOO_file in glob(data_file+MOO_same+resize+'/const_param/'+passive_val_name+'_full_trace/*.p'):
-            # if 'before' in MOO_file:continue
+            if 'before' in MOO_file.split('/')[-1]:continue
             copy_file(MOO_file,save_file_resize,extra_name='full_relative_'+passive_val_name)
         copy_file(glob(data_file+MOO_same+resize+'/const_param/'+passive_val_name+'_full_trace/data.txt')[0],save_file_resize,extra_name='full_same_'+passive_val_name)
