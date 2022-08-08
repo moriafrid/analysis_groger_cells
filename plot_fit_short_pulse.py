@@ -53,6 +53,9 @@ def plot_res_short_pusle(dirr ,RM, RA, CM,resize_diam_by=1.0,shrinkage_factor=1.
     file_type=dirr.split('/')[4][:dirr.split('/')[4].rfind('_SPINE_START')]
     # before_after=dirr.split('/')[3].replace('fit_short_pulse','')
     cell_file=glob(data_dir+cell_name+'/*'+file_type[:-4]+before_after+file_type[-4:])[0]
+    # if cell_name =='2017_07_06_C_4-3':
+    #     cell_file=glob(data_dir+cell_name+'/*'+file_type[:-4]+'_before_shrink'+file_type[-4:])[0]
+
     path_short_pulse=glob(data_dir+cell_name+'/mean_short_pulse_with_parameters.p')[0]
 
     cell=None
@@ -122,7 +125,7 @@ def plot_res_short_pusle(dirr ,RM, RA, CM,resize_diam_by=1.0,shrinkage_factor=1.
         npTvec=npTvec[:len(npVec)]
     plt.plot(npTvec, npVec, color = 'r', linestyle ="--",alpha=0.3,label='NEURON simulation')
     plt.title(cell_name)
-    plt.show()
+    # plt.show()
     with open(save_dirr, 'wb') as fr:
     	pickle.dump(dict_result, fr)
     return save_dirr
