@@ -12,7 +12,7 @@ else:
     print("run_execute_level2.py running with sys.argv",sys.argv)
 cells=read_from_pickle(cells_name_place)
 
-before_after='_before_shrink'
+before_after='_after_shrink'
 
 file_type2read=['z_correct.swc','morphology.swc']
 # SPINE_START=str(20)
@@ -21,11 +21,16 @@ os.system('python csv_for_passive_val_results.py cells_name2.p')
 i=0
     # os.system('python run_analysis_fit_after_run.py')
 for cell_name in read_from_pickle(cells_name_place):
-    if not cell_name in ['2017_03_04_A_6-7']:continue
+    if cell_name=='2017_07_06_C_4-3':
+        before_after='_before_shrink'
+    else:
+        before_after='_after_shrink'
+        continue
+    # if not cell_name in ['2017_03_04_A_6-7']:continue
     # if not cell_name in ['2017_07_06_C_4-3','2016_04_16_A']:continue#['2017_02_20_B','2017_07_06_C_3-4']:continue
     passive_vals_dict= {}
     # p='cells_initiall_information/'+cell_name+'/results_passive_fits.csv'
-    p='cells_outputs_data_short/'+cell_name+'/fit_short_pulse/results_passive_fits.csv'
+    p='cells_outputs_data_short/'+cell_name+'/fit_short_pulse'+before_after+'/results_passive_fits.csv'
     print(cell_name)
     df = pd.read_csv(p)
     for resize_diam_by ,shrinkage_by in zip([1.0,1.0,1.1,1.5][:2],[1.0,1.1,1.1,1.0][:2]):#zip([1.0],[1.0]):
@@ -62,6 +67,7 @@ for cell_name in read_from_pickle(cells_name_place):
                             # command ="python dendogram.py"
                             send_command = " ".join([command,cell_name,file_type,fit_condition,name,str(resize_diam_by),str(shrinkage_by),str(SPINE_START),double_spine_area,before_after])
                             os.system(send_command)
+                            print(send_command)
                             print(cell_name+ ' .'+file_type+': execute level2.py, dendogram.py, Rin_Rm.py','attenuations.py')
 
 

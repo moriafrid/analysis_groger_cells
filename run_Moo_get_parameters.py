@@ -10,7 +10,6 @@ from read_spine_properties import get_n_spinese
 
 if len(sys.argv) != 3:
     cells_name_place="cells_name2.p"
-
     in_parallel=False
     print("run_Moo_get_parameters not running with sys.argv",len(sys.argv))
 else:
@@ -20,13 +19,18 @@ else:
 folder_=""
 folder_data="cells_initial_information/"
 folder_save="cells_outputs_data_short/"
-before_after='_before_shrink'
+before_after='_after_shrink'
 
 os.system('python csv_for_passive_val_results.py cells_name2.p '+before_after)
 
 
 for cell_name in read_from_pickle(cells_name_place):
-    if not cell_name in ['2017_07_06_C_3-4','2017_07_06_C_4-3']:continue #,'2017_02_20_B'? after  clear more noise?,'2017_07_06_C_3-4'
+    if cell_name=='2017_07_06_C_4-3':
+        before_after='_before_shrink'
+    else:
+        before_after='_after_shrink'
+        continue
+    # if not cell_name in ['2017_07_06_C_3-4','2017_07_06_C_4-3']:continue #,'2017_02_20_B'? after  clear more noise?,'2017_07_06_C_3-4'
     passive_vals_dict= {}
     # p='cells_initiall_information/'+cell_name+'/results_passive_fits.csv'
     p='cells_outputs_data_short/'+cell_name+'/fit_short_pulse'+before_after+'/results_passive_fits.csv'
