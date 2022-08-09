@@ -75,7 +75,7 @@ else:
     num_of_genarations = 1000
 from_the_begin=True
 
-# same_strengh=False
+print(same_strengh)
 
 if same_strengh:
     reletive_strengths=np.ones(get_n_spinese(cell_name))
