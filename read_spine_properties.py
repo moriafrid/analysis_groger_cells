@@ -79,19 +79,26 @@ def get_spine_params(spine_type,cell_name=''):
         df = pd.read_excel('cells_initial_information/Data2.xlsx')
         parameter_cv=df[df['cell_name']==spine_type].reset_index()
         return parameter_cv['neck_length'],parameter_cv['neck_diam'],get_R_head(cell_name,num='list')*2
-def get_sec_and_seg(cell_name,spine_num=None,after='after'):
+def get_sec_and_seg(cell_name,spine_num=None,after='after',with_distance=False):
     #this is correct syn to after shrink!
     # df = pd.read_excel('cells_outputs_data_short/'+cell_name+'/synaptic_location_seperate.xlsx',index_col=0)
     df=pd.read_csv('cells_initial_information/synaptic_location_seperate.csv',index_col=0)
     if not spine_num is None:
-        print(df[cell_name+str(spine_num)]['sec_name'],float(df[cell_name+str(spine_num)]['seg_num']))
-        return df[cell_name+str(spine_num)]['sec_name'],float(df[cell_name+str(spine_num)]['seg_num'])
+        if with_distance:
+            return df[cell_name+str(spine_num)]['sec_name'],float(df[cell_name+str(spine_num)]['seg_num']),float(df[cell_name+str(spine_num)]['distance'])
+        else:
+            # print(df[cell_name+str(spine_num)]['sec_name'],float(df[cell_name+str(spine_num)]['seg_num']))
+            return df[cell_name+str(spine_num)]['sec_name'],float(df[cell_name+str(spine_num)]['seg_num'])
     else:
-        secs,segs=[],[]
+        secs,segs,dis=[],[],[]
         for i in range(get_n_spinese(cell_name)):
             secs.append(df[cell_name+str(i)]['sec_name'])
             segs.append(float(df[cell_name+str(i)]['seg_num']))
-        return secs,segs
+            dis.append(float(df[cell_name+str(i)]['distance']))
+        if with_distance:
+            return secs,segs,dis
+        else:
+            return secs,segs
 if __name__ == '__main__':
     cell_name='2017_03_04_A_6-7'
     from open_pickle import read_from_pickle
