@@ -3,8 +3,8 @@ import numpy as np
 import sys
 from glob import glob
 if len(sys.argv) != 2:
-    cell_name="2017_07_06_C_4-3"
-    before_after="_before_shrink"
+    cell_name="2017_03_04_A_6-7"
+    before_after="_after_shrink"
 else:
     cell_name=sys.argv[1]
     # before_after=sys.argv[2]

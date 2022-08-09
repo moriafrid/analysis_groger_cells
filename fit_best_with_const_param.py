@@ -16,13 +16,13 @@ from parameters_short_pulse import decay_length
 from open_pickle import read_from_pickle
 do_calculate_F_factor=True
 if len(sys.argv) != 8:
-   cell_name= '2017_07_06_C_3-4'
+   cell_name= '2017_03_04_A_6-7'
    file_type='z_correct.swc'
    resize_diam_by=1.0
    shrinkage_factor=1.0
    SPINE_START=20
    double_spine_area=False
-   before_after='_before_shrink'
+   before_after='_after_shrink'
 
 else:
    cell_name = sys.argv[1]

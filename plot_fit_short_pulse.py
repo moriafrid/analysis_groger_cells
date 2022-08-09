@@ -12,14 +12,14 @@ import pickle
 import sys
 # dirr,str(RM), str(RA), str(CM),str(resize_diam_by),str(shrinkage_by),str(passive_val_name)
 if len(sys.argv) != 9:
-   cell_name = "2017_07_06_C_3-4"
-   RM=12282.0
-   RA=206.0
-   CM=1.3955201031182711
+   cell_name = "2017_03_04_A_6-7"
+   RM=15450.0
+   RA=78.0
+   CM=1.19
    resize_diam_by = 1.0 #how much the cell sweel during the electrophisiology records
    shrinkage_by =1.0 #how much srinkage the cell get between electrophysiology record and LM
-   passive_val_name='RA_min_error'
-   before_after='_before_shrink'
+   passive_val_name='RA_best_fit_test'
+   before_after='_after_shrink'
    print("plot_fit_short_pulse don't run with sys.srgv")
 else:
    cell_name = sys.argv[1]
@@ -52,6 +52,7 @@ def plot_res_short_pusle(dirr ,RM, RA, CM,resize_diam_by=1.0,shrinkage_factor=1.
     cell_name=dirr.split('/')[1]
     file_type=dirr.split('/')[4][:dirr.split('/')[4].rfind('_SPINE_START')]
     # before_after=dirr.split('/')[3].replace('fit_short_pulse','')
+    # cell_file='cells_initial_information/2017_03_04_A_6-7/morphology_z_correct_after_shrink.swc'
     cell_file=glob(data_dir+cell_name+'/*'+file_type[:-4]+before_after+file_type[-4:])[0]
     # if cell_name =='2017_07_06_C_4-3':
     #     cell_file=glob(data_dir+cell_name+'/*'+file_type[:-4]+'_before_shrink'+file_type[-4:])[0]
@@ -125,7 +126,7 @@ def plot_res_short_pusle(dirr ,RM, RA, CM,resize_diam_by=1.0,shrinkage_factor=1.
         npTvec=npTvec[:len(npVec)]
     plt.plot(npTvec, npVec, color = 'r', linestyle ="--",alpha=0.3,label='NEURON simulation')
     plt.title(cell_name)
-    # plt.show()
+    plt.show()
     with open(save_dirr, 'wb') as fr:
     	pickle.dump(dict_result, fr)
     return save_dirr

@@ -7,7 +7,7 @@ if len(sys.argv) != 2:
 else:
     cells_name_place=sys.argv[1]
     print("run_execute_fits.py running with sys.argv",sys.argv)
-before_after="_before_shrink"
+before_after="_after_shrink"
 
 # os.system(" ".join(['sbatch execute_python_script.sh', 'plot_neuron_3D.py',cells_name_place,'ASC']))
 print('plot_neuron_3D.py for all cells in ',cells_name_place,'with file type of','ASC') ##moria - not plot_neuron_3D working
@@ -18,6 +18,7 @@ SPINE_START=20
 
 for cell_name in read_from_pickle(cells_name_place):
     print(cell_name)
+    if cell_name!='2017_03_04_A_6-7':continue
     for resize_diam_by ,shrinkage_by in zip([1.0,1.1,1.0,1.5],[1.0,1.1,1.1,1.0]):
         if cell_name!='2017_05_08_A_4-5' and resize_diam_by==1.5:continue
         if resize_diam_by==1.0 and shrinkage_by==1.0 and cell_name=='2017_05_08_A_4-5':

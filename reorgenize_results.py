@@ -30,11 +30,18 @@ def copy_file(copy,paste,extra_name=''):
             print('')
 #need to run again with 3,5,8 if os.system is runing
 for cell_name in read_from_pickle('cells_name2.p'):
+    # if cell_name in ['2017_07_06_C_3-4','2016_05_12_A','2016_04_16_A','2017_07_06_C_4-3','2017_05_08_A_5-4']:continue
+    if cell_name!='2017_03_04_A_6-7':continue
+
     if cell_name=='2017_07_06_C_4-3':
         before_after='_before_shrink'
     else:
         before_after='_after_shrink'
         # continue
+    if cell_name=='2017_07_06_C_3-4':
+        full=''
+    else:
+        full='_full_trace'
     save_file='final_data/'+cell_name+'/'
     data_file='cells_outputs_data_short/'+cell_name+'/'
 
@@ -71,6 +78,10 @@ for cell_name in read_from_pickle('cells_name2.p'):
     for passive_val_name in ['RA_min_error','RA_best_fit','RA=120','RA=150']:
         if next_continue: continue
         passive_vals_dict=get_passive_parameter(cell_name,before_after,double_spine_area='False',shrinkage_resize=[shrinkage_by,resize_diam_by],fit_condition='const_param',spine_start=20,file_type='z_correct.swc',passive_param_name=passive_val_name)
+        if len(full)>0:
+            full2='full_'
+        else:
+            full2=''
         RA,CM,RM=get_passive_val(passive_vals_dict,what_return='full_result')
         if RA<50:
             continue
@@ -93,16 +104,17 @@ for cell_name in read_from_pickle('cells_name2.p'):
 
         try:
             if get_n_spinese(cell_name)>1:
-                for MOO_file in glob(data_file+MOO_relative+resize+'/const_param/'+passive_val_name+'_full_trace/*.p'):
+                for MOO_file in glob(data_file+MOO_relative+resize+'/const_param/'+passive_val_name+full+'/*.p'):
                     if 'before' in MOO_file.split('/')[-1]:continue
-                    copy_file(MOO_file,save_file_resize,extra_name='full_relative_'+passive_val_name)
-                copy_file(glob(data_file+MOO_relative+resize+'/const_param/'+passive_val_name+'_full_trace/data.txt')[0],save_file_resize,extra_name='full_relative_'+passive_val_name)
+                    copy_file(MOO_file,save_file_resize,extra_name=full2+'relative_'+passive_val_name)
+                copy_file(glob(data_file+MOO_relative+resize+'/const_param/'+passive_val_name+full+'/data.txt')[0],save_file_resize,extra_name=full2+'relative_'+passive_val_name)
 
             else:
-                for MOO_file in glob(data_file+MOO_same+resize+'/const_param/'+passive_val_name+'_full_trace/*.p'):
+                for MOO_file in glob(data_file+MOO_same+resize+'/const_param/'+passive_val_name+full+'/*.p'):
                     if 'before' in MOO_file.split('/')[-1]:continue
-                    copy_file(MOO_file,save_file_resize,extra_name='full_same_'+passive_val_name)
-                copy_file(glob(data_file+MOO_same+resize+'/const_param/'+passive_val_name+'_full_trace/data.txt')[0],save_file_resize,extra_name='full_same_'+passive_val_name)
+
+                    copy_file(MOO_file,save_file_resize,extra_name=full2+passive_val_name)
+                copy_file(glob(data_file+MOO_same+resize+'/const_param/'+passive_val_name+full+'/data.txt')[0],save_file_resize,extra_name=+full2+passive_val_name)
 
         except: "the moo isn't finish"
 
