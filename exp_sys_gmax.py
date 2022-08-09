@@ -15,7 +15,7 @@ matplotlib.rcParams['svg.fonttype'] = 'none'
 import sys
 if len(sys.argv) != 3:
     specipic_cell='*'
-    before_after='_before_shrink'
+    before_after='_after_shrink'
 
 else:
     print("the sys.argv len is correct",flush=True)

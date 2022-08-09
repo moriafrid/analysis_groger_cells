@@ -1,3 +1,5 @@
+import os
+
 from open_MOO_after_fit import OPEN_RES
 import numpy as np
 from neuron import h
@@ -16,8 +18,7 @@ matplotlib.rcParams['svg.fonttype'] = 'none'
 import sys
 if len(sys.argv) != 3:
     specipic_cell='*'
-    before_after='_before_shrink'
-
+    before_after='_after_shrink'
     print("sys.argv isn't run")
 else:
     print("the sys.argv len is correct",flush=True)
@@ -121,18 +122,16 @@ for curr_i, model_place in tqdm(enumerate(glob(folder_data2+'*')+glob(folder_dat
     for num in range(get_n_spinese(cell_name)):
         dict_result['voltage_'+str(num)]=simulate_syn(secs[num],segs[num],num=num,color=color[num])
     dict_result['voltage_all']=simulate_syn(secs,segs,color='black')
-
-
     plt.plot(T_base, np.array(V_base)+loader.get_param('e_pas'), color='black',label='EP record',alpha=0.2,lw=5)
-    dict_result['voltage_all']={'experiment':np.array(V_base)+loader.get_param('e_pas')}
+    dict_result['voltage_all']['experiment']=np.array(V_base)+loader.get_param('e_pas')
     plt.legend()
     print("Save ", model_place+save_name+'.png')
     plt.savefig(model_place+save_name+'.png')
     plt.savefig(model_place+save_name+'.pdf')
     pickle.dump(fig, open(model_place+save_name+'.p', 'wb'))
-    pickle.dump([{'time':time_all},dict_result], open(model_place+save_name+'_data.p', 'wb'))
-    plt.show()
+    pickle.dump([{'time':time_all},dict_result,{'strengths':{'relative':reletive_strengths,'PSD':psd_sizes}}], open(model_place+save_name+'_data.p', 'wb'))
+    # plt.show()
     plt.close()
     loader.destroy()
     # model.destroy()
-
+os.system('python reorgenize_results.py')

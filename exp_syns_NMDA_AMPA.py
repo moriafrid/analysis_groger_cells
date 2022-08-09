@@ -14,7 +14,7 @@ matplotlib.rcParams['svg.fonttype'] = 'none'
 import sys
 if len(sys.argv) != 3:
     specipic_cell='*'
-    before_after='_before_shrink'
+    before_after='_after_shrink'
 
 
     print("sys.argv isn't run")
@@ -112,7 +112,7 @@ for curr_i, model_place in tqdm(enumerate(glob(folder_data1+'*')+glob(folder_dat
     plt.savefig(model_place+save_name+'.png')
     plt.savefig(model_place+save_name+'.pdf')
     pickle.dump(fig, open(model_place+save_name+'.p', 'wb'))
-    # plt.show()
+    plt.show()
     plt.close()
     loader.destroy()
     model.destroy()

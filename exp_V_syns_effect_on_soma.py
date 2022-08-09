@@ -1,3 +1,5 @@
+import os
+
 from open_MOO_after_fit import OPEN_RES
 import numpy as np
 from neuron import h
@@ -14,7 +16,7 @@ matplotlib.rcParams['pdf.fonttype'] = 42
 matplotlib.rcParams['svg.fonttype'] = 'none'
 if len(sys.argv) != 3:
     specipic_cell='*'
-    before_after='_before_shrink'
+    before_after='_after_shrink'
 else:
     print("the sys.argv len is correct",flush=True)
     specipic_cell = sys.argv[1]
@@ -34,8 +36,8 @@ for curr_i, model_place in tqdm(enumerate(glob(folder_data1+'*')+glob(folder_dat
     except:
         print(model_place + '/hall_of_fame.p is not exsist' )
         continue
+    psd_sizes=get_parameter(cell_name,'PSD')
     if 'relative' in model_place:
-        psd_sizes=get_parameter(cell_name,'PSD')
         argmax=np.argmax(psd_sizes)
         reletive_strengths=psd_sizes/psd_sizes[argmax]
     else:
@@ -100,8 +102,9 @@ for curr_i, model_place in tqdm(enumerate(glob(folder_data1+'*')+glob(folder_dat
        axs = fig.subplot_mosaic("""A""")
 
     fig.suptitle('Voltage in Spine and Soma\n '+" ".join([model_place.split('/')[1],model_place.split('/')[-1] ,'\n',model_place.split('/')[4],model_place.split('/')[2]])+'\n'+passive_propert_title)
-
-
+    dicty={}
+    dicty['time']=time
+    dicty['parameters']={'reletive_strengths':reletive_strengths,'PSD':psd_sizes}
     for j in range(len(V_spine)):
         V_spine[j]=np.array(V_spine[j])[cut_from_start_time:]
         axs[names[j]].set_title('spine'+str(j)+" "+secs[j]+" "+str(segs[j]))
@@ -111,15 +114,19 @@ for curr_i, model_place in tqdm(enumerate(glob(folder_data1+'*')+glob(folder_dat
         axs[names[j]].set_ylabel('voltage [mv]')
         axs[names[j]].legend()
         axs[names[j]].plot(np.array(T_base), np.array(V_base)+loader.get_param('e_pas'), color='black',label='EP record',alpha=0.2,lw=5)
+        dicty['voltage_'+str(j)]=V_spine[j]
 
+    pickle.dump(dicty, open(model_place+save_name+'_data.p', 'wb'))
 
     plt.savefig(model_place+save_name+'.png')
     plt.savefig(model_place+save_name+'.pdf')
     pickle.dump(fig, open(model_place+save_name+'.p', 'wb'))
+    # plt.show()
     plt.close()
 
-    plt.show()
     loader.destroy()
     model.destroy()
+os.system('python reorgenize_results.py')
+
 
 
