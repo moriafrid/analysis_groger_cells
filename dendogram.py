@@ -2,14 +2,13 @@ import numpy as np
 from neuron import h, gui
 import sys
 import matplotlib
-matplotlib.use('agg')
+# matplotlib.use('agg')
 import matplotlib.pyplot as plt
 from matplotlib.lines import Line2D
 import signal
 from find_apic import find_apic
 from extra_function import load_hoc,load_ASC,load_swc, SIGSEGV_signal_arises,create_folder_dirr,create_folders_list
 from glob import glob
-import pandas as pd
 from open_pickle import read_from_pickle
 from calculate_F_factor import calculate_F_factor
 from read_spine_properties import get_n_spinese, get_sec_and_seg
@@ -42,12 +41,11 @@ else:
     resize_diam_by = float(sys.argv[5]) #how much the cell sweel during the electrophisiology records
     shrinkage_factor =float(sys.argv[6]) #how much srinkage the cell get between electrophysiology record and LM
     SPINE_START=int(sys.argv[7])
-    double_spine=sys.argv[8]
+    double_spine=eval(sys.argv[8])
     before_after=sys.argv[9]
     passive_val=get_passive_parameter(cell_name,before_after,double_spine_area=double_spine,shrinkage_resize=[shrinkage_factor,resize_diam_by],fit_condition=fit_condition,spine_start=SPINE_START,file_type=file_type2read)[name]
 print(name, passive_val)
 folder_=''
-double_spine=eval(double_spine)
 data_dir= "cells_initial_information/"
 save_dir = "cells_outputs_data_short/"
 # cell_file=glob(folder_+data_dir+cell_name+'/*'+file_type2read)[0]
@@ -142,9 +140,13 @@ class Dendogram():
                  color_dict = colors_dict,
                  diam_factor=None,
                  del_axon=True,
-                 load_func=''):
+                 load_func='',
+                 E_PAS=-70,
+                 passive_val={}):
         self.name=name
         self.colors_dict = color_dict
+        self.E_PAS=E_PAS
+        self.passive_val=passive_val
         self.does_axon_inside_cell=True
         self.cell=None
         if del_axon:
@@ -161,7 +163,7 @@ class Dendogram():
            F_factor=calculate_F_factor(self.cell,double_spine=double_spine)
         else:
            F_factor = 1.9
-        self.cell=change_model_pas(self.cell, CM=passive_val['CM'], RA = passive_val['RA'], RM = passive_val['RM'], E_PAS = E_PAS,F_factor=F_factor)
+        self.cell=change_model_pas(self.cell, CM=self.passive_val['CM'], RA = self.passive_val['RA'], RM = self.passive_val['RM'], E_PAS = self.E_PAS,F_factor=F_factor)
         self.tree_dendogram_dist = dict()
         self.tree_dendogram_dist[self.cell.soma] = 0
         self.add_sec = length_function
@@ -262,10 +264,11 @@ class Dendogram():
 
         return x_pos, mid_x
 
-    def plot(self, save_folder, max_y=None,title='Dendogram',ylabel='distance from soma'):
-        fig=plt.figure(figsize=(10, 10))
-        plt.title(title+'\n'+name+' '+str(passive_val),fontsize=24)
-        plt.ylabel(ylabel,fontsize=16)
+    def plot(self, save_folder,ax=None, max_y=None,title='Dendogram',ylabel='distance from soma'):
+        if ax is None:
+            fig,ax=plt.subplot(figsize=(10, 10))
+            plt.title(title+'\n'+name+' '+str(self.passive_val),fontsize=24)
+        ax.set_ylabel(ylabel,fontsize=16)
         x_pos = 0.0
         start_pos=0.0
         self.done_section = set()
@@ -277,10 +280,10 @@ class Dendogram():
             sec = h.SectionRef(sec=self.cell.soma).child[i]
             if sec not in self.apic:
                 x_pos, end_pos = self.plot_func(sec, x_pos, color=self.get_color(sec))
-        plt.plot([start_pos, end_pos], [0] * 2, color=self.colors_dict["soma"], linewidth=1 if self.diam_factor is None else self.cell.soma.diam *self.diam_factor)
+        ax.plot([start_pos, end_pos], [0] * 2, color=self.colors_dict["soma"], linewidth=1 if self.diam_factor is None else self.cell.soma.diam *self.diam_factor)
         mid_x = start_pos + abs(end_pos - start_pos) / 2.0
-        plt.plot([mid_x, mid_x], [-0.01, 0], color=self.colors_dict["soma"], linewidth=1 if self.diam_factor is None else self.cell.soma.diam *self.diam_factor)
-        plt.xticks([])
+        ax.plot([mid_x, mid_x], [-0.01, 0], color=self.colors_dict["soma"], linewidth=1 if self.diam_factor is None else self.cell.soma.diam *self.diam_factor)
+        ax.set_xticks([])
 
         legend_elements = [
             Line2D([0], [0], color=self.colors_dict["soma"], lw=2, label="soma"),
@@ -290,14 +293,17 @@ class Dendogram():
             Line2D([0], [0], color=self.colors_dict["oblique"], lw=2, label="oblique"),
             Line2D([0], [0], color=self.colors_dict["synapse"], lw=2, label="synapse")
         ]
-        plt.legend(handles=legend_elements, loc="best")
+        ax.legend(handles=legend_elements, loc="best")
         if max_y is None:
             max_y = plt.ylim()[1]
-        plt.ylim([-0.1, max_y])
+        ax.set_ylim([-0.1, max_y])
         plt.savefig(save_folder + self.name)
         plt.savefig(save_folder + self.name+ ".pdf")
-        pickle.dump(fig, open(save_folder + self.name+'.p', 'wb'))
-        plt.close()
+        try:
+            pickle.dump(fig, open(save_folder + self.name+'.p', 'wb'))
+            plt.close()
+        except:pass
+
         self.done_section = set()
 
         return max_y
@@ -315,40 +321,41 @@ class Dendogram():
     #     run_find_apic(apics,start_apic)
     #     return apics
 
+if __name__ == '__main__':
+    save_folder_E = folder_save+'/E_dendogram/'
+    save_folder_M = folder_save+'/M_dendogram/'
+    create_folders_list([save_folder_E,save_folder_M])
 
-save_folder_E = folder_save+'/E_dendogram/'
-save_folder_M = folder_save+'/M_dendogram/'
-create_folders_list([save_folder_E,save_folder_M])
 
-
-E_PAS=read_from_pickle(folder_+save_dir+cell_name+'/data/electrophysio_records/short_pulse/mean_short_pulse_with_parameters.p')['E_pas']
-# for i in [1,2,3,5,8,9,10,11,12]:
-# path = "05_08_A_01062017_Splice_shrink_FINISHED_LABEL_Bluecell_spinec91.ASC"
-# syn_poses['05_08_A_01062017_Splice_shrink_FINISHED_LABEL_Bluecell_spinec91']=[(-5.56, -325.88, -451.42)]
-morph_path=glob(folder_+data_dir+"/"+cell_name+'/*'+file_type2read)[0]
-cell=load_func(morph_path)
-# dendogram = Dendogram('dend_only', p, add_sec2)#@#
-# dendogram.cumpute_distances(dendogram.cell.soma)#@#
-dendogram=None
-dendogram = Dendogram('dend_only', morph_path, add_sec2,load_func=load_func)
-dendogram.cumpute_distances(dendogram.cell.soma)
-max_y=dendogram.plot(save_folder_M,title=save_folder_M.split('/')[-2],ylabel="distance from soma (um)")
-
-if len(cell.axon)>1:
+    E_PAS=read_from_pickle(folder_+save_dir+cell_name+'/data/electrophysio_records/short_pulse/mean_short_pulse_with_parameters.p')['E_pas']
+    # for i in [1,2,3,5,8,9,10,11,12]:
+    # path = "05_08_A_01062017_Splice_shrink_FINISHED_LABEL_Bluecell_spinec91.ASC"
+    # syn_poses['05_08_A_01062017_Splice_shrink_FINISHED_LABEL_Bluecell_spinec91']=[(-5.56, -325.88, -451.42)]
+    morph_path=glob(folder_+data_dir+"/"+cell_name+'/*'+file_type2read)[0]
+    cell=load_func(morph_path)
+    kwargs={'load_func':load_func,'E_PAS':E_PAS,'passive_val':passive_val}
+    # dendogram = Dendogram('dend_only', p, add_sec2)#@#
+    # dendogram.cumpute_distances(dendogram.cell.soma)#@#
     dendogram=None
-    dendogram = Dendogram('all', morph_path, add_sec2, load_func=load_func,del_axon=False)
+    dendogram = Dendogram('dend_only', morph_path, add_sec2,**kwargs)
     dendogram.cumpute_distances(dendogram.cell.soma)
-    max_y = dendogram.plot(save_folder_M,title=save_folder_M.split('/')[-2],ylabel="distance from soma (um)")
+    max_y=dendogram.plot(save_folder_M,title=save_folder_M.split('/')[-2],ylabel="distance from soma (um)")
 
-dendogram=None
-dendogram = Dendogram('dend_only_with_syn', morph_path, add_sec,load_func=load_func)
-dendogram.cumpute_distances(dendogram.cell.soma)
-max_y = dendogram.plot(save_folder_E,title=save_folder_E.split('/')[-2],ylabel="distance from soma (lamda)")
+    if len(cell.axon)>1:
+        dendogram=None
+        dendogram = Dendogram('all', morph_path, add_sec2, del_axon=False,**kwargs)
+        dendogram.cumpute_distances(dendogram.cell.soma)
+        max_y = dendogram.plot(save_folder_M,title=save_folder_M.split('/')[-2],ylabel="distance from soma (um)")
 
-if len(cell.axon)>1:
     dendogram=None
-    dendogram = Dendogram('all_with_syn', morph_path, add_sec,load_func=load_func, del_axon=False)
+    dendogram = Dendogram('dend_only_with_syn', morph_path, add_sec,**kwargs)
     dendogram.cumpute_distances(dendogram.cell.soma)
     max_y = dendogram.plot(save_folder_E,title=save_folder_E.split('/')[-2],ylabel="distance from soma (lamda)")
-    dendogram=None
-print('dendogram.py is complete to run for '+cell_name)
+
+    if len(cell.axon)>1:
+        dendogram=None
+        dendogram = Dendogram('all_with_syn', morph_path, add_sec, del_axon=False,**kwargs)
+        dendogram.cumpute_distances(dendogram.cell.soma)
+        max_y = dendogram.plot(save_folder_E,title=save_folder_E.split('/')[-2],ylabel="distance from soma (lamda)")
+        dendogram=None
+    print('dendogram.py is complete to run for '+cell_name)
