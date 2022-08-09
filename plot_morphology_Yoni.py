@@ -32,7 +32,7 @@ def plot_morphology(ax, segment_colors, names=[], width_mult_factors=None, seg_i
         # add synapses
         if seg_ind_to_xyz_coords_map[seg_ind]['sec name'] in synapse[0]:
         # for i,syn in enumerate(synapse):
-            colors_per_segment[seg_ind]=colors[seg_ind]/2
+        #     colors_per_segment[seg_ind]=colors[seg_ind]/2
             sec_dots=[seg_ind_to_xyz_coords_map[seg_ind]['x'],seg_ind_to_xyz_coords_map[seg_ind]['y']]
             syn_num=synapse[0].index(seg_ind_to_xyz_coords_map[seg_ind]['sec name'])
             syn_x,syn_y=find_xy(sec_dots,synapse[1][syn_num])
