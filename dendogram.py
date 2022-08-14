@@ -43,7 +43,7 @@ else:
     SPINE_START=int(sys.argv[7])
     double_spine=eval(sys.argv[8])
     before_after=sys.argv[9]
-    passive_val=get_passive_parameter(cell_name,before_after,double_spine_area=str(double_spine),shrinkage_resize=[shrinkage_factor,resize_diam_by],fit_condition=fit_condition,spine_start=SPINE_START,file_type=file_type2read)[name]
+    passive_val=get_passive_parameter(cell_name,before_after,double_spine_area=double_spine,shrinkage_resize=[shrinkage_factor,resize_diam_by],fit_condition=fit_condition,spine_start=SPINE_START,file_type=file_type2read)[name]
 print(name, passive_val)
 folder_=''
 data_dir= "cells_initial_information/"
@@ -91,7 +91,7 @@ def get_segment_length_lamda(seg):
 
 
 
-def add_sec(self,sec):
+def add_sec(self, sec):
     """
     electric dendogram
     :param sec:
@@ -100,6 +100,8 @@ def add_sec(self,sec):
     sec_length = 0
     for seg in sec:
         sec_length += get_segment_length_lamda(seg)
+    parent = h.SectionRef(sec=sec).parent
+    self.tree_dendogram_dist[sec] = self.tree_dendogram_dist[parent] + sec_length
 
 
 def add_sec2(self, sec):
@@ -262,11 +264,10 @@ class Dendogram():
 
         return x_pos, mid_x
 
-    def plot(self, save_folder,ax=None, max_y=None,title='Dendogram',ylabel='distance from soma'):
-        if ax is None:
-            fig,ax=plt.subplots()
-            plt.title(title+'\n'+name+' '+str(self.passive_val),fontsize=24)
-        ax.set_ylabel(ylabel,fontsize=16)
+    def plot(self, save_folder, max_y=None,title='Dendogram',ylabel='distance from soma'):
+        fig=plt.figure(figsize=(10, 10))
+        plt.title(title+'\n'+name+' '+str(passive_val),fontsize=24)
+        plt.ylabel(ylabel,fontsize=16)
         x_pos = 0.0
         start_pos=0.0
         self.done_section = set()
@@ -278,10 +279,10 @@ class Dendogram():
             sec = h.SectionRef(sec=self.cell.soma).child[i]
             if sec not in self.apic:
                 x_pos, end_pos = self.plot_func(sec, x_pos, color=self.get_color(sec))
-        ax.plot([start_pos, end_pos], [0] * 2, color=self.colors_dict["soma"], linewidth=1 if self.diam_factor is None else self.cell.soma.diam *self.diam_factor)
+        plt.plot([start_pos, end_pos], [0] * 2, color=self.colors_dict["soma"], linewidth=1 if self.diam_factor is None else self.cell.soma.diam *self.diam_factor)
         mid_x = start_pos + abs(end_pos - start_pos) / 2.0
-        ax.plot([mid_x, mid_x], [-0.01, 0], color=self.colors_dict["soma"], linewidth=1 if self.diam_factor is None else self.cell.soma.diam *self.diam_factor)
-        ax.set_xticks([])
+        plt.plot([mid_x, mid_x], [-0.01, 0], color=self.colors_dict["soma"], linewidth=1 if self.diam_factor is None else self.cell.soma.diam *self.diam_factor)
+        plt.xticks([])
 
         legend_elements = [
             Line2D([0], [0], color=self.colors_dict["soma"], lw=2, label="soma"),
@@ -291,10 +292,10 @@ class Dendogram():
             Line2D([0], [0], color=self.colors_dict["oblique"], lw=2, label="oblique"),
             Line2D([0], [0], color=self.colors_dict["synapse"], lw=2, label="synapse")
         ]
-        ax.legend(handles=legend_elements, loc="best")
+        plt.legend(handles=legend_elements, loc="best")
         if max_y is None:
             max_y = plt.ylim()[1]
-        ax.set_ylim([-0.1, max_y])
+        plt.ylim([-0.1, max_y])
         plt.savefig(save_folder + self.name)
         plt.savefig(save_folder + self.name+ ".pdf")
         try:
