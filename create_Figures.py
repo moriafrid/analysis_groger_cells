@@ -54,7 +54,7 @@ def plot_syn_model(ax,dirr):
     plt.rcParams.update({'font.size': text_size})
     ax.text(200,place_text,dict_result['parameters'][0]+'='+str(round(dict_result['mean_final_pop'][0]*1000,2))+'[nS]',c='#18852a')
     ax.text(200,place_text-0.2,dict_result['parameters'][1]+'='+str(round(dict_result['mean_final_pop'][1]*1000,2))+'[nS]',c='#03b5fc')
-    plt.legend(loc="upper left",prop={'size': label_size})
+    ax.legend(loc="upper left",prop={'size': label_size})
     add_scale_bar(ax,'fit_syn')
 
 def plot_syn_model2(ax,dirr):
@@ -102,7 +102,7 @@ def plot_syn_voltage(ax,dirr):
         size_y_scal_bar.append(int(max(V[k])-E_PAS))
     # place_text=0.5
     plt.rcParams.update({'font.size': text_size})
-    plt.legend(loc="upper left",prop={'size': label_size})
+    ax.legend(loc="upper left",prop={'size': label_size})
     x_to_ms=lambda x: x
 
     ax.add_artist(AnchoredHScaleBar(size_x=25, size_y=max(size_y_scal_bar)-2, frameon=False, ax=ax, x_to_ms=x_to_ms,
@@ -195,6 +195,7 @@ def add_scale_bar(ax,type=''):
 
 if __name__=='__main__':
     for cell_name in read_from_pickle('cells_name2.p'):
+        #if '4-3' in cell_name: continue
         before_after='_after_shrink'
         # if cell_name in ['2017_07_06_C_3-4','2016_05_12_A','2016_04_16_A','2017_07_06_C_4-3','2017_05_08_A_5-4']:continue
         # if cell_name!='2017_04_03_B':continue
@@ -221,6 +222,7 @@ if __name__=='__main__':
         plt.rc('figure', titlesize=22)  # fontsize of the figure title
 
         decided_passive_params=find_RA(base_dir)
+        if cell_name in ['2017_03_04_A_6-7','2017_05_08_A_5-4']: decided_passive_params='RA_best_fit'
         plot_morph(ax1, cell_name, before_after,without_axons=True)
 
         if get_n_spinese(cell_name)>1:
@@ -238,6 +240,7 @@ if __name__=='__main__':
             plot_syn_voltage(ax5,glob(base_dir+'Voltage Spine&Soma_data*_relative_'+decided_passive_params+'.p')[0])
 
         else:
+
             ax3 = plt.subplot2grid(shape=shapes, loc=(0, 3), colspan=1, rowspan=1, sharey=ax2) # , sharex=ax2
             ax5 = plt.subplot2grid(shape=shapes, loc=(1, 3), colspan=1, rowspan=1, sharey=ax4) # , sharex=ax4
             plot_pickle(ax2,base_dir+'clear_short_pulse_after_peeling.p','clear_short_pulse')
@@ -246,6 +249,7 @@ if __name__=='__main__':
             plot_syn_model(ax5,glob(base_dir+'AMPA&NMDA_soma_data_*'+decided_passive_params+'.p')[0])
 
         plt.savefig(save_dir+cell_name+'.svg',dpi=500)
+        plt.savefig(save_dir+cell_name+'.pdf',dpi=500)
         plt.savefig(save_dir+cell_name+'.pdf',dpi=500)
         # pickle.dump(fig, open(save_dir+cell_name+'.p', 'wb'))  # cant work with scalebar
         plt.show()
