@@ -3,17 +3,10 @@ from create_folder import create_folder_dirr
 from read_spine_properties import get_n_spinese
 from function_Figures import *
 
-L_widgh=5
-text_size=15
-label_size=8
-
-
 if __name__=='__main__':
     for cell_name in read_from_pickle('cells_name2.p'):
         #if '4-3' in cell_name: continue
         before_after='_after_shrink'
-        # if cell_name in ['2017_07_06_C_3-4','2016_05_12_A','2016_04_16_A','2017_07_06_C_4-3','2017_05_08_A_5-4']:continue
-        # if cell_name!='2017_04_03_B':continue
         base_dir='final_data/'+cell_name+'/'
         save_dir='final_data/Figure1/'
         create_folder_dirr(save_dir)
@@ -28,31 +21,30 @@ if __name__=='__main__':
 
         # plt.subplots_adjust(hspace=0.3, wspace=0.3)
 
-
         decided_passive_params=find_RA(base_dir)
-        if cell_name in ['2017_03_04_A_6-7','2017_05_08_A_5-4']: decided_passive_params='RA_best_fit'
+        # if cell_name in ['2017_03_04_A_6-7','2017_05_08_A_5-4']: decided_passive_params='RA_best_fit'
         plot_morph(ax1, cell_name, before_after,without_axons=True)
 
         if get_n_spinese(cell_name)>1:
             ax3 = plt.subplot2grid(shape=shapes, loc=(0, 3), colspan=1, rowspan=1, sharey=ax2)
             ax5 = plt.subplot2grid(shape=shapes, loc=(1, 3), colspan=1, rowspan=1)
             plot_pickle(ax2,base_dir+'clear_short_pulse_after_peeling.p','clear_short_pulse')
-            plot_short_pulse_model(ax3,glob(base_dir+decided_passive_params+'_results.p')[0])
-            plot_syn_model2(ax4,glob(base_dir+'AMPA&NMDA_soma_seperete_data*_relative_'+decided_passive_params+'.p')[0])
+            plot_short_pulse_model(ax3,glob(base_dir+decided_passive_params+'_pickles.p')[0])
+            plot_syn_model2(ax4,glob(base_dir+'AMPA&NMDA_soma_seperete_pickles*_relative_'+decided_passive_params+'.p')[0])
             # morph_path=glob("cells_initial_information/"+cell_name+'/*'+before_after+'.swc')[0]
             # dendogram=None
             # dendogram = Dendogram('dend_only', morph_path, add_sec2,load_func=load_swc,E_PAS=E_PAS,passive_val={"RM":parameters['RM'],"RA":parameters['RA'],"CM":parameters['CM']})
             # dendogram.cumpute_distances(dendogram.cell.soma)
             # max_y=dendogram.plot(base_dir,ax=ax4,title='',ylabel="distance from soma (um)")
             # plot_pickle(ax5,glob(base_dir+'Voltage Spine&Soma_full_relative_'+decided_passive_params+'.p')[0])
-            plot_syn_voltage(ax5,glob(base_dir+'Voltage Spine&Soma_pickles*_relative_'+decided_passive_params+'.p')[0])
+            plot_syn_voltage(ax5,glob(base_dir+'Voltage Spine&Soma_pickles*relative_'+decided_passive_params+'.p')[0])
 
         else:
 
             ax3 = plt.subplot2grid(shape=shapes, loc=(0, 3), colspan=1, rowspan=1, sharey=ax2) # , sharex=ax2
             ax5 = plt.subplot2grid(shape=shapes, loc=(1, 3), colspan=1, rowspan=1, sharey=ax4) # , sharex=ax4
             plot_pickle(ax2,base_dir+'clear_short_pulse_after_peeling.p','clear_short_pulse')
-            plot_short_pulse_model(ax3,glob(base_dir+decided_passive_params+'_results.p')[0])
+            plot_short_pulse_model(ax3,glob(base_dir+decided_passive_params+'_pickles.p')[0])
             plot_pickle(ax4,base_dir+'clear_syn_after_peeling.p','clear_syn')
             plot_syn_model(ax5,glob(base_dir+'AMPA&NMDA_soma_pickles_*'+decided_passive_params+'.p')[0])
 
