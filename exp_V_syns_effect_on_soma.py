@@ -22,14 +22,13 @@ if len(sys.argv) != 4:
 else:
     print("the sys.argv len is correct",flush=True)
     specipic_cell = sys.argv[1]
-    if type(specipic_cell)!=str:
+    if specipic_cell=='None':
         specipic_cell='*'
     before_after=sys.argv[2]
     specipic_moo= sys.argv[3]
-    if type(specipic_moo)!=str:
+    if specipic_moo=='None':
         specipic_moo='*'
 
-    print('run with sys.argv', sys.argv)
 
 folder_= ''
 folder_data1=folder_+'cells_outputs_data_short/'+specipic_cell+'/MOO_results_same_strange'+before_after+specipic_moo+'/*/F_shrinkage=*/const_param/'
