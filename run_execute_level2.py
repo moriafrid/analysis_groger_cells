@@ -21,11 +21,13 @@ os.system('python csv_for_passive_val_results.py cells_name2.p')
 i=0
     # os.system('python run_analysis_fit_after_run.py')
 for cell_name in read_from_pickle(cells_name_place):
-    if cell_name=='2017_07_06_C_4-3':
-        before_after='_before_shrink'
-    else:
-        before_after='_after_shrink'
-        continue
+    if not cell_name in ['2017_03_04_A_6-7']:continue #'2017_07_06_C_4-3','2017_07_06_C_3-4',
+
+    # if cell_name=='2017_07_06_C_4-3':
+    #     before_after='_before_shrink'
+    # else:
+    #     before_after='_after_shrink'
+    #     continue
     # if not cell_name in ['2017_03_04_A_6-7']:continue
     # if not cell_name in ['2017_07_06_C_4-3','2016_04_16_A']:continue#['2017_02_20_B','2017_07_06_C_3-4']:continue
     passive_vals_dict= {}

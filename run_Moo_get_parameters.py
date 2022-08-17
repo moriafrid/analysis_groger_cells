@@ -25,12 +25,14 @@ os.system('python csv_for_passive_val_results.py cells_name2.p '+before_after)
 
 
 for cell_name in read_from_pickle(cells_name_place):
-    if cell_name=='2017_07_06_C_4-3':
-        before_after='_before_shrink'
-    else:
-        before_after='_after_shrink'
-        continue
-    # if not cell_name in ['2017_07_06_C_3-4','2017_07_06_C_4-3']:continue #,'2017_02_20_B'? after  clear more noise?,'2017_07_06_C_3-4'
+    # if cell_name!='2016_04_16_A':continue
+    if cell_name in ['2017_03_04_A_6-7','2017_05_08_A_5-4']:continue#'2017_07_06_C_4-3','2017_07_06_C_3-4',
+
+    # if cell_name=='2017_07_06_C_4-3':
+    #     before_after='_before_shrink'
+    # else:
+    #     before_after='_after_shrink'
+        # continue
     passive_vals_dict= {}
     # p='cells_initiall_information/'+cell_name+'/results_passive_fits.csv'
     p='cells_outputs_data_short/'+cell_name+'/fit_short_pulse'+before_after+'/results_passive_fits.csv'
@@ -53,7 +55,7 @@ for cell_name in read_from_pickle(cells_name_place):
                         passive_vals_dict=get_passive_parameter(cell_name,before_after,double_spine_area=double_spine_area,shrinkage_resize=[shrinkage_by,resize_diam_by],fit_condition=fit_condition,spine_start=SPINE_START,file_type=file_type)
                         next_continue=False
                         for i, passive_val_name in enumerate(['RA_min_error','RA_best_fit','RA=120','RA=150']):
-
+                            # if passive_val_name=='RA_min_error':continue
                             if next_continue: continue
                             try: passive_vals_dict[passive_val_name]
                             except:
@@ -73,29 +75,28 @@ for cell_name in read_from_pickle(cells_name_place):
                                 send_command = " ".join([command, '30',cell_name,file_type,RA,CM,RM,fit_condition,passive_val_name,str(resize_diam_by),str(shrinkage_by),str(SPINE_START),double_spine_area,before_after])
                             else:
                                 command="sbatch -p ss.q,elsc.q runs_change_passive_val.sh"
-
                                 if cell_name=='2017_07_06_C_3-4':
                                     fits_until_point=str(1300)
                                     send_command = " ".join([command,"1",cell_name,file_type,RA,CM,RM,fit_condition,passive_val_name,str(resize_diam_by),str(shrinkage_by),str(SPINE_START),double_spine_area,before_after,fits_until_point])
                                     print(send_command)
                                     os.system(send_command+ " True")
-                                    if get_n_spinese(cell_name)>1:
-                                        os.system(send_command+" False")
+                                    # if get_n_spinese(cell_name)>1:
+                                    #     os.system(send_command+" False")
                                 elif cell_name=='2017_02_20_B':
                                     fits_until_point=str(1250)
                                     send_command = " ".join([command,"1",cell_name,file_type,RA,CM,RM,fit_condition,passive_val_name,str(resize_diam_by),str(shrinkage_by),str(SPINE_START),double_spine_area,before_after,fits_until_point])
                                     print(send_command)
                                     os.system(send_command+ " True")
-                                    if get_n_spinese(cell_name)>1:
-                                        os.system(send_command+" False")
-                                fits_until_point=str(-1)
+                                    # if get_n_spinese(cell_name)>1:
+                                    #    os.system(send_command+" False")
 
+                                fits_until_point=str(-1)
+                                # command="python MOO_get_parameters.py"
                                 send_command = " ".join([command,"1",cell_name,file_type,RA,CM,RM,fit_condition,passive_val_name,str(resize_diam_by),str(shrinkage_by),str(SPINE_START),double_spine_area,before_after,fits_until_point])
 
-                            print(send_command)
-                            os.system(send_command+ " True")
-                            if get_n_spinese(cell_name)>1:
-                                os.system(send_command+" False")
-                            # else:
-                            #     os.system(send_command+ " True")
+                                print(send_command)
 
+
+                                os.system(send_command+ " True")
+                                # if get_n_spinese(cell_name)>1:
+                                #     os.system(send_command+" False")
