@@ -159,6 +159,14 @@ for curr_i, model_place in tqdm(enumerate(glob(folder_data1+'*')+glob(folder_dat
 
     pickle.dump(dicty, open(model_place+save_name+'_pickles.p', 'wb'))
     parameters_dict['distance']=distance
+    parameters_dict['W_AMPA']=loader.get_param('weight_AMPA')
+    parameters_dict['W_NMDA']=loader.get_param('weight_NMDA')
+    parameters_dict['tau1_AMPA']=loader.get_param('exp2syn_tau1')
+    parameters_dict['tau2_AMPA']=loader.get_param('exp2syn_tau2')
+
+    parameters_dict['tau1_NMDA']=loader.get_param('NMDA_tau_r_NMDA')
+    parameters_dict['tau2_NMDA']=loader.get_param('NMDA_tau_d_NMDA')
+
     pickle.dump({'soma':{'Rin':Rin_soma},'neck_base':{'Rin':Rin_base,'Rtrans':Rtrans_base},'spine_head':{'Rin':Rin_head,'Rtrans':Rtrans_head},'parameters':parameters_dict}, open(model_place+'/Rins_pickles.p', 'wb'))
 
     plt.savefig(model_place+save_name+'.png')
