@@ -43,7 +43,7 @@ else:
     SPINE_START=int(sys.argv[7])
     double_spine=eval(sys.argv[8])
     before_after=sys.argv[9]
-    passive_val=get_passive_parameter(cell_name,before_after,double_spine_area=double_spine,shrinkage_resize=[shrinkage_factor,resize_diam_by],fit_condition=fit_condition,spine_start=SPINE_START,file_type=file_type2read)[name]
+    passive_val=get_passive_parameter(cell_name,before_after,double_spine_area=str(double_spine),shrinkage_resize=[shrinkage_factor,resize_diam_by],fit_condition=fit_condition,spine_start=SPINE_START,file_type=file_type2read)[name]
 print(name, passive_val)
 folder_=''
 data_dir= "cells_initial_information/"
