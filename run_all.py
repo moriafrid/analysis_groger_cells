@@ -36,7 +36,7 @@ os.system('python choose_syn.py')
 
 os.system('python run_Moo_get_parameters.py')
 
-os.system("python run_analysis_MOO.py")
+os.system("python run_exp_after_MOO.py")
 
 os.system("python reorgenize_results.py")
 
