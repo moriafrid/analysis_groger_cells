@@ -36,15 +36,16 @@ def plot_morphology(ax, segment_colors, names=[], width_mult_factors=None, seg_i
             sec_dots=[seg_ind_to_xyz_coords_map[seg_ind]['x'],seg_ind_to_xyz_coords_map[seg_ind]['y']]
             syn_num=synapse[0].index(seg_ind_to_xyz_coords_map[seg_ind]['sec name'])
             syn_x,syn_y=find_xy(sec_dots,synapse[1][syn_num])
-            psd_size=synapse[2][syn_num]/max(synapse[2])
+            psd_size=synapse[3][syn_num]/max(synapse[3])
 
             if psd_size==1:
                 psd_size=1
             else:
                 psd_size=round(psd_size,2)
                 # psd_size=findFraction(str(psd_size))
-            ax.scatter(x=syn_x, y=syn_y, s=100, c='r',zorder=2,alpha=0.6,label=''+str(syn_num)+'  '+str(psd_size)+'   '+str(round(synapse[2][syn_num],2)))
-            if len(synapse[2])>1:
+
+            ax.scatter(x=syn_x, y=syn_y, s=100, c='r',zorder=2,alpha=0.6,label=str(syn_num)+'  '+str(psd_size*100)+'%         '+str(round(synapse[3][syn_num],2))+'micron^2'+'\ndis from soma='+str(round(synapse[2][syn_num],2))+' micron')
+            if len(synapse[0])>1:
                 ax.text(syn_x-1,syn_y-2,syn_num,color='black',**{'size':'12'})
 
     # plot the cell morphology
@@ -70,10 +71,11 @@ def plot_morphology(ax, segment_colors, names=[], width_mult_factors=None, seg_i
         for ind in all_seg_inds:
             ax.text(np.max(seg_ind_to_xyz_coords_map[key]['x']), np.max(seg_ind_to_xyz_coords_map[key]['y']),
                     names[ind])
+    ax.legend(loc='upper right',prop={'size':12})
+    # leg = ax.get_legend()
+    # leg.legendHandles[0].set_color('red')
+    # leg.legendHandles[1].set_color('yellow')
 
-    ax.legend()
-    # ax.set_xlim(-180, 235)
-    # ax.set_ylim(-210, 1200);
     ax.add_artist(ScaleBar(1, "um", fixed_value=50, location="lower center",rotation="horizontal"))
     plt.rcParams.update({'font.size': L_widgh})
 
@@ -86,7 +88,7 @@ def plot_morph(ax, cell_name, before_after,without_axons=True):
     num_segments=len(seg_ind_to_xyz_coords_map)
     segment_colors_selected = np.zeros(num_segments)
     segment_widths_selected = 5 * np.ones(segment_colors_selected.shape)
-    synapses=list(get_sec_and_seg(cell_name))+[get_parameter(cell_name,'PSD')]
+    synapses=list(get_sec_and_seg(cell_name,with_distance=True))+[get_parameter(cell_name,'PSD')]
     print(synapses)
     # synapses=[get_spine_xyz(cell_name,i) for i in range(get_n_spinese(cell_name))]
     # choosen_synpase=[]
