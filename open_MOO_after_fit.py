@@ -95,7 +95,8 @@ class OPEN_RES():
 
     def get_model(self):
         return self.hoc_model
-
+    def get_sec(self,sec):
+        return eval('self.hoc_model.'+sec)
     def create_synapse(self, sec, pos, weight, number=0,
                        hall_of_fame_num=0, netstim=None, ignore_netstim=False):
 
