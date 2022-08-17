@@ -89,9 +89,9 @@ data_dir= "cells_initial_information/"
 save_dir = "cells_outputs_data_short/"
 
 if same_strengh:
-    base2 = folder_+save_dir+cell_name+'/MOO_results_relative_strange'+before_after+'/'+file_type+'_SPINE_START='+str(SPINE_START)+'/'  # folder name  _RA_free
+    base2 = folder_+save_dir+cell_name+'/MOO_results_same_strange'+before_after+'_correct_seg/'+file_type+'_SPINE_START='+str(SPINE_START)+'/'  # folder name  _RA_free
 else:
-    base2 = folder_+save_dir+cell_name+'/MOO_results_relative_strange'+before_after+'/'+file_type+'_SPINE_START='+str(SPINE_START)+'/'  # folder name  _RA_free
+    base2 = folder_+save_dir+cell_name+'/MOO_results_relative_strange'+before_after+'_correct_seg/'+file_type+'_SPINE_START='+str(SPINE_START)+'/'  # folder name  _RA_free
 
 base2+='F_shrinkage='+str(round(shrinkage_by,2))+'_dend*'+str(round(resize_dend_by,2))
 if double_spine_area:
