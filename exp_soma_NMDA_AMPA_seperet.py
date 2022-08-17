@@ -27,8 +27,8 @@ else:
     print('run with sys.argv', sys.argv)
 
 folder_= ''
-folder_data1=folder_+'cells_outputs_data_short/'+specipic_cell+'/MOO_results_same_strange'+before_after+'/*/F_shrinkage=*/const_param/'
-folder_data2=folder_+'cells_outputs_data_short/'+specipic_cell+'/MOO_results_relative_strange'+before_after+'/*/F_shrinkage=*/const_param/'
+folder_data1=folder_+'cells_outputs_data_short/'+specipic_cell+'/MOO_results_same_strange'+before_after+'*/*/F_shrinkage=*/const_param/'
+folder_data2=folder_+'cells_outputs_data_short/'+specipic_cell+'/MOO_results_relative_strange'+before_after+'*/*/F_shrinkage=*/const_param/'
 save_name='/AMPA&NMDA_soma_seperete'
 color=['#03d7fc','#fcba03']
 def simulate_syn(sec,seg,num=None,color='black'):

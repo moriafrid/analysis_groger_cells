@@ -14,7 +14,7 @@ matplotlib.rcParams['pdf.fonttype'] = 42
 matplotlib.rcParams['svg.fonttype'] = 'none'
 if len(sys.argv) != 3:
     specipic_cell='*'
-    before_after='_before_shrink'
+    before_after='_after_shrink'
 
 else:
     print("the sys.argv len is correct",flush=True)
@@ -22,8 +22,8 @@ else:
     before_after=sys.argv[2]
 
 folder_= ''
-folder_data1=folder_+'cells_outputs_data_short/'+specipic_cell+'/MOO_results_same_strange'+before_after+'/*/F_shrinkage=*/const_param/'
-folder_data2=folder_+'cells_outputs_data_short/'+specipic_cell+'/MOO_results_relative_strange'+before_after+'/*/F_shrinkage=*/const_param/'
+folder_data1=folder_+'cells_outputs_data_short/'+specipic_cell+'/MOO_results_same_strange'+before_after+'*/*/F_shrinkage=*/const_param/'
+folder_data2=folder_+'cells_outputs_data_short/'+specipic_cell+'/MOO_results_relative_strange'+before_after+'*/*/F_shrinkage=*/const_param/'
 save_name='/Voltage Spine&Soma'
 
 
@@ -119,7 +119,9 @@ for curr_i, model_place in tqdm(enumerate(glob(folder_data1+'*')+glob(folder_dat
     pickle.dump(fig, open(model_place+save_name+'.p', 'wb'))
     plt.close()
 
-    plt.show()
+    # plt.show()
+    plt.close()
+
     loader.destroy()
     model.destroy()
 
