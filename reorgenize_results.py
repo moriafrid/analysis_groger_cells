@@ -31,13 +31,15 @@ def copy_file(copy,paste,extra_name=''):
 #need to run again with 3,5,8 if os.system is runing
 for cell_name in read_from_pickle('cells_name2.p'):
     # if cell_name in ['2017_07_06_C_3-4','2016_05_12_A','2016_04_16_A','2017_07_06_C_4-3','2017_05_08_A_5-4']:continue
-    if cell_name!='2017_03_04_A_6-7':continue
+    # if cell_name!='2017_03_04_A_6-7':continue
+    # if not cell_name in ['2017_07_06_C_4-3','2017_07_06_C_3-4','2017_03_04_A_6-7']:continue
 
-    if cell_name=='2017_07_06_C_4-3':
-        before_after='_before_shrink'
-    else:
-        before_after='_after_shrink'
-        # continue
+    #
+    # if cell_name=='2017_07_06_C_4-3':
+    #     before_after='_before_shrink'
+    # else:
+    #     before_after='_after_shrink'
+    #     # continue
     if cell_name=='2017_07_06_C_3-4':
         full=''
     else:
@@ -45,8 +47,9 @@ for cell_name in read_from_pickle('cells_name2.p'):
     save_file='final_data/'+cell_name+'/'
     data_file='cells_outputs_data_short/'+cell_name+'/'
 
-    MOO_relative='MOO_results_relative_strange'+before_after+'/z_correct.swc_SPINE_START=20/'
+    MOO_relative='MOO_results_relative_strange'+before_after+'_correct_seg/z_correct.swc_SPINE_START=20/'
     MOO_same='MOO_results_same_strange'+before_after+'/z_correct.swc_SPINE_START=20/'
+    MOO_same=MOO_relative
     short_pulse='/fit_short_pulse'+before_after+'/'
     print(cell_name)
 
@@ -89,7 +92,7 @@ for cell_name in read_from_pickle('cells_name2.p'):
             if RA>70:
                 next_continue=True
         dirr_passive_result=glob(data_file+short_pulse+'z_correct.swc_SPINE_START=20/dend*'+str(resize_diam_by)+'&F_shrinkage='+str(shrinkage_by)+'/const_param/RA/')[0]
-        os.system(" ".join(["python plot_fit_short_pulse.py",cell_name,str(RM), str(RA), str(CM),str(resize_diam_by),str(shrinkage_by),str(passive_val_name),before_after]))
+        # os.system(" ".join(["python plot_fit_short_pulse.py",cell_name,str(RM), str(RA), str(CM),str(resize_diam_by),str(shrinkage_by),str(passive_val_name),before_after]))
 
         copy_file(dirr_passive_result+passive_val_name+'_results.p',save_file_resize)
 
