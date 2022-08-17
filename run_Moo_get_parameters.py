@@ -25,8 +25,8 @@ os.system('python csv_for_passive_val_results.py cells_name2.p '+before_after)
 
 
 for cell_name in read_from_pickle(cells_name_place):
-    # if cell_name!='2016_04_16_A':continue
-    if cell_name in ['2017_03_04_A_6-7','2017_05_08_A_5-4']:continue#'2017_07_06_C_4-3','2017_07_06_C_3-4',
+    if cell_name!='2017_07_06_C_3-4':continue
+    # if cell_name in ['2017_03_04_A_6-7','2017_05_08_A_5-4']:continue#'2017_07_06_C_4-3','2017_07_06_C_3-4',
 
     # if cell_name=='2017_07_06_C_4-3':
     #     before_after='_before_shrink'
@@ -80,15 +80,15 @@ for cell_name in read_from_pickle(cells_name_place):
                                     send_command = " ".join([command,"1",cell_name,file_type,RA,CM,RM,fit_condition,passive_val_name,str(resize_diam_by),str(shrinkage_by),str(SPINE_START),double_spine_area,before_after,fits_until_point])
                                     print(send_command)
                                     os.system(send_command+ " True")
-                                    # if get_n_spinese(cell_name)>1:
-                                    #     os.system(send_command+" False")
+                                    if get_n_spinese(cell_name)>1:
+                                        os.system(send_command+" False")
                                 elif cell_name=='2017_02_20_B':
                                     fits_until_point=str(1250)
                                     send_command = " ".join([command,"1",cell_name,file_type,RA,CM,RM,fit_condition,passive_val_name,str(resize_diam_by),str(shrinkage_by),str(SPINE_START),double_spine_area,before_after,fits_until_point])
                                     print(send_command)
                                     os.system(send_command+ " True")
-                                    # if get_n_spinese(cell_name)>1:
-                                    #    os.system(send_command+" False")
+                                    if get_n_spinese(cell_name)>1:
+                                       os.system(send_command+" False")
 
                                 fits_until_point=str(-1)
                                 # command="python MOO_get_parameters.py"
@@ -98,5 +98,5 @@ for cell_name in read_from_pickle(cells_name_place):
 
 
                                 os.system(send_command+ " True")
-                                # if get_n_spinese(cell_name)>1:
-                                #     os.system(send_command+" False")
+                                if get_n_spinese(cell_name)>1:
+                                    os.system(send_command+" False")
