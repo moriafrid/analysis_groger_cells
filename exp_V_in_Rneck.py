@@ -42,6 +42,7 @@ save_name='/Voltage in neck'
 for curr_i, model_place in tqdm(enumerate(glob(folder_data1+'*')+glob(folder_data2+'*'))):
     type=model_place.split('/')[-1]
     cell_name=model_place.split('/')[1]
+    # if get_n_spinese(cell_name)==2:continue
     if type=='test': continue
     try:loader = OPEN_RES(res_pos=model_place+'/', curr_i=curr_i)
     except:
@@ -53,7 +54,7 @@ for curr_i, model_place in tqdm(enumerate(glob(folder_data1+'*')+glob(folder_dat
         reletive_strengths=psd_sizes/psd_sizes[argmax]
     else:
         reletive_strengths=np.ones(get_n_spinese(cell_name))
-        RDSM_objective_file = folder_+'cells_initial_information/'+cell_name+"/mean_syn.p"
+    RDSM_objective_file = folder_+'cells_initial_information/'+cell_name+"/mean_syn.p"
     V_data,T_data=read_from_pickle(RDSM_objective_file)
     T_with_units=T_data-T_data[0]
     T_with_units=T_with_units*1000
@@ -80,18 +81,28 @@ for curr_i, model_place in tqdm(enumerate(glob(folder_data1+'*')+glob(folder_dat
     V_base_neck=[]
     spines=[]
     syn_objs=[]
-    imps=[]
+    imps_base=[]
+    imps_spine_head=[]
+    imp_soma=h.Impedance(sec=model.soma[0])
+    imp_soma.loc(0.5)
+    distance=[]
     for sec,seg in zip(secs,segs):
         dict_spine_param=get_building_spine(cell_name,num)
-        spine, syn_obj = loader.create_synapse(eval('model.'+sec), seg,reletive_strengths[num], number=num,netstim=netstim)
+        spine, syn_obj = loader.create_synapse(loader.get_sec(sec), seg,reletive_strengths[num], number=num,netstim=netstim)
         spines.append(spine)
         syn_objs.append(syn_obj)
         V_spine.append(h.Vector())
         V_spine[num].record(spine[1](1)._ref_v) #thh spine head
         V_base_neck.append(h.Vector())
         V_base_neck[num].record(loader.get_sec(sec)(seg)._ref_v) #the neck base
-        imps.append(h.Impedance(sec=loader.get_sec(sec)))
-        imps[num].loc(seg)
+
+        imps_base.append(h.Impedance(sec=loader.get_sec(sec)))
+        imps_base[num].loc(seg) #spine base = on dend segment
+
+        imps_spine_head.append(h.Impedance(sec=spine[1]))
+        imps_spine_head[num].loc(1) #spine_head
+
+        distance.append(h.distance(model.soma[0](0.5),loader.get_sec(sec)(seg)))
         num+=1
 
     time = h.Vector()
@@ -102,12 +113,18 @@ for curr_i, model_place in tqdm(enumerate(glob(folder_data1+'*')+glob(folder_dat
     h.steps_per_ms = 1.0/h.dt
 
     h.run()
-    Rin,Rtrans=[],[]
-    for imp in imps:
+    Rin_soma=imp_soma.input(0)
+    Rin_base,Rtrans_base=[],[]
+    for imp in imps_base:
         imp.compute(0)
-        Rin.append( imp.input(0))
-        Rtrans.append(imp.transfer(model.soma[0](0.5)))
+        Rin_base.append(imp.input(0))
+        Rtrans_base.append(imp.transfer(model.soma[0](0.5)))
 
+    Rin_head,Rtrans_head=[],[]
+    for imp in imps_spine_head:
+        imp.compute(0)
+        Rin_head.append(imp.input(0))
+        Rtrans_head.append(imp.transfer(model.soma[0](0.5)))
     passive_propert_title='Rm='+str(round(1.0/model.soma[0].g_pas,2)) +' Ra='+str(round(model.soma[0].Ra,2))+' Cm='+str(round(model.soma[0].cm,2))
     cut_from_start_time=int(neuron_start_time/0.1)
 
@@ -125,7 +142,8 @@ for curr_i, model_place in tqdm(enumerate(glob(folder_data1+'*')+glob(folder_dat
     fig.suptitle('Voltage in Spine base\n '+" ".join([model_place.split('/')[1],model_place.split('/')[-1] ,'\n',model_place.split('/')[4],model_place.split('/')[2]])+'\n'+passive_propert_title)
     dicty={}
     dicty['time']=time
-    dicty['parameters']={'reletive_strengths':reletive_strengths,'PSD':psd_sizes,'RA':loader.get_param('Ra'),'RM':1.0/loader.get_param('g_pas'),'CM':loader.get_param('cm'),'E_PAS':loader.get_param('e_pas')}
+    parameters_dict={'reletive_strengths':reletive_strengths,'PSD':psd_sizes,'RA':loader.get_param('Ra'),'RM':1.0/loader.get_param('g_pas'),'CM':loader.get_param('cm'),'E_PAS':loader.get_param('e_pas')}
+    dicty['parameters']=parameters_dict
     for j in range(len(V_spine)):
         V_spine[j]=np.array(V_spine[j])[cut_from_start_time:]
         V_base_neck[j]=np.array(V_base_neck[j])[cut_from_start_time:]
@@ -140,6 +158,8 @@ for curr_i, model_place in tqdm(enumerate(glob(folder_data1+'*')+glob(folder_dat
         dicty['voltage_'+str(j)]={'V_head':V_spine[j],'V_base_neck':V_base_neck[j]}
 
     pickle.dump(dicty, open(model_place+save_name+'_pickles.p', 'wb'))
+    parameters_dict['distance']=distance
+    pickle.dump({'soma':{'Rin':Rin_soma},'neck_base':{'Rin':Rin_base,'Rtrans':Rtrans_base},'spine_head':{'Rin':Rin_head,'Rtrans':Rtrans_head},'parameters':parameters_dict}, open(model_place+'/Rins_pickles.p', 'wb'))
 
     plt.savefig(model_place+save_name+'.png')
     plt.savefig(model_place+save_name+'.pdf')
