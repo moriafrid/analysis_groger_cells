@@ -16,19 +16,26 @@ from add_figure import add_figure
 matplotlib.rcParams['pdf.fonttype'] = 42
 matplotlib.rcParams['svg.fonttype'] = 'none'
 import sys
-if len(sys.argv) != 3:
+if len(sys.argv) != 4:
     specipic_cell='*'
     before_after='_after_shrink'
+    specipic_moo='_correct_seg'
     print("sys.argv isn't run")
 else:
     print("the sys.argv len is correct",flush=True)
     specipic_cell = sys.argv[1]
+    if type(specipic_cell)!=str:
+        specipic_cell='*'
     before_after=sys.argv[2]
+    specipic_moo= sys.argv[3]
+    if type(specipic_moo)!=str:
+        specipic_moo='*'
+
     print('run with sys.argv', sys.argv)
 
 folder_= ''
-folder_data1=folder_+'cells_outputs_data_short/'+specipic_cell+'/MOO_results_same_strange'+before_after+'*/*/F_shrinkage=*/const_param/'
-folder_data2=folder_+'cells_outputs_data_short/'+specipic_cell+'/MOO_results_relative_strange'+before_after+'*/*/F_shrinkage=*/const_param/'
+folder_data1=folder_+'cells_outputs_data_short/'+specipic_cell+'/MOO_results_same_strange'+before_after+specipic_moo+'/*/F_shrinkage=*/const_param/'
+folder_data2=folder_+'cells_outputs_data_short/'+specipic_cell+'/MOO_results_relative_strange'+before_after+specipic_moo+'/*/F_shrinkage=*/const_param/'
 save_name='/AMPA&NMDA_soma_seperete'
 color=['#03d7fc','#fcba03']
 def simulate_syn(sec,seg,num=None,color='black'):
@@ -129,7 +136,8 @@ for curr_i, model_place in tqdm(enumerate(glob(folder_data2+'*')+glob(folder_dat
     plt.savefig(model_place+save_name+'.png')
     plt.savefig(model_place+save_name+'.pdf')
     pickle.dump(fig, open(model_place+save_name+'.p', 'wb'))
-    pickle.dump([{'time':time_all},dict_result,{'strengths':{'relative':reletive_strengths,'PSD':psd_sizes}}], open(model_place+save_name+'_data.p', 'wb'))
+    dict_result['parameters']={'reletive_strengths':reletive_strengths,'PSD':psd_sizes,'RA':loader.get_param('Ra'),'RM':1.0/loader.get_param('g_pas'),'CM':loader.get_param('cm'),'E_PAS':loader.get_param('e_pas')}
+    pickle.dump([{'time':time_all},dict_result], open(model_place+save_name+'_pickles.p', 'wb'))
     # plt.show()
     plt.close()
     loader.destroy()

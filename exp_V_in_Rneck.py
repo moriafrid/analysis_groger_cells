@@ -15,18 +15,27 @@ import sys
 matplotlib.rcParams['pdf.fonttype'] = 42
 matplotlib.rcParams['svg.fonttype'] = 'none'
 print(sys.argv)
-if len(sys.argv) != 3:
+if len(sys.argv) != 4:
     specipic_cell='*'
     before_after='_after_shrink'
-    print("the exp don't run with sys.argv",len(sys.argv))
+    specipic_moo='_correct_seg'
+    print("sys.argv isn't run")
 else:
     print("the sys.argv len is correct",flush=True)
     specipic_cell = sys.argv[1]
+    if type(specipic_cell)!=str:
+        specipic_cell='*'
     before_after=sys.argv[2]
+    specipic_moo= sys.argv[3]
+    if type(specipic_moo)!=str:
+        specipic_moo='*'
+
+
+    print('run with sys.argv', sys.argv)
 
 folder_= ''
-folder_data1=folder_+'cells_outputs_data_short/'+specipic_cell+'/MOO_results_same_strange'+before_after+'*/*/F_shrinkage=*/const_param/'
-folder_data2=folder_+'cells_outputs_data_short/'+specipic_cell+'/MOO_results_relative_strange'+before_after+'*/*/F_shrinkage=*/const_param/'
+folder_data1=folder_+'cells_outputs_data_short/'+specipic_cell+'/MOO_results_same_strange'+before_after+specipic_moo+'/*/F_shrinkage=*/const_param/'
+folder_data2=folder_+'cells_outputs_data_short/'+specipic_cell+'/MOO_results_relative_strange'+before_after+specipic_moo+'/*/F_shrinkage=*/const_param/'
 save_name='/Voltage in neck'
 
 
@@ -116,7 +125,7 @@ for curr_i, model_place in tqdm(enumerate(glob(folder_data1+'*')+glob(folder_dat
     fig.suptitle('Voltage in Spine base\n '+" ".join([model_place.split('/')[1],model_place.split('/')[-1] ,'\n',model_place.split('/')[4],model_place.split('/')[2]])+'\n'+passive_propert_title)
     dicty={}
     dicty['time']=time
-    dicty['parameters']={'reletive_strengths':reletive_strengths,'PSD':psd_sizes}
+    dicty['parameters']={'reletive_strengths':reletive_strengths,'PSD':psd_sizes,'RA':loader.get_param('Ra'),'RM':1.0/loader.get_param('g_pas'),'CM':loader.get_param('cm'),'E_PAS':loader.get_param('e_pas')}
     for j in range(len(V_spine)):
         V_spine[j]=np.array(V_spine[j])[cut_from_start_time:]
         V_base_neck[j]=np.array(V_base_neck[j])[cut_from_start_time:]
@@ -128,9 +137,9 @@ for curr_i, model_place in tqdm(enumerate(glob(folder_data1+'*')+glob(folder_dat
         axs[names[j]].set_ylabel('voltage [mv]')
         axs[names[j]].legend()
         axs[names[j]].plot(np.array(T_base), np.array(V_base)+loader.get_param('e_pas'), color='black',label='EP record',alpha=0.2,lw=5)
-        dicty['voltage_'+str(j)]={'V_head':V_spine[j],'V_base_neck':V_base_neck}
+        dicty['voltage_'+str(j)]={'V_head':V_spine[j],'V_base_neck':V_base_neck[j]}
 
-    pickle.dump(dicty, open(model_place+save_name+'_data.p', 'wb'))
+    pickle.dump(dicty, open(model_place+save_name+'_pickles.p', 'wb'))
 
     plt.savefig(model_place+save_name+'.png')
     plt.savefig(model_place+save_name+'.pdf')
