@@ -2,6 +2,19 @@ import pandas as pd
 from math import pi,sqrt
 import numpy as np
 
+def calculate_Rneck(cell_name,Ra,spine_num=None):
+    L=np.array(get_parameter(cell_name,'neck_length',spine_num))
+    R=np.array(get_parameter(cell_name,'neck_diam',spine_num))/2
+    #print(L,R)
+    if np.size(R)>1:
+        R[np.where(R==0)]=1
+    else:
+        if R==0:
+            R=1
+    Ra=Ra*10000 #change the units to be in micron
+    return (L*Ra/(pi*R**2))/1e6 #in Mega Oum
+
+
 def get_n_spinese(cell_name):
     df = pd.read_excel('cells_initial_information/Data2.xlsx')
     return len(df[df['cell_name']==cell_name])
