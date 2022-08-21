@@ -47,8 +47,7 @@ def find_RA(file_dirr):
 def plot_syn_model(ax,dirr):
     dict_syn=read_from_pickle(dirr)
     E_PAS=dict_syn['parameters']['E_PAS']
-
-    dict_result=read_from_pickle(glob(dirr[:dirr.rfind('/')]+'/final_pop'+dirr[dirr.rfind('data_')+4:])[0])
+    dict_result=read_from_pickle(glob(dirr[:dirr.rfind('/')]+'/final_pop'+dirr[dirr.rfind('pickles_')+7:])[0])
     T=dict_syn['time']
     V=dict_syn['voltage']
     ax.plot(T,V['experiment']-E_PAS,color = 'black',alpha=0.2,label='experiment',lw=9)
@@ -64,11 +63,11 @@ def plot_syn_model(ax,dirr):
 
 def plot_syn_model2(ax,dirr):
     dict_syn=read_from_pickle(dirr)
-    E_PAS=dict_syn['parameters']['E_PAS']
-    dict_result=read_from_pickle(glob(dirr[:dirr.rfind('/')]+'/final_pop'+dirr[dirr.rfind('data_')+4:])[0])
+    E_PAS=dict_syn[-1]['parameters']['E_PAS']
+    dict_result=read_from_pickle(glob(dirr[:dirr.rfind('/')]+'/final_pop'+dirr[dirr.rfind('pickles_')+7:])[0])
     T=dict_syn[0]['time']
     V=dict_syn[1]
-    reletive_strengths=dict_syn[2]['strengths']['relative']
+    reletive_strengths=dict_syn[-1]['parameters']['reletive_strengths']
     AMPA_weight=round(dict_result['mean_final_pop'][0]*1000,2)
     NMDA_weight=round(dict_result['mean_final_pop'][1]*1000,2)
     for k,color,label in zip(['voltage_all','voltage_0','voltage_1'],['black','#03d7fc','#fcba03'],['model','syn_0','syn1']):
@@ -103,10 +102,16 @@ def plot_neck_voltage(ax,dirr):
     V=dict_syn
     size_y_scal_bar=[]
     num=0
-    for k,color,label in zip(['voltage_0','voltage_1'],['#0390fc','#fc6703'],['syn_0','syn1']):
+    #['#0390fc','#fc6703']
+    for k,color,label in zip(['voltage_0','voltage_1'],['#03d7fc','#fcba03'],['syn_0','syn1']):
         Rneck=calculate_Rneck(cell_name,RA,num) #chnage to be in Mega
-        ax.plot(T,V[k]['V_base_neck']-E_PAS,'-',c=color,lw=2,alpha=0.6,label=str(round(Rneck/10e6,2))+'MOhm')
-        size_y_scal_bar.append(int(max(V[k]['V_base_neck'])-E_PAS))
+        antil_point=int(len(V[k]['V_base_neck'])*2/3)
+        T=T[:antil_point]
+        ax.plot(T,V[k]['V_base_neck'][:antil_point]-E_PAS,c='black',lw=2,alpha=0.5)
+        ax.plot(T,V[k]['V_head'][:antil_point]-E_PAS,'-',c=color,lw=2,alpha=0.6,label=str(round(Rneck,2))+'MOhm')
+        ax.plot(T,V[k]['V_base_neck'][:antil_point]-E_PAS,linestyle='dashdot',alpha=0.5,dashes=[3, 2],c=color,lw=2)
+
+        size_y_scal_bar.append(int(max(V[k]['V_head'])-E_PAS))
         num+=1
     # place_text=0.5
     plt.rcParams.update({'font.size': text_size})
@@ -120,9 +125,10 @@ def plot_neck_voltage(ax,dirr):
     ax.set_axis_off()
 def plot_syn_voltage(ax,dirr):
     dict_syn=read_from_pickle(dirr)
-    dict_result=read_from_pickle(glob(dirr[:dirr.rfind('/')]+'/final_pop'+dirr[dirr.rfind('data_')+4:])[0])
+    dict_result=read_from_pickle(glob(dirr[:dirr.rfind('/')]+'/final_pop'+dirr[dirr.rfind('pickles_')+7:])[0])
     T=dict_syn['time']
     V=dict_syn
+    E_PAS=dict_syn['parameters']['E_PAS']
     reletive_strengths=dict_syn['parameters']['reletive_strengths']
     AMPA_weight=round(dict_result['mean_final_pop'][0]*1000,2)
     NMDA_weight=round(dict_result['mean_final_pop'][0]*1000,2)
