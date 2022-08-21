@@ -6,7 +6,8 @@ import matplotlib.pyplot as plt
 from open_pickle import read_from_pickle
 from read_spine_properties import calculate_Rneck
 from scalbar_sapir import AnchoredHScaleBar
-
+from pdf2image import convert_from_path
+import matplotlib.image as mpimg
 fontsize=16
 L_widgh=5
 text_size=15
@@ -19,6 +20,53 @@ plt.rc('xtick', labelsize=10)    # fontsize of the tick labels
 plt.rc('ytick', labelsize=10)    # fontsize of the tick labels
 plt.rc('legend', fontsize=16)    # legend fontsize
 plt.rc('figure', titlesize=22)  # fontsize of the figure title
+
+place=["A","B","C","D","E","F","G","H","I","J","K","L","M","N","O","P","Q","R","S","T","U","V","W","X","Y","Z","a","b","c","d","e","f"]
+# folder_='cells_outputs_data_short/'+cell_name
+# folder_='cells_outputs_data_3_initial_cells/'+cell_name
+
+i=0
+def show_dirr(png_file):
+    if png_file.split('.')[-1]=='pdf':  # if only have pdf (no png) => create png and read it later
+        images = convert_from_path(png_file)
+        if len(images) == 1:
+            images[0].save(png_file.replace(".pdf", ".png"))
+        else:  # save per page
+            print("Error. too many images")
+            return
+        # for page_no, image in enumerate(images):
+        #     image.save(png_file.replace(".pdf", "_p{0}.png".format(page_no)))
+        png_file = png_file.replace(".pdf", ".png")
+    # read png
+    img = mpimg.imread(png_file)
+    imgplot = plt.imshow(img)
+
+def show_directory(ax, title="",png_file=""):
+    global i
+    if png_file.split('.')[-1]=='pdf':  # if only have pdf (no png) => create png and read it later
+        if len(glob(png_file.replace(".pdf", ".png")))>0:
+            png_file = png_file.replace(".pdf", ".png")
+        else:
+            images = convert_from_path(png_file)
+            if len(images) == 1:
+                images[0].save(png_file.replace(".pdf", ".png"))
+            else:  # save per page
+                print("Error. too many images")
+                return
+                # for page_no, image in enumerate(images):
+                #     image.save(png_file.replace(".pdf", "_p{0}.png".format(page_no)))
+            png_file = png_file.replace(".pdf", ".png")
+    # read png
+    img = mpimg.imread(png_file)
+    if ax is None:
+        plt.title(title)
+        imgplot = plt.imshow(img)
+    else:
+        ax.set_title(title)
+        ax.axis('off')
+        ax.imshow(img)
+    i+=1
+
 def clear_short_pulse(ax, dir):
     # d = '/ems/elsc-labs/segev-i/moria.fridman/project/analysis_groger_cells/cells_initial_information/2017_05_08_A_4-5/clear_short_pulse.p'
     data = pickle.load(open(dir, 'rb'))
@@ -38,6 +86,7 @@ def clear_syn_mean(ax, dir):
         ax.plot(T, v, color='grey',alpha=0.2,lw=0.1)
     ax.plot(T, data[0].mean(axis=0), color='k')
     return ax
+
 def find_RA(file_dirr):
     for passive_params in ['RA_min_error','RA_best_fit','RA=120','RA=150']:
         try_find=glob(file_dirr+'fit RA=*_'+passive_params+'.p')
