@@ -17,44 +17,6 @@ import pickle
 matplotlib.rcParams['pdf.fonttype'] = 42
 matplotlib.rcParams['svg.fonttype'] = 'none'
 do_calculate_F_factor=True
-print("the number of parameters that sys loaded in dendogram.py is ",len(sys.argv),flush=True)
-print(len(sys.argv), sys.argv)
-
-if len(sys.argv) != 10:
-    print("the function doesn't run with sys.argv",flush=True)
-    cell_name= '2017_03_04_A_6-7'
-    file_type2read='z_correct.swc'
-    fit_condition='const_param'
-    passive_val={'RA':100.0,'CM':1.0,'RM':10000.0}
-    name='test'
-    resize_diam_by=1.0
-    shrinkage_factor=1.0
-    SPINE_START=20
-    double_spine='False'
-    before_after='_after_shrink'
-else:
-    print("the sys.argv len is correct",flush=True)
-    cell_name = sys.argv[1]
-    file_type2read=sys.argv[2] #hoc ar ASC
-    fit_condition=sys.argv[3]
-    name=sys.argv[4]
-    resize_diam_by = float(sys.argv[5]) #how much the cell sweel during the electrophisiology records
-    shrinkage_factor =float(sys.argv[6]) #how much srinkage the cell get between electrophysiology record and LM
-    SPINE_START=int(sys.argv[7])
-    double_spine=eval(sys.argv[8])
-    before_after=sys.argv[9]
-    passive_val=get_passive_parameter(cell_name,before_after,double_spine_area=str(double_spine),shrinkage_resize=[shrinkage_factor,resize_diam_by],fit_condition=fit_condition,spine_start=SPINE_START,file_type=file_type2read)[name]
-print(name, passive_val)
-folder_=''
-data_dir= "cells_initial_information/"
-save_dir = "cells_outputs_data_short/"
-# cell_file=glob(folder_+data_dir+cell_name+'/*'+file_type2read)[0]
-cell_file=glob(folder_+data_dir+cell_name+'/*'+file_type2read[:-4]+before_after+file_type2read[-4:])[0]
-# folder_save=folder_+save_dir+cell_name+"/data/cell_properties/"+file_type+'/SPINE_START='+str(SPINE_START)+'/'
-folder_save=folder_+save_dir+cell_name+"/fit_short_pulse"+before_after+"/"+file_type2read+'_SPINE_START='+str(SPINE_START)+'/'
-folder_save+="/dend*"+str(round(resize_diam_by,2))+'&F_shrinkage='+str(round(shrinkage_factor,2))
-folder_save+='/'+name+'/'
-create_folder_dirr(folder_save)
 
 colors_dict = {"soma":"black",
                "apical": "blue",
@@ -64,14 +26,9 @@ colors_dict = {"soma":"black",
                "axon": "green",
                "else": "gold",
                "synapse": "grey"}
-
+SPINE_START=20
 signal.signal(signal.SIGSEGV, SIGSEGV_signal_arises)
-if file_type2read=='hoc':
-    load_func=load_hoc
-elif file_type2read=='ASC':
-    load_func=load_ASC
-elif 'swc' in file_type2read:
-    load_func=load_swc
+
 
 def get_segment_length_lamda(seg):
     """
@@ -126,22 +83,22 @@ def change_model_pas(cell,CM=1, RA = 250, RM = 20000.0, E_PAS = -70.0,F_factor=1
               seg.cm *= F_factor
               seg.g_pas *= F_factor
     return cell
-# def run_find_apic(apics,last_apic):
-#     for child in last_apic.children():
-#         apics.append(child)
-#         run_find_apic(apics,child)
+
 class Dendogram():
     def __init__(self,
                  name,
                  morph_path,
                  length_function,
+                 cell_name='',
                  color_dict = colors_dict,
                  diam_factor=None,
                  del_axon=True,
                  load_func='',
                  E_PAS=-70,
-                 passive_val={}):
+                 passive_val={},
+                 double_spine='False'):
         self.name=name
+        self.cell_name=cell_name
         self.colors_dict = color_dict
         self.E_PAS=E_PAS
         self.passive_val=passive_val
@@ -169,8 +126,8 @@ class Dendogram():
         try: self.apic=self.cell.apic
         except:self.apic= find_apic(self.cell,self.does_axon_inside_cell)
         synapses_locations=[]
-        for i in range(get_n_spinese(cell_name)):
-            sec,seg=get_sec_and_seg(cell_name,i)
+        for i in range(get_n_spinese(self.cell_name)):
+            sec,seg=get_sec_and_seg(self.cell_name,i)
             synapses_locations.append([sec,seg])
         self.dots_loc=synapses_locations
         # self.syn = synapses_locations
@@ -203,17 +160,17 @@ class Dendogram():
         else:
             return self.colors_dict["else"]
 
-    def plot_synapse(self, sec_start, sec_end, pos, x_axis):
+    def plot_synapse(self,ax ,sec_start, sec_end, pos, x_axis):
         print('synapse plot',pos)
         syn_dis=sec_start + abs(sec_end - sec_start) * float(pos)
-        plt.scatter(x_axis, syn_dis, color=colors_dict["synapse"])
-        plt.annotate('syn distance\n' + str(round(syn_dis,3)),fontsize=10, xy=(x_axis, syn_dis), xycoords='data',
+        ax.scatter(x_axis, syn_dis, color=colors_dict["synapse"])
+        ax.annotate('syn distance\n' + str(round(syn_dis,3)),fontsize=10, xy=(x_axis, syn_dis), xycoords='data',
                      xytext=(0.3, 0.5), textcoords='axes fraction',
                      arrowprops=dict(facecolor='black', shrink=0.005,lw=0.0005),
                      horizontalalignment='center', verticalalignment='top',
                      )
         return syn_dis
-    def plot_func(self, sec, x_pos, color):
+    def plot_func(self,ax, sec, x_pos, color):
         parent = h.SectionRef(sec=sec).parent
         if sec in self.done_section:
             raise BaseException("problem with morph")
@@ -224,13 +181,13 @@ class Dendogram():
         sec_name = sec_name[sec_name.find(".") + 1:]
 
         if h.SectionRef(sec=sec).nchild() == 0:
-            plt.plot([x_pos, x_pos], [self.tree_dendogram_dist[parent], self.tree_dendogram_dist[sec]], color=self.get_color(sec),
+            ax.plot([x_pos, x_pos], [self.tree_dendogram_dist[parent], self.tree_dendogram_dist[sec]], color=self.get_color(sec),
                      linewidth=1 if self.diam_factor is None else sec.diam*self.diam_factor)
             for synapse in self.dots_loc:
                 sec_n=synapse[0]
                 seg=synapse[1]
                 if sec_name == sec_n:
-                    dendogram_syn_distance =self.plot_synapse(self.tree_dendogram_dist[parent], self.tree_dendogram_dist[sec], seg, x_pos)
+                    dendogram_syn_distance =self.plot_synapse(ax,self.tree_dendogram_dist[parent], self.tree_dendogram_dist[sec], seg, x_pos)
                     print('synapse dendogram len is ',dendogram_syn_distance)
             return x_pos + 1.0, x_pos
 
@@ -239,33 +196,30 @@ class Dendogram():
                 sec_n=synapse[0]
                 loc=synapse[1]
                 if sec_name == sec_n:
-                    self.plot_synapse(self.tree_dendogram_dist[parent], self.tree_dendogram_dist[sec], loc, x_pos)
+                    self.plot_synapse(ax,self.tree_dendogram_dist[parent], self.tree_dendogram_dist[sec], loc, x_pos)
             # x_pos+=1
-            x_pos, start_pos = self.plot_func(h.SectionRef(sec=sec).child[0], x_pos, color)
-            plt.plot([start_pos, start_pos], [self.tree_dendogram_dist[parent], self.tree_dendogram_dist[sec]], color=self.get_color(sec),
+            x_pos, start_pos = self.plot_func(ax,h.SectionRef(sec=sec).child[0], x_pos, color)
+            ax.plot([start_pos, start_pos], [self.tree_dendogram_dist[parent], self.tree_dendogram_dist[sec]], color=self.get_color(sec),
                      linewidth=1 if self.diam_factor is None else sec.diam*self.diam_factor)
             return x_pos, start_pos
 
-        x_pos, start_pos = self.plot_func(h.SectionRef(sec=sec).child[0], x_pos, color)
+        x_pos, start_pos = self.plot_func(ax,h.SectionRef(sec=sec).child[0], x_pos, color)
         for i in range(1, int(h.SectionRef(sec=sec).nchild()) - 1, 1):
-            x_pos, end_pos = self.plot_func(h.SectionRef(sec=sec).child[i], x_pos, color)
+            x_pos, end_pos = self.plot_func(ax,h.SectionRef(sec=sec).child[i], x_pos, color)
 
-        x_pos, end_pos = self.plot_func(h.SectionRef(sec=sec).child[int(h.SectionRef(sec=sec).nchild()) - 1], x_pos,
+        x_pos, end_pos = self.plot_func(ax,h.SectionRef(sec=sec).child[int(h.SectionRef(sec=sec).nchild()) - 1], x_pos,
                                    color)
         mid_x = start_pos + abs(end_pos - start_pos) / 2.0
-        plt.plot([mid_x, mid_x], [self.tree_dendogram_dist[parent], self.tree_dendogram_dist[sec]], color=self.get_color(sec),
+        ax.plot([mid_x, mid_x], [self.tree_dendogram_dist[parent], self.tree_dendogram_dist[sec]], color=self.get_color(sec),
                  linewidth=1 if self.diam_factor is None else sec.diam*self.diam_factor)
-        plt.plot([start_pos, end_pos], [self.tree_dendogram_dist[sec]] * 2, color=self.get_color(sec), linewidth=1 if self.diam_factor is None else sec.diam*self.diam_factor)
+        ax.plot([start_pos, end_pos], [self.tree_dendogram_dist[sec]] * 2, color=self.get_color(sec), linewidth=1 if self.diam_factor is None else sec.diam*self.diam_factor)
         for sec_n, loc in self.dots_loc:
             if sec_name == sec_n:
-                self.plot_synapse(self.tree_dendogram_dist[parent], self.tree_dendogram_dist[sec], loc, mid_x)
+                self.plot_synapse(ax,self.tree_dendogram_dist[parent], self.tree_dendogram_dist[sec], loc, mid_x)
 
         return x_pos, mid_x
 
-    def plot(self, save_folder,ax=None, max_y=None,title='Dendogram',ylabel='distance from soma'):
-        if ax is None:
-            fig,ax=plt.subplots()
-            plt.title(title+'\n'+name+' '+str(self.passive_val),fontsize=24)
+    def plot(self, ax=None, max_y=None,title='Dendogram',ylabel='distance from soma'):
         ax.set_ylabel(ylabel,fontsize=16)
         x_pos = 0.0
         start_pos=0.0
@@ -273,11 +227,11 @@ class Dendogram():
         for i in range(0, int(h.SectionRef(sec=self.cell.soma).nchild()), 1):
             sec = h.SectionRef(sec=self.cell.soma).child[i]
             if sec in self.apic:
-                x_pos, start_pos = self.plot_func(sec, x_pos, color=self.get_color(sec))
+                x_pos, start_pos = self.plot_func(ax,sec, x_pos, color=self.get_color(sec))
         for i in range(0, int(h.SectionRef(sec=self.cell.soma).nchild()), 1):
             sec = h.SectionRef(sec=self.cell.soma).child[i]
             if sec not in self.apic:
-                x_pos, end_pos = self.plot_func(sec, x_pos, color=self.get_color(sec))
+                x_pos, end_pos = self.plot_func(ax,sec, x_pos, color=self.get_color(sec))
         ax.plot([start_pos, end_pos], [0] * 2, color=self.colors_dict["soma"], linewidth=1 if self.diam_factor is None else self.cell.soma.diam *self.diam_factor)
         mid_x = start_pos + abs(end_pos - start_pos) / 2.0
         ax.plot([mid_x, mid_x], [-0.01, 0], color=self.colors_dict["soma"], linewidth=1 if self.diam_factor is None else self.cell.soma.diam *self.diam_factor)
@@ -293,67 +247,42 @@ class Dendogram():
         ]
         ax.legend(handles=legend_elements, loc="best")
         if max_y is None:
-            max_y = plt.ylim()[1]
+            max_y = ax.get_ylim()[1]
         ax.set_ylim([-0.1, max_y])
-        plt.savefig(save_folder + self.name)
-        plt.savefig(save_folder + self.name+ ".pdf")
-        try:
-            pickle.dump(fig, open(save_folder + self.name+'.p', 'wb'))
-            plt.close()
-        except:pass
-
         self.done_section = set()
-
         return max_y
 
-    # def find_apic(self):
-    #     print("unsure that there isn't cell.axon that send to find_apic.py or del_axon=False")
-    #     last_dend_diam=0
-    #     for dend in self.cell.soma.children():
-    #         if not self.del_axon and self.does_axon_inside_cell:
-    #             if dend in self.cell.axon: continue
-    #         if dend.diam>last_dend_diam:
-    #             start_apic=dend
-    #             last_dend_diam=dend.diam
-    #     apics=[start_apic]
-    #     run_find_apic(apics,start_apic)
-    #     return apics
 
-if __name__ == '__main__':
-    save_folder_E = folder_save+'/E_dendogram/'
-    save_folder_M = folder_save+'/M_dendogram/'
-    create_folders_list([save_folder_E,save_folder_M])
-
-
-    E_PAS=read_from_pickle(folder_+save_dir+cell_name+'/data/electrophysio_records/short_pulse/mean_short_pulse_with_parameters.p')['E_pas']
-    # for i in [1,2,3,5,8,9,10,11,12]:
-    # path = "05_08_A_01062017_Splice_shrink_FINISHED_LABEL_Bluecell_spinec91.ASC"
-    # syn_poses['05_08_A_01062017_Splice_shrink_FINISHED_LABEL_Bluecell_spinec91']=[(-5.56, -325.88, -451.42)]
-    morph_path=glob(folder_+data_dir+"/"+cell_name+'/*'+file_type2read)[0]
-    cell=load_func(morph_path)
-    kwargs={'load_func':load_func,'E_PAS':E_PAS,'passive_val':passive_val}
-    # dendogram = Dendogram('dend_only', p, add_sec2)#@#
-    # dendogram.cumpute_distances(dendogram.cell.soma)#@#
-    dendogram=None
-    dendogram = Dendogram('dend_only', morph_path, add_sec2,**kwargs)
-    dendogram.cumpute_distances(dendogram.cell.soma)
-    max_y=dendogram.plot(save_folder_M,title=save_folder_M.split('/')[-2],ylabel="distance from soma (um)")
-
-    if len(cell.axon)>1:
-        dendogram=None
-        dendogram = Dendogram('all', morph_path, add_sec2, del_axon=False,**kwargs)
-        dendogram.cumpute_distances(dendogram.cell.soma)
-        max_y = dendogram.plot(save_folder_M,title=save_folder_M.split('/')[-2],ylabel="distance from soma (um)")
-
-    dendogram=None
-    dendogram = Dendogram('dend_only_with_syn', morph_path, add_sec,**kwargs)
-    dendogram.cumpute_distances(dendogram.cell.soma)
-    max_y = dendogram.plot(save_folder_E,title=save_folder_E.split('/')[-2],ylabel="distance from soma (lamda)")
-
-    if len(cell.axon)>1:
-        dendogram=None
-        dendogram = Dendogram('all_with_syn', morph_path, add_sec, del_axon=False,**kwargs)
-        dendogram.cumpute_distances(dendogram.cell.soma)
-        max_y = dendogram.plot(save_folder_E,title=save_folder_E.split('/')[-2],ylabel="distance from soma (lamda)")
-        dendogram=None
+def func_dendogram(ax,dirr,type='E_dendogram',with_axon=False):
+    cell_name=dirr.split('/')[1]
+    file_type2read='z_correct.swc'
+    morph_path=glob("cells_initial_information/"+cell_name+'/*'+file_type2read)[0]
+    cell=load_swc(morph_path)
+    dicty=read_from_pickle(dirr)
+    E_PAS=dicty['parameters']['E_PAS']
+    passive_val={'RA':dicty['parameters']['RA'],'CM':dicty['parameters']['CM'],'RM':dicty['parameters']['RM']}
+    kwargs={'load_func':load_swc,'E_PAS':E_PAS,'passive_val':passive_val}
+    if type=='M_dendogram':
+        if len(cell.axon)>1 and with_axon:
+            dendogram=None
+            dendogram = Dendogram('all', morph_path, add_sec2,cell_name=cell_name, del_axon=False,**kwargs)
+            dendogram.cumpute_distances(dendogram.cell.soma)
+            max_y = dendogram.plot(ax,ylabel="distance from soma (um)")
+        else:
+            dendogram=None
+            dendogram = Dendogram('dend_only', morph_path, add_sec2,**kwargs)
+            dendogram.cumpute_distances(dendogram.cell.soma)
+            max_y=dendogram.plot(ax,ylabel="distance from soma (um)")
+    elif type=='E_dendogram':
+        if len(cell.axon)>1 and with_axon:
+            dendogram=None
+            dendogram = Dendogram('all_with_syn', morph_path, add_sec, del_axon=False,**kwargs)
+            dendogram.cumpute_distances(dendogram.cell.soma)
+            max_y = dendogram.plot(ax,ylabel="distance from soma (lamda)")
+            dendogram=None
+        else:
+            dendogram=None
+            dendogram = Dendogram('dend_only_with_syn', morph_path, add_sec,**kwargs)
+            dendogram.cumpute_distances(dendogram.cell.soma)
+            max_y = dendogram.plot(ax,ylabel="distance from soma (lamda)")
     print('dendogram.py is complete to run for '+cell_name)
