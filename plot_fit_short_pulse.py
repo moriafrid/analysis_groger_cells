@@ -118,7 +118,7 @@ def plot_res_short_pusle(dirr ,RM, RA, CM,resize_diam_by=1.0,shrinkage_factor=1.
     # error_tot = np.sqrt(np.sum(np.power(exp_V - npVec, 2))/len(exp_V)) # mean square error
     plt.legend(loc='best')
     dict_result={'parameter':{'RA':RA,'CM':CM,'RM':RM,'E_PAS':E_PAS},'passive_val_name':passive_val_name,'experiment':{'T':T,'V':V},'model':{'T':npTvec,'V':npVec,'error':error_2+error_3},'fit_decay':{'T':T[decay_start:decay_end],'V':V[decay_start:decay_end],'error':error_2},'fit_Rin':{'T':T[max2fit_start:max2fit_end], 'V':V[max2fit_start:max2fit_end],'error':error_3}}
-    save_dirr=dirr+passive_val_name+'_results.p'
+    save_dirr=dirr+passive_val_name+'_pickles.p'
     plt.plot(T, V, color = 'black',alpha=0.3,label='data',lw=2)
     plt.plot(T[decay_start:decay_end], V[decay_start:decay_end], color = 'b',alpha=0.3,label='fit decay')
     plt.plot(T[max2fit_start:max2fit_end], V[max2fit_start:max2fit_end],color = 'yellow',label='fit maxV')
@@ -126,7 +126,9 @@ def plot_res_short_pusle(dirr ,RM, RA, CM,resize_diam_by=1.0,shrinkage_factor=1.
         npTvec=npTvec[:len(npVec)]
     plt.plot(npTvec, npVec, color = 'r', linestyle ="--",alpha=0.3,label='NEURON simulation')
     plt.title(cell_name)
-    plt.show()
+    # plt.show()
+    plt.close()
+
     with open(save_dirr, 'wb') as fr:
     	pickle.dump(dict_result, fr)
     return save_dirr
