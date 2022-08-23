@@ -7,7 +7,7 @@ if __name__=='__main__':
     save_dir='final_data/Figure2/'
     create_folder_dirr(save_dir)
     # print(cell_name)
-    fig = plt.figure(figsize=(20, 20))  # , sharex="row", sharey="row"
+    fig = plt.figure(figsize=(15, 15))  # , sharex="row", sharey="row"
     # fig.suptitle(cell_name, fontsize=30)# fig.set_figheight(6)
     # fig.set_figwidth(6)
     shapes = (3, 3)
@@ -37,11 +37,12 @@ if __name__=='__main__':
         # plot_syn_voltage(eval('ax3_'+str(i)),glob(base_dir+'Voltage Spine&Soma_pickles*_relative_'+decided_passive_params+'.p')[0])
         plot_neck_voltage(eval('ax3_'+str(i)),glob(base_dir+'Voltage in neck_pickles*_relative_'+decided_passive_params+'.p')[0])
         # plt.show()
-    plt.savefig(save_dir+'1.svg',dpi=500)
-    plt.savefig(save_dir+'1.pdf',dpi=500)
+    plt.savefig(save_dir+'1.svg')
+    plt.savefig(save_dir+'1.pdf')
+    plt.savefig(save_dir+'1.png')
     # pickle.dump(fig, open(save_dir+cell_name+'.p', 'wb'))  # cant work with scalebar
 
-    fig = plt.figure(figsize=(20, 20))  # , sharex="row", sharey="row"
+    fig = plt.figure(figsize=(15, 15))  # , sharex="row", sharey="row"
     # fig.suptitle(cell_name, fontsize=30)# fig.set_figheight(6)
     # fig.set_figwidth(6)
     shapes = (3, 3)
@@ -70,13 +71,12 @@ if __name__=='__main__':
         # plot_syn_voltage(eval('ax3_'+str(i)),glob(base_dir+'Voltage Spine&Soma_pickles*_relative_'+decided_passive_params+'.p')[0])
         plot_neck_voltage(eval('ax3_'+str(i)),glob(base_dir+'Voltage in neck_pickles*_relative_'+decided_passive_params+'.p')[0])
 
-    plt.savefig(save_dir+'2.svg',dpi=500)
-    plt.savefig(save_dir+'2.pdf',dpi=500)
-    plt.show()
+    plt.savefig(save_dir+'2.svg')
+    plt.savefig(save_dir+'2.pdf')
+    plt.savefig(save_dir+'2.png')
 
 
-
-    fig = plt.figure(figsize=(20, 20))  # , sharex="row", sharey="row"
+    fig = plt.figure(figsize=(15, 10))  # , sharex="row", sharey="row"
     # fig.suptitle(cell_name, fontsize=30)# fig.set_figheight(6)
     # fig.set_figwidth(6)
     shapes = (2, 4)
@@ -92,13 +92,14 @@ if __name__=='__main__':
     for cell_name in read_from_pickle('cells_name2.p'):
         if cell_name in read_from_pickle('cells_with_2_syn.p'):continue
         base_dir='final_data/'+cell_name+'/'
-        if '4-3' in cell_name: continue
+        # if '4-3' in cell_name: continue
         print(cell_name)
-        i+=1
         decided_passive_params=find_RA(base_dir)
         plot_morph(eval('ax1_'+str(i)), cell_name, before_after,without_axons=True)
         plot_syn_model(eval('ax2_'+str(i)),glob(base_dir+'AMPA&NMDA_soma_pickles_*'+decided_passive_params+'.p')[0])
-    plt.savefig(save_dir+'3.svg',dpi=500)
-    plt.savefig(save_dir+'3.pdf',dpi=500)
+        i+=1
 
+    plt.savefig(save_dir+'3.svg')
+    plt.savefig(save_dir+'3.pdf')
+    plt.savefig(save_dir+'3.png')
     plt.show()
