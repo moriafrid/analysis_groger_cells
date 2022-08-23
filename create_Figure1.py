@@ -3,7 +3,7 @@ from create_folder import create_folder_dirr
 from read_spine_properties import get_n_spinese
 from function_Figures import *
 from matplotlib import pyplot as plt
-
+import string
 if __name__=='__main__':
     for cell_name in read_from_pickle('cells_name2.p'):
         #if '4-3' in cell_name: continue
@@ -12,7 +12,7 @@ if __name__=='__main__':
         save_dir='final_data/Figure1/'
         create_folder_dirr(save_dir)
         print(cell_name)
-        fig = plt.figure(figsize=(20, 20))  # , sharex="row", sharey="row"
+        fig = plt.figure(figsize=(20, 10))  # , sharex="row", sharey="row"
         fig.suptitle(cell_name, fontsize=30)# fig.set_figheight(6)
         # fig.set_figwidth(6)
         shapes = (2, 4)
@@ -48,11 +48,15 @@ if __name__=='__main__':
             plot_pickle(ax4,base_dir+'clear_syn_after_peeling.p','clear_syn')
             plot_syn_model(ax5,glob(base_dir+'AMPA&NMDA_soma_pickles_*'+decided_passive_params+'.p')[0])
 
-            
+        # axs = axs.flat
+  
+        for n, ax in enumerate([ax1,ax2,ax3,ax4,ax5]):
+            ax.text(-0.1, 0.9, string.ascii_uppercase[n], transform=ax.transAxes, 
+                    size=20, weight='bold')      
 
-        plt.savefig(save_dir+cell_name+'.png',dpi=500)
-        plt.savefig(save_dir+cell_name+'.pdf',dpi=500)
-        plt.savefig(save_dir+cell_name+'.svg',dpi=500)
+        plt.savefig(save_dir+cell_name+'.png')
+        plt.savefig(save_dir+cell_name+'.pdf')
+        plt.savefig(save_dir+cell_name+'.svg')
         # pickle.dump(fig, open(save_dir+cell_name+'.p', 'wb'))  # cant work with scalebar
-        plt.show()
+        # plt.show()
 
