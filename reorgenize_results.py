@@ -67,6 +67,7 @@ for cell_name in read_from_pickle('cells_name2.p'):
     save_file_resize=save_file
     resize='F_shrinkage='+str(shrinkage_by)+'_dend*'+str(resize_diam_by)
     copy_file(glob(data_file+short_pulse+'z_correct.swc_SPINE_START=20/dend*'+str(resize_diam_by)+'&F_shrinkage='+str(shrinkage_by)+'/const_param/RA/analysis/RA const against errors2.p')[0],save_file_resize)
+    copy_file(glob(data_file+short_pulse+'z_correct.swc_SPINE_START=20/dend*'+str(resize_diam_by)+'&F_shrinkage='+str(shrinkage_by)+'/const_param/RA/analysis/RA_total_errors_minimums.p')[0],save_file_resize)
 
     #the best fit
     next_continue=[]
@@ -127,6 +128,7 @@ for p in files:
     if 'double' in p:
         double_spine_area='True'
     copy_file(glob(data_file+short_pulse+'z_correct.swc_SPINE_START=20/dend*'+str(resize_diam_by)+'&F_shrinkage='+str(shrinkage_by)+'/const_param/RA/analysis/RA const against errors2.p')[0],save_file_resize)
+    copy_file(glob(data_file+short_pulse+'z_correct.swc_SPINE_START=20/dend*'+str(resize_diam_by)+'&F_shrinkage='+str(shrinkage_by)+'/const_param/RA/analysis/RA_total_errors_minimums.p')[0],save_file_resize)
 
     #the best fit
     next_continue=[]
