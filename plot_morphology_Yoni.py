@@ -4,11 +4,13 @@ from glob import glob
 import numpy as np
 from matplotlib import pyplot as plt, gridspec
 import pickle5 as pickle
-
+from function_Figures import fontsize
 from convert_friction import findFraction
 from read_spine_properties import get_spine_xyz, get_n_spinese,get_sec_and_seg,get_parameter
 from open_pickle import read_from_pickle
 from matplotlib_scalebar.scalebar import ScaleBar
+from function_Figures import text_size,legend_size
+addlw=0
 L_widgh=5
 def find_xy(sec_dots,find_seg):
     dots_number=len(sec_dots[0])
@@ -44,9 +46,9 @@ def plot_morphology(ax, segment_colors, names=[], width_mult_factors=None, seg_i
                 psd_size=round(psd_size,2)
                 # psd_size=findFraction(str(psd_size))
 
-            ax.scatter(x=syn_x, y=syn_y, s=100, c='r',zorder=2,alpha=0.6,label=str(syn_num)+'  '+str(psd_size*100)+'%         '+str(round(synapse[3][syn_num],2))+'micron^2'+'\ndis from soma='+str(round(synapse[2][syn_num],2))+' micron')
+            ax.scatter(x=syn_x, y=syn_y, lw=4+addlw, c='r',zorder=2,alpha=0.6,label=str(syn_num)+'  '+str(psd_size*100)+'%         '+str(round(synapse[3][syn_num],2))+'micron^2'+'\ndis from soma='+str(round(synapse[2][syn_num],2))+' micron')
             if len(synapse[0])>1:
-                ax.text(syn_x-1,syn_y-2,syn_num,color='black',**{'size':'12'})
+                ax.text(syn_x-1,syn_y-2,syn_num,color='black',**{'size':str(text_size-1)})
 
     # plot the cell morphology
     for key in all_seg_inds:
@@ -62,22 +64,23 @@ def plot_morphology(ax, segment_colors, names=[], width_mult_factors=None, seg_i
         seg_y_coords = seg_ind_to_xyz_coords_map[key]['y']
 
         if np.isscalar(seg_ind_to_xyz_coords_map[key]['x']):
-            ax.scatter(seg_x_coords, seg_y_coords,s=500, color=seg_color,zorder=2)
+            ax.scatter(seg_x_coords, seg_y_coords,lw=10, color=seg_color,zorder=2)
         else:
             ax.plot(seg_x_coords, seg_y_coords, lw=seg_line_width, color=seg_color,zorder=1)
-        plt.rcParams.update({'font.size': 12})
+        plt.rcParams.update({'font.size': fontsize})
 
     if names != []:
         for ind in all_seg_inds:
             ax.text(np.max(seg_ind_to_xyz_coords_map[key]['x']), np.max(seg_ind_to_xyz_coords_map[key]['y']),
                     names[ind])
-    ax.legend(loc='upper right',prop={'size':12})
+
+    ax.legend(loc='upper right',prop={'size':legend_size})
     # leg = ax.get_legend()
     # leg.legendHandles[0].set_color('red')
     # leg.legendHandles[1].set_color('yellow')
 
     ax.add_artist(ScaleBar(1, "um", fixed_value=50, location="lower center",rotation="horizontal"))
-    plt.rcParams.update({'font.size': L_widgh})
+    # plt.rcParams.update({'font.size': L_widgh})
 
     ax.set_axis_off()
 
