@@ -45,10 +45,14 @@ def plot_morphology(ax, segment_colors, names=[], width_mult_factors=None, seg_i
             else:
                 psd_size=round(psd_size,2)
                 # psd_size=findFraction(str(psd_size))
-
-            ax.scatter(x=syn_x, y=syn_y, lw=4+addlw, c='r',zorder=2,alpha=0.6,label=str(syn_num)+'  '+str(psd_size*100)+'%         '+str(round(synapse[3][syn_num],2))+'micron^2'+'\ndis from soma='+str(round(synapse[2][syn_num],2))+' micron')
+            color=['#03d7fc','#fc8003'][int(np.where(np.array(synapse[0])==seg_ind_to_xyz_coords_map[seg_ind]['sec name'])[0])]
+            label=' PSD='+str(round(synapse[3][syn_num],2))+'\u03BCm^2; '+str(round(synapse[2][syn_num],2))+' \u03BCm from the soma   '+str(psd_size*100)+'%'
+            # label=str(syn_num)+'  '+str(psd_size*100)+'%         '+str(round(synapse[3][syn_num],2))+'micron^2'+'\ndis from soma='+str(round(synapse[2][syn_num],2))+' micron'
             if len(synapse[0])>1:
-                ax.text(syn_x-1,syn_y-2,syn_num,color='black',**{'size':str(text_size-1)})
+                ax.scatter(x=syn_x, y=syn_y, lw=6+addlw, c=color,zorder=2,alpha=1,label=str(syn_num)+label)
+                ax.text(syn_x-3,syn_y-3,syn_num,color='white',**{'size':str(text_size-1)})
+            else:
+                ax.scatter(x=syn_x, y=syn_y, lw=6+addlw, c='red',zorder=2,alpha=1,label=label)
 
     # plot the cell morphology
     for key in all_seg_inds:
@@ -64,7 +68,7 @@ def plot_morphology(ax, segment_colors, names=[], width_mult_factors=None, seg_i
         seg_y_coords = seg_ind_to_xyz_coords_map[key]['y']
 
         if np.isscalar(seg_ind_to_xyz_coords_map[key]['x']):
-            ax.scatter(seg_x_coords, seg_y_coords,lw=10, color=seg_color,zorder=2)
+            ax.scatter(seg_x_coords, seg_y_coords,lw=12, color=seg_color,zorder=2)
         else:
             ax.plot(seg_x_coords, seg_y_coords, lw=seg_line_width, color=seg_color,zorder=1)
         plt.rcParams.update({'font.size': fontsize})
