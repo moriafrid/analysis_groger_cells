@@ -49,13 +49,14 @@ if __name__=='__main__':
             plot_syn_model(ax5,glob(base_dir+'AMPA&NMDA_soma_pickles_*'+decided_passive_params+'.p')[0])
 
         # axs = axs.flat
-  
+        latter=['A','B','C','D','E']
         for n, ax in enumerate([ax1,ax2,ax3,ax4,ax5]):
+        #string.ascii_uppercase[n]
             ax.text(-0.1, 0.9, string.ascii_uppercase[n], transform=ax.transAxes, 
                     size=20, weight='bold')      
 
         plt.savefig(save_dir+cell_name+'.png')
-        plt.savefig(save_dir+cell_name+'.pdf')
+        # plt.savefig(save_dir+cell_name+'.pdf')
         plt.savefig(save_dir+cell_name+'.svg')
         # pickle.dump(fig, open(save_dir+cell_name+'.p', 'wb'))  # cant work with scalebar
         # plt.show()

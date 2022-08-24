@@ -23,7 +23,7 @@ plt.rc('xtick', labelsize=10)    # fontsize of the tick labels
 plt.rc('ytick', labelsize=10)    # fontsize of the tick labels
 plt.rc('legend', fontsize=legend_size)    # legend fontsize
 plt.rc('figure', titlesize=22)  # fontsize of the figure title
-
+#plt.rcParams.update({ "text.usetex": True,"font.family": "Helvetica"})
 place=["A","B","C","D","E","F","G","H","I","J","K","L","M","N","O","P","Q","R","S","T","U","V","W","X","Y","Z","a","b","c","d","e","f"]
 # folder_='cells_outputs_data_short/'+cell_name
 # folder_='cells_outputs_data_3_initial_cells/'+cell_name
@@ -139,8 +139,11 @@ def plot_short_pulse_model(ax,dirr):
     ax.plot(fit_max['T'], fit_max['V']-E_PAS,color = 'yellow',alpha=0.8,label='fit maxV',lw=6+addlw)
     ax.plot(model['T'][:len(model['V'])], model['V']-E_PAS, color = 'red', linestyle ="-",alpha=1,label='Model',lw=3+addlw)
     plt.rcParams.update({'font.size': text_size})
-    print('\u03A9')
-    ax.text(500,-5,"RM="+str(round(parameters['RM']))+" \u03A9*cm^2\nRA="+str(round(parameters['RA']))+" \u03A9*cm\nCM="+str(round(parameters['CM'],1))+" \u03BCf/cm^2",size='large')
+    RM_text="R_m="+str(round(parameters['RM']))+"\u03A9cm^2"
+    RA_text="R_a="+str(round(parameters['RA']))+"\u03A9cm"+"\n"
+    CM_text="C_m="+str(round(parameters['CM'],1))+" \u03BCf/cm^2"+"\n"
+    ax.text(500,2,RA_text+CM_text+RM_text,size='medium')
+    #ax.text(500,-5,"RM="+str(round(parameters['RM']))+" "+'\u03A9cm^2'+"\nRA="+str(round(parameters['RA']))+" \u03A9cm\nCM="+str(roun (parameters['CM'],1))+" \u03BCf/cm^2",size='large')
     ax.legend(loc='upper left',prop={'size': legend_size})
     add_scale_bar(ax,'fit_short_pulse',dirr)
     return ax
@@ -181,9 +184,10 @@ def plot_syn_model2(ax,dirr):
             label_NMDA='NMDA '+str(NMDA_weight)+'nS'
         else:
             num=int(re.findall(r'\d+', k)[0])
-
-            label_AMPA='AMPA '+str(round(AMPA_weight*reletive_strengths[num]/sum(reletive_strengths),3))+'nS '+str(round(reletive_strengths[num]*100))+"%"
-            label_NMDA='NMDA '+str(round(NMDA_weight*reletive_strengths[num]/sum(reletive_strengths),3))+'nS '+str(round(reletive_strengths[num]*100))+"%"
+            label_AMPA='AMPA '+str(round(AMPA_weight*reletive_strengths[num]/sum(reletive_strengths),3))+'nS'
+            label_NMDA='NMDA '+str(round(NMDA_weight*reletive_strengths[num]/sum(reletive_strengths),3))+'nS'
+#            label_AMPA='AMPA '+str(round(AMPA_weight*reletive_strengths[num]/sum(reletive_strengths),3))+'nS '+str(round(reletive_strengths[num]*100))+"%"
+#            label_NMDA='NMDA '+str(round(NMDA_weight*reletive_strengths[num]/sum(reletive_strengths),3))+'nS '+str(round(reletive_strengths[num]*100))+"%"
 
         ax.plot(T,V[k]['V_soma_AMPA']-E_PAS,'-',c=color,lw=3+addlw,label=label_AMPA,alpha=0.8)
         ax.plot(T,V[k]['V_soma_NMDA']-E_PAS,'--',c=color,lw=3+addlw,label=label_NMDA,alpha=0.8)
@@ -225,7 +229,7 @@ def plot_neck_voltage(ax,dirr):
     ax.legend(loc="lower center", bbox_to_anchor=(0.5, -0.2),prop={'size': legend_size})
     x_to_ms=lambda x: x
 
-    ax.add_artist(AnchoredHScaleBar(size_x=10, size_y=max(size_y_scal_bar)-2, frameon=False, ax=ax, x_to_ms=x_to_ms,
+    ax.add_artist(AnchoredHScaleBar(size_x=6, size_y=round((max(size_y_scal_bar)-0)/4), frameon=False, ax=ax, x_to_ms=x_to_ms,
                                 sep=5, loc="upper right", linekw=dict(color="k", linewidth=2+addlw/2),))
     # start=75
     # ax.set_xlim(left=start,right=start+100)
@@ -278,7 +282,7 @@ def plot_pickle(ax,dirr,scale_bar_type=None,remove_begin=True,wigth_factor=1):
             if not scale_bar_type is None:
                 if "clear" in scale_bar_type:
                     try:
-                        alpha=line.get_alpha()/2
+                        alpha=line.get_alpha()*5/6
                     except:
                         alpha=1
                     ax.plot(x,y,line.get_linestyle(),color=line.get_color(),lw=line.get_lw()*wigth_factor+int(np.ceil(addlw/2)),alpha=alpha,label=label)
@@ -318,7 +322,7 @@ def add_scale_bar(ax,type='',dirr=''):
         x_lim=300
     else:
         x_lim=ax.get_xlim()[1]-ax.get_xlim()[0]
-
+        
     right=ax.get_xlim()[1]
     ax.set_xlim(left=max(0, right-x_lim),right = right)
     y_units = ax.get_ylim()[1] - ax.get_ylim()[0]
@@ -327,6 +331,8 @@ def add_scale_bar(ax,type='',dirr=''):
     x_txt = 50  # ms
     add_x, add_y = 100,  1  # ms, mv - scalebar size
     add_y=round(y_units/5)
+    if type=='fit_syn':
+        add_y=round(y_units/5,1)
     j=0
     while add_y==0:
         j+=1
@@ -338,7 +344,15 @@ def add_scale_bar(ax,type='',dirr=''):
     if not is_ms_diff:  # in sec
         add_x /= 1000
         x_to_ms=lambda x: x / 1000
-    if "fit" in type:
+    if "fit_short_pulse" == type:
+        print("fit_short_pulse is find")
+        if'04_03_B' in dirr:
+            loc="lower left" 
+        else:
+            loc="lower right"      
         ax.add_artist(AnchoredHScaleBar(size_x=x_txt, size_y=add_y, frameon=False, ax=ax, x_to_ms=x_to_ms,
-                                        sep=5, loc="upper right",linekw=dict(color="k", linewidth=2+int(np.ceil(addlw/2))),))
+                                        sep=5, loc=loc,linekw=dict(color="k", linewidth=2+int(np.ceil(addlw/2))),))
+    elif "fit_syn" == type:
+        ax.add_artist(AnchoredHScaleBar(size_x=x_txt, size_y=add_y, frameon=False, ax=ax, x_to_ms=x_to_ms,
+                                        sep=5, loc="upper right",linekw=dict(color="k", linewidth=2+int(np.ceil(addlw/2))),))    
     ax.set_axis_off()
