@@ -17,10 +17,10 @@ label_size=8
 font = {'size' : text_size}
 
 plt.rc('font', size=20)          # controls default text sizes
-plt.rc('axes', titlesize=12)     # fontsize of the axes title
-plt.rc('axes', labelsize=10)    # fontsize of the x and y labels
-plt.rc('xtick', labelsize=10)    # fontsize of the tick labels
-plt.rc('ytick', labelsize=10)    # fontsize of the tick labels
+plt.rc('axes', titlesize=16)     # fontsize of the axes title
+plt.rc('axes', labelsize=16)    # fontsize of the x and y labels
+plt.rc('xtick', labelsize=15)    # fontsize of the tick labels
+plt.rc('ytick', labelsize=15)    # fontsize of the tick labels
 plt.rc('legend', fontsize=legend_size)    # legend fontsize
 plt.rc('figure', titlesize=22)  # fontsize of the figure title
 #plt.rcParams.update({ "text.usetex": True,"font.family": "Helvetica"})
@@ -125,7 +125,7 @@ def find_RA(file_dirr):
         if len(try_find)>0:
             return passive_params
     return 'there is no decided passive parameters founded'
-def plot_short_pulse_model(ax,dirr):
+def plot_short_pulse_model(ax,dirr,antil_point=-1):
     global  E_PAS,parameters
     dict_result=read_from_pickle(dirr)
     experiment=dict_result['experiment']
@@ -134,42 +134,40 @@ def plot_short_pulse_model(ax,dirr):
     fit_max=dict_result['fit_Rin']
     parameters=dict_result['parameter']
     E_PAS=parameters['E_PAS']
-    ax.plot(experiment['T'], experiment['V']-E_PAS, color = 'black',alpha=0.2,label='experiment',lw=10+addlw*2)
-    ax.plot(fit_decay['T'], fit_decay['V']-E_PAS, color = 'b',alpha=0.3,label='fit decay',lw=6+addlw)
-    ax.plot(fit_max['T'], fit_max['V']-E_PAS,color = 'yellow',alpha=0.8,label='fit maxV',lw=6+addlw)
-    ax.plot(model['T'][:len(model['V'])], model['V']-E_PAS, color = 'red', linestyle ="-",alpha=1,label='Model',lw=3+addlw)
+    ax.plot(experiment['T'][:antil_point], experiment['V'][:antil_point]-E_PAS, color = 'black',alpha=0.2,label='experiment',lw=10+addlw*2)
+    ax.plot(fit_decay['T'][:antil_point], fit_decay['V'][:antil_point]-E_PAS, color = 'b',alpha=0.3,label='fit decay',lw=6+addlw)
+    ax.plot(fit_max['T'][:antil_point], fit_max['V'][:antil_point]-E_PAS,color = 'yellow',alpha=0.8,label='fit maxV',lw=6+addlw)
+    ax.plot(model['T'][:len(model['V'])][:antil_point], model['V'][:antil_point]-E_PAS, color = 'red', linestyle ="-",alpha=1,label='Model',lw=3+addlw)
     plt.rcParams.update({'font.size': text_size})
     RM_text="R_m="+str(round(parameters['RM']))+"\u03A9cm^2"
     RA_text="R_a="+str(round(parameters['RA']))+"\u03A9cm"+"\n"
     CM_text="C_m="+str(round(parameters['CM'],1))+" \u03BCf/cm^2"+"\n"
-    ax.text(500,2,RA_text+CM_text+RM_text,size='medium')
+    ax.text(0.6,0.9,RA_text+CM_text+RM_text,transform=ax.transAxes,size='medium')
     #ax.text(500,-5,"RM="+str(round(parameters['RM']))+" "+'\u03A9cm^2'+"\nRA="+str(round(parameters['RA']))+" \u03A9cm\nCM="+str(roun (parameters['CM'],1))+" \u03BCf/cm^2",size='large')
     ax.legend(loc='upper left',prop={'size': legend_size})
     add_scale_bar(ax,'fit_short_pulse',dirr)
     return ax
 
-def plot_syn_model(ax,dirr):
+def plot_syn_model(ax,dirr,start_point=0):
     dict_syn=read_from_pickle(dirr)
     E_PAS=dict_syn['parameters']['E_PAS']
     dict_result=read_from_pickle(glob(dirr[:dirr.rfind('/')]+'/final_pop'+dirr[dirr.rfind('pickles_')+7:])[0])
     T=dict_syn['time']
     V=dict_syn['voltage']
-    ax.plot(T,V['experiment']-E_PAS,color = 'black',alpha=0.2,label='experiment',lw=10+addlw*2)
-    ax.plot(T,V['Model']-E_PAS,c='red',label='Model',alpha=1,lw=4+addlw)
-    ax.plot(T,V['V_AMPA']-E_PAS,c='#18852a',linestyle ="--",alpha=1,lw=3+addlw)
-    ax.plot(T,V['V_NMDA']-E_PAS,c='#03b5fc',linestyle ="--",alpha=1,lw=3+addlw)
+    ax.plot(T[start_point:],V['experiment'][start_point:]-E_PAS,color = 'black',alpha=0.2,label='experiment',lw=10+addlw*2)
+    ax.plot(T[start_point:],V['Model'][start_point:]-E_PAS,c='red',label='Model',alpha=1,lw=4+addlw)
+    ax.plot(T,V['V_AMPA'][start_point:]-E_PAS,c='#18852a',linestyle ="--",alpha=1,lw=3+addlw)
+    ax.plot(T,V['V_NMDA'][start_point:]-E_PAS,c='#03b5fc',linestyle ="--",alpha=1,lw=3+addlw)
     plt.rcParams.update({'font.size': text_size})
     place_text=0.5
     xplace=T[0]
     yplace=V['Model'][0]-E_PAS-0.3
-    ax.text(T[0],yplace,dict_result['parameters'][0]+'='+str(round(dict_result['mean_final_pop'][0]*1000,2))+'[nS]',c='#18852a')
-    ax.text(T[0],yplace-0.3,dict_result['parameters'][1]+'='+str(round(dict_result['mean_final_pop'][1]*1000,2))+'[nS]',c='#03b5fc')
-    # ax.text(200,place_text,dict_result['parameters'][0]+'='+str(round(dict_result['mean_final_pop'][0]*1000,2))+'[nS]',c='#18852a')
-    # ax.text(200,place_text-0.2,dict_result['parameters'][1]+'='+str(round(dict_result['mean_final_pop'][1]*1000,2))+'[nS]',c='#03b5fc')
+    ax.text(T[int(len(T)/2)],yplace,'g_max AMPA='+str(round(dict_result['mean_final_pop'][0]*1000,2))+' [nS]',c='#18852a')#dict_result['parameters'][0]
+    ax.text(T[int(len(T)/2)],yplace-0.3,'g_max NMDA='+str(round(dict_result['mean_final_pop'][1]*1000,2))+' [nS]',c='#03b5fc')#dict_result['parameters'][1]
     ax.legend(loc="upper left",prop={'size': legend_size})
     add_scale_bar(ax,'fit_syn')
 
-def plot_syn_model2(ax,dirr):
+def plot_syn_model2(ax,dirr,start_point=0):
     dict_syn=read_from_pickle(dirr)
     E_PAS=dict_syn[-1]['parameters']['E_PAS']
     dict_result=read_from_pickle(glob(dirr[:dirr.rfind('/')]+'/final_pop'+dirr[dirr.rfind('pickles_')+7:])[0])
@@ -184,26 +182,26 @@ def plot_syn_model2(ax,dirr):
             label_NMDA='NMDA '+str(NMDA_weight)+'nS'
         else:
             num=int(re.findall(r'\d+', k)[0])
-            label_AMPA='AMPA '+str(round(AMPA_weight*reletive_strengths[num]/sum(reletive_strengths),3))+'nS'
-            label_NMDA='NMDA '+str(round(NMDA_weight*reletive_strengths[num]/sum(reletive_strengths),3))+'nS'
+            label_AMPA='AMPA '+str(round(AMPA_weight*reletive_strengths[num]/sum(reletive_strengths),3))+' nS'
+            label_NMDA='NMDA '+str(round(NMDA_weight*reletive_strengths[num]/sum(reletive_strengths),3))+' nS'
 #            label_AMPA='AMPA '+str(round(AMPA_weight*reletive_strengths[num]/sum(reletive_strengths),3))+'nS '+str(round(reletive_strengths[num]*100))+"%"
 #            label_NMDA='NMDA '+str(round(NMDA_weight*reletive_strengths[num]/sum(reletive_strengths),3))+'nS '+str(round(reletive_strengths[num]*100))+"%"
 
-        ax.plot(T,V[k]['V_soma_AMPA']-E_PAS,'-',c=color,lw=3+addlw,label=label_AMPA,alpha=0.8)
-        ax.plot(T,V[k]['V_soma_NMDA']-E_PAS,'--',c=color,lw=3+addlw,label=label_NMDA,alpha=0.8)
+        ax.plot(T[start_point:],V[k]['V_soma_AMPA'][start_point:]-E_PAS,'-',c=color,lw=3+addlw,label=label_AMPA,alpha=0.8)
+        ax.plot(T[start_point:],V[k]['V_soma_NMDA'][start_point:]-E_PAS,'--',c=color,lw=3+addlw,label=label_NMDA,alpha=0.8)
         # ax.text(200,place_text,dict_result['parameters'][0]+'='+str(round(dict_result['mean_final_pop'][0]*1000,2))+'[nS]',c=color)
         # ax.text(200,place_text-0.2,dict_result['parameters'][1]+'='+str(round(dict_result['mean_final_pop'][1]*1000,2))+'[nS]',c=color)
 
 
-    ax.plot(T,V['voltage_all']['experiment']-E_PAS,color = 'black',alpha=0.2,label='experiment',lw=12+addlw)
+    ax.plot(T[start_point:],V['voltage_all']['experiment'][start_point:]-E_PAS,color = 'black',alpha=0.2,label='experiment',lw=12+addlw)
     # place_text=0.5
     plt.rcParams.update({'font.size': text_size})
     # ax.text(200,place_text,dict_result['parameters'][0]+'='+str(round(dict_result['mean_final_pop'][0]*1000,2))+'[nS]',c='#18852a')
     # ax.text(200,place_text-0.2,dict_result['parameters'][1]+'='+str(round(dict_result['mean_final_pop'][1]*1000,2))+'[nS]',c='#03b5fc')
     
-    ax.legend(loc="lower center", bbox_to_anchor=(0.7, -0.3),prop={'size': legend_size-2})
+    ax.legend(loc="lower center", bbox_to_anchor=(1, 0.35),prop={'size': legend_size-2})
     add_scale_bar(ax,'fit_syn')
-def plot_neck_voltage(ax,dirr):
+def plot_neck_voltage(ax,dirr,start_point=900):
     dict_syn=read_from_pickle(dirr)
     cell_name=dirr.split('/')[1]
     RA=dict_syn['parameters']['RA']  
@@ -216,17 +214,16 @@ def plot_neck_voltage(ax,dirr):
     for k,color,label in zip(['voltage_0','voltage_1'],['#03d7fc','#fc8003'],['syn_0','syn1']):
         Rneck=calculate_Rneck(cell_name,RA,num) #chnage to be in Mega
         antil_point=len(V[k]['V_base_neck'])-1300#int(len(V[k]['V_base_neck'])*2/3)
-        from_point=900
-        T_temp=T[from_point:antil_point]
-        ax.plot(T_temp,V[k]['V_base_neck'][from_point:antil_point]-E_PAS,c='black',lw=3+addlw,alpha=0.5,zorder=2)
-        ax.plot(T_temp,V[k]['V_head'][from_point:antil_point]-E_PAS,'-',c=color,lw=4+addlw,alpha=0.8,label=str(round(Rneck,2))+'MOhm',zorder=1)
-        ax.plot(T_temp,V[k]['V_base_neck'][from_point:antil_point]-E_PAS,linestyle='dashdot',alpha=0.8,dashes=[2, 3],c=color,lw=2+addlw,zorder=3)
+        T_temp=T[start_point:antil_point]
+        ax.plot(T_temp,V[k]['V_base_neck'][start_point:antil_point]-E_PAS,c='black',lw=3+addlw,alpha=0.5,zorder=2)
+        ax.plot(T_temp,V[k]['V_head'][start_point:antil_point]-E_PAS,'-',c=color,lw=4+addlw,alpha=0.8,label=str(round(Rneck,2))+' MOhm',zorder=1)
+        ax.plot(T_temp,V[k]['V_base_neck'][start_point:antil_point]-E_PAS,linestyle='dashdot',alpha=0.8,dashes=[2, 3],c=color,lw=2+addlw,zorder=3)
 
         size_y_scal_bar.append(int(max(V[k]['V_head'])-E_PAS))
         num+=1
     # place_text=0.5
     plt.rcParams.update({'font.size': text_size})
-    ax.legend(loc="lower center", bbox_to_anchor=(0.5, -0.2),prop={'size': legend_size})
+    ax.legend(loc="lower center", bbox_to_anchor=(0.8, 0.5),prop={'size': legend_size+2})
     x_to_ms=lambda x: x
 
     ax.add_artist(AnchoredHScaleBar(size_x=6, size_y=round((max(size_y_scal_bar)-0)/4), frameon=False, ax=ax, x_to_ms=x_to_ms,
@@ -258,7 +255,7 @@ def plot_syn_voltage(ax,dirr):
     ax.set_xlim(left=start,right=start+100)
     ax.set_axis_off()
 
-def plot_pickle(ax,dirr,scale_bar_type=None,remove_begin=True,wigth_factor=1):
+def plot_pickle(ax,dirr,scale_bar_type=None,remove_begin=True,wigth_factor=1,antil_point=-1):
     plt.rc('font', size=text_size)
     fig1=read_from_pickle(dirr)
     ax_temp=fig1.gca()
@@ -294,7 +291,11 @@ def plot_pickle(ax,dirr,scale_bar_type=None,remove_begin=True,wigth_factor=1):
 
 
     if not scale_bar_type is None:
-        add_scale_bar(ax,scale_bar_type,dirr)
+        if 'syn' in scale_bar_type:
+            end_point=1.7
+        else:
+            end_point=0
+        add_scale_bar(ax,scale_bar_type,dirr,end_point=end_point)
         ax.plot(x,np.mean(mean_cal,axis=0),color='black',lw=line.get_lw()*wigth_factor+addlw)
     else:
         ax.legend(loc="upper center", bbox_to_anchor=(0.5, 1.3),prop={'size': legend_size-1})
@@ -304,7 +305,7 @@ def plot_pickle(ax,dirr,scale_bar_type=None,remove_begin=True,wigth_factor=1):
 
 
     return ax
-def add_scale_bar(ax,type='',dirr=''):
+def add_scale_bar(ax,type='',dirr='',end_point=0):
     start_place=0
     # args = dict(transform=ax.transData)
     if type=='clear_short_pulse':
@@ -316,13 +317,12 @@ def add_scale_bar(ax,type='',dirr=''):
         if '6-7' in dirr:
             x_lim=600
     elif type=='clear_syn':
-        x_lim=0.3
-
+        x_lim=0.2
+        end_point=1.7
     elif type=='fit_syn':
-        x_lim=300
+        x_lim=200
     else:
         x_lim=ax.get_xlim()[1]-ax.get_xlim()[0]
-        
     right=ax.get_xlim()[1]
     ax.set_xlim(left=max(0, right-x_lim),right = right)
     y_units = ax.get_ylim()[1] - ax.get_ylim()[0]
@@ -354,5 +354,5 @@ def add_scale_bar(ax,type='',dirr=''):
                                         sep=5, loc=loc,linekw=dict(color="k", linewidth=2+int(np.ceil(addlw/2))),))
     elif "fit_syn" == type:
         ax.add_artist(AnchoredHScaleBar(size_x=x_txt, size_y=add_y, frameon=False, ax=ax, x_to_ms=x_to_ms,
-                                        sep=5, loc="upper right",linekw=dict(color="k", linewidth=2+int(np.ceil(addlw/2))),))    
+                                        sep=5, loc="upper right",linekw=dict(color="k", linewidth=2+int(np.ceil(addlw/2))),))
     ax.set_axis_off()
