@@ -47,7 +47,7 @@ class AnchoredHScaleBar(matplotlib.offsetbox.AnchoredOffsetbox):
         else:  # todo flip direction as well?
             print(dir(matplotlib.offsetbox.TextArea))
             txt_x = matplotlib.offsetbox.TextArea("{0} {1}".format(size_x, x_units), textprops=txtkw)
-            txt_y = matplotlib.offsetbox.TextArea("{0} {1}".format(size_y, y_units), textprops=txtkw)
+            txt_y = matplotlib.offsetbox.TextArea("{0} {1}".format(size_y, y_units),textprops=txtkw)
             children = [txt_y, matplotlib.offsetbox.VPacker(children=[size_bar, txt_x], align="center", pad=ppad, sep=sep)]
             packer = matplotlib.offsetbox.HPacker
         self.vpac = packer(children=children, align="center", pad=ppad, sep=sep)
