@@ -8,12 +8,14 @@ if __name__=='__main__':
     for cell_name in read_from_pickle('cells_name2.p'):
         #if '4-3' in cell_name: continue
         before_after='_after_shrink'
+        #'final_data_after_shrink_with_mistak#
         base_dir='final_data/'+cell_name+'/'
         save_dir='final_data/Figure1/'
         create_folder_dirr(save_dir)
         print(cell_name)
         fig = plt.figure(figsize=(20, 10))  # , sharex="row", sharey="row"
         fig.suptitle(cell_name, fontsize=30)# fig.set_figheight(6)
+        fig.subplots_adjust(left=0.01,right=0.99,top=0.94,bottom=0.05,hspace=0.01, wspace=0.05)
         # fig.set_figwidth(6)
         shapes = (2, 4)
         ax1 = plt.subplot2grid(shape=shapes, loc=(0, 0), rowspan=2, colspan=2)
@@ -32,14 +34,7 @@ if __name__=='__main__':
             plot_pickle(ax2,base_dir+'clear_short_pulse_after_peeling.p','clear_short_pulse')
             plot_short_pulse_model(ax3,glob(base_dir+decided_passive_params+'_pickles.p')[0])
             plot_syn_model2(ax4,glob(base_dir+'AMPA&NMDA_soma_seperete_pickles*_relative_'+decided_passive_params+'.p')[0])
-            # morph_path=glob("cells_initial_information/"+cell_name+'/*'+before_after+'.swc')[0]
-            # dendogram=None
-            # dendogram = Dendogram('dend_only', morph_path, add_sec2,load_func=load_swc,E_PAS=E_PAS,passive_val={"RM":parameters['RM'],"RA":parameters['RA'],"CM":parameters['CM']})
-            # dendogram.cumpute_distances(dendogram.cell.soma)
-            # max_y=dendogram.plot(base_dir,ax=ax4,title='',ylabel="distance from soma (um)")
-            # plot_pickle(ax5,glob(base_dir+'Voltage Spine&Soma_full_relative_'+decided_passive_params+'.p')[0])
-            # plot_syn_voltage(ax5,glob(base_dir+'Voltage Spine&Soma_pickles*relative_'+decided_passive_params+'.p')[0])
-            plot_neck_voltage(ax5,glob(base_dir+'Voltage in neck_pickles*'+decided_passive_params+'.p')[0])
+            plot_neck_voltage(ax5,glob(base_dir+'Voltage in neck_pickles*'+decided_passive_params+'.p')[0],start_point=970)
         else:
             ax3 = plt.subplot2grid(shape=shapes, loc=(0, 3), colspan=1, rowspan=1, sharey=ax2) # , sharex=ax2
             ax5 = plt.subplot2grid(shape=shapes, loc=(1, 3), colspan=1, rowspan=1, sharey=ax4) # , sharex=ax4
@@ -52,8 +47,7 @@ if __name__=='__main__':
         latter=['A','B','C','D','E']
         for n, ax in enumerate([ax1,ax2,ax3,ax4,ax5]):
         #string.ascii_uppercase[n]
-            ax.text(-0.1, 0.9, string.ascii_uppercase[n], transform=ax.transAxes, 
-                    size=20, weight='bold')      
+            ax.text(-0.1, 0.9, string.ascii_uppercase[n], transform=ax.transAxes, size=25)
 
         plt.savefig(save_dir+cell_name+'.png')
         # plt.savefig(save_dir+cell_name+'.pdf')
