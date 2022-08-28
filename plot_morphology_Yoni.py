@@ -49,10 +49,10 @@ def plot_morphology(ax, segment_colors, names=[], width_mult_factors=None, seg_i
             label=' PSD='+str(round(synapse[3][syn_num],2))+'\u03BCm^2; '+str(round(synapse[2][syn_num],2))+' \u03BCm from the soma   '+str(psd_size*100)+'%'
             # label=str(syn_num)+'  '+str(psd_size*100)+'%         '+str(round(synapse[3][syn_num],2))+'micron^2'+'\ndis from soma='+str(round(synapse[2][syn_num],2))+' micron'
             if len(synapse[0])>1:
-                ax.scatter(x=syn_x, y=syn_y, lw=6+addlw, c=color,zorder=2,alpha=1,label=str(syn_num)+label)
-                ax.text(syn_x-3,syn_y-3,syn_num,color='white',**{'size':str(text_size-1)})
+                ax.scatter(x=syn_x, y=syn_y, lw=10+addlw, c=color,zorder=2,alpha=1,label=str(syn_num)+label)
+                # ax.text(syn_x-3,syn_y-3,syn_num,color='white',**{'size':str(text_size)})
             else:
-                ax.scatter(x=syn_x, y=syn_y, lw=6+addlw, c='red',zorder=2,alpha=1,label=label)
+                ax.scatter(x=syn_x, y=syn_y, lw=8+addlw, c='red',zorder=2,alpha=1,label=label)
 
     # plot the cell morphology
     for key in all_seg_inds:
@@ -68,7 +68,9 @@ def plot_morphology(ax, segment_colors, names=[], width_mult_factors=None, seg_i
         seg_y_coords = seg_ind_to_xyz_coords_map[key]['y']
 
         if np.isscalar(seg_ind_to_xyz_coords_map[key]['x']):
+            ax.scatter(seg_x_coords, seg_y_coords,lw=15, color=seg_color,zorder=2)
             ax.scatter(seg_x_coords, seg_y_coords,lw=12, color=seg_color,zorder=2)
+
         else:
             ax.plot(seg_x_coords, seg_y_coords, lw=seg_line_width, color=seg_color,zorder=1)
         plt.rcParams.update({'font.size': fontsize})
@@ -78,7 +80,7 @@ def plot_morphology(ax, segment_colors, names=[], width_mult_factors=None, seg_i
             ax.text(np.max(seg_ind_to_xyz_coords_map[key]['x']), np.max(seg_ind_to_xyz_coords_map[key]['y']),
                     names[ind])
 
-    ax.legend(loc='upper right',prop={'size':legend_size})
+    ax.legend(loc='upper right',prop={'size':legend_size},bbox_to_anchor=(1, 0.9))
     # leg = ax.get_legend()
     # leg.legendHandles[0].set_color('red')
     # leg.legendHandles[1].set_color('yellow')
@@ -94,7 +96,7 @@ def plot_morph(ax, cell_name, before_after,without_axons=True):
 
     num_segments=len(seg_ind_to_xyz_coords_map)
     segment_colors_selected = np.zeros(num_segments)
-    segment_widths_selected = 5 * np.ones(segment_colors_selected.shape)
+    segment_widths_selected = 6 * np.ones(segment_colors_selected.shape)
     synapses=list(get_sec_and_seg(cell_name,with_distance=True))+[get_parameter(cell_name,'PSD')]
     print(synapses)
     # synapses=[get_spine_xyz(cell_name,i) for i in range(get_n_spinese(cell_name))]
