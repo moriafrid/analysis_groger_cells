@@ -25,7 +25,7 @@ os.system('python csv_for_passive_val_results.py cells_name2.p '+before_after)
 
 
 for cell_name in read_from_pickle(cells_name_place):
-    if cell_name!='2017_07_06_C_3-4':continue
+    if cell_name!='2017_04_03_B':continue
     # if cell_name in ['2017_03_04_A_6-7','2017_05_08_A_5-4']:continue#'2017_07_06_C_4-3','2017_07_06_C_3-4',
 
     # if cell_name=='2017_07_06_C_4-3':
