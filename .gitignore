@@ -140,6 +140,7 @@ cells_outputs_data_short_before_10_shrinkage/
 cells_outputs_data_after_10_shrinkage/
 cells_outputs_data_after_10_shrink/
 drivesync/
+cells_ASC_swc/
 
 final_data/
 final_data_with_mean_syn0.p/
@@ -148,6 +149,8 @@ final_data_before_shrink/
 final_data_after_shrink_with_mistak/
 final_data_before_change_seg/
 drobox/
+
+cells_initial_information/*/dict_morphology/
 
 David_kaggel_data/
 x86_64/
