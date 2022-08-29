@@ -7,7 +7,7 @@ from neuron import h
 from glob import glob
 import numpy as np
 import sys
-if len(sys.argv[1])!=2:
+if len(sys.argv)!=2:
     numver=0
 else:
     numbe=int(sys.argv[1])
