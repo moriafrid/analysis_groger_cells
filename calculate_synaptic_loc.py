@@ -14,7 +14,7 @@ signal.signal(signal.SIGSEGV, SIGSEGV_signal_arises)
 if len(sys.argv) != 4:
     print("sys.argv not running and with length",len(sys.argv))
     cells= read_from_pickle('cells_name2.p')#['2016_05_12_A']#
-    file_type='shrinkXYZ.ASC'
+    file_type='ASC'
     with_plot=False
 else:
     print("sys.argv is correct and running")
@@ -26,7 +26,6 @@ folder_data='cells_initial_information/'
 folder_save='cells_outputs_data_short/'
 
 def synaptic_loc(cell_dir,syn_poses_list,with_plot=False, part='all', save_place=''):
-
     dict2={}
     cell=None
     cell=load_ASC(cell_dir)
@@ -175,13 +174,13 @@ def try_save_dict(dict,folder_save,name):
         print("Error trying to save pickle: " + str(e))
         pass
 
-    with open(folder_save+name+'.txt', 'w') as f:
-        try:
-            f.write('synaptic_location')
-            f.write(dict)
-        except Exception as e:
-            print("Error trying to save txt: " + str(e))
-            pass
+    # with open(folder_save+name+'.txt', 'w') as f:
+    #     try:
+    #         f.write('synaptic_location')
+    #         f.write(dict)
+    #     except Exception as e:
+    #         print("Error trying to save txt: " + str(e))
+    #         pass
     try:
         df1 = pd.DataFrame(dict)
         df1.to_excel(folder_save+name+".xlsx")
@@ -200,11 +199,13 @@ if __name__=='__main__':
         if not 'shrinkXYZ' in file_type:
             if 'shrinkXYZ' in dir:
                 dir=glob(folder_data+cell_name+'/*'+file_type)[1]
-            if cell_name in ['2017_07_06_C_3-4','2017_07_06_C_4-3']:
-                dir=glob(folder_data+cell_name+'/*/'+cell_name+file_type)[0]
+            before_after="_before_shrink"
+        else:
+            before_after="_after_shrink"
+
         for i in range(get_n_spinese(cell_name)):
             print('one syn dict:',dict)
-            xyz.append(list(get_spine_xyz(cell_name,i)))
+            xyz.append(list(get_spine_xyz(cell_name,i,before_after)))
             dend_part.append(get_spine_part(cell_name,i))
 
         dict1,dict2=synaptic_loc(dir,xyz, part='all', save_place=folder_save+cell_name+'/synapses',with_plot=with_plot)
@@ -212,7 +213,7 @@ if __name__=='__main__':
         for key in dict2.keys():
             dict4[cell_name+key]=dict2[key]
         print('more then one syn dict',cell_name,[xyz])
-    try_save_dict(dict3,folder_save,'synaptic_location_test')
-    try_save_dict(dict4,folder_save,'synaptic_location_seperate_test')
+    # try_save_dict(dict3,folder_save,'synaptic_location_test')
+    try_save_dict(dict4,folder_save,'synaptic_location_seperate'+before_after)
     # with open("cells_without_xyz.p", 'wb') as handle:
     #     pickle.dump(cell_withou_xyz, handle, protocol=pickle.HIGHEST_PROTOCOL)
