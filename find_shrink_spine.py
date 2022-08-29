@@ -1,8 +1,5 @@
-
 from glob import glob
-
 from matplotlib import pyplot as plt
-
 from extra_function import load_ASC, load_swc
 from neuron import h
 from open_pickle import read_from_pickle
@@ -71,7 +68,7 @@ if __name__=='__main__':
         plt.show()
         path=glob('cells_initial_information/'+cell_name+'/*before_shrink.swc')[0]
         cell=load_swc(path)
-        secs,seg=get_sec_and_seg(cell_name)
+        secs,seg=get_sec_and_seg(cell_name,from_picture=True)
         print(secs)
         sec_distances,child_nums,diams=[],[],[]
         for secy in secs:
