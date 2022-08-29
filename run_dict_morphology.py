@@ -1,15 +1,15 @@
 import os
-before_after='_after_shrink'
+from create_folder import create_folder_dirr
+from open_pickle import read_from_pickle
 base="python "
 base="sbatch execute_python_script.sh "
-cell2run='None'
+for cell_name in read_from_pickle('cells_name2.p'):
+    create_folder_dirr('cells_initial_information/'+cell_name+'/dict_morphology/')
+    for file_type in [' shrinkXYZ.ASC ',' ASC ']:
+        os.system(base+' creat_morphology_dict_ASC.py '+cell_name+file_type)
+    for before_after in [' _befor_shrink ',' _after_shrink ']:
+        os.system(base+' creat_morphology_dict_swc.py '+cell_name+file_type)
 
-specific_moo='_correct_seg'
-os.system("python csv_for_MOO_results.py "+ cell2run+' '+before_after+' '+specific_moo)
-os.system(base+"exp_soma_NMDA_AMPA_seperet.py "+ cell2run+' '+ before_after+' '+specific_moo)
-os.system(base+"exp_V_syns_effect_on_soma.py "+ cell2run+' '+before_after+' '+specific_moo)
-os.system(base+"exp_soma_NMDA_AMPA.py "+ cell2run+' '+before_after+' '+specific_moo)
-# os.system(base+"exp_syns_NMDA_AMPA.py "+before_after)
-os.system(base+"exp_sys_gmax.py "+ cell2run+' '+before_after+' '+specific_moo)
-os.system(base+"exp_V_in_Rneck.py "+ cell2run+' '+before_after+' '+specific_moo)
+
+
 

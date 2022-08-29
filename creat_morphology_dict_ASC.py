@@ -1,17 +1,22 @@
-from neuron import h, gui
 import numpy as np
 import sys
 from glob import glob
 import pickle
-from extra_function import load_swc
+from extra_function import load_ASC
+from open_pickle import read_from_pickle
 
 if len(sys.argv) != 3:
-    cell_name="2017_03_04_A_6-7"
-    before_after='_before_shrink'
+    cell_name=read_from_pickle('cells_name2.p')[0]
+    file_type='shrinkXYZ.ASC'
+
     print('before or after need to be choose')
 else:
     cell_name=sys.argv[1]
-    before_after=sys.argv[2]
+    file_type=sys.argv[2]
+if 'shrinkXYZ' in file_type:
+    before_after='_after_shrink'
+else:
+    before_after='_before_shrink'
 
 folder_="cells_initial_information/"
 def run(id, prev_id,sec,type, parent_point=np.array([0, 0, 0]), print_=True):
@@ -46,26 +51,22 @@ def get_closest_z(soma_point, sec_point, soma_r):
     return soma_point + vec * soma_r
 
 id=2
-fname = glob(folder_+cell_name+'/*z_correct'+before_after+'.swc')[0]
+fname = glob(folder_+cell_name+'/*'+file_type)[0]
+
+if not 'shrinkXYZ' in file_type and 'shrinkXYZ' in fname:
+    fname = glob(folder_+cell_name+'/*'+file_type)[1]
+
+
+print(fname)
 
 print(fname.split('/')[1])
 morphology_dict={}
 cell=None
-cell=load_swc(fname)
+cell=load_ASC(fname)
 
 sec_num=0
 soma_points = np.array([list(i) for i in cell.soma.psection()['morphology']['pts3d']]).mean(axis=0)
 morphology_dict[sec_num]={'sec name':cell.soma.name().split('.')[-1],'x':round(soma_points[0],4),'y':round(soma_points[1],4),'z':round(soma_points[2],4),'d':round(soma_points[3],4)}
-
-
-# x,y,z,diam=[],[],[],[]
-# for i, point in enumerate(cell.soma.psection()['morphology']['pts3d']):
-#     x.append(point[0])
-#     y.append(point[1])
-#     z.append(point[2])
-#     diam.append(point[3])
-# morphology_dict[sec_num]={'sec name':cell.soma.name().split('.')[-1],'x':x,'y':y,'z':z,'d':diam}
-
 
 
 for child in cell.soma.children():
@@ -76,8 +77,13 @@ for child in cell.soma.children():
     id=run(id,1,child,type, print_=type==2, parent_point=parent_point)
 
 
-with open(folder_+cell_name+"/dict_morphology_swc"+before_after+".pickle", 'wb') as handle:
+
+with open(folder_+cell_name+"/dict_morphology/ASC"+before_after+".pickle", 'wb') as handle:
     pickle.dump(morphology_dict, handle, protocol=pickle.HIGHEST_PROTOCOL)
 cell=None
+
+
+
+
 
 

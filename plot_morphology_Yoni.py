@@ -14,9 +14,9 @@ addlw=0
 L_widgh=5
 def find_xy(sec_dots,find_seg):
     dots_number=len(sec_dots[0])
-    places=[int(find_seg*dots_number),int(find_seg*dots_number)]
+    places=np.array([int(find_seg*dots_number),int(find_seg*dots_number)])-np.array([1,1])
     return sec_dots[0][places[0]],sec_dots[1][places[1]]
-def plot_morphology(ax, segment_colors, names=[], width_mult_factors=None, seg_ind_to_xyz_coords_map={},synapse=[], without_axons=True):
+def plot_morphology(ax, segment_colors, names=[], width_mult_factors=None, seg_ind_to_xyz_coords_map={},synapse=[], without_axons=True,color_num=0):
     if width_mult_factors is None:
         width_mult_factor = 1.2
         width_mult_factors = width_mult_factor * np.ones((segment_colors.shape))
@@ -29,7 +29,7 @@ def plot_morphology(ax, segment_colors, names=[], width_mult_factors=None, seg_i
     colors_per_segment = {}
     widths_per_segment = {}
     for seg_ind in all_seg_inds:
-        colors_per_segment[seg_ind] = colors[seg_ind]
+        colors_per_segment[seg_ind] = colors[seg_ind]+[0,0,color_num,0]
         widths_per_segment[seg_ind] = width_mult_factors[seg_ind]
         # add synapses
         if seg_ind_to_xyz_coords_map[seg_ind]['sec name'] in synapse[0]:
@@ -90,31 +90,47 @@ def plot_morphology(ax, segment_colors, names=[], width_mult_factors=None, seg_i
 
     ax.set_axis_off()
 
-def plot_morph(ax, cell_name, before_after,without_axons=True):
-    morphology_filename=glob('cells_initial_information/'+cell_name+'/dict_morphology_swc'+before_after+'.pickle')
-    seg_ind_to_xyz_coords_map=read_from_pickle(morphology_filename[0])
+def plot_morph(ax, cell_name, before_after,file_type='swc',without_axons=True,from_picture=True,color_code='black'):
+    morphology_filename=glob('cells_initial_information/'+cell_name+'/dict_morphology/'+file_type+before_after+'.pickle')[0]
+    seg_ind_to_xyz_coords_map=read_from_pickle(morphology_filename)
 
     num_segments=len(seg_ind_to_xyz_coords_map)
     segment_colors_selected = np.zeros(num_segments)
     segment_widths_selected = 6 * np.ones(segment_colors_selected.shape)
-    synapses=list(get_sec_and_seg(cell_name,with_distance=True))+[get_parameter(cell_name,'PSD')]
+    synapses=list(get_sec_and_seg(cell_name,with_distance=True,from_picture=from_picture,before_after=before_after,file_type=file_type))+[get_parameter(cell_name,'PSD')]
     print(synapses)
     # synapses=[get_spine_xyz(cell_name,i) for i in range(get_n_spinese(cell_name))]
     # choosen_synpase=[]
     # for spine_num in np.arange(get_n_spinese(cell_name)):
     #     choosen_synpase.append(get_spine_xyz(cell_name,spine_num))
+    if color_code=='black':
+        color_num=0
+    elif color_code=='blue':
+        color_num=0.9
     plot_morphology(ax, segment_colors_selected, width_mult_factors=segment_widths_selected,
-                    seg_ind_to_xyz_coords_map=seg_ind_to_xyz_coords_map,synapse=synapses, names=[], without_axons=without_axons)
+                    seg_ind_to_xyz_coords_map=seg_ind_to_xyz_coords_map,synapse=synapses, names=[], without_axons=without_axons,color_num=color_num)
     return ax
 
 if __name__=='__main__':
-    cell_name = read_from_pickle('cells_name2.p')[8:10]
-    print(cell_name)
-    fig = plt.figure(figsize=(20, 20))  # , sharex="row", sharey="row"
-    fig.suptitle(cell_name, fontsize=30)# fig.set_figheight(6)
-    shapes = (1, 2)
-    ax1 = plt.subplot2grid(shape=shapes, loc=(0, 0), rowspan=1, colspan=1)
-    ax2 = plt.subplot2grid(shape=shapes, loc=(0, 1), colspan=1, rowspan=1)
-    plot_morph(ax1,cell_name[0],'_after_shrink')
-    plot_morph(ax2,cell_name[1],'_after_shrink')
-    plt.show()
+    for cell_name in read_from_pickle('cells_name2.p'):
+        print(cell_name)
+        fig = plt.figure(figsize=(15,10))  # , sharex="row", sharey="row"
+        fig.suptitle(cell_name, fontsize=30)# fig.set_figheight(6)
+        shapes = (1, 3)
+        ax1 = plt.subplot2grid(shape=shapes, loc=(0, 0), rowspan=1, colspan=1)
+        ax2 = plt.subplot2grid(shape=shapes, loc=(0, 1), colspan=1, rowspan=1)
+        ax3 = plt.subplot2grid(shape=shapes, loc=(0, 2), colspan=1, rowspan=1)
+
+        ax1.set_title('swc')
+        plot_morph(ax1,cell_name,'_after_shrink',file_type='swc',from_picture=True,color_code='black')
+
+        ax2.set_title('swc with ASC location')
+        plot_morph(ax2,cell_name,'_after_shrink',file_type='swc',from_picture=False,color_code='black')
+
+        # ax1 = plt.subplot2grid(shape=shapes, loc=(1, 0), rowspan=1, colspan=1)
+        # ax2 = plt.subplot2grid(shape=shapes, loc=(1, 1), colspan=1, rowspan=1)
+        ax3.set_title('ASC')
+        plot_morph(ax3,cell_name,'_after_shrink',file_type='ASC',from_picture=False,color_code='black')
+        plt.savefig('cells_ASC_swc/'+cell_name)
+        plt.close()
+    # plt.show()
