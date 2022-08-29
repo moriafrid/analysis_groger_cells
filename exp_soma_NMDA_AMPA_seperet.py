@@ -142,4 +142,9 @@ for curr_i, model_place in tqdm(enumerate(glob(folder_data2+'*')+glob(folder_dat
     plt.close()
     loader.destroy()
     # model.destroy()
-os.system('python reorgenize_results.py')
+if specipic_cell=='*':
+    specipic_cell=None
+if specipic_moo=='*':
+    specipic_moo=None
+
+os.system('python reorgenize_results.py'+ specipic_cell+' '+before_after+' '+specipic_moo)

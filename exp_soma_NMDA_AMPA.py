@@ -12,6 +12,7 @@ from extraClasses import neuron_start_time
 matplotlib.rcParams['pdf.fonttype'] = 42
 matplotlib.rcParams['svg.fonttype'] = 'none'
 import sys
+import os
 if len(sys.argv) != 4:
     specipic_cell='*'
     before_after='_after_shrink'
@@ -129,3 +130,9 @@ for curr_i, model_place in tqdm(enumerate(glob(folder_data1+'*')+glob(folder_dat
     loader.destroy()
     # model.destroy()
 
+if specipic_cell=='*':
+    specipic_cell=None
+if specipic_moo=='*':
+    specipic_moo=None
+
+os.system('python reorgenize_results.py'+ specipic_cell+' '+before_after+' '+specipic_moo)

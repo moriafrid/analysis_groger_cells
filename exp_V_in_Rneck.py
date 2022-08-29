@@ -29,8 +29,6 @@ else:
     specipic_moo= sys.argv[3]
     if specipic_moo=='None':
         specipic_moo='*'
-
-
     print('run with sys.argv', sys.argv)
 
 folder_= ''
@@ -177,7 +175,11 @@ for curr_i, model_place in tqdm(enumerate(glob(folder_data1+'*')+glob(folder_dat
 
     loader.destroy()
     model.destroy()
-os.system('python reorgenize_results.py')
+if specipic_cell=='*':
+    specipic_cell=None
+if specipic_moo=='*':
+    specipic_moo=None
+os.system('python reorgenize_results.py'+ specipic_cell+' '+before_after+' '+specipic_moo)
 
 
 
