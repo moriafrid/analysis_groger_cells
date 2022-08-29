@@ -1,7 +1,5 @@
 #!/ems/elsc-labs/segev-i/moria.fridman/anaconda3/envs/project/bin/python
 # from __future__ import print_function
-import shutil
-
 import bluepyopt as bpopt
 import bluepyopt.ephys as ephys
 import pprint
@@ -9,7 +7,6 @@ import matplotlib.pyplot as plt
 import matplotlib
 import pickle
 from add_figure import add_figure
-from open_pickle import read_from_pickle
 from calculate_F_factor import calculate_F_factor
 import sys
 from read_spine_properties import *
@@ -74,7 +71,11 @@ else:
     generation_size = 100
     num_of_genarations = 1000
 from_the_begin=True
-
+seg_from_picture=False
+if seg_from_picture:
+    pluse_save='_syn_from_picture'
+else:
+    pluse_save='_find_syn_xyz'
 print(same_strengh)
 
 if same_strengh:
@@ -89,9 +90,9 @@ data_dir= "cells_initial_information/"
 save_dir = "cells_outputs_data_short/"
 
 if same_strengh:
-    base2 = folder_+save_dir+cell_name+'/MOO_results_same_strange'+before_after+'_correct_seg/'+file_type+'_SPINE_START='+str(SPINE_START)+'/'  # folder name  _RA_free
+    base2 = folder_+save_dir+cell_name+'/MOO_results_same_strange'+before_after+'_correct_seg'+pluse_save+'/'+file_type+'_SPINE_START='+str(SPINE_START)+'/'  # folder name  _RA_free
 else:
-    base2 = folder_+save_dir+cell_name+'/MOO_results_relative_strange'+before_after+'_correct_seg/'+file_type+'_SPINE_START='+str(SPINE_START)+'/'  # folder name  _RA_free
+    base2 = folder_+save_dir+cell_name+'/MOO_results_relative_strange'+before_after+'_correct_seg'+pluse_save+'/'+file_type+'_SPINE_START='+str(SPINE_START)+'/'  # folder name  _RA_free
 
 base2+='F_shrinkage='+str(round(shrinkage_by,2))+'_dend*'+str(round(resize_dend_by,2))
 if double_spine_area:
@@ -267,7 +268,7 @@ def run(cell, seed=0):
     synapses_locations=[]
     spine_properties={}
     for i in range(get_n_spinese(cell_name)):
-        sec,seg=get_sec_and_seg(cell_name,i)
+        sec,seg=get_sec_and_seg(cell_name,i,from_picture=seg_from_picture,file_type='swc')
         seg=float(seg)
         synapses_locations.append([sec,seg])
         spine_properties[i]=get_building_spine(cell_name,i)
