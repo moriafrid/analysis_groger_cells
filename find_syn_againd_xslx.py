@@ -13,6 +13,10 @@ print(cell_name)
 print(cell_name)
 cell_file=glob('cells_initial_information/'+cell_name+'/*after_shrink.swc')[0]
 cell=load_swc(cell_file)
+file_type='swc'
+before_after='_after_shrink'
+from_picture=True
+
 SPINE_START=20
 for sec in cell.all_sec():
     sec.insert('pas')
@@ -67,7 +71,7 @@ decided_passive_params=find_RA(base_dir)
 dict_result=read_from_pickle(glob(base_dir+decided_passive_params+'_pickles.p')[0])['parameter']
 cell=change_model_pas(cell,CM=dict_result['CM'], RA = dict_result['RA'], RM = dict_result['RM'], E_PAS = dict_result['E_PAS'],F_factor=calculate_F_factor(cell))
 i=0
-for sec,seg in zip(get_sec_and_seg(cell_name)[0],get_sec_and_seg(cell_name)[1]):
+for sec,seg in zip(get_sec_and_seg(cell_name)[0],get_sec_and_seg(cell_name,file_type=file_type,before_after=before_after,from_picture=from_picture)[1]):
     sec= eval('cell.'+sec)
     print(sec,seg)
     print('soma distance:')
