@@ -11,9 +11,11 @@ if len(sys.argv)!=2:
     number=9
 else:
     number=int(sys.argv[1])
-cell_name=read_from_pickle('cells_name2.p')[number]#@need to be run form the consule and the cell number need to be change
+cell_name='2017_04_03_B'#read_from_pickle('cells_name2.p')[number]#@need to be run form the consule and the cell number need to be change
 print(cell_name)
 cell_file=glob('cells_initial_information/'+cell_name+'/*after_shrink.swc')[0]
+# cell_file=glob('cells_initial_information/'+cell_name+'/morphology.swc')[0]
+
 cell=load_swc(cell_file)
 SPINE_START=20
 for sec in cell.all_sec():
@@ -64,7 +66,7 @@ def change_model_pas(cell,CM=1, RA = 250, RM = 20000.0, E_PAS = -70.0,F_factor=1
               seg.g_pas *= F_factor
     return cell
 
-base_dir='final_data/'+cell_name+'/'
+base_dir='final_data/total_moo/'+cell_name+'/'
 decided_passive_params=find_RA(base_dir)
 dict_result=read_from_pickle(glob(base_dir+decided_passive_params+'_pickles.p')[0])['parameter']
 for sec,seg in zip(get_sec_and_seg(cell_name,from_picture=False)[0],get_sec_and_seg(cell_name,from_picture=False)[1]):
@@ -76,7 +78,15 @@ for sec,seg in zip(get_sec_and_seg(cell_name,from_picture=False)[0],get_sec_and_
     sec= eval('cell.'+sec)
     print(sec,seg)
     print('soma distance:')
-    print(h.distance( sec(seg)))
+    print(h.distance(sec(seg)))
+    print(h.distance(sec(0)))
+    print(h.distance(sec(1)))
+
+    print(0,h.distance(cell.apic[3](0)))
+    print(1,h.distance(cell.apic[3](1)))
+
+    for s in np.arange(0,1.2,0.2):
+        print(s,h.distance(cell.apic[7](s)))
     # print('new_seg')
     x=(h.distance(cell.soma(0.5), sec(seg))-get_parameter(cell_name,par_name='dis_from_soma',spine_num=i))
     new_seg=((seg*sec.L)-x)/sec.L
