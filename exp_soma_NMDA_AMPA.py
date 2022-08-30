@@ -13,11 +13,12 @@ matplotlib.rcParams['pdf.fonttype'] = 42
 matplotlib.rcParams['svg.fonttype'] = 'none'
 import sys
 import os
-if len(sys.argv) != 4:
+if len(sys.argv) != 5:
     specipic_cell='*'
     before_after='_after_shrink'
     specipic_moo='_correct_seg*'
     run_reorgenize=False
+    sec_from_picture=False
     print("sys.argv isn't run")
 else:
     print("the sys.argv len is correct",flush=True)
@@ -31,7 +32,7 @@ else:
         run_reorgenize=False
     else:
         run_reorgenize=True
-
+    sec_from_picture=sys.argv[4]
 
 
 
@@ -42,6 +43,10 @@ folder_data1=folder_+'cells_outputs_data_short/'+specipic_cell+'/MOO_results_sam
 folder_data2=folder_+'cells_outputs_data_short/'+specipic_cell+'/MOO_results_relative_strange'+before_after+specipic_moo+'/*/F_shrinkage=*/const_param/'
 save_name='/AMPA&NMDA_soma'
 for curr_i, model_place in tqdm(enumerate(glob(folder_data1+'*')+glob(folder_data2+'*'))):
+    if 'syn_xyz' in model_place:
+        sec_from_picture=False
+    else:
+        sec_from_picture=True
     # if '3-4' in model_place: continue
     print(model_place)
     type=model_place.split('/')[-1]
@@ -80,7 +85,7 @@ for curr_i, model_place in tqdm(enumerate(glob(folder_data1+'*')+glob(folder_dat
     netstim.noise = 0
     h.tstop = total_duration
 
-    secs,segs=get_sec_and_seg(cell_name)
+    secs,segs=get_sec_and_seg(cell_name,from_picture=sec_from_picture)
     num=0
     V_spine=[]
     spines=[]

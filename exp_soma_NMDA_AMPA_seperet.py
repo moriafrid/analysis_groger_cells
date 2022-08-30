@@ -86,6 +86,10 @@ def simulate_syn(sec,seg,num=None,color='black'):
 
 for curr_i, model_place in tqdm(enumerate(glob(folder_data2+'*')+glob(folder_data1+'*'))):
     print(model_place)
+    if 'syn_xyz' in model_place:
+        sec_from_picture=False
+    else:
+        sec_from_picture=True
     type=model_place.split('/')[-1]
     cell_name=model_place.split('/')[1]
     if get_n_spinese(cell_name)<2:continue
@@ -128,7 +132,7 @@ for curr_i, model_place in tqdm(enumerate(glob(folder_data2+'*')+glob(folder_dat
     passive_propert_title='Rm='+str(round(1.0/model.soma[0].g_pas,2)) +' Ra='+str(round(model.soma[0].Ra,2))+' Cm='+str(round(model.soma[0].cm,2))
     fig=add_figure(cell_name+' AMPA and NMDA '+relative+" strength"+'\n'+model_place.split('/')[-1]+" "+passive_propert_title,'time[ms]','Voltage[mV]')
     plt.text(0,V_base[0]+2,reletive_strengths)
-    secs,segs=get_sec_and_seg(cell_name)
+    secs,segs=get_sec_and_seg(cell_name,from_picture=sec_from_picture)
     dict_result={}
     for num in range(get_n_spinese(cell_name)):
         dict_result['voltage_'+str(num)]=simulate_syn(secs[num],segs[num],num=num,color=color[num])

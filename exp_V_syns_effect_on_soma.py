@@ -41,6 +41,10 @@ save_name='/Voltage Spine&Soma'
 
 
 for curr_i, model_place in tqdm(enumerate(glob(folder_data1+'*')+glob(folder_data2+'*'))):
+    if 'syn_xyz' in model_place:
+        sec_from_picture=False
+    else:
+        sec_from_picture=True
     type=model_place.split('/')[-1]
     cell_name=model_place.split('/')[1]
     if type=='test': continue
@@ -75,7 +79,7 @@ for curr_i, model_place in tqdm(enumerate(glob(folder_data1+'*')+glob(folder_dat
     netstim.noise = 0
     h.tstop = total_duration
 
-    secs,segs=get_sec_and_seg(cell_name)
+    secs,segs=get_sec_and_seg(cell_name,from_picture=sec_from_picture)
     num=0
     V_spine=[]
     spines=[]

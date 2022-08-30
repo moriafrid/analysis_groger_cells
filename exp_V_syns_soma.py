@@ -62,7 +62,7 @@ for curr_i, model_place in tqdm(enumerate(glob(folder_data1+'*')+glob(folder_dat
     netstim.noise = 0
     h.tstop = total_duration
 
-    secs,segs=get_sec_and_seg(cell_name)
+    secs,segs=get_sec_and_seg(cell_name,from_picture=sec_from_picture)
     num=0
     V_spine=[]
     spines=[]
