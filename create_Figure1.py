@@ -6,16 +6,16 @@ from matplotlib import pyplot as plt
 import string
 import sys
 if sys.argv!=2:
-    folder2run='final_data/correct_seg_syn_from_picture/'
+    folder2run='final_data/correct_seg_syn_from_picture'
 else:
     folder2run=sys.argv[1]
 
 if __name__=='__main__':
-    for cell_name in read_from_pickle('cells_name2.p')[2:]:
+    for cell_name in read_from_pickle('cells_name2.p'):
         #if '4-3' in cell_name: continue
         before_after='_after_shrink'
         #'final_data_after_shrink_with_mistak#
-        base_dir=folder2run+cell_name+'/'
+        base_dir=folder2run+'/'+cell_name+'/'
         save_dir=folder2run+'/Figure1/'
         create_folder_dirr(save_dir)
         print(cell_name)
@@ -32,10 +32,10 @@ if __name__=='__main__':
 
         decided_passive_params=find_RA(base_dir)
         # if cell_name in ['2017_03_04_A_6-7','2017_05_08_A_5-4']: decided_passive_params='RA_best_fit'
-        if 'from_picture' in folder2run:
-            from_picture=True
-        else:
+        if 'syn_xyz' in folder2run:
             from_picture=False
+        else:
+            from_picture=True
         plot_morph(ax1, cell_name, before_after,without_axons=True,from_picture=from_picture)
 
         if get_n_spinese(cell_name)>1:
@@ -63,5 +63,5 @@ if __name__=='__main__':
         # plt.savefig(save_dir+cell_name+'.pdf')
         plt.savefig(save_dir+cell_name+'.svg')
         # pickle.dump(fig, open(save_dir+cell_name+'.p', 'wb'))  # cant work with scalebar
-        plt.show()
+        # plt.show()
 
