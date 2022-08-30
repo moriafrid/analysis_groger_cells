@@ -112,25 +112,25 @@ def plot_morph(ax, cell_name, before_after,file_type='swc',without_axons=True,fr
     return ax
 
 if __name__=='__main__':
-    for cell_name in read_from_pickle('cells_name2.p'):
+    for cell_name in read_from_pickle('cells_name2.p')[9:]:
         print(cell_name)
         fig = plt.figure(figsize=(15,10))  # , sharex="row", sharey="row"
         fig.suptitle(cell_name, fontsize=30)# fig.set_figheight(6)
-        shapes = (1, 3)
+        shapes = (1, 2)
         ax1 = plt.subplot2grid(shape=shapes, loc=(0, 0), rowspan=1, colspan=1)
         ax2 = plt.subplot2grid(shape=shapes, loc=(0, 1), colspan=1, rowspan=1)
-        ax3 = plt.subplot2grid(shape=shapes, loc=(0, 2), colspan=1, rowspan=1)
+        # ax3 = plt.subplot2grid(shape=shapes, loc=(0, 2), colspan=1, rowspan=1)
 
         ax1.set_title('swc')
         plot_morph(ax1,cell_name,'_after_shrink',file_type='swc',from_picture=True,color_code='black')
+        plot_morph(ax1,cell_name,'_after_shrink',file_type='ASC',from_picture=False,color_code='blue')
 
         ax2.set_title('swc with ASC location')
         plot_morph(ax2,cell_name,'_after_shrink',file_type='swc',from_picture=False,color_code='black')
 
-        # ax1 = plt.subplot2grid(shape=shapes, loc=(1, 0), rowspan=1, colspan=1)
-        # ax2 = plt.subplot2grid(shape=shapes, loc=(1, 1), colspan=1, rowspan=1)
-        ax3.set_title('ASC')
-        plot_morph(ax3,cell_name,'_after_shrink',file_type='ASC',from_picture=False,color_code='black')
+
+        # ax3.set_title('ASC')
+        # plot_morph(ax3,cell_name,'_after_shrink',file_type='ASC',from_picture=False,color_code='black')
         plt.savefig('cells_ASC_swc/'+cell_name)
-        plt.close()
-    # plt.show()
+        # plt.close()
+        plt.show()

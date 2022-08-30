@@ -8,10 +8,10 @@ from glob import glob
 import numpy as np
 import sys
 if len(sys.argv)!=2:
-    numver=0
+    number=9
 else:
-    numbe=int(sys.argv[1])
-cell_name=read_from_pickle('cells_name2.p')[numbe]#@need to be run form the consule and the cell number need to be change
+    number=int(sys.argv[1])
+cell_name=read_from_pickle('cells_name2.p')[number]#@need to be run form the consule and the cell number need to be change
 print(cell_name)
 cell_file=glob('cells_initial_information/'+cell_name+'/*after_shrink.swc')[0]
 cell=load_swc(cell_file)
@@ -67,20 +67,23 @@ def change_model_pas(cell,CM=1, RA = 250, RM = 20000.0, E_PAS = -70.0,F_factor=1
 base_dir='final_data/'+cell_name+'/'
 decided_passive_params=find_RA(base_dir)
 dict_result=read_from_pickle(glob(base_dir+decided_passive_params+'_pickles.p')[0])['parameter']
+for sec,seg in zip(get_sec_and_seg(cell_name,from_picture=False)[0],get_sec_and_seg(cell_name,from_picture=False)[1]):
+    sec=eval('cell.'+sec)
+    print(h.distance(cell.soma(0.5),sec(seg)))
 cell=change_model_pas(cell,CM=dict_result['CM'], RA = dict_result['RA'], RM = dict_result['RM'], E_PAS = dict_result['E_PAS'],F_factor=calculate_F_factor(cell))
 i=0
-for sec,seg in zip(get_sec_and_seg(cell_name)[0],get_sec_and_seg(cell_name)[1]):
+for sec,seg in zip(get_sec_and_seg(cell_name,from_picture=False)[0],get_sec_and_seg(cell_name,from_picture=False)[1]):
     sec= eval('cell.'+sec)
     print(sec,seg)
     print('soma distance:')
-    print(h.distance(cell.soma(0.5), sec(seg)))
-    print('new_seg')
+    print(h.distance( sec(seg)))
+    # print('new_seg')
     x=(h.distance(cell.soma(0.5), sec(seg))-get_parameter(cell_name,par_name='dis_from_soma',spine_num=i))
     new_seg=((seg*sec.L)-x)/sec.L
-    try:print(new_seg,h.distance(cell.soma(0.5), sec(new_seg)))
+    try:print('')#print(new_seg,h.distance(cell.soma(0.5), sec(new_seg)))
     except:print('the founding segment is too far')
 
-    print('lambda:')
+    # print('lambda:')
     sec_t=sec
     sections=[sec_t]
     total_lambda=[add_sec(sec_t)]
@@ -89,6 +92,6 @@ for sec,seg in zip(get_sec_and_seg(cell_name)[0],get_sec_and_seg(cell_name)[1]):
         sec_t=sec_t.parentseg().sec
         sections.append(sec_t)
 
-    print(len(sections))
-    print(sum(total_lambda))
+    # print(len(sections))
+    # print(sum(total_lambda))
     i+=1
