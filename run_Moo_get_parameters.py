@@ -25,7 +25,7 @@ os.system('python csv_for_passive_val_results.py cells_name2.p '+before_after)
 
 
 for cell_name in read_from_pickle(cells_name_place):
-    # if cell_name!='2017_04_03_B':continue
+    if cell_name!='2017_03_04_A_6-7':continue
     passive_vals_dict= {}
     p='cells_outputs_data_short/'+cell_name+'/fit_short_pulse'+before_after+'/results_passive_fits.csv'
     print(cell_name)
