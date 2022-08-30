@@ -47,7 +47,6 @@ for curr_i, model_place in tqdm(enumerate(glob(folder_data1+'*')+glob(folder_dat
         sec_from_picture=False
     else:
         sec_from_picture=True
-    # if '3-4' in model_place: continue
     print(model_place)
     type=model_place.split('/')[-1]
     cell_name=model_place.split('/')[1]
