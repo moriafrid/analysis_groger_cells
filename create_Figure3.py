@@ -6,6 +6,11 @@ from function_Figures import find_RA,legend_size
 from glob import glob
 import numpy as np
 import string
+import sys
+if sys.argv!=2:
+    folder2run='_correct_seg'
+else:
+    folder2run=sys.argv[1]
 
 colors=['#1f77b4', '#ff7f0e', '#2ca02c', '#d62728', '#9467bd', '#8c564b', '#e377c2', '#7f7f7f', '#bcbd22', '#17becf','#1f77b4']
 scatter_size=8
@@ -19,7 +24,8 @@ ax0_3 = plt.subplot2grid(shape=shapes, loc=(0, 2), colspan=1, rowspan=1)
 
 for i,cell_name in enumerate(read_from_pickle('cells_name2.p')):
     color=colors[i]
-    base_dir='final_data/'+cell_name+'/'
+    base_dir=folder2run+cell_name+'/'
+    save_dir=folder2run+'/Figure3/'
     decided_passive_params=find_RA(base_dir)
     dicty=read_from_pickle(glob(base_dir+'Rins_pickles*'+decided_passive_params+'.p')[0])
     PSD=dicty['parameters']['PSD']
@@ -138,7 +144,7 @@ for i,cell_name in enumerate(read_from_pickle('cells_name2.p')):
         diss.append(dis)
         psd.append(get_parameter(cell_name,'PSD',i))
     plt.scatter(diss,psd,lw=scatter_size,color=colors[i])
-plt.savefig('final_data/Figure3/PSD_distance.png')
+plt.savefig(save_dir+'/PSD_distance.png')
 plt.close()
 plt.show()
 

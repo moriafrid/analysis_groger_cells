@@ -2,9 +2,15 @@ from plot_morphology_Yoni import plot_morph
 from create_folder import create_folder_dirr
 from read_spine_properties import get_n_spinese
 from function_Figures import *
+import sys
+if sys.argv!=2:
+    folder2run='final_data/correct_seg_syn_from_picture/'
+else:
+    folder2run=sys.argv[1]
+
 if __name__=='__main__':
     before_after='_after_shrink'
-    save_dir='final_data/Figure2/'
+    save_dir=folder2run+'/Figure2/'
     create_folder_dirr(save_dir)
     # print(cell_name)
     fig = plt.figure(figsize=(15, 15))  # , sharex="row", sharey="row"
@@ -28,7 +34,7 @@ if __name__=='__main__':
 
     # plt.subplots_adjust(hspace=0.3, wspace=0.3)
     for i,cell_name in enumerate(read_from_pickle('cells_with_2_syn.p')[:3]):
-        base_dir='final_data/'+cell_name+'/'
+        base_dir=folder2run+cell_name+'/'
         decided_passive_params=find_RA(base_dir)
         if cell_name in ['2017_03_04_A_6-7','2017_05_08_A_5-4']: decided_passive_params='RA_best_fit'
 

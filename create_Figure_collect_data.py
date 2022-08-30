@@ -5,12 +5,18 @@ from read_spine_properties import get_n_spinese
 from matplotlib import pyplot as plt
 from open_pickle import read_from_pickle
 import string
+import sys
+if sys.argv!=2:
+    folder2run='_correct_seg'
+else:
+    folder2run=sys.argv[1]
+
 if __name__=='__main__':
     for cell_name in read_from_pickle('cells_name2.p')[:]:
         #if '4-3' in cell_name: continue
         before_after='_after_shrink'
-        base_dir='final_data/'+cell_name+'/'
-        save_dir='final_data/Figure4/'
+        base_dir=folder2run+cell_name+'/'
+        save_dir=folder2run+'/Figure4/'
         create_folder_dirr(save_dir)
         print(cell_name)
         fig = plt.figure(figsize=(22, 8))  # , sharex="row", sharey="row"
