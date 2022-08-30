@@ -6,9 +6,10 @@ import string
 import sys
 from function_Figures import *
 
-if sys.argv!=2:
+if sys.argv!=3:
     cell_name=read_from_pickle('cells_name2.p')[0]
     folder2run='final_data/correct_seg_syn_from_picture'
+    print("sys.argv isn't run")
 else:
     cell_name=sys.argv[1]
     folder2run=sys.argv[2]
