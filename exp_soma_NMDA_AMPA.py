@@ -16,7 +16,7 @@ import os
 if len(sys.argv) != 4:
     specipic_cell='*'
     before_after='_after_shrink'
-    specipic_moo='_correct_seg'
+    specipic_moo='_correct_seg*'
     print("sys.argv isn't run")
 else:
     print("the sys.argv len is correct",flush=True)
@@ -131,8 +131,7 @@ for curr_i, model_place in tqdm(enumerate(glob(folder_data1+'*')+glob(folder_dat
     # model.destroy()
 
 if specipic_cell=='*':
-    specipic_cell=None
-if specipic_moo=='*':
-    specipic_moo=None
+    specipic_cell="None"
+if not specipic_moo=='*':
+    os.system('python reorgenize_results.py '+ specipic_cell+' '+before_after+' '+specipic_moo)
 
-os.system('python reorgenize_results.py'+ specipic_cell+' '+before_after+' '+specipic_moo)
