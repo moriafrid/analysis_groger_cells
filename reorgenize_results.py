@@ -1,4 +1,4 @@
-import os
+
 import re
 from matplotlib import pyplot as plt
 from open_pickle import read_from_pickle
@@ -8,9 +8,22 @@ from read_passive_parameters_csv import get_passive_parameter
 from passive_val_function import get_passive_val
 from read_spine_properties import get_n_spinese
 from extra_function import create_folder_dirr
-before_after='_after_shrink'
-data_file='cells_outputs_data_short/'
+import sys
+if len(sys.argv) != 4:
+    specipic_cell='*'
+    before_after='_after_shrink'
+    specipic_moo='_correct_seg_syn_from_picture' #_correct_seg_find_syn_xyz
+    print("sys.argv isn't run")
+else:
+    print("the sys.argv len is correct",flush=True)
+    specipic_cell = sys.argv[1]
+    if specipic_cell=='None':
+        specipic_cell='*'
+    before_after=sys.argv[2]
+    specipic_moo= sys.argv[3]
 
+
+data_file='cells_outputs_data_short/'
 
 
 def copy_file(copy,paste,extra_name=''):
@@ -36,11 +49,11 @@ for cell_name in read_from_pickle('cells_name2.p'):
         full=''
     else:
         full='_full_trace'
-    save_file='final_data/'+cell_name+'/'
+    save_file='final_data/'+specipic_moo[1:]+'/'+cell_name+'/'
     data_file='cells_outputs_data_short/'+cell_name+'/'
 
-    MOO_relative='MOO_results_relative_strange'+before_after+'_correct_seg/z_correct.swc_SPINE_START=20/'
-    MOO_same='MOO_results_same_strange'+before_after+'_correct_seg/z_correct.swc_SPINE_START=20/'
+    MOO_relative='MOO_results_relative_strange'+before_after+specipic_moo+'/z_correct.swc_SPINE_START=20/'
+    MOO_same='MOO_results_same_strange'+before_after+specipic_moo+'/z_correct.swc_SPINE_START=20/'
     # MOO_same=MOO_relative
     short_pulse='/fit_short_pulse'+before_after+'/'
     print(cell_name)
