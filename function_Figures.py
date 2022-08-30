@@ -203,7 +203,7 @@ def plot_syn_model2(ax,dirr,start_point=0):
     add_scale_bar(ax,'fit_syn')
 def plot_neck_voltage(ax,dirr,start_point=900):
     dict_syn=read_from_pickle(dirr)
-    cell_name=dirr.split('/')[1]
+    cell_name=dirr.split('/')[2]
     RA=dict_syn['parameters']['RA']  
     E_PAS=dict_syn['parameters']['E_PAS']
     T=dict_syn['time']
