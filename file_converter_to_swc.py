@@ -51,7 +51,7 @@ def run(id, prev_id,sec,type, print_=True):
 # build the model
 ######################################################
 
-fname = glob(folder_+cell_name+'/*.ASC')[0]
+fname = glob(folder_+cell_name+'/*shrinkXYZ.ASC')[0]
 cell=mkcell(fname)
 sp2 = h.PlotShape()
 sp2.color_all(3)
