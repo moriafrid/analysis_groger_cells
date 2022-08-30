@@ -153,4 +153,4 @@ for curr_i, model_place in tqdm(enumerate(glob(folder_data2+'*')+glob(folder_dat
 if specipic_cell=='*':
     specipic_cell="None"
 if run_reorgenize:
-    os.system('python reorgenize_results.py '+ specipic_cell+' '+before_after+' '+specipic_moo)
+    os.system('python reorgenize_results.py '+ '_'+specipic_cell+' '+before_after+' '+specipic_moo)
