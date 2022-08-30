@@ -13,8 +13,9 @@ for cell_name in read_from_pickle('cells_name2.p')[9:]:
     path=glob('cells_initial_information/'+cell_name+'/morphology.swc')[0]
     cell=None
     cell=load_swc(path)
+    h.distance(0,0.5,cell.soma)
     for sec,seg in zip(get_sec_and_seg(cell_name,file_type='swc',from_picture=False)[0],get_sec_and_seg(cell_name,file_type='swc',from_picture=False)[1]):
-        print(h.distance(cell.soma(0.5),eval('cell.'+sec)(seg)))
+        print(h.distance(eval('cell.'+sec)(seg)))
     for sec,seg in zip(get_sec_and_seg(cell_name,file_type='swc',from_picture=True)[0],get_sec_and_seg(cell_name,file_type='swc',from_picture=True)[1]):
         print(h.distance(cell.soma(0.5),eval('cell.'+sec)(seg)))
 
