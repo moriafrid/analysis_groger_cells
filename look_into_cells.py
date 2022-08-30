@@ -15,6 +15,8 @@ for cell_name in read_from_pickle('cells_name2.p')[9:]:
     cell=load_swc(path)
     for sec,seg in zip(get_sec_and_seg(cell_name,file_type='swc',from_picture=False)[0],get_sec_and_seg(cell_name,file_type='swc',from_picture=False)[1]):
         print(h.distance(cell.soma(0.5),eval('cell.'+sec)(seg)))
+    for sec,seg in zip(get_sec_and_seg(cell_name,file_type='swc',from_picture=True)[0],get_sec_and_seg(cell_name,file_type='swc',from_picture=True)[1]):
+        print(h.distance(cell.soma(0.5),eval('cell.'+sec)(seg)))
 
     path=glob('cells_initial_information/'+cell_name+'/*after_shrink.swc')[0]
     print(cell_name)
@@ -23,6 +25,12 @@ for cell_name in read_from_pickle('cells_name2.p')[9:]:
     for sec,seg in zip(get_sec_and_seg(cell_name,file_type='swc',from_picture=False)[0],get_sec_and_seg(cell_name,file_type='swc',from_picture=False)[1]):
         print(h.distance(cell.soma(0.5),eval('cell.'+sec)(seg)))
 
+    path=glob('cells_initial_information/'+cell_name+'/*before_shrink.swc')[0]
+    print(cell_name)
+    cell=None
+    cell=load_swc(path)
+    for sec,seg in zip(get_sec_and_seg(cell_name,file_type='swc',before_after='_before_shrink',from_picture=False)[0],get_sec_and_seg(cell_name,file_type='swc',from_picture=False)[1]):
+        print(h.distance(cell.soma(0.5),eval('cell.'+sec)(seg)))
     # h.PlotShape()
     print('len ASC dend',len(cell.dend))
     print(sum([sec.L for sec in cell.dend]))
