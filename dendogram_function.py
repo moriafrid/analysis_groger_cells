@@ -260,7 +260,7 @@ class Dendogram():
         return max_y
 
 def func_dendogram(ax,dirr,type='E_dendogram',with_axon=False):
-    cell_name=dirr.split('/')[1]
+    cell_name=dirr.split('/')[2]
     file_type2read='z_correct.swc'
     morph_path=glob("cells_initial_information/"+cell_name+'/*'+file_type2read)[0]
     cell=load_swc(morph_path)
