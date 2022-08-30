@@ -15,6 +15,7 @@ import signal
 from extra_function import SIGSEGV_signal_arises, load_hoc,load_ASC,load_swc,create_folder_dirr
 from glob import glob
 import os
+from open_pickle import read_from_pickle
 matplotlib.rcParams['pdf.fonttype'] = 42
 matplotlib.rcParams['svg.fonttype'] = 'none'
 
@@ -51,7 +52,7 @@ if len(sys.argv) != 17:
     same_strengh=False
     fit_until_point=-1
     before_after='_after_shrink'
-else:
+elif len(sys.argv) == 18:
     print("the sys.argv len is correct",flush=True)
     cpu_node = int(sys.argv[1])
     cell_name = sys.argv[2]
@@ -66,12 +67,38 @@ else:
     before_after=sys.argv[13]
     fit_until_point=int(sys.argv[14])
     same_strengh=eval(sys.argv[15])
+    special_sec=sys.argv[16]
+    passive_val_name=passive_val_name+special_sec
+    profile = sys.argv[17]
+    RA=float(sys.argv[4])
+    generation_size = 100
+    num_of_genarations = 1000
+
+else:
+    print("the sys.argv len is correct",flush=True)
+    cpu_node = int(sys.argv[1])
+    cell_name = sys.argv[2]
+    file_type=sys.argv[3] #hoc ar ASC
+    passive_val={"RA":float(sys.argv[4]),"CM":float(sys.argv[5]),'RM':float(sys.argv[6])}
+    passive_fit_condition=sys.argv[7]
+    passive_val_name=sys.argv[8]
+    resize_dend_by = float(sys.argv[9]) #how much the cell sweel during the electrophisiology records
+    shrinkage_by =float(sys.argv[10]) #how much srinkage the cell get between electrophysiology record and LM
+    SPINE_START=int(sys.argv[11])
+    double_spine_area=eval(sys.argv[12])
+    before_after=sys.argv[13]
+    fit_until_point=int(sys.argv[14])
+
+    same_strengh=eval(sys.argv[15])
     profile = sys.argv[16]
     RA=float(sys.argv[4])
     generation_size = 100
     num_of_genarations = 1000
 from_the_begin=True
-seg_from_picture=False
+if cell_name in read_from_pickle('cells_sec_from_picture.p'):
+    seg_from_picture=True
+else:
+    seg_from_picture=False
 if seg_from_picture:
     pluse_save='_syn_from_picture'
 else:
