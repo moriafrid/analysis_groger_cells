@@ -92,6 +92,11 @@ if __name__=='__main__':
     # ax4_2 = plt.subplot2grid(shape=shapes, loc=(2, 3), colspan=1, rowspan=1)
 
     for i,cell_name in enumerate(read_from_pickle('cells_with_2_syn.p')[3:6]):
+        
+        if cell_name in read_from_pickle('cells_sec_from_picture.p'):
+            from_picture=True
+        else:
+            from_picture=False        
         if run_all:
             if cell_name in read_from_pickle('cells_sec_from_picture.p'): #cell that taken from picture
                 folder2run='final_data/correct_seg_syn_from_picture'
@@ -104,7 +109,7 @@ if __name__=='__main__':
             save_dir=folder2run+'/Figure2/'
             if 'syn_xyz' in folder2run:
                from_picture=False
-            else:
+            elif 'syn_from_picture' in folder2run:
                from_picture=True
         base_dir=folder2run+'/'+cell_name+'/'
         decided_passive_params=find_RA(base_dir)
@@ -135,6 +140,10 @@ if __name__=='__main__':
     i=0
     for cell_name in read_from_pickle('cells_name2.p'):
         if cell_name in read_from_pickle('cells_with_2_syn.p'):continue
+        if cell_name in read_from_pickle('cells_sec_from_picture.p'):
+            from_picture=True
+        else:
+            from_picture=False        
         if run_all:
             if cell_name in read_from_pickle('cells_sec_from_picture.p'): #cell that taken from picture
                 folder2run='final_data/correct_seg_syn_from_picture'
@@ -147,7 +156,7 @@ if __name__=='__main__':
             save_dir=folder2run+'/Figure2/'
             if 'syn_xyz' in folder2run:
                from_picture=False
-            else:
+            elif 'syn_from_picture' in folder2run:
                from_picture=True
         base_dir=folder2run+'/'+cell_name+'/'
         # if '4-3' in cell_name: continue
