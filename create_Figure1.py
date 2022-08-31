@@ -5,11 +5,13 @@ from function_Figures import *
 from matplotlib import pyplot as plt
 import string
 import sys
-if sys.argv!=2:
-    folder2run='final_data/correct_seg_syn_from_picture'
+from open_pickle import read_from_pickle
+if len(sys.argv)!=2:
+    folder2run='final_data/total_moo'
+    print("sys.argv not running" ,len(sys.argv),sys.argv)
 else:
     folder2run=sys.argv[1]
-
+print(folder2run)
 if __name__=='__main__':
     for cell_name in read_from_pickle('cells_name2.p'):
         #if '4-3' in cell_name: continue
@@ -32,10 +34,10 @@ if __name__=='__main__':
 
         decided_passive_params=find_RA(base_dir)
         # if cell_name in ['2017_03_04_A_6-7','2017_05_08_A_5-4']: decided_passive_params='RA_best_fit'
-        if 'syn_xyz' in folder2run:
-            from_picture=False
-        else:
+        if cell_name in read_from_pickle('cells_sec_from_picture.p'):
             from_picture=True
+        else:
+            from_picture=False
         plot_morph(ax1, cell_name, before_after,without_axons=True,from_picture=from_picture)
 
         if get_n_spinese(cell_name)>1:

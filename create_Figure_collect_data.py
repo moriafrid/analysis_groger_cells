@@ -6,13 +6,14 @@ import string
 import sys
 from function_Figures import *
 
-if sys.argv!=3:
+if len(sys.argv)!=3:
     cell_name=read_from_pickle('cells_name2.p')[0]
-    folder2run='final_data/correct_seg_syn_from_picture'
-    print("sys.argv isn't run")
+    folder2run='final_data/total_moo'
+    print("sys.argv isn't run",len(sys.argv))
 else:
     cell_name=sys.argv[1]
     folder2run=sys.argv[2]
+print(cell_name,folder2run)
 
 if __name__=='__main__':
     #if '4-3' in cell_name: continue
@@ -34,10 +35,10 @@ if __name__=='__main__':
     ax7 = plt.subplot2grid(shape=shapes, loc=(1, 4), colspan=1, rowspan=1)
     # plt.subplots_adjust(hspace=0.3, wspace=0.3)
     decided_passive_params=find_RA(base_dir)
-    if 'syn_xyz' in folder2run:
-        from_picture=False
-    else:
+    if cell_name in read_from_pickle('cells_sec_from_picture.p'):
         from_picture=True
+    else:
+        from_picture=False
     plot_morph(ax1, cell_name, before_after,without_axons=True,from_picture=from_picture)
 
     if get_n_spinese(cell_name)>1:

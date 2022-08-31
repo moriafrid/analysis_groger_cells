@@ -3,11 +3,12 @@ from create_folder import create_folder_dirr
 from read_spine_properties import get_n_spinese
 from function_Figures import *
 import sys
-if sys.argv!=2:
-    folder2run='final_data/correct_seg_syn_from_picture'
-    folder2run=''
+if len(sys.argv)!=2:
+    folder2run='final_data/total_moo'
+    print("sys.argv not running" ,len(sys.argv))
 else:
     folder2run=sys.argv[1]
+print(folder2run)
 if folder2run=='':
     run_all=True
 else:
@@ -37,6 +38,10 @@ if __name__=='__main__':
 
     # plt.subplots_adjust(hspace=0.3, wspace=0.3)
     for i,cell_name in enumerate(read_from_pickle('cells_with_2_syn.p')[:3]):
+        if cell_name in read_from_pickle('cells_sec_from_picture.p'):
+            from_picture=True
+        else:
+            from_picture=False        
         if run_all:
             if cell_name in read_from_pickle('cells_sec_from_picture.p'): #cell that taken from picture
                 folder2run='final_data/correct_seg_syn_from_picture'
@@ -49,7 +54,7 @@ if __name__=='__main__':
             save_dir=folder2run+'/Figure2/'
             if 'syn_xyz' in folder2run:
                from_picture=False
-            else:
+            elif 'syn_from_picture' in folder2run:
                from_picture=True
         create_folder_dirr(save_dir)
 

@@ -8,11 +8,14 @@ from glob import glob
 import numpy as np
 import string
 import sys
-if sys.argv!=2:
+if len(sys.argv)!=2:
     folder2run='final_data/correct_seg_syn_from_picture'
     folder2run=''
+    print("sys.argv not running" ,len(sys.argv))
 else:
     folder2run=sys.argv[1]
+print(folder2run)
+
 if folder2run=='':
     run_all=True
 else:
