@@ -99,11 +99,10 @@ def get_spine_params(spine_type,cell_name=''):
         return parameter_cv['neck_length'],parameter_cv['neck_diam'],get_R_head(cell_name,num='list')*2
 def get_sec_and_seg(cell_name,spine_num=None,file_type='swc',before_after='_after_shrink',with_distance=False,from_picture=True,special_sec=''):
     #sepcial_sec could be '_1', '_2' .etc
-
     #this is correct syn to after shrink!
     # df = pd.read_excel('cells_outputs_data_short/'+cell_name+'/synaptic_location_seperate.xlsx',index_col=0)
     if file_type=='swc':
-        df=pd.read_csv('cells_initial_information/synaptic_location_seperate.csv',index_col=0)
+        df=pd.read_excel('cells_initial_information/synaptic_location_seperate.xlsx',index_col=0)
         if from_picture:
             dist_from_soma='dist_from_soma'
             seg_num='seg_num'
@@ -131,12 +130,13 @@ def get_sec_and_seg(cell_name,spine_num=None,file_type='swc',before_after='_afte
             return secs,segs,dis
         else:
             return secs,segs
-if __name__ == '__main__':
-    cell_name='2017_03_04_A_6-7'
+if __name__ == '__main__': 
+    
     from open_pickle import read_from_pickle
     for cell_name in read_from_pickle('cells_name2.p'):
-        print(cell_name,get_n_spinese(cell_name))
-    get_sec_and_seg(cell_name,from_picture=False)
+        print(cell_name,get_sec_and_seg(cell_name))
+    cell_name='2017_04_03_B'
+    print(get_sec_and_seg(cell_name,from_picture=True))
     get_parameter(cell_name,'PSD')
     get_F_factor_params('human_spine')
     get_R_head(cell_name,i=0)
