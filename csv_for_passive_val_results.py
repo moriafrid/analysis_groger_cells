@@ -52,16 +52,22 @@ for cell_name in cells:
                         except:
                             # print("there isn't have RA_total_errors_minimums in spine strart=" +SPINE_START+" "+initial_folder)
                             continue
+                        passive_vals_dict['RA=100']=found(passive_val_total,100)
+                        passive_vals_dict['RA=200']=found(passive_val_total,200)
+                        passive_vals_dict['RA=300']=found(passive_val_total,300)
                         passive_vals_dict['RA=120']=found(passive_val_total,120)
                         passive_vals_dict['RA=150']=found(passive_val_total,150)
                         passive_vals_dict['RA_min_error']=passive_val_total[0]
                         passive_vals_dict['min_CM']=found_min_parameter(passive_val_total,parameter='CM')
                         passive_vals_dict['RA_best_fit']=found_best_RA(passive_val_total)
                         passive_vals_dict['mean_best_10']=mean_best_n(passive_val_total,10)
-                        if fit_condition=='different_initial_conditions' and (passive_vals_dict['RA=120'] is None or passive_vals_dict['RA=150'] is None):
+                        if fit_condition=='different_initial_conditions' and (passive_vals_dict['RA=120'] is None or passive_vals_dict['RA=150'] is None or passive_vals_dict['RA=100'] is None or passive_vals_dict['RA=200'] is None or passive_vals_dict['RA=300'] is None):
                             passive_val_total=read_from_pickle(glob(initial_folder+'/RA_min'+str(100)+'/analysis/RA_total_errors_minimums.p')[0])
                             passive_vals_dict['RA=120']=found(passive_val_total,120)
                             passive_vals_dict['RA=150']=found(passive_val_total,150)
+                            passive_vals_dict['RA=120']=found(passive_val_total,100)
+                            passive_vals_dict['RA=120']=found(passive_val_total,200)
+                            passive_vals_dict['RA=120']=found(passive_val_total,300)
                         dict_fit_condition[fit_condition]={SPINE_START:{file_type:passive_vals_dict}}
 
 
