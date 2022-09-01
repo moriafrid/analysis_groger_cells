@@ -33,27 +33,9 @@ frozen_NMDA_weigth=False
 runnum2compare = '13'
 # spine_type="mouse_spine" #"groger_spine"
 print(sys.argv,flush=True)
-if len(sys.argv) != 17:
-    print("the function doesn't run with sys.argv",len(sys.argv),flush=True)
-    cpu_node = 1
-    cell_name= read_from_pickle('cells_name2.p')[0]
-    file_type='z_correct.swc'  #file type is just used to calculate F_factor
-    passive_val={'RA':float(120),'CM':1.6713,'RM':12075}
-    passive_fit_condition='const_param'
-    passive_val_name='test'
-    resize_dend_by=1.0
-    shrinkage_by=1.0
-    SPINE_START=20
-    profile = '_'
-    RA=float(100)
-    generation_size = 5
-    num_of_genarations = 2
-    double_spine_area=False
-    same_strengh=False
-    fit_until_point=-1
-    before_after='_after_shrink'
-elif len(sys.argv) == 18:
-    print("the sys.argv len is correct",flush=True)
+special_sec=''
+if len(sys.argv) == 18:
+    print("the sys.argv len is 18 and run correct",flush=True)
     cpu_node = int(sys.argv[1])
     cell_name = sys.argv[2]
     file_type=sys.argv[3] #hoc ar ASC
@@ -73,7 +55,25 @@ elif len(sys.argv) == 18:
     RA=float(sys.argv[4])
     generation_size = 100
     num_of_genarations = 1000
-
+elif len(sys.argv) != 17:
+    print("the function doesn't run with sys.argv",len(sys.argv),flush=True)
+    cpu_node = 1
+    cell_name= read_from_pickle('cells_name2.p')[0]
+    file_type='z_correct.swc'  #file type is just used to calculate F_factor
+    passive_val={'RA':float(120),'CM':1.6713,'RM':12075}
+    passive_fit_condition='const_param'
+    passive_val_name='test'
+    resize_dend_by=1.0
+    shrinkage_by=1.0
+    SPINE_START=20
+    profile = '_'
+    RA=float(100)
+    generation_size = 5
+    num_of_genarations = 2
+    double_spine_area=False
+    same_strengh=False
+    fit_until_point=-1
+    before_after='_after_shrink'
 else:
     print("the sys.argv len is correct",flush=True)
     cpu_node = int(sys.argv[1])
@@ -88,7 +88,6 @@ else:
     double_spine_area=eval(sys.argv[12])
     before_after=sys.argv[13]
     fit_until_point=int(sys.argv[14])
-
     same_strengh=eval(sys.argv[15])
     profile = sys.argv[16]
     RA=float(sys.argv[4])
@@ -295,7 +294,7 @@ def run(cell, seed=0):
     synapses_locations=[]
     spine_properties={}
     for i in range(get_n_spinese(cell_name)):
-        sec,seg=get_sec_and_seg(cell_name,i,from_picture=seg_from_picture,file_type='swc')
+        sec,seg=get_sec_and_seg(cell_name,i,from_picture=seg_from_picture,file_type='swc',special_sec=special_sec)
         seg=float(seg)
         synapses_locations.append([sec,seg])
         spine_properties[i]=get_building_spine(cell_name,i)
@@ -363,7 +362,7 @@ def run(cell, seed=0):
         ephys.parameters.NrnSectionParameter(name="g_pas", param_name="g_pas", value=1.0 / passive_val["RM"],
                                              locations=sec_list, frozen=True, value_scaler=F_FACTOR_DISTANCE))
     parameters_list.append(
-        ephys.parameters.NrnSectionParameter(name="cm", param_name="cm", bounds=[0.5, 4], value=CM_startValue,
+        ephys.parameters.NrnSectionParameter(name="cm", param_name="cm", bounds=[0.5, 5], value=CM_startValue,
                                              locations=sec_list, frozen=CM_FROZEN, value_scaler=F_FACTOR_DISTANCE)) #@# change the limit form [0.5, 1.5]
 
     param_names.append("e_pas")

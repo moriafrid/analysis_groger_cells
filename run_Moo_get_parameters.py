@@ -25,7 +25,8 @@ os.system('python csv_for_passive_val_results.py cells_name2.p '+before_after)
 
 
 for cell_name in read_from_pickle(cells_name_place):
-    if cell_name=='2017_03_04_A_6-7':continue
+    # if cell_name!='2017_04_03_B':continue
+    if not cell_name  in ['2016_05_12_A','2016_08_30_A']:continue
     passive_vals_dict= {}
     p='cells_outputs_data_short/'+cell_name+'/fit_short_pulse'+before_after+'/results_passive_fits.csv'
     print(cell_name)
@@ -34,15 +35,15 @@ for cell_name in read_from_pickle(cells_name_place):
         for fit_condition in ['const_param','different_initial_conditions'][:1]:
             for SPINE_START in [20,60,10][:1]:
                 if cell_name!='2017_05_08_A_4-5' and resize_diam_by==1.5:continue
-                if resize_diam_by==1.0 and shrinkage_by==1.0:
-                    do_double_spine_area=['True','False']
-                else:
-                    do_double_spine_area=['False']
-                for double_spine_area in do_double_spine_area:
+                # if resize_diam_by==1.0 and shrinkage_by==1.0:
+                #     do_double_spine_area=['True','False']
+                # else:
+                #     do_double_spine_area=['False']
+                for double_spine_area in ['False']: #do_double_spine_area
                     for file_type in ['z_correct.swc']:
                         passive_vals_dict=get_passive_parameter(cell_name,before_after,double_spine_area=double_spine_area,shrinkage_resize=[shrinkage_by,resize_diam_by],fit_condition=fit_condition,spine_start=SPINE_START,file_type=file_type)
                         next_continue=False
-                        for i, passive_val_name in enumerate(['RA_min_error','RA_best_fit','RA=120','RA=150'][:]):
+                        for i, passive_val_name in enumerate(['RA_min_error','RA_best_fit','RA=120','RA=150','RA=100','RA=200','RA=300'][-1:]):
                             # if passive_val_name=='RA_min_error':continue
                             if next_continue: continue
                             try: passive_vals_dict[passive_val_name]
@@ -52,11 +53,9 @@ for cell_name in read_from_pickle(cells_name_place):
                             RA,CM,RM=get_passive_val(passive_vals_dict[passive_val_name])
                             if float(RA)<50:
                                 continue
-                            # if float(RA)<70:
-                            #     continue
-                            else:
-                                if float(RA)>70:
-                                    next_continue=True
+                            # else:
+                            #     if float(RA)>70:
+                            #         next_continue=True
 
                             fits_until_point=str(-1)
                             if in_parallel:
@@ -85,7 +84,8 @@ for cell_name in read_from_pickle(cells_name_place):
 
                                 print(send_command)
 
-
-                                os.system(send_command+ " True")
                                 if get_n_spinese(cell_name)>1:
                                     os.system(send_command+" False")
+                                else:
+                                    os.system(send_command+ " True")
+
