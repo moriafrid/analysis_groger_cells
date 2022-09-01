@@ -43,7 +43,7 @@ for cell_name in read_from_pickle(cells_name_place):
                     for file_type in ['z_correct.swc']:
                         passive_vals_dict=get_passive_parameter(cell_name,before_after,double_spine_area=double_spine_area,shrinkage_resize=[shrinkage_by,resize_diam_by],fit_condition=fit_condition,spine_start=SPINE_START,file_type=file_type)
                         next_continue=False
-                        for i, passive_val_name in enumerate(['RA_min_error','RA_best_fit','RA=120','RA=150','RA=100','RA=200','RA=300'][-1:]):
+                        for i, passive_val_name in enumerate(['RA_min_error','RA_best_fit','RA=120','RA=150','RA=100','RA=200','RA=300'][:]):
                             # if passive_val_name=='RA_min_error':continue
                             if next_continue: continue
                             try: passive_vals_dict[passive_val_name]
@@ -51,10 +51,10 @@ for cell_name in read_from_pickle(cells_name_place):
                                 # print(cell_name,file_type,shrinkage_by,resize_diam_by,fit_condition,SPINE_START, " isn't found")
                                 continue
                             RA,CM,RM=get_passive_val(passive_vals_dict[passive_val_name])
-                            if float(RA)<50:
+                            if float(RA)<70:
                                 continue
                             # else:
-                            #     if float(RA)>70:
+                            #     if float(RA)>100:
                             #         next_continue=True
 
                             fits_until_point=str(-1)

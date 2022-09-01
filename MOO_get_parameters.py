@@ -362,7 +362,7 @@ def run(cell, seed=0):
         ephys.parameters.NrnSectionParameter(name="g_pas", param_name="g_pas", value=1.0 / passive_val["RM"],
                                              locations=sec_list, frozen=True, value_scaler=F_FACTOR_DISTANCE))
     parameters_list.append(
-        ephys.parameters.NrnSectionParameter(name="cm", param_name="cm", bounds=[0.5, 5], value=CM_startValue,
+        ephys.parameters.NrnSectionParameter(name="cm", param_name="cm", bounds=[0.5, 4], value=CM_startValue,
                                              locations=sec_list, frozen=CM_FROZEN, value_scaler=F_FACTOR_DISTANCE)) #@# change the limit form [0.5, 1.5]
 
     param_names.append("e_pas")
