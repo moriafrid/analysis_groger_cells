@@ -1,3 +1,4 @@
+from find_MOO_file import MOO_file
 from open_MOO_after_fit import OPEN_RES
 import numpy as np
 # from neuron import h
@@ -34,11 +35,12 @@ else:
         run_reorgenize=True
 
 folder_= ''
-folder_data1=folder_+'cells_outputs_data_short/'+specipic_cell+'/MOO_results_same_strange'+before_after+'*/*/F_shrinkage=*/const_param/'
-folder_data2=folder_+'cells_outputs_data_short/'+specipic_cell+'/MOO_results_relative_strange'+before_after+'*/*/F_shrinkage=*/const_param/'
 save_name='/g_max'
+folders=[]
+for moo_file in MOO_file(before_after=before_after):
+    folders+=glob(folder_+'cells_outputs_data_short/'+specipic_cell+'/'+moo_file+'/F_shrinkage=*/const_param/*/')
 
-for curr_i, model_place in tqdm(enumerate(glob(folder_data1+'*')+glob(folder_data2+'*'))):
+for curr_i, model_place in tqdm(enumerate(folders)):
     if 'syn_xyz' in model_place:
         sec_from_picture=False
     else:

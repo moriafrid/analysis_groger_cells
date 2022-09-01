@@ -1,4 +1,4 @@
-
+from find_MOO_file import MOO_file
 import re
 from matplotlib import pyplot as plt
 from open_pickle import read_from_pickle
@@ -12,7 +12,7 @@ import sys
 if len(sys.argv) != 4:
     specipic_cell='*'
     before_after='_after_shrink'
-    specipic_moo='_correct_seg_syn_from_picture' #_correct_seg_find_syn_xyz
+    specipic_moo='total_moo'#'_correct_seg_syn_from_picture' #_correct_seg_find_syn_xyz
     print("sys.argv isn't run")
 else:
     print("the sys.argv len is correct",flush=True)
@@ -20,8 +20,10 @@ else:
     if specipic_cell=='None':
         specipic_cell='*'
     before_after=sys.argv[2]
-    specipic_moo= sys.argv[3]
+    specipic_moo_save= sys.argv[3]
 
+# specipic_moo_save=specipic_moo[1:]
+specipic_moo_save='total_moo'
 
 data_file='cells_outputs_data_short/'
 
@@ -43,18 +45,21 @@ def copy_file(copy,paste,extra_name=''):
             print('')
 #need to run again with 3,5,8 if os.system is runing
 for cell_name in read_from_pickle('cells_name2.p'):
+    if cell_name in read_from_pickle('cells_sec_from_picture.p'):
+        specipic_moo='_correct_seg_syn_from_picture'
+    else:
+        specipic_moo='_correct_seg_find_syn_xyz'
+    # continue
     # if cell_name!='2017_03_04_A_6-7':continue
     # if not cell_name in ['2017_07_06_C_4-3','2017_07_06_C_3-4','2017_03_04_A_6-7']:continue
     if cell_name=='2017_07_06_C_3-4':
         full=''
     else:
         full='_full_trace'
-    save_file='final_data/'+specipic_moo[1:]+'/'+cell_name+'/'
-    data_file='cells_outputs_data_short/'+cell_name+'/'
 
-    MOO_relative='MOO_results_relative_strange'+before_after+specipic_moo+'/z_correct.swc_SPINE_START=20/'
-    MOO_same='MOO_results_same_strange'+before_after+specipic_moo+'/z_correct.swc_SPINE_START=20/'
-    # MOO_same=MOO_relative
+    save_file='final_data/'+specipic_moo_save+'/'+cell_name+'/'
+    data_file='cells_outputs_data_short/'+cell_name+'/'
+    MOO_same,MOO_relative=MOO_file()
     short_pulse='/fit_short_pulse'+before_after+'/'
     print(cell_name)
 
@@ -127,14 +132,21 @@ for cell_name in read_from_pickle('cells_name2.p'):
 
         except: "the moo isn't finish"
 
+#diffrent in
 cell_name='2017_05_08_A_4-5'
-data_file='cells_outputs_data_short/'+cell_name
+if cell_name in read_from_pickle('cells_sec_from_picture.p'):
+    specipic_moo='_correct_seg_syn_from_picture'
+else:
+    specipic_moo='_correct_seg_find_syn_xyz'
+data_file='cells_outputs_data_short/'+cell_name+'/'
+MOO_same='MOO_results_same_strange'+before_after+specipic_moo+'/z_correct.swc_SPINE_START=20/'
+short_pulse='/fit_short_pulse'+before_after+'/'
 
 files=glob(data_file+MOO_same+'/*')
 for p in files:
     resize=p.split('/')[-1]
     file_type=p.split('/')[-2]
-    save_file_resize='final_data'+before_after+'/'+cell_name+'/'+resize+'/'
+    save_file_resize='final_data/'+specipic_moo_save+'/'+cell_name+'/'+resize+'/'
     create_folder_dirr(save_file_resize)
     shrinkage_by,resize_diam_by=[float(par) for par in re.findall("\d+\.\d+", resize)]
     double_spine_area='False'
