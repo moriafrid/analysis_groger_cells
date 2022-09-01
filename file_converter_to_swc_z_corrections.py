@@ -3,8 +3,8 @@ import numpy as np
 import sys
 from glob import glob
 if len(sys.argv) != 2:
-    cell_name="2017_07_06_C_4-3"
-    before_after="_after_shrink"
+    cell_name="2017_04_03_B"
+    before_after="_before_shrink"
 else:
     cell_name=sys.argv[1]
     # before_after=sys.argv[2]
@@ -171,7 +171,7 @@ swc_file.close()
 # sp = h.PlotShape()
 # sp.show(0)  # show diameters
 import os
-os.system('python creat_morphology_dict.py '+cell_name+" "+before_after)
+os.system('python creat_morphology_dict_swc.py '+cell_name+" "+before_after)
 
 
 

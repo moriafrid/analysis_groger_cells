@@ -6,7 +6,7 @@ import pickle
 from extra_function import load_swc
 
 if len(sys.argv) != 3:
-    cell_name="2017_03_04_A_6-7"
+    cell_name="2017_04_03_B"
     before_after='_before_shrink'
     print('before or after need to be choose')
 else:
