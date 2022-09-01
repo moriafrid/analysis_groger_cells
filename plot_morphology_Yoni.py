@@ -112,7 +112,7 @@ def plot_morph(ax, cell_name, before_after,file_type='swc',without_axons=True,fr
     return ax
 
 if __name__=='__main__':
-    for cell_name in read_from_pickle('cells_name2.p')[9:]:
+    for cell_name in read_from_pickle('cells_name2.p')[3:]:
         print(cell_name)
         fig = plt.figure(figsize=(15,10))  # , sharex="row", sharey="row"
         fig.suptitle(cell_name, fontsize=30)# fig.set_figheight(6)
@@ -123,7 +123,9 @@ if __name__=='__main__':
 
         ax1.set_title('swc')
         plot_morph(ax1,cell_name,'_after_shrink',file_type='swc',from_picture=True,color_code='black')
-        plot_morph(ax1,cell_name,'_after_shrink',file_type='ASC',from_picture=False,color_code='blue')
+        plot_morph(ax1,cell_name,'_before_shrink',file_type='swc',from_picture=False,color_code='blue')
+
+        # plot_morph(ax1,cell_name,'_after_shrink',file_type='ASC',from_picture=False,color_code='blue')
 
         ax2.set_title('swc with ASC location')
         plot_morph(ax2,cell_name,'_after_shrink',file_type='swc',from_picture=False,color_code='black')
