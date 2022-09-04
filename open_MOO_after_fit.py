@@ -90,9 +90,11 @@ class OPEN_RES():
                                             params=self.parameters_list)
         self.model.instantiate(self.sim)
         self.hoc_model = getattr(self.sim.neuron.h, 'Model' + str(curr_i))[0]  # unique Model name - otherwise it will not override (despite destroy ahaaahhhaaa)
+        for section in self.hoc_model.all:
+            section.nseg = 1 + 2 * int(section.L / 40)
+
         # print("Loaded ", self.fixed_params_res)
         # print("Params: ", [(self.parameters_list[i].to_dict()['value'], self.parameters_list[i].to_dict()['name']) for i in range(len(self.parameters_list))])
-
     def get_model(self):
         return self.hoc_model
     def get_sec(self,sec):
