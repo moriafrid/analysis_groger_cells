@@ -19,8 +19,8 @@ matplotlib.rcParams['svg.fonttype'] = 'none'
 print(sys.argv)
 if len(sys.argv) != 4:
     specipic_cell='*'
-    before_after='_before_shrink'
-    specipic_moo='_correct_seg'
+    before_after='_after_shrink'
+    specipic_moo='*'
     run_reorgenize=False
     print("sys.argv isn't run")
 else:
@@ -110,7 +110,6 @@ for curr_i, model_place in tqdm(enumerate(folders)):
 
         imps_spine_head.append(h.Impedance(sec=spine[1]))
         imps_spine_head[num].loc(1) #spine_head
-
         distance.append(h.distance(model.soma[0](0.5),loader.get_sec(sec)(seg)))
         num+=1
 
@@ -186,6 +185,8 @@ for curr_i, model_place in tqdm(enumerate(folders)):
 
     loader.destroy()
     model.destroy()
+os.system("sbatch execute_python_script.sh "+ "csv_for_MOO_results_final.py")
+
 if specipic_cell=='*':
     specipic_cell="None"
 if run_reorgenize:

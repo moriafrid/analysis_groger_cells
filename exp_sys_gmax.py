@@ -143,6 +143,7 @@ for curr_i, model_place in tqdm(enumerate(folders)):
     # plt.plot(time_all, V_spine_All-V_spine_All[0], color='k', label='all',alpha=0.3)
     # plt.plot(time_all, g_spine_All, color='red', linestyle='--', label='NMDA gmax')
     # plt.plot(time_all, g_spine_All, color='b', linestyle='--', label='AMPA gmax')
+os.system("sbatch execute_python_script.sh "+ "csv_for_MOO_results_final.py")
 
 if specipic_cell=='*':
     specipic_cell="None"

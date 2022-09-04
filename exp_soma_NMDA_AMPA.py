@@ -15,7 +15,7 @@ matplotlib.rcParams['svg.fonttype'] = 'none'
 import sys
 import os
 if len(sys.argv) != 5:
-    specipic_cell='*'
+    specipic_cell='*3-4'
     before_after='_after_shrink'
     specipic_moo='_correct_seg*'
     run_reorgenize=False

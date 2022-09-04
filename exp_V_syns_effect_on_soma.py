@@ -145,6 +145,8 @@ for curr_i, model_place in tqdm(enumerate(folders)):
 
     loader.destroy()
     model.destroy()
+os.system("sbatch execute_python_script.sh "+ "csv_for_MOO_results_final.py")
+
 if specipic_cell=='*':
     specipic_cell="None"
 if run_reorgenize:
