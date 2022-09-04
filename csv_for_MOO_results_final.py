@@ -11,33 +11,29 @@ import re
 
 from read_spine_properties import get_n_spinese
 
-if len(sys.argv) != 3:
-    cells_name_place="cells_name2.p"
+if len(sys.argv) != 2:
     before_after='_after_shrink'
     print("creat csv for passive_val not running with sys.argv",len(sys.argv))
 else:
-    cells_name_place=sys.argv[1]
-    before_after=sys.argv[2]
+    before_after=sys.argv[1]
     print("creat csv for passive_val running with sys.argv",sys.argv)
 save_moo='_Rin_result'
 folder_=""
 folder_data="cells_initial_information/"
 folder_save="cells_outputs_data_short/"
-cells=read_from_pickle(cells_name_place)
-data_file='cells_outputs_data_short/'
 
-
-short_pulse='/fit_short_pulse'+before_after+'/'
 i=0
 # os.system('python run_analysis_fit_after_run.py')
-
-for cell_name in cells:
+all_data_cell=[]
+for cell_name in read_from_pickle('cells_name2.p')[:]: #['2017_03_04_A_6-7']:#
     print(cell_name)
     all_data = []
     file=[]
-    for p in MOO_file(cell_name,before_after=before_after):
+    for p in MOO_file(cell_name,before_after='_after_shrink')+MOO_file(cell_name,before_after='_before_shrink'):
         for passive_param_name in ['RA_min_error','RA_best_fit','RA=100','RA=120','RA=150','RA=200','RA=300']:
             file+=glob(folder_save+cell_name+p+'/F_shrinkage=1.0*1.0/const_param/'+passive_param_name+'/Rins_pickles.p')
+            file+=glob(folder_save+cell_name+p+'/F_shrinkage=1.0*1.0/const_param/'+passive_param_name+'*/Rins_pickles.p')
+
     moo_total_dict={}
     for loc in tqdm(file):
         moo_total_dict={}
@@ -56,9 +52,14 @@ for cell_name in cells:
         # spine_start=int(re.findall(r"[-+]?\d*\.\d+|\d+", loc.split('/')[3])[0])
         if "full_trace" in passive_param_name:
             passive_param_name=passive_param_name[:passive_param_name.rfind('_full_trace')]
-
+            full_trace=True
+        else:
+            full_trace=False
         result_dict=read_from_pickle(loc)
-
+        if "after_shrink" in loc:
+            before_after='_after_shrink'
+        else:
+            before_after="_before_shrink"
         for i in range(get_n_spinese(cell_name)):
             Moo_dict = {}
             for value in ['PSD','distance']:
@@ -79,28 +80,34 @@ for cell_name in cells:
                 dict_for_records = {}
                 # add metadata
                 dict_for_records['cell_name']=cell_name
+                dict_for_records['full_trace']=full_trace
                 dict_for_records['passive_parameter']=passive_param_name
                 dict_for_records['RA']=result_dict['parameters']['RA']
-                dict_for_records['relative']=result_dict['parameters']['reletive_strengths']
-                dict_for_records['shrinkage&resize_factors']=shrinkage_resize
+                dict_for_records['relative_relation']=result_dict['parameters']['reletive_strengths']
+                dict_for_records['relative']=np.mean(result_dict['parameters']['reletive_strengths'])<1
+                dict_for_records['shrinkage_resize']=shrinkage_resize
                 dict_for_records['double_spine_area']=double_spine_area
+                dict_for_records['from_picture']=cell_name in read_from_pickle('cells_sec_from_picture.p')
                 dict_for_records['before_shrink']=before_after.split('_')[1]
                 dict_for_records['syn_num']=i
                 if value is not None:
                     dict_for_records.update(value)
                 all_data.append(dict_for_records)
+                all_data_cell.append(dict_for_records)
+
 
         # all_data.append(dict_for_records)
-        output_df = pd.DataFrame.from_records(all_data)
+        # output_df = pd.DataFrame.from_records(all_data)
         # Rin_dict=read_from_pickle(glob(loc[:loc.find('hall_of_fame')]+'Rins_pickles.p')[0])
         # dict_for_records.update(Rin_dict)
         # all_data.append(dict_for_records)
 
-
-
-    save_pickle_folder=folder_+folder_data+cell_name+'/'
     output_df = pd.DataFrame.from_records(all_data)
     output_df.to_csv(folder_data+cell_name+"/results_MOO"+save_moo+".csv", index=False)
+    a=1
+output_df_cells = pd.DataFrame.from_records(all_data_cell)
+output_df_cells.to_csv(folder_data+"/results_MOO"+save_moo+".csv", index=False)
+
 
     # save_pickle_folder2=folder_+folder_data+cell_name
     # output_df = pd.DataFrame.from_records(all_data)
