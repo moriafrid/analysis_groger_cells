@@ -3,7 +3,7 @@ from neuron import h
 from extra_function import load_ASC, load_swc
 from open_pickle import read_from_pickle
 from read_spine_properties import get_sec_and_seg
-for cell_name in read_from_pickle('cells_name2.p')[9:]:
+for cell_name in read_from_pickle('cells_name2.p')[3:]:
     path1=glob('cells_initial_information/'+cell_name+'/*shrinkXYZ.ASC')[0]
     cell=load_ASC(path1)
     print(cell_name)
