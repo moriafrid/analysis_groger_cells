@@ -16,8 +16,8 @@ print(len(sys.argv),sys.argv,flush=True)
 
 if len(sys.argv) != 3:
     print("sys.argv not running and with length",len(sys.argv))
-    cell_name= '2017_03_04_A_6-7'
-    file_type2read= 'z_correct.swc'
+    cell_name= '2017_04_03_B'
+    file_type2read= 'z_correct_after*.swc'
 else:
     print("sys.argv is correct and running")
     cell_name = sys.argv[1]
@@ -26,9 +26,9 @@ folder_=''
 data_dir= "cells_initial_information"
 save_dir = "cells_outputs_data_short"
 print(cell_name, folder_+data_dir+"/"+cell_name+"/"+file_type2read)
-cell_file = glob(folder_+data_dir+"/"+cell_name+"/"+file_type2read)[0]
+cell_file = glob(folder_+data_dir+"/"+cell_name+"/*"+file_type2read)[0]
 if 'XYZ' not in file_type2read and 'XYZ' in cell_file:
-    cell_file = glob(folder_+data_dir+"/"+cell_name+"/"+file_type2read)[1]
+    cell_file = glob(folder_+data_dir+"/"+cell_name+"/*"+file_type2read)[1]
 
 print(cell_file,file_type2read)
 
@@ -148,7 +148,8 @@ for terminal in terminals:
     plt.plot(dis,diam,alpha=0.5)
     if len(diam)==1:
         plt.plot(dis,diam,'*')
+plt.show()
 plt.savefig(folder_save+'diam-dis.png')
 plt.savefig(folder_save+'diam-dis.pdf')
 pickle.dump(fig, open(folder_save+'diam-dis.p', 'wb'))
-# plt.show()
+plt.show()
