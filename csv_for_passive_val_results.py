@@ -65,9 +65,9 @@ for cell_name in cells:
                             passive_val_total=read_from_pickle(glob(initial_folder+'/RA_min'+str(100)+'/analysis/RA_total_errors_minimums.p')[0])
                             passive_vals_dict['RA=120']=found(passive_val_total,120)
                             passive_vals_dict['RA=150']=found(passive_val_total,150)
-                            passive_vals_dict['RA=120']=found(passive_val_total,100)
-                            passive_vals_dict['RA=120']=found(passive_val_total,200)
-                            passive_vals_dict['RA=120']=found(passive_val_total,300)
+                            passive_vals_dict['RA=100']=found(passive_val_total,100)
+                            passive_vals_dict['RA=200']=found(passive_val_total,200)
+                            passive_vals_dict['RA=300']=found(passive_val_total,300)
                         dict_fit_condition[fit_condition]={SPINE_START:{file_type:passive_vals_dict}}
 
 
