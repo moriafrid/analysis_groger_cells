@@ -14,13 +14,13 @@ matplotlib.rcParams['pdf.fonttype'] = 42
 matplotlib.rcParams['svg.fonttype'] = 'none'
 import sys
 import os
-if len(sys.argv) != 5:
-    specipic_cell='*3-4'
+if len(sys.argv) != 4:
+    specipic_cell='*'
     before_after='_after_shrink'
     specipic_moo='_correct_seg*'
     run_reorgenize=False
     sec_from_picture=False
-    print("sys.argv isn't run")
+    print("sys.argv isn't run and have len", len(sys.argv),sys.argv)
 else:
     print("the sys.argv len is correct",flush=True)
     specipic_cell = sys.argv[1]
@@ -33,7 +33,6 @@ else:
         run_reorgenize=False
     else:
         run_reorgenize=True
-    sec_from_picture=sys.argv[4]
 
 
 
