@@ -4,6 +4,8 @@ from glob import glob
 # from matplotlib_scalebar.scalebar import ScaleBar
 import matplotlib.pyplot as plt
 import numpy as np
+import pandas as pd
+from read_spine_properties import get_n_spinese
 from open_pickle import read_from_pickle
 from read_spine_properties import calculate_Rneck
 from scalbar_sapir import AnchoredHScaleBar
@@ -120,11 +122,14 @@ def clear_syn_mean(ax, dir):
     return ax
 
 def find_RA(file_dirr):
-    for passive_params in ['RA_min_error','RA_best_fit','RA=120','RA=150']:
+    RA=0
+    for passive_params in ['RA_min_error','RA_best_fit','RA=120','RA=150','RA=100','RA=200','RA=300']:
         try_find=glob(file_dirr+'fit RA=*_'+passive_params+'.p')
         if len(try_find)>0:
-            return passive_params
-    return 'there is no decided passive parameters founded'
+            RA=float(re.findall(r"[-+]?(?:\d*\.\d+|\d+)", try_find[0].split('/')[-1])[0])
+            if RA>50:
+                return passive_params
+    raise 'Error no passive parameters founded'
 def plot_short_pulse_model(ax,dirr,antil_point=-1):
     global  E_PAS,parameters
     dict_result=read_from_pickle(dirr)
@@ -178,14 +183,14 @@ def plot_syn_model2(ax,dirr,start_point=0):
     NMDA_weight=round(dict_result['mean_final_pop'][1]*1000,2)
     for k,color,label in zip(['voltage_all','voltage_0','voltage_1'],['black','#03d7fc','#fc8003'],['model','syn_0','syn1']):
         if k== 'voltage_all':
-            label_AMPA='AMPA '+str(AMPA_weight)+'nS'
-            label_NMDA='NMDA '+str(NMDA_weight)+'nS'
+            label_AMPA='AMPA '+str(AMPA_weight)+' nS'
+            label_NMDA='NMDA '+str(NMDA_weight)+' nS'
         else:
             num=int(re.findall(r'\d+', k)[0])
             label_AMPA='AMPA '+str(round(AMPA_weight*reletive_strengths[num]/sum(reletive_strengths),3))+' nS'
             label_NMDA='NMDA '+str(round(NMDA_weight*reletive_strengths[num]/sum(reletive_strengths),3))+' nS'
-#            label_AMPA='AMPA '+str(round(AMPA_weight*reletive_strengths[num]/sum(reletive_strengths),3))+'nS '+str(round(reletive_strengths[num]*100))+"%"
-#            label_NMDA='NMDA '+str(round(NMDA_weight*reletive_strengths[num]/sum(reletive_strengths),3))+'nS '+str(round(reletive_strengths[num]*100))+"%"
+#            label_AMPA='AMPA '+str(round(AMPA_weight*reletive_strengths[num]/sum(reletive_strengths),3))+' nS '+str(round(reletive_strengths[num]*100))+"%"
+#            label_NMDA='NMDA '+str(round(NMDA_weight*reletive_strengths[num]/sum(reletive_strengths),3))+' nS '+str(round(reletive_strengths[num]*100))+"%"
 
         ax.plot(T[start_point:],V[k]['V_soma_AMPA'][start_point:]-E_PAS,'-',c=color,lw=3+addlw,label=label_AMPA,alpha=0.8)
         ax.plot(T[start_point:],V[k]['V_soma_NMDA'][start_point:]-E_PAS,'--',c=color,lw=3+addlw,label=label_NMDA,alpha=0.8)
@@ -201,10 +206,46 @@ def plot_syn_model2(ax,dirr,start_point=0):
     
     ax.legend(loc="lower center", bbox_to_anchor=(1, 0.35),prop={'size': legend_size-2})
     add_scale_bar(ax,'fit_syn')
+
+
+def get_resistance_par(dirr,parameter):
+    found_path=glob(dirr[:dirr.rfind('/')]+'/Rins_pickles*.p')
+    if found_path!=1:
+        raise "there is more then one option"
+    else:
+        found_path=found_path[0]
+    return read_from_pickle(found_path)['parameters'][parameter]
+
+def get_MOO_result_parameters(cell_name,return_parameter,
+                              passive_parameter=None,syn_num=None,relative=None,before_shrink='after',shrinkage_resize=['1.0','1.0'],
+                              full_trace=True,from_picture=None,double_spine_area=False):
+    df=pd.read_csv('cells_initial_information/'+cell_name+'/results_MOO_Rin_result.csv',index_col=0)
+    curr=df
+    colombs=[]
+    if relative is None:
+        relative=get_n_spinese(cell_name)>1
+    for v in ['passive_parameter','syn_num','before_shrink','full_trace','relative','from_picture']:
+        if not eval(v) is None:
+            colombs.append((df[v] == eval(v)).to_numpy().astype(int))
+    correct_col = np.mean(colombs, axis=0).astype(int).astype(bool)
+    curr_df = df[correct_col]
+    return curr_df[return_parameter].to_numpy()
+
+def get_passive_val_name(dirr):
+    for p in ['RA_min_error','RA_best_fit','RA=100','RA=120','RA=150','RA=200','RA=300']:
+        if p in dirr:
+            return p
+    raise "no passive_val_name in this dirr"
+
+
 def plot_neck_voltage(ax,dirr,start_point=900):
     dict_syn=read_from_pickle(dirr)
+    passive_parameter=get_passive_val_name(dirr)
     cell_name=dirr.split('/')[2]
-    RA=dict_syn['parameters']['RA']  
+    RA=dict_syn['parameters']['RA']
+    Rin_base=get_MOO_result_parameters(cell_name,'neck_base_Rin',passive_parameter=passive_parameter)
+    if len(Rin_base)>get_n_spinese(cell_name): raise "there is too many argue from Rin"
+    # Rin_base=get_resistance_par(dirr)
     E_PAS=dict_syn['parameters']['E_PAS']
     T=dict_syn['time']
     V=dict_syn
@@ -216,7 +257,7 @@ def plot_neck_voltage(ax,dirr,start_point=900):
         antil_point=len(V[k]['V_base_neck'])-1300#int(len(V[k]['V_base_neck'])*2/3)
         T_temp=T[start_point:antil_point]
         ax.plot(T_temp,V[k]['V_base_neck'][start_point:antil_point]-E_PAS,c='black',lw=3+addlw,alpha=0.5,zorder=2)
-        ax.plot(T_temp,V[k]['V_head'][start_point:antil_point]-E_PAS,'-',c=color,lw=4+addlw,alpha=0.8,label=str(round(Rneck,2))+' MOhm',zorder=1)
+        ax.plot(T_temp,V[k]['V_head'][start_point:antil_point]-E_PAS,'-',c=color,lw=4+addlw,alpha=0.8,label='Rneck='+str(round(Rneck,2))+' MOhm\n Rin_base='+str(round(Rin_base[num],2)),zorder=1)
         ax.plot(T_temp,V[k]['V_base_neck'][start_point:antil_point]-E_PAS,linestyle='dashdot',alpha=0.8,dashes=[2, 3],c=color,lw=2+addlw,zorder=3)
 
         size_y_scal_bar.append(int(max(V[k]['V_head'])-E_PAS))
@@ -298,7 +339,7 @@ def plot_pickle(ax,dirr,scale_bar_type=None,remove_begin=True,wigth_factor=1,ant
         add_scale_bar(ax,scale_bar_type,dirr,end_point=end_point)
         ax.plot(x,np.mean(mean_cal,axis=0),color='black',lw=line.get_lw()*wigth_factor+addlw)
     else:
-        ax.legend(loc="upper center", bbox_to_anchor=(0.5, 1.3),prop={'size': legend_size-1})
+        ax.legend(loc="upper center", bbox_to_anchor=(0.5, 1),prop={'size': legend_size-1})
         ax.spines['left'].set_visible(False)
         ax.spines['top'].set_visible(False)
         ax.spines['right'].set_visible(False)
