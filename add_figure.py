@@ -31,6 +31,9 @@ def adgust_subplot(ax,title,x_label,y_label,titlesize=30):
 
 	#plt.rc('legend', fontsize=30)    # legend fontsize
 	# plt.rc('figure', titlesize=40)  # fontsize of the figure title
+
+	ax.spines['top'].set_visible(False)
+	ax.spines['right'].set_visible(False)
 	ax.set_title(title,fontsize=titlesize)
 	ax.set_xlabel(x_label)
 	ax.set_ylabel(y_label)
