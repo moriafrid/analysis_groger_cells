@@ -6,7 +6,7 @@ import numpy as np
 from neuron import h
 import matplotlib.pyplot as plt
 from glob import glob
-from read_spine_properties import get_sec_and_seg,get_building_spine,get_n_spinese,get_parameter
+from read_spine_properties import get_sec_and_seg, get_building_spine, get_n_spinese, get_parameter, calculate_Rneck
 from tqdm import tqdm
 import pickle
 import matplotlib
@@ -18,7 +18,7 @@ matplotlib.rcParams['pdf.fonttype'] = 42
 matplotlib.rcParams['svg.fonttype'] = 'none'
 print(sys.argv)
 if len(sys.argv) != 4:
-    specipic_cell='*'
+    specipic_cell='*04_03_B'
     before_after='_after_shrink'
     specipic_moo='*'
     run_reorgenize=False
@@ -83,8 +83,14 @@ for curr_i, model_place in tqdm(enumerate(folders)):
     netstim.start = spike_timeing + neuron_start_time
     netstim.noise = 0
     h.tstop = total_duration
+    special_sec=''
+    if cell_name =='2017_04_03_B':
+        for n in np.arange(1,7):
+            if '_'+str(n)+'_' in model_place.split('/')[-2]:
+                special_sec='_'+str(n)
 
-    secs,segs=get_sec_and_seg(cell_name,from_picture=sec_from_picture)
+
+    secs,segs=get_sec_and_seg(cell_name,from_picture=sec_from_picture,special_sec=special_sec)
     num=0
     V_spine=[]
     V_base_neck=[]
@@ -92,8 +98,12 @@ for curr_i, model_place in tqdm(enumerate(folders)):
     syn_objs=[]
     imps_base=[]
     imps_spine_head=[]
-    imp_soma=h.Impedance(sec=model.soma[0])
-    imp_soma.loc(0.5)
+    seg_for_record_base=[]
+    seg_for_record_head=[]
+    # imp_soma=h.Impedance(sec=model.soma[0])
+    imp_soma=h.Impedance()
+    seg_for_record=model.soma[0](0.5)
+    imp_soma.loc(seg_for_record,sec=seg_for_record.sec)
     distance=[]
     for sec,seg in zip(secs,segs):
         dict_spine_param=get_building_spine(cell_name,num)
@@ -105,11 +115,19 @@ for curr_i, model_place in tqdm(enumerate(folders)):
         V_base_neck.append(h.Vector())
         V_base_neck[num].record(loader.get_sec(sec)(seg)._ref_v) #the neck base
 
-        imps_base.append(h.Impedance(sec=loader.get_sec(sec)))
-        imps_base[num].loc(seg) #spine base = on dend segment
+        seg_for_record_base.append(loader.get_sec(sec)(seg))
+        imps_base.append(h.Impedance())
+        # imps_base.append(h.Impedance(sec=loader.get_sec(sec)))
+        # imps_base[num].loc(0) #spine base = on dend segment
+        imps_base[num].loc(seg_for_record_base[num],sec=seg_for_record_base[num].sec) #spine base = on dend segment
 
-        imps_spine_head.append(h.Impedance(sec=spine[1]))
-        imps_spine_head[num].loc(1) #spine_head
+        seg_for_record_head.append(spine[1](1))
+        imps_spine_head.append(h.Impedance())
+
+        # imps_spine_head.append(h.Impedance(sec=spine[1]))
+        # imps_spine_head[num].loc(1) #spine_head
+        imps_spine_head[num].loc(seg_for_record_head[num],sec=seg_for_record_head[num].sec) #spine_head
+
         distance.append(h.distance(model.soma[0](0.5),loader.get_sec(sec)(seg)))
         num+=1
 
@@ -121,18 +139,24 @@ for curr_i, model_place in tqdm(enumerate(folders)):
     h.steps_per_ms = 1.0/h.dt
 
     h.run()
-    Rin_soma=imp_soma.input(0)
+
+    # Rin_soma=imp_soma.input(0)
+    imp_soma.compute(0)
+    Rin_soma=imp_soma.input(0.5,sec=model.soma[0])
+
     Rin_base,Rtrans_base=[],[]
-    for imp in imps_base:
+    for num,imp in enumerate(imps_base):
         imp.compute(0)
-        Rin_base.append(imp.input(0))
-        Rtrans_base.append(imp.transfer(model.soma[0](0.5)))
+        Rin_base.append(imp.input(seg_for_record_base[num],sec=seg_for_record_base[num].sec))
+        Rtrans_base.append(imp.transfer(seg_for_record_base[num],sec=seg_for_record_base[num].sec))
+        # Rtrans_base.append(imp.transfer(model.soma[0](0.5)))
 
     Rin_head,Rtrans_head=[],[]
-    for imp in imps_spine_head:
+    for num,imp in enumerate(imps_spine_head):
         imp.compute(0)
-        Rin_head.append(imp.input(0))
-        Rtrans_head.append(imp.transfer(model.soma[0](0.5)))
+        Rin_head.append(imp.input(seg_for_record_head[num],sec=seg_for_record_head[num].sec))
+        Rtrans_base.append(imp.transfer(seg_for_record_head[num],sec=seg_for_record_head[num].sec))
+        # Rtrans_head.append(imp.transfer(model.soma[0](0.5)))
     passive_propert_title='Rm='+str(round(1.0/model.soma[0].g_pas,2)) +' Ra='+str(round(model.soma[0].Ra,2))+' Cm='+str(round(model.soma[0].cm,2))
     cut_from_start_time=int(neuron_start_time/0.1)
 
@@ -150,7 +174,7 @@ for curr_i, model_place in tqdm(enumerate(folders)):
     fig.suptitle('Voltage in Spine base\n '+" ".join([model_place.split('/')[1],model_place.split('/')[-1] ,'\n',model_place.split('/')[4],model_place.split('/')[2]])+'\n'+passive_propert_title)
     dicty={}
     dicty['time']=time
-    parameters_dict={'reletive_strengths':reletive_strengths,'PSD':psd_sizes,'RA':loader.get_param('Ra'),'RM':1.0/loader.get_param('g_pas'),'CM':loader.get_param('cm'),'E_PAS':loader.get_param('e_pas')}
+    parameters_dict={'reletive_strengths':reletive_strengths,'PSD':psd_sizes,'RA':loader.get_param('Ra'),'RM':1.0/loader.get_param('g_pas'),'CM':loader.get_param('cm'),'E_PAS':loader.get_param('e_pas'),'Rneck':calculate_Rneck(cell_name,Ra=loader.get_param('Ra'))}
     dicty['parameters']=parameters_dict
     for j in range(len(V_spine)):
         V_spine[j]=np.array(V_spine[j])[cut_from_start_time:]
@@ -185,7 +209,7 @@ for curr_i, model_place in tqdm(enumerate(folders)):
 
     loader.destroy()
     model.destroy()
-os.system("sbatch execute_python_script.sh "+ "csv_for_MOO_results_final.py")
+os.system("python csv_for_MOO_results_final.py")
 
 if specipic_cell=='*':
     specipic_cell="None"
