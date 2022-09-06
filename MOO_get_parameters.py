@@ -891,7 +891,7 @@ spine_properties={}
 result_R_neck_m_ohm=[]
 for i in range(get_n_spinese(cell_name)):
     spine_properties[i]=get_building_spine(cell_name,i)
-    result_R_neck_m_ohm.append((spine_properties[i]['NECK_LENGHT'] * 4.0 * passive_val['RA'])/(np.pi*(spine_properties[i]['NECK_DIAM']/2)**2) *100.0 *1e-6)# 0.25 is neck_diam
+    result_R_neck_m_ohm.append((spine_properties[i]['NECK_LENGHT'] * passive_val['RA'])/(np.pi*(spine_properties[i]['NECK_DIAM']/2)**2) /100.0) #mega oum
 spine_properties['F_factor']=F_factor
 
 #################################33
