@@ -103,6 +103,11 @@ def get_sec_and_seg(cell_name,spine_num=None,file_type='swc',before_after='_afte
     # df = pd.read_excel('cells_outputs_data_short/'+cell_name+'/synaptic_location_seperate.xlsx',index_col=0)
     if file_type=='swc':
         df=pd.read_excel('cells_initial_information/synaptic_location_seperate.xlsx',index_col=0)
+        if from_picture is None:
+            if cell_name in read_from_pickle('cells_sec_from_picture.p'):
+                from_picture=True
+            else:
+                from_picture=False
         if from_picture:
             dist_from_soma='dist_from_soma'
             seg_num='seg_num'
@@ -114,6 +119,7 @@ def get_sec_and_seg(cell_name,spine_num=None,file_type='swc',before_after='_afte
         df=pd.read_excel('cells_outputs_data_short/synaptic_location_seperate'+before_after+'.xlsx',index_col=0)
         dist_from_soma='dist_from_soma'
         seg_num='seg_num'
+
     if not spine_num is None:
         if with_distance:
             return df[cell_name+str(spine_num)+special_sec]['sec_name'],float(df[cell_name+str(spine_num)+special_sec][seg_num]),float(df[cell_name+str(spine_num)+special_sec][dist_from_soma])
