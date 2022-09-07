@@ -483,14 +483,14 @@ def run(cell, seed=0):
         param_name='tau1',
         value=0.3276467256184666,
         frozen=AMPA_RISE_FIX,
-        bounds=[0.1, 0.4],#[0.1, 0.4],
+        bounds=[0.05, 0.4],#[0.1, 0.4],
         locations=tau_param_locs))
     syn_params.append(ephys.parameters.NrnPointProcessParameter(
         name='exp2syn_tau2',
         param_name='tau2',
         value=1.7068789695815033,#1.8,  # min(AMPA_FIT[cell]['tau2'],8),
         frozen=AMPA_DECAY_FIX,
-        bounds=[1, 3],
+        bounds=[0.5, 3],
         locations=tau_param_locs))
 
     syn_params.append(ephys.parameters.NrnPointProcessParameter(
@@ -498,14 +498,14 @@ def run(cell, seed=0):
         param_name='tau_r_NMDA',
         value=7.017839009279828,
         frozen=False,
-        bounds=[3, 15],
+        bounds=[3, 20],
         locations=NMDA_param_locs))
     syn_params.append(ephys.parameters.NrnPointProcessParameter(
         name='NMDA_tau_d_NMDA',
         param_name='tau_d_NMDA',
         value=68.15239933603264,
         frozen=False,
-        bounds=[25, 90],
+        bounds=[25, 120],
         locations=NMDA_param_locs))
     syn_params.append(ephys.parameters.NrnPointProcessParameter(
         name='NMDA_n_NMDA',
