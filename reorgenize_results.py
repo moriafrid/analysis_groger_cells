@@ -145,7 +145,7 @@ for cell_name in read_from_pickle('cells_name2.p'):
         RA,CM,RM=get_passive_val(passive_vals_dict,what_return='full_result')
         RA=str(int(float(RA)))
         copy_file(glob(data_file+short_pulse+'z_correct.swc_SPINE_START=20/dend*'+str(resize_diam_by)+'&F_shrinkage='+str(shrinkage_by)+'/const_param/RA/fit RA='+RA+'.p')[0],save_file_RA,extra_name=passive_val_name)
-        os.system(" ".join(["python plot_fit_short_pulse.py",cell_name,str(RM), str(RA), str(CM),str(resize_diam_by),str(shrinkage_by),str(passive_val_name),before_after]))
+        # os.system(" ".join(["python plot_fit_short_pulse.py",cell_name,str(RM), str(RA), str(CM),str(resize_diam_by),str(shrinkage_by),str(passive_val_name),before_after]))
         copy_file(dirr_passive_result+passive_val_name+'_pickles.p',save_file_RA)
 
         try:
