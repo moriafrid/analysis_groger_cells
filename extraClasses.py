@@ -6,9 +6,11 @@
 # parameter that compansate for spine area in CM or g_pas
 #
 #############################################################
+import numpy as np
 from bluepyopt import ephys
 from bluepyopt.ephys.parameters import NrnParameter,NrnRangeParameter
 from bluepyopt.ephys.parameterscalers import *
+from extra_fit_func import short_pulse_edges
 
 import logging
 logger = logging.getLogger(__name__)
@@ -193,7 +195,7 @@ class EFeatureHalfWidth(EFeature):
 
 
 class EFeaturePeakTime(EFeature):
-    def __init__(self, T, V):
+    def __init__(self, T, V, extra_rec=''):
         """
 
         :param T: the time objective
@@ -205,12 +207,13 @@ class EFeaturePeakTime(EFeature):
         # self.fit_times = fit_times
         self.T_objective = T
         self.V_objective = V
+        self.extra_rec = extra_rec
 
     def calculate_feature(self, responses, raise_warnings=False):
         """Calculate feature value"""
         import numpy
-        T = numpy.array(responses['soma.v']['time'])
-        V = numpy.array(responses['soma.v']['voltage'])
+        T = numpy.array(responses[self.extra_rec+'soma.v']['time'])
+        V = numpy.array(responses[self.extra_rec+'soma.v']['voltage'])
         seatell = numpy.where(T > neuron_start_time)[0][0]
         T = T - T[seatell]
         T = T[seatell:]
@@ -228,25 +231,26 @@ class EFeaturePeakTime(EFeature):
 
 
 class EFeaturePeak(EFeature):
-    def __init__(self, T, V, exp_std=1):
+    def __init__(self, T, V, exp_std=1, extra_rec=''):
         """
 
         :param T: the time objective
         :param V: the voltage objective
         """
-        super(EFeaturePeak, self).__init__('RDSM', '')
+        super(EFeaturePeak, self).__init__('EFeaturePeak', '')
         # if len(fit_times) < 1:
         #     raise Exception('need time for RDSM fit')
         # self.fit_times = fit_times
         self.T_objective = T
         self.V_objective = V
         self.exp_std=exp_std
+        self.extra_rec=extra_rec
 
     def calculate_feature(self, responses, raise_warnings=False):
         """Calculate feature value"""
         import numpy
-        T = numpy.array(responses['soma.v']['time'])
-        V = numpy.array(responses['soma.v']['voltage'])
+        T = numpy.array(responses[self.extra_rec+'soma.v']['time'])
+        V = numpy.array(responses[self.extra_rec+'soma.v']['voltage'])
         seatell = numpy.where(T > neuron_start_time)[0][0]
         T = T - T[seatell]
         T = T[seatell:]
@@ -256,6 +260,81 @@ class EFeaturePeak(EFeature):
 
     def calculate_score(self, responses, trace_check=False):
         return self.calculate_feature(responses, raise_warnings=trace_check)/self.exp_std
+
+
+class EFeatureRin(EFeature):
+    def __init__(self, V, exp_std=1, extra_rec='EFeatureRin', cell_name=''):
+        from parameters_short_pulse import decay_length
+
+        """
+
+        :param T: the time objective
+        :param V: the voltage objective
+        """
+        super(EFeatureRin, self).__init__('short_pulse', '')
+        self.V_objective = V
+        self.exp_std=exp_std
+        self.extra_rec=extra_rec
+        start,end,length=short_pulse_edges(cell_name)
+        decay_start=start
+        decay_end=start+decay_length
+        self.max2fit_start=start+decay_length
+        if cell_name=='2017_04_03_B':
+            self.max2fit_end=end-500
+        else:
+            self.max2fit_end=end-10
+        Vss=V[self.max2fit_start:self.max2fit_end]
+        # Vss = V[self.start+(self.end-self.start)//2:self.end-100]
+        self.Vss_mean = np.mean(Vss)
+
+    def calculate_feature(self, responses, raise_warnings=False):
+        """Calculate feature value"""
+        import numpy
+        T = numpy.array(responses[self.extra_rec+'soma.v']['time'])
+        V = numpy.array(responses[self.extra_rec+'soma.v']['voltage'])
+        seatell = numpy.where(T > neuron_start_time)[0][0]
+        V = V[seatell:]
+        Vss = V[self.max2fit_start:self.max2fit_end]
+        # Vss = V[self.start+(self.end-self.start)//2:self.end-100]
+        Vss_mean = np.mean(Vss)
+        return abs(Vss_mean - self.Vss_mean)
+
+
+    def calculate_score(self, responses, trace_check=False):
+        return self.calculate_feature(responses, raise_warnings=trace_check)/self.exp_std
+
+class EFeatureDecay(EFeature):
+    def __init__(self, V, exp_std=1, extra_rec='',cell_name=''):
+        from parameters_short_pulse import decay_length
+        """
+        :param T: the time objective
+        :param V: the voltage objective
+        """
+        super(EFeatureDecay, self).__init__('EFeatureDecay', '')
+        # if len(fit_times) < 1:
+        #     raise Exception('need time for RDSM fit')
+        # self.fit_times = fit_times
+        self.V_objective = V
+        self.exp_std=exp_std
+        self.extra_rec=extra_rec
+        start,end,length=short_pulse_edges(cell_name)
+        self.decay_start=start
+        self.decay_end=start+decay_length
+        self.decay=V[self.decay_start:self.decay_end]
+    def calculate_feature(self, responses, raise_warnings=False):
+        """Calculate feature value"""
+        import numpy
+        T = numpy.array(responses[self.extra_rec+'soma.v']['time'])
+        V = numpy.array(responses[self.extra_rec+'soma.v']['voltage'])
+        seatell = numpy.where(T > neuron_start_time)[0][0]
+        V = V[seatell:]
+        return np.sqrt(np.sum(np.power(self.decay - V[self.decay_start:self.decay_end], 2))/(self.decay_end-self.decay_start))
+        # return abs(numpy.max(self.V_objective)-numpy.max(V))
+
+
+    def calculate_score(self, responses, trace_check=False):
+        return self.calculate_feature(responses, raise_warnings=trace_check)/self.exp_std
+
 
 class EFeatureImpadance(EFeature):
     def __init__(self, Rin, injEnd, injCur, extra_rec="Rin1"):
