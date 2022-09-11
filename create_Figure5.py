@@ -1,12 +1,10 @@
-import pandas as pd
 from matplotlib import pyplot as plt
-from add_figure import add_figure, adgust_subplot
+from add_figure import  adgust_subplot
 from create_folder import create_folder_dirr
 from open_pickle import read_from_pickle
 from read_spine_properties import get_sec_and_seg, get_parameter, get_n_spinese, calculate_Rneck
 from function_Figures import find_RA, legend_size, get_MOO_result_parameters
 import numpy as np
-import string
 import sys
 if len(sys.argv)!=2:
     save_folder='final_data/total_moo/'
@@ -24,8 +22,8 @@ shapes = (1, 2)
 fig1.subplots_adjust(left=0.1,right=0.90,top=0.85,bottom=0.15,hspace=0.01, wspace=0.2)
 ax0_1 = plt.subplot2grid(shape=shapes, loc=(0, 0), rowspan=1, colspan=1)
 ax0_2 = plt.subplot2grid(shape=shapes, loc=(0, 1), colspan=1, rowspan=1)
-adgust_subplot(ax0_1,'gmax AMPA diffrent Ra' ,'PSD','gmax AMPA [nS]')
-adgust_subplot(ax0_2,'gmax NMDA diffrent Ra','PSD','gmax NMDA [nS]')
+adgust_subplot(ax0_1,'gmax AMPA diffrent Ra' ,'PSD','gmax AMPA [nS]','A')
+adgust_subplot(ax0_2,'gmax NMDA diffrent Ra','PSD','gmax NMDA [nS]','B')
 all_AMPA,all_NMDA,all_PSD=[],[],[]
 # all_AMPA=np.zeros(9)
 for i,cell_name in enumerate(read_from_pickle('cells_name2.p')[:]):
@@ -76,8 +74,8 @@ shapes = (1, 2)
 fig1.subplots_adjust(left=0.1,right=0.90,top=0.85,bottom=0.15,hspace=0.01, wspace=0.2)
 ax0_1 = plt.subplot2grid(shape=shapes, loc=(0, 0), rowspan=1, colspan=1)
 ax0_2 = plt.subplot2grid(shape=shapes, loc=(0, 1), colspan=1, rowspan=1)
-adgust_subplot(ax0_1,'gmax AMPA diffrent Ra' ,'PSD','gmax AMPA [nS]')
-adgust_subplot(ax0_2,'gmax NMDA diffrent Ra','PSD','gmax NMDA [nS]')
+adgust_subplot(ax0_1,'gmax AMPA diffrent Ra' ,'PSD','gmax AMPA [nS]','A')
+adgust_subplot(ax0_2,'gmax NMDA diffrent Ra','PSD','gmax NMDA [nS]','B')
 for i,cell_name in enumerate(read_from_pickle('cells_name2.p')):
     plot_dict={'color':colors[i],'label':cell_name,'lw':scatter_size-2}
     # for num in range(get_n_spinese(cell_name)):

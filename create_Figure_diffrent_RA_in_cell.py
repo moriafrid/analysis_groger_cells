@@ -16,7 +16,7 @@ else:
 save_dir=save_folder+'Figure7_RA_influence/'
 create_folder_dirr(save_dir)
 scatter_size=5
-passive_parameter_names=['RA_min_error','RA_best_fit','RA=100','RA=120']
+passive_parameter_names=['RA=70','RA_min_error','RA_best_fit','RA=100','RA=120']
 
 fig1 = plt.figure(figsize=(15, 15))  # , sharex="row", sharey="row"
 shapes = (5, 4)
