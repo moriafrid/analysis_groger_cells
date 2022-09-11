@@ -16,7 +16,8 @@ def find_xy(sec_dots,find_seg):
     dots_number=len(sec_dots[0])
     places=np.array([int(find_seg*dots_number),int(find_seg*dots_number)])-np.array([1,1])
     return sec_dots[0][places[0]],sec_dots[1][places[1]]
-def plot_morphology(ax, segment_colors, names=[], width_mult_factors=None, seg_ind_to_xyz_coords_map={},synapse=[], without_axons=True,color_num=0):
+def plot_morphology(ax, segment_colors, names=[], width_mult_factors=None, seg_ind_to_xyz_coords_map={},synapse=[], without_axons=True,color_num=0
+                    ,bbox_to_anchor=(1, 0.9),show_legend=True):
     if width_mult_factors is None:
         width_mult_factor = 1.2
         width_mult_factors = width_mult_factor * np.ones((segment_colors.shape))
@@ -79,8 +80,8 @@ def plot_morphology(ax, segment_colors, names=[], width_mult_factors=None, seg_i
         for ind in all_seg_inds:
             ax.text(np.max(seg_ind_to_xyz_coords_map[key]['x']), np.max(seg_ind_to_xyz_coords_map[key]['y']),
                     names[ind])
-
-    ax.legend(loc='upper right',prop={'size':legend_size},bbox_to_anchor=(1, 0.9))
+    if show_legend:
+        ax.legend(loc='upper right',prop={'size':legend_size},bbox_to_anchor=bbox_to_anchor)
     # leg = ax.get_legend()
     # leg.legendHandles[0].set_color('red')
     # leg.legendHandles[1].set_color('yellow')
@@ -90,7 +91,7 @@ def plot_morphology(ax, segment_colors, names=[], width_mult_factors=None, seg_i
 
     ax.set_axis_off()
 
-def plot_morph(ax, cell_name, before_after,file_type='swc',without_axons=True,from_picture=True,color_code='black'):
+def plot_morph(ax, cell_name, before_after,file_type='swc',without_axons=True,from_picture=True,color_code='black',bbox_to_anchor=(1, 0.9),show_legend=True):
     morphology_filename=glob('cells_initial_information/'+cell_name+'/dict_morphology/'+file_type+before_after+'.pickle')[0]
     seg_ind_to_xyz_coords_map=read_from_pickle(morphology_filename)
 
@@ -99,16 +100,12 @@ def plot_morph(ax, cell_name, before_after,file_type='swc',without_axons=True,fr
     segment_widths_selected = 6 * np.ones(segment_colors_selected.shape)
     synapses=list(get_sec_and_seg(cell_name,with_distance=True,from_picture=from_picture,before_after=before_after,file_type=file_type))+[get_parameter(cell_name,'PSD')]
     print(synapses)
-    # synapses=[get_spine_xyz(cell_name,i) for i in range(get_n_spinese(cell_name))]
-    # choosen_synpase=[]
-    # for spine_num in np.arange(get_n_spinese(cell_name)):
-    #     choosen_synpase.append(get_spine_xyz(cell_name,spine_num))
     if color_code=='black':
         color_num=0
     elif color_code=='blue':
         color_num=0.9
     plot_morphology(ax, segment_colors_selected, width_mult_factors=segment_widths_selected,
-                    seg_ind_to_xyz_coords_map=seg_ind_to_xyz_coords_map,synapse=synapses, names=[], without_axons=without_axons,color_num=color_num)
+                    seg_ind_to_xyz_coords_map=seg_ind_to_xyz_coords_map,synapse=synapses, names=[], without_axons=without_axons,color_num=color_num,show_legend=True,bbox_to_anchor=bbox_to_anchor)
     return ax
 
 if __name__=='__main__':

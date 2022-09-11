@@ -123,14 +123,14 @@ def clear_syn_mean(ax, dir):
 
 def find_RA(file_dirr):
     RA=0
-    for passive_params in ['RA_min_error','RA_best_fit','RA=120','RA=150','RA=100','RA=200','RA=300']:
+    for passive_params in ['RA=70','RA_min_error','RA_best_fit','RA=120','RA=150','RA=100','RA=200','RA=300']:
         try_find=glob(file_dirr+'fit RA=*_'+passive_params+'.p')
         if len(try_find)>0:
             RA=float(re.findall(r"[-+]?(?:\d*\.\d+|\d+)", try_find[0].split('/')[-1])[0])
             if RA>50:
                 return passive_params
     raise 'Error no passive parameters founded'
-def plot_short_pulse_model(ax,dirr,antil_point=-1):
+def plot_short_pulse_model(ax,dirr,antil_point=-1,show_legend=True):
     global  E_PAS,parameters
     dict_result=read_from_pickle(dirr)
     experiment=dict_result['experiment']
@@ -149,30 +149,33 @@ def plot_short_pulse_model(ax,dirr,antil_point=-1):
     CM_text="C_m="+str(round(parameters['CM'],1))+" \u03BCf/cm^2"+"\n"
     ax.text(0.6,0.9,RA_text+CM_text+RM_text,transform=ax.transAxes,size='medium')
     #ax.text(500,-5,"RM="+str(round(parameters['RM']))+" "+'\u03A9cm^2'+"\nRA="+str(round(parameters['RA']))+" \u03A9cm\nCM="+str(roun (parameters['CM'],1))+" \u03BCf/cm^2",size='large')
-    ax.legend(loc='upper left',prop={'size': legend_size})
+    if show_legend:
+        ax.legend(loc='upper left',prop={'size': legend_size})
     add_scale_bar(ax,'fit_short_pulse',dirr)
     return ax
 
-def plot_syn_model(ax,dirr,start_point=0):
+def plot_syn_model(ax,dirr,start_point=600,show_legend=False):
     dict_syn=read_from_pickle(dirr)
     E_PAS=dict_syn['parameters']['E_PAS']
     dict_result=read_from_pickle(glob(dirr[:dirr.rfind('/')]+'/final_pop'+dirr[dirr.rfind('pickles_')+7:])[0])
     T=dict_syn['time']
     V=dict_syn['voltage']
-    ax.plot(T[start_point:],V['experiment'][start_point:]-E_PAS,color = 'black',alpha=0.2,label='experiment',lw=10+addlw*2)
-    ax.plot(T[start_point:],V['Model'][start_point:]-E_PAS,c='red',label='Model',alpha=1,lw=4+addlw)
-    ax.plot(T,V['V_AMPA'][start_point:]-E_PAS,c='#18852a',linestyle ="--",alpha=1,lw=3+addlw)
-    ax.plot(T,V['V_NMDA'][start_point:]-E_PAS,c='#03b5fc',linestyle ="--",alpha=1,lw=3+addlw)
+    end_point=int(len(T)*5/6)
+    ax.plot(T[start_point:end_point],V['experiment'][start_point:end_point]-E_PAS,color = 'black',alpha=0.2,label='experiment',lw=10+addlw*2)
+    ax.plot(T[start_point:end_point],V['Model'][start_point:end_point]-E_PAS,c='red',label='Model',alpha=1,lw=4+addlw)
+    ax.plot(T[start_point:end_point],V['V_AMPA'][start_point:end_point]-E_PAS,c='#18852a',linestyle ="--",alpha=1,lw=3+addlw)
+    ax.plot(T[start_point:end_point],V['V_NMDA'][start_point:end_point]-E_PAS,c='#03b5fc',linestyle ="--",alpha=1,lw=3+addlw)
     plt.rcParams.update({'font.size': text_size})
     place_text=0.5
     xplace=T[0]
     yplace=V['Model'][0]-E_PAS-0.3
-    ax.text(T[int(len(T)/2)],yplace,'g_max AMPA='+str(round(dict_result['mean_final_pop'][0]*1000,2))+' [nS]',c='#18852a')#dict_result['parameters'][0]
-    ax.text(T[int(len(T)/2)],yplace-0.3,'g_max NMDA='+str(round(dict_result['mean_final_pop'][1]*1000,2))+' [nS]',c='#03b5fc')#dict_result['parameters'][1]
-    ax.legend(loc="upper left",prop={'size': legend_size})
+    ax.text(-0.1,-0.02,'g_max AMPA='+str(round(dict_result['mean_final_pop'][0]*1000,2))+' [nS]',c='#18852a',transform=ax.transAxes)#dict_result['parameters'][0]
+    ax.text(-0.1,-0.07,'g_max NMDA='+str(round(dict_result['mean_final_pop'][1]*1000,2))+' [nS]',c='#03b5fc',transform=ax.transAxes)#dict_result['parameters'][1]
+    if show_legend:
+        ax.legend(loc="upper left",prop={'size': legend_size})
     add_scale_bar(ax,'fit_syn')
 
-def plot_syn_model2(ax,dirr,start_point=0):
+def plot_syn_model2(ax,dirr,start_point=0,show_legend=True,bbox_to_anchor=(1, 0.35)):
     dict_syn=read_from_pickle(dirr)
     E_PAS=dict_syn[-1]['parameters']['E_PAS']
     dict_result=read_from_pickle(glob(dirr[:dirr.rfind('/')]+'/final_pop'+dirr[dirr.rfind('pickles_')+7:])[0])
@@ -203,8 +206,8 @@ def plot_syn_model2(ax,dirr,start_point=0):
     plt.rcParams.update({'font.size': text_size})
     # ax.text(200,place_text,dict_result['parameters'][0]+'='+str(round(dict_result['mean_final_pop'][0]*1000,2))+'[nS]',c='#18852a')
     # ax.text(200,place_text-0.2,dict_result['parameters'][1]+'='+str(round(dict_result['mean_final_pop'][1]*1000,2))+'[nS]',c='#03b5fc')
-    
-    ax.legend(loc="lower center", bbox_to_anchor=(1, 0.35),prop={'size': legend_size-2})
+    if show_legend:
+        ax.legend(loc="lower center", bbox_to_anchor=bbox_to_anchor,prop={'size': legend_size-2})
     add_scale_bar(ax,'fit_syn')
 
 
@@ -232,13 +235,13 @@ def get_MOO_result_parameters(cell_name,return_parameter,
     return curr_df[return_parameter].to_numpy()
 
 def get_passive_val_name(dirr):
-    for p in ['RA_min_error','RA_best_fit','RA=100','RA=120','RA=150','RA=200','RA=300']:
+    for p in ['RA=70','RA_min_error','RA_best_fit','RA=100','RA=120','RA=150','RA=200','RA=300']:
         if p in dirr:
             return p
     raise "no passive_val_name in this dirr"
 
 
-def plot_neck_voltage(ax,dirr,start_point=900):
+def plot_neck_voltage(ax,dirr,start_point=900,bbox_to_anchor=(0.8, 0.5)):
     dict_syn=read_from_pickle(dirr)
     passive_parameter=get_passive_val_name(dirr)
     cell_name=dirr.split('/')[2]
@@ -264,7 +267,7 @@ def plot_neck_voltage(ax,dirr,start_point=900):
         num+=1
     # place_text=0.5
     plt.rcParams.update({'font.size': text_size})
-    ax.legend(loc="lower center", bbox_to_anchor=(0.8, 0.5),prop={'size': legend_size+2})
+    ax.legend(loc="lower center", bbox_to_anchor=bbox_to_anchor,prop={'size': legend_size})
     x_to_ms=lambda x: x
 
     ax.add_artist(AnchoredHScaleBar(size_x=6, size_y=round((max(size_y_scal_bar)-0)/4), frameon=False, ax=ax, x_to_ms=x_to_ms,
