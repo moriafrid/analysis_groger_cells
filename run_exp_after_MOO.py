@@ -1,5 +1,5 @@
 import os
-before_after='_before_shrink'
+before_after='_after_shrink'
 base="python "
 base="sbatch execute_python_script.sh "
 cell2run='None'
