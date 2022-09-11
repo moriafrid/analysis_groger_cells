@@ -52,6 +52,7 @@ for cell_name in cells:
                         except:
                             # print("there isn't have RA_total_errors_minimums in spine strart=" +SPINE_START+" "+initial_folder)
                             continue
+                        passive_vals_dict['RA=70']=found(passive_val_total,70)                            
                         passive_vals_dict['RA=100']=found(passive_val_total,100)
                         passive_vals_dict['RA=200']=found(passive_val_total,200)
                         passive_vals_dict['RA=300']=found(passive_val_total,300)

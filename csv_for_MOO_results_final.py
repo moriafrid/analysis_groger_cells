@@ -26,11 +26,14 @@ i=0
 # os.system('python run_analysis_fit_after_run.py')
 all_data_cell=[]
 for cell_name in read_from_pickle('cells_name2.p')[:]: #['2017_03_04_A_6-7']:#
+    next_continue=False
+    already_save=False
+
     print(cell_name)
     all_data = []
     file=[]
     for p in MOO_file(cell_name,before_after='_after_shrink')+MOO_file(cell_name,before_after='_before_shrink'):
-        for passive_param_name in ['RA_min_error','RA_best_fit','RA=100','RA=120','RA=150','RA=200','RA=300']:
+        for passive_param_name in ['RA_min_error','RA_best_fit','RA=70','RA=100','RA=120','RA=150','RA=200','RA=300']:
             file+=glob(folder_save+cell_name+p+'/F_shrinkage=1.0*1.0/const_param/'+passive_param_name+'/Rins_pickles.p')
             file+=glob(folder_save+cell_name+p+'/F_shrinkage=1.0*1.0/const_param/'+passive_param_name+'*/Rins_pickles.p')
 
@@ -62,7 +65,7 @@ for cell_name in read_from_pickle('cells_name2.p')[:]: #['2017_03_04_A_6-7']:#
             before_after="_before_shrink"
         for i in range(get_n_spinese(cell_name)):
             Moo_dict = {}
-            for value in ['PSD','distance']:
+            for value in ['distance','PSD']:
                 Moo_dict[value]=result_dict['parameters'][value][i]
             relative_PSD=result_dict['parameters']['PSD']/max(result_dict['parameters']['PSD'])
             for value in ['W_AMPA','W_NMDA']:
@@ -72,9 +75,13 @@ for cell_name in read_from_pickle('cells_name2.p')[:]: #['2017_03_04_A_6-7']:#
                 Moo_dict[value]=result_dict['parameters'][value]
             Moo_dict['soma_Rin']=result_dict['soma']['Rin']
 
+            Moo_dict['Rneck']=result_dict['parameters']['Rneck'][i]
             for value in ['neck_base','spine_head']:
-                for value1 in ['Rin','Rtrans']:
-                    Moo_dict[value+'_'+value1]=result_dict[value][value1][i]
+                for value1 in ['Rin','Rtrans','V_high']:
+                    if len(result_dict[value][value1])>0:
+                        Moo_dict[value+'_'+value1]=result_dict[value][value1][i]
+                    else:
+                        Moo_dict[value+'_'+value1]=result_dict[value][value1]                  
             moo_total_dict[passive_param_name]=Moo_dict
             for key, value in moo_total_dict.items():
                 dict_for_records = {}
@@ -93,7 +100,15 @@ for cell_name in read_from_pickle('cells_name2.p')[:]: #['2017_03_04_A_6-7']:#
                 if value is not None:
                     dict_for_records.update(value)
                 all_data.append(dict_for_records)
-                all_data_cell.append(dict_for_records)
+                if Moo_dict['RA']>50 and not next_continue:
+                    if cell_name=='2017_04_03_B' and dict_for_records['before_shrink']=='after':continue
+                    if cell_name!='2017_04_03_B' and dict_for_records['before_shrink']=='before':continue
+                    if (cell_name in read_from_pickle('cells_sec_from_picture.p') and dict_for_records['from_picture']) or (not cell_name in read_from_pickle('cells_sec_from_picture.p') and not dict_for_records['from_picture']):
+                        all_data_cell.append(dict_for_records)
+                        already_save=True
+        if already_save:
+            next_continue=True
+
 
 
         # all_data.append(dict_for_records)
@@ -104,7 +119,6 @@ for cell_name in read_from_pickle('cells_name2.p')[:]: #['2017_03_04_A_6-7']:#
 
     output_df = pd.DataFrame.from_records(all_data)
     output_df.to_csv(folder_data+cell_name+"/results_MOO"+save_moo+".csv", index=False)
-    a=1
 output_df_cells = pd.DataFrame.from_records(all_data_cell)
 output_df_cells.to_csv(folder_data+"/results_MOO"+save_moo+".csv", index=False)
 

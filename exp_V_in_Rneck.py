@@ -18,7 +18,7 @@ matplotlib.rcParams['pdf.fonttype'] = 42
 matplotlib.rcParams['svg.fonttype'] = 'none'
 print(sys.argv)
 if len(sys.argv) != 4:
-    specipic_cell='*04_03_B'
+    specipic_cell='*'
     before_after='_after_shrink'
     specipic_moo='*'
     run_reorgenize=False
@@ -155,7 +155,7 @@ for curr_i, model_place in tqdm(enumerate(folders)):
     for num,imp in enumerate(imps_spine_head):
         imp.compute(0)
         Rin_head.append(imp.input(seg_for_record_head[num],sec=seg_for_record_head[num].sec))
-        Rtrans_base.append(imp.transfer(seg_for_record_head[num],sec=seg_for_record_head[num].sec))
+        Rtrans_head.append(imp.transfer(seg_for_record_head[num],sec=seg_for_record_head[num].sec))
         # Rtrans_head.append(imp.transfer(model.soma[0](0.5)))
     passive_propert_title='Rm='+str(round(1.0/model.soma[0].g_pas,2)) +' Ra='+str(round(model.soma[0].Ra,2))+' Cm='+str(round(model.soma[0].cm,2))
     cut_from_start_time=int(neuron_start_time/0.1)
@@ -198,8 +198,10 @@ for curr_i, model_place in tqdm(enumerate(folders)):
 
     parameters_dict['tau1_NMDA']=loader.get_param('NMDA_tau_r_NMDA')
     parameters_dict['tau2_NMDA']=loader.get_param('NMDA_tau_d_NMDA')
-
-    pickle.dump({'soma':{'Rin':Rin_soma},'neck_base':{'Rin':Rin_base,'Rtrans':Rtrans_base},'spine_head':{'Rin':Rin_head,'Rtrans':Rtrans_head},'parameters':parameters_dict}, open(model_place+'/Rins_pickles.p', 'wb'))
+    V_high_base_neck=np.amax(V_base_neck,axis=1)-loader.get_param('e_pas')
+    V_high_spine_head=np.amax(V_spine,axis=1)-loader.get_param('e_pas')
+    pickle.dump({'soma':{'Rin':Rin_soma},'neck_base':{'Rin':Rin_base,'Rtrans':Rtrans_base,'V_high':V_high_base_neck},
+                 'spine_head':{'Rin':Rin_head,'Rtrans':Rtrans_head,'V_high':V_high_spine_head},'parameters':parameters_dict}, open(model_place+'/Rins_pickles.p', 'wb'))
 
     plt.savefig(model_place+save_name+'.png')
     plt.savefig(model_place+save_name+'.pdf')
