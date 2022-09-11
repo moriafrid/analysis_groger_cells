@@ -21,15 +21,8 @@ os.system('python csv_for_passive_val_results.py cells_name2.p')
 i=0
     # os.system('python run_analysis_fit_after_run.py')
 for cell_name in read_from_pickle(cells_name_place):
-    if not cell_name in ['2017_03_04_A_6-7']:continue #'2017_07_06_C_4-3','2017_07_06_C_3-4',
+    # if not cell_name in ['2017_03_04_A_6-7']:continue #'2017_07_06_C_4-3','2017_07_06_C_3-4',
 
-    # if cell_name=='2017_07_06_C_4-3':
-    #     before_after='_before_shrink'
-    # else:
-    #     before_after='_after_shrink'
-    #     continue
-    # if not cell_name in ['2017_03_04_A_6-7']:continue
-    # if not cell_name in ['2017_07_06_C_4-3','2016_04_16_A']:continue#['2017_02_20_B','2017_07_06_C_3-4']:continue
     passive_vals_dict= {}
     # p='cells_initiall_information/'+cell_name+'/results_passive_fits.csv'
     p='cells_outputs_data_short/'+cell_name+'/fit_short_pulse'+before_after+'/results_passive_fits.csv'
@@ -52,7 +45,6 @@ for cell_name in read_from_pickle(cells_name_place):
                         passive_vals_dict=get_passive_parameter(cell_name,before_after,double_spine_area=double_spine_area,shrinkage_resize=[shrinkage_by,resize_diam_by],fit_condition=fit_condition,spine_start=SPINE_START,file_type=file_type)
                         next_continue=False
                         for i, name in enumerate(['RA_min_error','RA_best_fit','RA=120','RA=150']):
-
                             if next_continue: continue
                             try: passive_vals_dict[name]
                             except:
@@ -62,7 +54,7 @@ for cell_name in read_from_pickle(cells_name_place):
                             if float(RA)<50:
                                 continue
                             else:
-                                if float(RA)>70:
+                                if float(RA)>100:
                                     next_continue=True
                             print(name,RA,CM,RM)
                             command="sbatch execute_level2.sh"
@@ -71,27 +63,6 @@ for cell_name in read_from_pickle(cells_name_place):
                             os.system(send_command)
                             print(send_command)
                             print(cell_name+ ' .'+file_type+': execute level2.py, dendogram.py, Rin_Rm.py','attenuations.py')
-
-
-                            # command='sbatch execute_python_script.sh'
-                            # command='python'
-
-                            #
-                            # send_command = " ".join([command, 'Rin_Rm_plot.py',cell_name,file_type,fit_condition,name,str(resize_diam_by),str(shrinkage_factor),SPINE_START])
-                            # os.system(send_command)
-                            # print(cell_name+ ' .'+file_type+':  Rin_Rm_plot.py')
-
-                            # send_command = " ".join([command, 'dendogram.py',cell_name,file_type,fit_condition,name,str(resize_diam_by),str(shrinkage_factor),SPINE_START])
-                            # # os.system(send_command)
-                            # print(cell_name+ ' .'+file_type+':  dendogram.py')
-                            #
-                            # for syn_injection in ['True','False']:
-                            #     os.system(" ".join([command, 'attenuations.py', cell_name,file_type,fit_condition,name,syn_injection,str(resize_diam_by),str(shrinkage_factor),SPINE_START]))
-                            #     print('execute level2 runing analysis_after_run.py dendogram.py and Rin_Rm.py')
-                            #     if eval(syn_injection):
-                            #         print(cell_name+ ' '+file_type+': attenuations.py with syn injection')
-                            #     else:
-                            #         print(cell_name+ ' '+file_type+': attenuations.py with current injection')
 
 
 
