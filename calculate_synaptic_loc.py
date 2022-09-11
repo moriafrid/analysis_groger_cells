@@ -13,7 +13,7 @@ signal.signal(signal.SIGSEGV, SIGSEGV_signal_arises)
 
 if len(sys.argv) != 4:
     print("sys.argv not running and with length",len(sys.argv))
-    cells= read_from_pickle('cells_name2.p')#['2016_05_12_A']#
+    cells= read_from_pickle('cells_name2.p')[3:4]#['2016_05_12_A']#
     file_type='ASC'
     with_plot=False
 else:
@@ -159,7 +159,7 @@ def synaptic_loc(cell_dir,syn_poses_list,with_plot=False, part='all', save_place
         dict2[str(i)] = {'sec_name':sec_name[i],'sec_num':sec_num[i],'seg_num':seg_num[i],'place_name':dends_name[i],'dist_from_soma':dis_from_soma[i],'dist':dists[i], 'part':part,'best_found_location':best_dend_pos}
         # print(dict2)
 
-    try_save_dict(dict2,folder_save+cell_name+'/','synaptic_location_seperate_test')
+    try_save_dict(dict2,folder_save+cell_name+'/','synaptic_location_seperate'+before_after)
     return dict,dict2
 
 def syn_dis_from_soma(cell,syn_loc):
@@ -196,10 +196,17 @@ if __name__=='__main__':
         xyz,dend_part=[],[]
         # if len(glob(folder_data+cell_name+'/*'+file_type))<1:continue
         dir=glob(folder_data+cell_name+'/*'+file_type)[0]
+        if cell_name=='2017_04_03_B':
+            dir=glob(folder_data+cell_name+'/*'+'.ASC')[0]
+            if 'shrinkXYZ' in dir:
+                dir=glob(folder_data+cell_name+'/*'+'.ASC')[1]
         if not 'shrinkXYZ' in file_type:
             if 'shrinkXYZ' in dir:
                 dir=glob(folder_data+cell_name+'/*'+file_type)[1]
+
             before_after="_before_shrink"
+            # if cell_name=='2017_04_03_B':
+            #     before_after="_after_shrink"
         else:
             before_after="_after_shrink"
 
@@ -214,6 +221,6 @@ if __name__=='__main__':
             dict4[cell_name+key]=dict2[key]
         print('more then one syn dict',cell_name,[xyz])
     # try_save_dict(dict3,folder_save,'synaptic_location_test')
+
     try_save_dict(dict4,folder_save,'synaptic_location_seperate'+before_after)
-    # with open("cells_without_xyz.p", 'wb') as handle:
-    #     pickle.dump(cell_withou_xyz, handle, protocol=pickle.HIGHEST_PROTOCOL)
+
