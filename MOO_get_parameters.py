@@ -9,6 +9,8 @@ import pickle
 from add_figure import add_figure
 from calculate_F_factor import calculate_F_factor
 import sys
+
+from extra_fit_func import short_pulse_edges
 from read_spine_properties import *
 import logging
 import signal
@@ -21,7 +23,7 @@ matplotlib.rcParams['svg.fonttype'] = 'none'
 
 signal.signal(signal.SIGSEGV, SIGSEGV_signal_arises)
 logger = logging.getLogger(__name__)
-matplotlib.use('agg')
+# matplotlib.use('agg')
 
 
 do_calculate_F_factor=True
@@ -58,9 +60,9 @@ if len(sys.argv) == 18:
 elif len(sys.argv) != 17:
     print("the function doesn't run with sys.argv",len(sys.argv),flush=True)
     cpu_node = 1
-    cell_name= read_from_pickle('cells_name2.p')[0]
+    cell_name= '2017_04_03_B' #read_from_pickle('cells_name2.p')[3]
     file_type='z_correct.swc'  #file type is just used to calculate F_factor
-    passive_val={'RA':float(120),'CM':1.6713,'RM':12075}
+    passive_val={'RA':float(100),'CM':2.6078,'RM':5581}
     passive_fit_condition='const_param'
     passive_val_name='test'
     resize_dend_by=1.0
@@ -71,7 +73,10 @@ elif len(sys.argv) != 17:
     generation_size = 5
     num_of_genarations = 2
     double_spine_area=False
-    same_strengh=False
+    if get_n_spinese(cell_name)==2:
+        same_strengh=False
+    else:
+        same_strengh=True
     fit_until_point=-1
     before_after='_after_shrink'
 else:
@@ -93,6 +98,7 @@ else:
     RA=float(sys.argv[4])
     generation_size = 100
     num_of_genarations = 1000
+
 from_the_begin=True
 if cell_name in read_from_pickle('cells_sec_from_picture.p'):
     seg_from_picture=True
@@ -262,7 +268,7 @@ def add_morph(sim, icell, syns, spine_properties):#,spine_property=self.spine_pr
 
 def run(cell, seed=0):
     from extraClasses import NrnSegmentSomaDistanceScaler_, NrnSectionParameterPas, neuron_start_time, \
-        EFeatureImpadance, EFeaturePeak, EFeaturePeakTime, EFeatureRDSM, NrnNetstimWeightParameter, SweepProtocolRin2
+        EFeatureImpadance, EFeaturePeak, EFeaturePeakTime, EFeatureRDSM, NrnNetstimWeightParameter, SweepProtocolRin2, EFeatureRin,EFeatureDecay
     #cell_folder = base + cell + "/"  # the folder where the data is
     # cell_folder="/ems/elsc-labs/segev-i/moria.fridman/project/data_analysis_git/data_analysis/test_moo/"
     #############################################################################################################
@@ -277,11 +283,15 @@ def run(cell, seed=0):
     T_base = np.array(T_with_units)[:fit_until_point]
     V_base = np.array(V_with_units)[:fit_until_point]
     # syn_place=np.argmax(np.array(V_base))
-
     dt =T_with_units.units
     spike_timeing=T_base[read_from_pickle('syn_onset.p')[cell_name]]
     # spike_timeing=T_base[np.argmax(np.array(V_base))-65]
     # syn_place=np.argmax(np.array(V_base))
+    T_short_pulse=read_from_pickle(short_pulse_parameters_file)['mean'][1]
+    T_short_pulse=T_short_pulse-T_short_pulse[0]
+    T_short_pulse=T_short_pulse.rescale('ms')
+
+    V_short_pulse=read_from_pickle(short_pulse_parameters_file)['mean'][0]
     E_PAS=read_from_pickle(short_pulse_parameters_file)['E_pas']
     V_base=V_base+E_PAS
     # E_PAS=syn_pickle['E_pas']
@@ -457,7 +467,7 @@ def run(cell, seed=0):
             name='weight_AMPA',
             param_name='weight[0]',
             frozen=False,
-            value=9.0054239913091/1000,
+            value=5.0054239913091/1000,
             bounds=[0.000000, 0.02/sum(reletive_strengths)],#0.01],
             locations=netstims,
             reletive_strength = reletive_strengths)) #[1, 0.1,0.01]))
@@ -466,7 +476,7 @@ def run(cell, seed=0):
         name='weight_NMDA',
         param_name='weight[0]',
         frozen=frozen_NMDA_weigth,
-        value=3.9702950525904908/1000,
+        value=0.9702950525904908/1000,
         bounds=[0.000005, 0.03/sum(reletive_strengths)],
         locations=netstims_NMDA,
         reletive_strength = reletive_strengths)) #[1, 0.1,0.01]))
@@ -476,21 +486,19 @@ def run(cell, seed=0):
         location=somacenter_loc,
         variable='v'))
 
-
-
     syn_params.append(ephys.parameters.NrnPointProcessParameter(
         name='exp2syn_tau1',
         param_name='tau1',
-        value=0.3276467256184666,
+        value=0.3,
         frozen=AMPA_RISE_FIX,
-        bounds=[0.05, 0.4],#[0.1, 0.4],
+        bounds=[0.1, 0.4],#yoni:[0.2, 0.4], #04_03_B:[0.05, 0.4]
         locations=tau_param_locs))
     syn_params.append(ephys.parameters.NrnPointProcessParameter(
         name='exp2syn_tau2',
         param_name='tau2',
-        value=1.7068789695815033,#1.8,  # min(AMPA_FIT[cell]['tau2'],8),
+        value=1.8,#1.8,  # min(AMPA_FIT[cell]['tau2'],8),
         frozen=AMPA_DECAY_FIX,
-        bounds=[0.5, 3],
+        bounds=[1,3],#yoni:[1.4,2.5]  #04_03_B:[0.5, 3]
         locations=tau_param_locs))
 
     syn_params.append(ephys.parameters.NrnPointProcessParameter(
@@ -498,21 +506,21 @@ def run(cell, seed=0):
         param_name='tau_r_NMDA',
         value=7.017839009279828,
         frozen=False,
-        bounds=[3, 20],
+        bounds=[5, 15],#yoni:[5,10]  #04_03_B:[3, 20]
         locations=NMDA_param_locs))
     syn_params.append(ephys.parameters.NrnPointProcessParameter(
         name='NMDA_tau_d_NMDA',
         param_name='tau_d_NMDA',
         value=68.15239933603264,
         frozen=False,
-        bounds=[25, 120],
+        bounds=[25, 100],#[20,90] #04_03_B:[25, 120]
         locations=NMDA_param_locs))
     syn_params.append(ephys.parameters.NrnPointProcessParameter(
         name='NMDA_n_NMDA',
         param_name='n_NMDA',
         value=0.27,
         frozen=N_NMDA_FROZEN,
-        bounds=[0.1, 0.4],
+        bounds=[0.2, 1],
         locations=NMDA_param_locs))
     syn_params.append(ephys.parameters.NrnPointProcessParameter(
         name='NMDA_gama_NMDA',
@@ -522,11 +530,24 @@ def run(cell, seed=0):
         bounds=[0.06, 0.09],
         locations=NMDA_param_locs))
 
-    protocol = ephys.protocols.SweepProtocol('netstim_protocol', netstims + netstims_NMDA, [rec[-1]], cvode_active=False)
-    protocol_spine_head=[ephys.protocols.SweepProtocol('netstim_protocol', netstims+ netstims_NMDA , rec, cvode_active=False)]
-    # for i in range(len(synapses_locations)):
-    #     protocol_spine_head.append(ephys.protocols.SweepProtocol('netstim_protocol', netstims+ netstims_NMDA , [rec[i]], cvode_active=False))
+    protocol_syn = ephys.protocols.SweepProtocol('RMSD', netstims + netstims_NMDA, [rec[-1]], cvode_active=False, initiate_stim=False)
 
+    ##################################short pulse stim################################################
+    short_pulse_amplitude=-50/1000 #pA
+    short_pulse_start_time,short_pulse_end_time,short_pulse_dur=short_pulse_edges(cell_name)
+
+    stim_short_soma = ephys.stimuli.NrnSquarePulse(
+                step_amplitude=short_pulse_amplitude,
+                step_delay=np.array(T_short_pulse[short_pulse_start_time]) + neuron_start_time,
+                step_duration=short_pulse_dur*0.1,#ms
+                location=somacenter_loc,
+                total_duration=neuron_start_time + np.array(T_short_pulse)[-1])
+    # rec.append(ephys.recordings.CompRecording(
+    #     name='soma.v',
+    #     location=somacenter_loc,
+    #     variable='v'))
+    protocol_short_pulse = ephys.protocols.SweepProtocol('short_pulse', [stim_short_soma], [rec[-1]], cvode_active=False, initiate_stim=True)
+    # all_protocols = ephys.protocols.SequenceProtocol('all_protocols', protocols=[protocol_syn, protocol_short_pulse])
     ##################################################################################
 
 
@@ -566,13 +587,21 @@ def run(cell, seed=0):
     # difine features
     #
     ##################################################################################
-    feature1 = EFeatureRDSM(T_base, V_base)
-    feature2 = EFeaturePeakTime(T_base, V_base)
-    feature3 = EFeaturePeak(T_base, V_base, exp_std=0.05)
+    feature1 = EFeatureRDSM(T_base, V_base, extra_rec='')
+    feature2 = EFeaturePeakTime(T_base, V_base, extra_rec='')
+    feature3 = EFeaturePeak(T_base, V_base, exp_std=0.05, extra_rec='')
+    #short_pulse_features
+    feature4 = EFeatureRin(V_short_pulse, exp_std=0.05, extra_rec='short_pulse.', cell_name=cell_name)
+    feature5 = EFeatureDecay(V_short_pulse, exp_std=0.05, extra_rec='short_pulse.', cell_name=cell_name)
+
+
 
     objective1 = ephys.objectives.SingletonObjective('netstim_protocol1', feature1)
     objective2 = ephys.objectives.SingletonObjective('netstim_protocol2', feature2)
     objective3 = ephys.objectives.SingletonObjective('netstim_protocol3', feature3)
+
+    objective4 = ephys.objectives.SingletonObjective('short_pulse_protocol1', feature4)
+    objective5 = ephys.objectives.SingletonObjective('short_pulse_protocol2', feature5)
 
     # objectives=[objective1,objective2 , objective3]
     objectives = [objective1, objective3]
@@ -602,7 +631,7 @@ def run(cell, seed=0):
 
                     from extraClasses import NrnSegmentSomaDistanceScaler_, NrnSectionParameterPas, neuron_start_time, \
                         EFeatureImpadance, EFeaturePeak, EFeaturePeakTime, EFeatureRDSM, NrnNetstimWeightParameter, \
-                        SweepProtocolRin2 # add_morph creat_spine
+                        SweepProtocolRin2, EFeatureRin # add_morph creat_spine
             except:
                 print("closing engine number", g)
                 rc.shutdown([g])
@@ -643,7 +672,7 @@ def run(cell, seed=0):
     cell_evaluator = ephys.evaluators.CellEvaluator(
         cell_model=model,
         param_names=param_names,
-        fitness_protocols={'RDSM': protocol},  # "Rin2":protocol3
+        fitness_protocols={'RMSD': protocol_syn},  # "Rin2":protocol3
         fitness_calculator=score_calc,
         sim=sim)
     ##################################################################################
@@ -675,7 +704,7 @@ def run(cell, seed=0):
         #         continue
         #     start_values1[param] = model1.params[param].value
         fig=add_figure('befure fit',T_with_units.units,V_with_units.units)
-        responses = protocol.run(cell_model=model, param_values=start_values, sim=sim)
+        responses = protocol_syn.run(cell_model=model, param_values=start_values, sim=sim)
         temp = np.array(responses['soma.v']['time'])
         temp2 = np.array(responses['soma.v']['voltage'])
         start = np.where(temp > neuron_start_time)[0][0]
@@ -689,6 +718,7 @@ def run(cell, seed=0):
         plt.legend()
         plt.savefig(base_save_folder + 'before_fit_transient_RDSM.png')
         pickle.dump(fig, open(base_save_folder + 'before_fit_transient_RDSM.p', 'wb'))
+        plt.show()
         plt.close()
     final_pop, hall_of_fame, logs, hist = optimisation.run(max_ngen=num_of_genarations, cp_filename=base_save_folder+'cp', continue_cp=True, cp_frequency=1)
 
@@ -809,7 +839,7 @@ def run(cell, seed=0):
     #     default_params[key] = val
     print(default_params)
     fig=add_figure('MOO RDSM fit to transient',T_with_units.units,V_with_units.units)
-    responses = protocol.run(cell_model=model, param_values=best_ind_dict, sim=sim)
+    responses = protocol_syn.run(cell_model=model, param_values=best_ind_dict, sim=sim)
 
     temp = np.array(responses['soma.v']['time'])
     temp2 = np.array(responses['soma.v']['voltage'])
