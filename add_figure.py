@@ -18,7 +18,9 @@ def add_figure(title,x_label,y_label):
 	return figure
 
 
-def adgust_subplot(ax,title,x_label,y_label,titlesize=30):
+def adgust_subplot(ax,title,x_label,y_label,latter='',titlesize=30,bottom_visiability=True):
+	ax.text(-0.2, 1.05, latter, transform=ax.transAxes, size=22,weight="bold")
+	# ax.text(-0.1, 0.9, string.ascii_uppercase[i], transform=ax.transAxes, size=25)
 	# plt.rc('font', size=20)
 	plt.rc('axes', titlesize=20)     # fontsize of the axes title
 	plt.rc('axes', labelsize=20)    # fontsize of the x and y labels
@@ -34,6 +36,9 @@ def adgust_subplot(ax,title,x_label,y_label,titlesize=30):
 
 	ax.spines['top'].set_visible(False)
 	ax.spines['right'].set_visible(False)
+	# ax.spines['bottom'].set_visible(bottom_visiability)
+	if not bottom_visiability:
+		ax.get_xaxis().set_ticks([])
 	ax.set_title(title,fontsize=titlesize)
 	ax.set_xlabel(x_label)
 	ax.set_ylabel(y_label)
