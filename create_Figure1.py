@@ -14,7 +14,7 @@ else:
 print(folder2run)
 if __name__=='__main__':
     for cell_name in read_from_pickle('cells_name2.p'):
-        #if '4-3' in cell_name: continue
+        if cell_name!='2017_04_03_B':continue
         before_after='_after_shrink'
         #'final_data_after_shrink_with_mistak#
         base_dir=folder2run+'/'+cell_name+'/'
@@ -65,5 +65,5 @@ if __name__=='__main__':
         # plt.savefig(save_dir+cell_name+'.pdf')
         plt.savefig(save_dir+cell_name+'.svg')
         # pickle.dump(fig, open(save_dir+cell_name+'.p', 'wb'))  # cant work with scalebar
-        # plt.show()
+        plt.show()
 
