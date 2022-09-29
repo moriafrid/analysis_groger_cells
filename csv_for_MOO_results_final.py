@@ -65,7 +65,7 @@ for cell_name in read_from_pickle('cells_name2.p')[:]: #['2017_03_04_A_6-7']:#
             before_after="_before_shrink"
         for i in range(get_n_spinese(cell_name)):
             Moo_dict = {}
-            for value in ['distance','PSD']:
+            for value in ['PSD','distance','lambda']:
                 Moo_dict[value]=result_dict['parameters'][value][i]
             relative_PSD=result_dict['parameters']['PSD']/max(result_dict['parameters']['PSD'])
             for value in ['W_AMPA','W_NMDA']:
@@ -101,8 +101,11 @@ for cell_name in read_from_pickle('cells_name2.p')[:]: #['2017_03_04_A_6-7']:#
                     dict_for_records.update(value)
                 all_data.append(dict_for_records)
                 if Moo_dict['RA']>50 and not next_continue:
-                    if cell_name=='2017_04_03_B' and dict_for_records['before_shrink']=='after':continue
-                    if cell_name!='2017_04_03_B' and dict_for_records['before_shrink']=='before':continue
+                    if dict_for_records['before_shrink']=='before':continue
+                    if cell_name=='2017_04_03_B' and dict_for_records['passive_parameter']!='RA=70':continue
+                    if cell_name=='2017_07_06_C_3-4' and dict_for_records['full_trace']==True:continue
+                    #if cell_name=='2017_04_03_B' and dict_for_records['before_shrink']=='after':continue
+                    #if cell_name!='2017_04_03_B' and dict_for_records['before_shrink']=='before':continue
                     if (cell_name in read_from_pickle('cells_sec_from_picture.p') and dict_for_records['from_picture']) or (not cell_name in read_from_pickle('cells_sec_from_picture.p') and not dict_for_records['from_picture']):
                         all_data_cell.append(dict_for_records)
                         already_save=True
