@@ -123,14 +123,16 @@ def clear_syn_mean(ax, dir):
 
 def find_RA(file_dirr):
     RA=0
-    for passive_params in ['RA=70','RA_min_error','RA_best_fit','RA=120','RA=150','RA=100','RA=200','RA=300']:
+    if '2017_04_03_B' in file_dirr:
+        return 'RA=70'
+    for passive_params in ['RA_min_error','RA_best_fit','RA=70','RA=100','RA=120','RA=150','RA=200','RA=300']:
         try_find=glob(file_dirr+'fit RA=*_'+passive_params+'.p')
         if len(try_find)>0:
             RA=float(re.findall(r"[-+]?(?:\d*\.\d+|\d+)", try_find[0].split('/')[-1])[0])
             if RA>50:
                 return passive_params
     raise 'Error no passive parameters founded'
-def plot_short_pulse_model(ax,dirr,antil_point=-1,show_legend=True):
+def plot_short_pulse_model(ax,dirr,antil_point=-1,show_legend=True,text_place=[0.6,0.9]):
     global  E_PAS,parameters
     dict_result=read_from_pickle(dirr)
     experiment=dict_result['experiment']
@@ -146,8 +148,8 @@ def plot_short_pulse_model(ax,dirr,antil_point=-1,show_legend=True):
     plt.rcParams.update({'font.size': text_size})
     RM_text="R_m="+str(round(parameters['RM']))+"\u03A9cm^2"
     RA_text="R_a="+str(round(parameters['RA']))+"\u03A9cm"+"\n"
-    CM_text="C_m="+str(round(parameters['CM'],1))+" \u03BCf/cm^2"+"\n"
-    ax.text(0.6,0.9,RA_text+CM_text+RM_text,transform=ax.transAxes,size='medium')
+    CM_text="C_m="+str(round(parameters['CM'],1))+"\u03BCf/cm^2"+"\n"
+    ax.text(text_place[0],text_place[1],RA_text+CM_text+RM_text,transform=ax.transAxes,size='medium')
     #ax.text(500,-5,"RM="+str(round(parameters['RM']))+" "+'\u03A9cm^2'+"\nRA="+str(round(parameters['RA']))+" \u03A9cm\nCM="+str(roun (parameters['CM'],1))+" \u03BCf/cm^2",size='large')
     if show_legend:
         ax.legend(loc='upper left',prop={'size': legend_size})
@@ -222,6 +224,7 @@ def get_resistance_par(dirr,parameter):
 def get_MOO_result_parameters(cell_name,return_parameter,
                               passive_parameter=None,syn_num=None,relative=None,before_shrink='after',shrinkage_resize=['1.0','1.0'],
                               full_trace=True,from_picture=None,double_spine_area=False):
+    if cell_name in ['2017_07_06_C_3-4','2017_02_20_B']: full_trace=False
     df=pd.read_csv('cells_initial_information/'+cell_name+'/results_MOO_Rin_result.csv',index_col=0)
     curr=df
     colombs=[]
@@ -235,7 +238,7 @@ def get_MOO_result_parameters(cell_name,return_parameter,
     return curr_df[return_parameter].to_numpy()
 
 def get_passive_val_name(dirr):
-    for p in ['RA=70','RA_min_error','RA_best_fit','RA=100','RA=120','RA=150','RA=200','RA=300']:
+    for p in ['RA_min_error','RA_best_fit','RA=70','RA=100','RA=120','RA=150','RA=200','RA=300']:
         if p in dirr:
             return p
     raise "no passive_val_name in this dirr"
@@ -400,3 +403,6 @@ def add_scale_bar(ax,type='',dirr='',end_point=0):
         ax.add_artist(AnchoredHScaleBar(size_x=x_txt, size_y=add_y, frameon=False, ax=ax, x_to_ms=x_to_ms,
                                         sep=5, loc="upper right",linekw=dict(color="k", linewidth=2+int(np.ceil(addlw/2))),))
     ax.set_axis_off()
+
+if __name__=='__main__':
+    print(get_MOO_result_parameters('2017_07_06_C_3-4','W_NMDA'))
