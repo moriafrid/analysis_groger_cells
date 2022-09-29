@@ -35,6 +35,8 @@ def copy_file(copy,paste,extra_name=''):
         extra_name='_'+extra_name
     if 'txt' in copy:
         shutil.copy(copy,paste+'/'+copy.split('/')[-1].split('.txt')[0]+extra_name+'.txt'+copy.split('.txt')[1])
+    elif 'tmp' in copy:
+        shutil.copy(copy,paste+'/'+copy.split('/')[-1].split('.tmp')[0]+extra_name+'.tmp'+copy.split('.tmp')[1])
     else:
         shutil.copy(copy,paste+'/'+copy.split('/')[-1].split('.p')[0]+extra_name+'.p'+copy.split('.p')[1])
     if 'png' not in copy and 'final_pop' not in copy and "pickles" not in copy:
@@ -49,6 +51,8 @@ def copy_file(copy,paste,extra_name=''):
 MOO_same,MOO_relative=MOO_file(before_after=before_after)
 
 for cell_name in read_from_pickle('cells_name2.p'):
+    # if not cell_name in ['2017_07_06_C_3-4','2017_04_03_B']:continue
+    # if cell_name in read_from_pickle('cells_name2.p'):continue
     if cell_name in read_from_pickle('cells_sec_from_picture.p'):
         specipic_moo='_correct_seg_syn_from_picture'
     else:
@@ -91,7 +95,11 @@ for cell_name in read_from_pickle('cells_name2.p'):
 
     #the best fit
     next_continue=[]
-    for passive_val_name in ['RA_min_error','RA_best_fit','RA=120','RA=150']:
+    if cell_name=='2017_04_03_B':
+        passive_val_names=['RA=70','RA_min_error','RA_best_fit','RA=300']
+    else:
+        passive_val_names=['RA_min_error','RA_best_fit','RA=70','RA=300']
+    for passive_val_name in passive_val_names:
         if next_continue: continue
         passive_vals_dict=get_passive_parameter(cell_name,before_after,double_spine_area='False',shrinkage_resize=[shrinkage_by,resize_diam_by],fit_condition='const_param',spine_start=20,file_type='z_correct.swc',passive_param_name=passive_val_name)
         if len(full)>0:
@@ -112,9 +120,10 @@ for cell_name in read_from_pickle('cells_name2.p'):
         RA=str(int(float(RA)))
         copy_file(glob(data_file+short_pulse+'z_correct.swc_SPINE_START=20/dend*'+str(resize_diam_by)+'&F_shrinkage='+str(shrinkage_by)+'/const_param/RA/fit RA='+RA+'.p')[0],save_file_resize,extra_name=passive_val_name)
         copy_file(glob(data_file+'/data/electrophysio_records/*IV*/-50pA.p')[0],save_file_resize,extra_name=passive_val_name)
-        copy_file(glob(data_file+short_pulse+'z_correct.swc_SPINE_START=20/dend*'+str(resize_diam_by)+'&F_shrinkage='+str(shrinkage_by)+'/'+passive_val_name+'/E_dendogram/dend_only_with_syn.p')[0],save_file_resize)
-        copy_file(glob(data_file+short_pulse+'z_correct.swc_SPINE_START=20/dend*'+str(resize_diam_by)+'&F_shrinkage='+str(shrinkage_by)+'/'+passive_val_name+'/M_dendogram/dend_only.p')[0],save_file_resize)
-
+        try:
+            copy_file(glob(data_file+short_pulse+'z_correct.swc_SPINE_START=20/dend*'+str(resize_diam_by)+'&F_shrinkage='+str(shrinkage_by)+'/'+passive_val_name+'/E_dendogram/dend_only_with_syn.p')[0],save_file_resize)
+            copy_file(glob(data_file+short_pulse+'z_correct.swc_SPINE_START=20/dend*'+str(resize_diam_by)+'&F_shrinkage='+str(shrinkage_by)+'/'+passive_val_name+'/M_dendogram/dend_only.p')[0],save_file_resize)
+        except:pass
         # copy_file(glob(data_file+'/data/cell_properties/z_correct.swc/SPINE_START=20/dend*'+str(resize_diam_by)+'&F_shrinkage='+str(shrinkage_by)+'/'+passive_val_name+'/E_dendogram/dend_only_with_syn.p')[0],save_file_resize)
         # copy_file(glob(data_file+'/data/cell_properties/z_correct.swc/SPINE_START=20/dend*'+str(resize_diam_by)+'&F_shrinkage='+str(shrinkage_by)+'/'+passive_val_name+'/M_dendogram/dend_only.p')[0],save_file_resize)
 
@@ -127,14 +136,18 @@ for cell_name in read_from_pickle('cells_name2.p'):
                     copy_file(MOO_file,save_file_resize,extra_name=full2+'relative_'+passive_val_name)
 
                 copy_file(glob(data_file+MOO_relative+resize+'/const_param/'+passive_val_name+full+'/data.txt')[0],save_file_resize,extra_name=full2+'relative_'+passive_val_name)
+                copy_file(glob(data_file+MOO_relative+resize+'/const_param/'+passive_val_name+full+'/cp.tmp')[0],save_file_resize,extra_name=full2+'relative_'+passive_val_name)
+
             else:
                 for MOO_file in glob(data_file+MOO_same+resize+'/const_param/'+passive_val_name+full+'/*.p'):
                     if 'before' in MOO_file.split('/')[-1]:continue
                     copy_file(MOO_file,save_file_resize,extra_name=full2+passive_val_name)
                 copy_file(glob(data_file+MOO_same+resize+'/const_param/'+passive_val_name+full+'/data.txt')[0],save_file_resize,extra_name=full2+passive_val_name)
-        except: "the moo isn't finish"
+                copy_file(glob(data_file+MOO_same+resize+'/const_param/'+passive_val_name+full+'/cp.tmp')[0],save_file_resize,extra_name=full2+passive_val_name)
 
-    for passive_val_name in ['RA_min_error','RA_best_fit','RA=100','RA=120','RA=150','RA=200','RA=300']:
+        except: "the moo isn't finish"
+    continue
+    for passive_val_name in ['RA_min_error','RA_best_fit','RA=70','RA=300']:#RA_min_error','RA_best_fit','RA=100','RA=120','RA=150','RA=200','RA=300']:
         save_file_RA=save_file+passive_val_name+'/'
         create_folder_dirr(save_file_RA)
         passive_vals_dict=get_passive_parameter(cell_name,before_after,double_spine_area='False',shrinkage_resize=[shrinkage_by,resize_diam_by],fit_condition='const_param',spine_start=20,file_type='z_correct.swc',passive_param_name=passive_val_name)
@@ -187,15 +200,15 @@ for p in files:
 
     #the best fit
     next_continue=[]
-    for passive_val_name in ['RA_min_error','RA_best_fit','RA=120','RA=150']:
+    for passive_val_name in ['RA_min_error','RA_best_fit','RA=70','RA=100','RA=120','RA=150','RA=200','RA=300']:#,'RA_min_error','RA_best_fit','RA=120','RA=150']:
         if next_continue: continue
         passive_vals_dict=get_passive_parameter(cell_name,before_after,double_spine_area=double_spine_area,shrinkage_resize=[shrinkage_by,resize_diam_by],fit_condition='const_param',spine_start=20,file_type='z_correct.swc')
         RA,CM,RM=get_passive_val(passive_vals_dict[passive_val_name],what_return='full_result')
         RA=str(int(float(RA)))
-        if float(RA)<70:
+        if float(RA)<50:
             continue
         else:
-            if float(RA)>70:
+            if float(RA)>100:
                 next_continue=True
         # dirr_passive_result=glob(data_file+short_pulse+'z_correct.swc_SPINE_START=20/dend*'+str(resize_diam_by)+'&F_shrinkage='+str(shrinkage_by)+'/const_param/RA/')[0]
         # os.system(" ".join(["python plot_fit_short_pulse.py",cell_name,str(RM), str(RA), str(CM),str(resize_diam_by),str(shrinkage_by),str(passive_val_name),before_after]))
