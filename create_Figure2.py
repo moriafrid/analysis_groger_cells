@@ -125,14 +125,14 @@ if __name__=='__main__':
 
         base_dir=folder2run+'/'+cell_name+'/'
         decided_passive_params=find_RA(base_dir)
-        plot_morph(eval('ax1_'+str(i)), cell_name, before_after,without_axons=True,from_picture=from_picture,bbox_to_anchor=(1.2,1.3))
+        plot_morph(eval('ax1_'+str(i)), cell_name, before_after,without_axons=True,from_picture=from_picture,bbox_to_anchor=(1.0,1.1))
         plot_syn_model2(eval('ax2_'+str(i)),glob(base_dir+'AMPA&NMDA_soma_seperete_pickles*_relative_'+decided_passive_params+'.p')[0],bbox_to_anchor=(1.15,0.1))
         # plot_syn_voltage(eval('ax3_'+str(i)),glob(base_dir+'Voltage Spine&Soma_pickles*_relative_'+decided_passive_params+'.p')[0])
         plot_neck_voltage(eval('ax3_'+str(i)),glob(base_dir+'Voltage in neck_pickles*_relative_'+decided_passive_params+'.p')[0],bbox_to_anchor=(1.1,0.15))
     plt.savefig(save_dir+'1.svg')
     plt.savefig(save_dir+'1.pdf')
     plt.savefig(save_dir+'1.png')
-    # pickle.dump(fig, open(save_dir+cell_name+'.p', 'wb'))  # cant work with scalebar
+
     fig = plt.figure(figsize=(15, 15))  # , sharex="row", sharey="row"
     fig.subplots_adjust(left=0.1,right=0.90,top=0.9,bottom=0.1,hspace=0.05, wspace=0.05)
 
@@ -158,7 +158,8 @@ if __name__=='__main__':
     # ax4_2 = plt.subplot2grid(shape=shapes, loc=(2, 3), colspan=1, rowspan=1)
 
     for i,cell_name in enumerate(read_from_pickle('cells_with_2_syn.p')[3:6]):
-        
+        eval('ax2_'+str(i)).title.set_text(cell_name)
+
         if cell_name in read_from_pickle('cells_sec_from_picture.p'):
             from_picture=True
         else:
@@ -180,7 +181,7 @@ if __name__=='__main__':
         base_dir=folder2run+'/'+cell_name+'/'
         decided_passive_params=find_RA(base_dir)
 
-        plot_morph(eval('ax1_'+str(i)), cell_name, before_after,without_axons=True,from_picture=from_picture,bbox_to_anchor=(1.2,1.3))
+        plot_morph(eval('ax1_'+str(i)), cell_name, before_after,without_axons=True,from_picture=from_picture,bbox_to_anchor=(1.0,1.1))
         plot_syn_model2(eval('ax2_'+str(i)),glob(base_dir+'AMPA&NMDA_soma_seperete_pickles*_relative_'+decided_passive_params+'.p')[0],bbox_to_anchor=(1.15,0.1))
         # plot_syn_voltage(eval('ax3_'+str(i)),glob(base_dir+'Voltage Spine&Soma_pickles*_relative_'+decided_passive_params+'.p')[0])
         plot_neck_voltage(eval('ax3_'+str(i)),glob(base_dir+'Voltage in neck_pickles*_relative_'+decided_passive_params+'.p')[0],bbox_to_anchor=(1.1,0.15))
@@ -188,5 +189,6 @@ if __name__=='__main__':
     plt.savefig(save_dir+'2.svg')
     plt.savefig(save_dir+'2.pdf')
     plt.savefig(save_dir+'2.png')
+    # plt.show()
 
 
