@@ -87,7 +87,7 @@ else:
     file_type=sys.argv[3] #hoc ar ASC
     passive_val={"RA":float(sys.argv[4]),"CM":float(sys.argv[5]),'RM':float(sys.argv[6])}
     passive_fit_condition=sys.argv[7]
-    passive_val_name=sys.argv[8]+'0'
+    passive_val_name=sys.argv[8]
     resize_dend_by = float(sys.argv[9]) #how much the cell sweel during the electrophisiology records
     shrinkage_by =float(sys.argv[10]) #how much srinkage the cell get between electrophysiology record and LM
     SPINE_START=int(sys.argv[11])
