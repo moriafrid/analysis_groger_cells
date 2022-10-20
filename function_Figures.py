@@ -126,7 +126,7 @@ def find_RA(file_dirr):
     if '2017_04_03_B' in file_dirr:
         return 'RA=70'
     for passive_params in ['RA_min_error','RA_best_fit','RA=70','RA=100','RA=120','RA=150','RA=200','RA=300']:
-        try_find=glob(file_dirr+'fit RA=*_'+passive_params+'.p')
+        try_find=glob(file_dirr+'/fit RA=*_'+passive_params+'.p')
         if len(try_find)>0:
             RA=float(re.findall(r"[-+]?(?:\d*\.\d+|\d+)", try_find[0].split('/')[-1])[0])
             if RA>50:
@@ -236,6 +236,15 @@ def get_MOO_result_parameters(cell_name,return_parameter,
     correct_col = np.mean(colombs, axis=0).astype(int).astype(bool)
     curr_df = df[correct_col]
     return curr_df[return_parameter].to_numpy()
+
+def get_std_halloffame(cell_name,folder2run='final_data/total_moo/'):
+    passive_param=find_RA(folder2run+cell_name+'/')
+    print(passive_param)
+    population=read_from_pickle(glob(folder2run+cell_name+'/hall_of_fame*'+passive_param+'.p')[0])['hall_of_fame'].items
+    # population=np.array(read_from_pickle(glob(folder2run+cell_name+'/final_pop*'+passive_param+'.p')[0])['final_pop'])
+    std_AMPA=np.std([i[0] for i in population])*1000
+    std_NMDA=np.std([i[1] for i in population])*1000
+    return std_AMPA, std_NMDA
 
 def get_passive_val_name(dirr):
     for p in ['RA_min_error','RA_best_fit','RA=70','RA=100','RA=120','RA=150','RA=200','RA=300']:
