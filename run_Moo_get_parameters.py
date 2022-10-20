@@ -1,3 +1,5 @@
+import re
+
 from open_pickle import read_from_pickle
 import os
 from glob import glob
@@ -23,10 +25,19 @@ before_after='_after_shrink'
 
 os.system('python csv_for_passive_val_results.py cells_name2.p '+before_after)
 
-
+def find_RA(file_dirr):
+    RA=0
+    if '2017_04_03_B' in file_dirr:
+        return 'RA=70'
+    for passive_params in ['RA_min_error','RA_best_fit','RA=70','RA=100','RA=120','RA=150','RA=200','RA=300']:
+        try_find=glob(file_dirr+'/fit RA=*_'+passive_params+'.p')
+        if len(try_find)>0:
+            RA=float(re.findall(r"[-+]?(?:\d*\.\d+|\d+)", try_find[0].split('/')[-1])[0])
+            if RA>50:
+                return passive_params
+    raise 'Error no passive parameters founded'
 for cell_name in read_from_pickle(cells_name_place):
-    # if cell_name!='2017_04_03_B':continue
-    # if not cell_name  in ['2016_05_12_A','2016_08_30_A']:continue
+
     passive_vals_dict= {}
     p='cells_outputs_data_short/'+cell_name+'/fit_short_pulse'+before_after+'/results_passive_fits.csv'
     print(cell_name)
@@ -35,16 +46,11 @@ for cell_name in read_from_pickle(cells_name_place):
         for fit_condition in ['const_param','different_initial_conditions'][:1]:
             for SPINE_START in [20,60,10][:1]:
                 if cell_name!='2017_05_08_A_4-5' and resize_diam_by==1.5:continue
-                # if resize_diam_by==1.0 and shrinkage_by==1.0:
-                #     do_double_spine_area=['True','False']
-                # else:
-                #     do_double_spine_area=['False']
                 for double_spine_area in ['False']: #do_double_spine_area
                     for file_type in ['z_correct.swc']:
                         passive_vals_dict=get_passive_parameter(cell_name,before_after,double_spine_area=double_spine_area,shrinkage_resize=[shrinkage_by,resize_diam_by],fit_condition=fit_condition,spine_start=SPINE_START,file_type=file_type)
                         next_continue=False
-                        for i, passive_val_name in enumerate(['RA=70','RA_min_error','RA_best_fit','RA=120','RA=150','RA=100','RA=200','RA=300'][:1]):
-                            # if passive_val_name=='RA_min_error':continue
+                        for i, passive_val_name in enumerate([find_RA('final_data/total_moo/'+cell_name)]):#enumerate(['RA=70','RA_min_error','RA_best_fit','RA=120','RA=150','RA=100','RA=200','RA=300'][:1]):
                             if next_continue: continue
                             try: passive_vals_dict[passive_val_name]
                             except:
@@ -53,9 +59,9 @@ for cell_name in read_from_pickle(cells_name_place):
                             RA,CM,RM=get_passive_val(passive_vals_dict[passive_val_name])
                             if float(RA)<60:
                                 continue
-                            # else:
-                            #     if float(RA)>100:
-                            #         next_continue=True
+                            else:
+                                if float(RA)>100:
+                                    next_continue=True
 
                             fits_until_point=str(-1)
                             if in_parallel:
