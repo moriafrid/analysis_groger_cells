@@ -25,7 +25,7 @@ folder_save="cells_outputs_data_short/"
 i=0
 # os.system('python run_analysis_fit_after_run.py')
 all_data_cell=[]
-for cell_name in read_from_pickle('cells_name2.p')[:]: #['2017_03_04_A_6-7']:#
+for cell_name in read_from_pickle('cells_name2.p'): #['2017_03_04_A_6-7']:#
     next_continue=False
     already_save=False
 
@@ -63,6 +63,15 @@ for cell_name in read_from_pickle('cells_name2.p')[:]: #['2017_03_04_A_6-7']:#
             before_after='_after_shrink'
         else:
             before_after="_before_shrink"
+        if get_n_spinese(cell_name)>1:
+            dict_spine_vol=read_from_pickle(loc[:loc.rfind('/')]+'/AMPA&NMDA_soma_seperete_pickles.p')[1]
+            V_AMPA=[max(dict_spine_vol[name]['V_soma_AMPA']) for name in ['voltage_0','voltage_1']]
+            V_NMDA=[max(dict_spine_vol[name]['V_soma_NMDA']) for name in ['voltage_0','voltage_1']]
+        else:
+            dict_spine_vol=read_from_pickle(loc[:loc.rfind('/')]+'/AMPA&NMDA_soma_pickles.p')['voltage']
+            V_AMPA=[max(dict_spine_vol['V_AMPA'])]
+            V_NMDA=[max(dict_spine_vol['V_NMDA'])]
+
         for i in range(get_n_spinese(cell_name)):
             Moo_dict = {}
             for value in ['PSD','distance','lambda']:
@@ -81,7 +90,9 @@ for cell_name in read_from_pickle('cells_name2.p')[:]: #['2017_03_04_A_6-7']:#
                     if len(result_dict[value][value1])>0:
                         Moo_dict[value+'_'+value1]=result_dict[value][value1][i]
                     else:
-                        Moo_dict[value+'_'+value1]=result_dict[value][value1]                  
+                        Moo_dict[value+'_'+value1]=result_dict[value][value1]
+            Moo_dict['V_soma_NMDA']=V_NMDA[i]-Moo_dict['E_PAS']
+            Moo_dict['V_soma_AMPA']=V_AMPA[i]-Moo_dict['E_PAS']
             moo_total_dict[passive_param_name]=Moo_dict
             for key, value in moo_total_dict.items():
                 dict_for_records = {}
