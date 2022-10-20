@@ -42,16 +42,22 @@ folder_= ''
 
 save_name='/AMPA&NMDA_soma_seperete'
 color=['#03d7fc','#fcba03']
-def simulate_syn(sec,seg,num=None,color='black'):
+def simulate_syn(ax,sec,seg,num=None,color='black'):
     global time_all
     if num is None:
-        V_spine,spines,syn_objs=[],[],[]
+        spines,syn_objs,V_spinses=[],[],[]
         for sec_t,seg_t,i in zip(sec,seg,range(get_n_spinese(cell_name))):
             spine, syn_obj = loader.create_synapse(eval('model.'+sec_t), seg_t,reletive_strengths[i], number=i,netstim=netstim)
             spines.append(spine)
             syn_objs.append(syn_obj)
+
     else:
         spines, syn_objs = loader.create_synapse(eval('model.'+sec),seg,reletive_strengths[num], number=num,netstim=netstim)
+        V_spine=h.Vector()
+        if isinstance(spines[0],float):
+            V_spine.record(spines[1](spines[0])._ref_v)
+        else:
+            V_spine.record(spines[1](1)._ref_v)
     time = h.Vector()
     time.record(h._ref_t)
     V_soma = h.Vector()
@@ -61,6 +67,8 @@ def simulate_syn(sec,seg,num=None,color='black'):
     h.run()
     cut_from_start_time=int(neuron_start_time/0.1)
     V_soma_All = np.array(V_soma)[cut_from_start_time:]
+    if not num is None:
+        V_spine_All=np.array(V_spine)[cut_from_start_time:]
     time_all = np.array(time)[cut_from_start_time:]
     time_all-=time_all[0]
     # take syn_obj to be 0 to see the NMDA
@@ -74,15 +82,33 @@ def simulate_syn(sec,seg,num=None,color='black'):
     h.run()
     V_soma_AMPA = np.array(V_soma)[cut_from_start_time:]
     V_NMDA = V_soma_All-V_soma_AMPA
-
-    # plt.plot(time_all, V_soma_All, color='g', lw=5,label='all',alpha=0.4)
     if not num is None:
-        plt.plot(time_all, V_soma_AMPA, color=color, lw=2,linestyle='-', label='AMPA '+str(round(loader.get_param('weight_AMPA')*1000*reletive_strengths[num]/sum(reletive_strengths),3))+'nS '+str(round(reletive_strengths[num]*100))+"%",alpha=0.6)
-        plt.plot(time_all, V_NMDA+V_soma_All[0],lw=2, color=color, linestyle='--', label='NMDA '+str(round(loader.get_param('weight_NMDA')*1000*reletive_strengths[num]/sum(reletive_strengths),3))+'nS '+str(round(reletive_strengths[num]*100))+"%",alpha=0.6)
+        V_spine_AMPA = np.array(V_spine)[cut_from_start_time:]
+        V_spine_NMDA = V_spine_All-V_spine_AMPA
+    # plt.plot(time_all, V_soma_All, color='g', lw=5,label='all',alpha=0.4)
+    fig2=add_figure(cell_name+' AMPA and NMDA '+relative+" strength"+'\non spine','time[ms]','Voltage[mV]')
+    ax2=fig.axes[0]
+    if not num is None:
+        ax.plot(time_all, V_soma_AMPA, color=color, lw=2,linestyle='-', label='AMPA '+str(round(loader.get_param('weight_AMPA')*1000*reletive_strengths[num]/sum(reletive_strengths),3))+'nS '+str(round(reletive_strengths[num]*100))+"%",alpha=0.6)
+        ax.plot(time_all, V_NMDA+V_soma_All[0],lw=2, color=color, linestyle='--', label='NMDA '+str(round(loader.get_param('weight_NMDA')*1000*reletive_strengths[num]/sum(reletive_strengths),3))+'nS '+str(round(reletive_strengths[num]*100))+"%",alpha=0.6)
+        # ax2.plot(time_all, V_soma_AMPA, color=color, lw=2,linestyle='-', label='AMPA '+str(round(loader.get_param('weight_AMPA')*1000*reletive_strengths[num]/sum(reletive_strengths),3))+'nS '+str(round(reletive_strengths[num]*100))+"%",alpha=0.6)
+        # ax2.plot(time_all, V_NMDA+V_soma_All[0],lw=2, color=color, linestyle='--', label='NMDA '+str(round(loader.get_param('weight_NMDA')*1000*reletive_strengths[num]/sum(reletive_strengths),3))+'nS '+str(round(reletive_strengths[num]*100))+"%",alpha=0.6)
+        # ax2.plot(time_all, V_spine_AMPA, color=color, lw=2,linestyle='-', label='AMPA spine')
+        # ax2.plot(time_all, V_spine_NMDA+V_spine_All[0],lw=2, color=color, linestyle='--', label='NMDA spine')
+
     else:
-        plt.plot(time_all, V_soma_AMPA, color=color, lw=2,linestyle='-', label='AMPA '+str(round(loader.get_param('weight_AMPA')*1000,3))+'nS',alpha=0.6)
-        plt.plot(time_all, V_NMDA+V_soma_All[0],lw=2, color=color, linestyle='--', label='NMDA '+str(round(loader.get_param('weight_NMDA')*1000,3))+'nS',alpha=0.6)
-    return {'V_soma_AMPA':V_soma_AMPA,'V_soma_NMDA':V_NMDA+V_soma_All[0]}
+        ax.plot(time_all, V_soma_AMPA, color=color, lw=2,linestyle='-', label='AMPA '+str(round(loader.get_param('weight_AMPA')*1000,3))+'nS',alpha=0.6)
+        ax.plot(time_all, V_NMDA+V_soma_All[0],lw=2, color=color, linestyle='--', label='NMDA '+str(round(loader.get_param('weight_NMDA')*1000,3))+'nS',alpha=0.6)
+        # ax2.plot(time_all, V_soma_AMPA, color=color, lw=2,linestyle='-', label='AMPA '+str(round(loader.get_param('weight_AMPA')*1000,3))+'nS',alpha=0.6)
+        # ax2.plot(time_all, V_spine_NMDA+V_soma_All[0],lw=2, color=color, linestyle='--', label='NMDA '+str(round(loader.get_param('weight_NMDA')*1000,3))+'nS',alpha=0.6)
+        # ax2.plot(time_all, V_spine_AMPA, color=color, lw=2,linestyle='-', label='AMPA')
+        # ax2.plot(time_all, V_spine_NMDA+V_spine_All[0],lw=2, color=color, linestyle='--', label='NMDA')
+    if not num is None:
+        return {'V_soma_AMPA':V_soma_AMPA,'V_soma_NMDA':V_NMDA+V_soma_All[0],'V_syn_AMPA':V_spine_AMPA,'V_syn_NMDA':V_spine_NMDA}
+        # return {'V_soma_AMPA':V_soma_AMPA,'V_soma_NMDA':V_NMDA+V_soma_All[0],'V_syn_AMPA':V_spine_AMPA,'V_syn_NMDA':V_spine_NMDA-V_spine_All[0] }
+
+    else:
+        return {'V_soma_AMPA':V_soma_AMPA,'V_soma_NMDA':V_NMDA+V_soma_All[0]}
 
 folders=[]
 for moo_file in MOO_file(before_after=before_after):
@@ -135,15 +161,16 @@ for curr_i, model_place in tqdm(enumerate(folders)):
 
     passive_propert_title='Rm='+str(round(1.0/model.soma[0].g_pas,2)) +' Ra='+str(round(model.soma[0].Ra,2))+' Cm='+str(round(model.soma[0].cm,2))
     fig=add_figure(cell_name+' AMPA and NMDA '+relative+" strength"+'\n'+model_place.split('/')[-1]+" "+passive_propert_title,'time[ms]','Voltage[mV]')
-    plt.text(0,V_base[0]+2,reletive_strengths)
+    ax=fig.axes[0]
+    ax.text(0,V_base[0]+2,reletive_strengths)
     secs,segs=get_sec_and_seg(cell_name,from_picture=sec_from_picture)
     dict_result={}
     for num in range(get_n_spinese(cell_name)):
-        dict_result['voltage_'+str(num)]=simulate_syn(secs[num],segs[num],num=num,color=color[num])
-    dict_result['voltage_all']=simulate_syn(secs,segs,color='black')
-    plt.plot(T_base, np.array(V_base)+loader.get_param('e_pas'), color='black',label='EP record',alpha=0.2,lw=5)
+        dict_result['voltage_'+str(num)]=simulate_syn(ax,secs[num],segs[num],num=num,color=color[num])
+    dict_result['voltage_all']=simulate_syn(ax,secs,segs,color='black')
+    ax.plot(T_base, np.array(V_base)+loader.get_param('e_pas'), color='black',label='EP record',alpha=0.2,lw=5)
     dict_result['voltage_all']['experiment']=np.array(V_base)+loader.get_param('e_pas')
-    plt.legend()
+    ax.legend()
     print("Save ", model_place+save_name+'.png')
     plt.savefig(model_place+save_name+'.png')
     plt.savefig(model_place+save_name+'.pdf')

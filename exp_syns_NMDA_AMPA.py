@@ -12,15 +12,28 @@ from extraClasses import neuron_start_time
 matplotlib.rcParams['pdf.fonttype'] = 42
 matplotlib.rcParams['svg.fonttype'] = 'none'
 import sys
-if len(sys.argv) != 3:
+if len(sys.argv) != 4:
     specipic_cell='*'
     before_after='_after_shrink'
+    specipic_moo='_correct_seg*'
+    run_reorgenize=False
     print("sys.argv isn't run")
 else:
     print("the sys.argv len is correct",flush=True)
     specipic_cell = sys.argv[1]
+    if specipic_cell=='None':
+        specipic_cell='*'
     before_after=sys.argv[2]
+    specipic_moo= sys.argv[3]
+    if specipic_moo=='None':
+        specipic_moo='*'
+        run_reorgenize=False
+    else:
+        run_reorgenize=True
+
     print('run with sys.argv', sys.argv)
+
+folder_= ''
 
 folder_= ''
 folder_data1=folder_+'cells_outputs_data_short/'+specipic_cell+'/MOO_results_same_strange'+before_after+'/*/F_shrinkage=*/const_param/'

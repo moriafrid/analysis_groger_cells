@@ -38,7 +38,7 @@ for cell_name in read_from_pickle('cells_name2.p'): #['2017_03_04_A_6-7']:#
             file+=glob(folder_save+cell_name+p+'/F_shrinkage=1.0*1.0/const_param/'+passive_param_name+'*/Rins_pickles.p')
 
     moo_total_dict={}
-    for loc in tqdm(file):
+    for loc in tqdm([*set(file)]):
         moo_total_dict={}
         print(loc)
         # df = pd.read_csv('cells_initial_information/'+cell_name+'/results_passive_fits.csv')
@@ -67,10 +67,14 @@ for cell_name in read_from_pickle('cells_name2.p'): #['2017_03_04_A_6-7']:#
             dict_spine_vol=read_from_pickle(loc[:loc.rfind('/')]+'/AMPA&NMDA_soma_seperete_pickles.p')[1]
             V_AMPA=[max(dict_spine_vol[name]['V_soma_AMPA']) for name in ['voltage_0','voltage_1']]
             V_NMDA=[max(dict_spine_vol[name]['V_soma_NMDA']) for name in ['voltage_0','voltage_1']]
+            V_syn_AMPA=[max(dict_spine_vol[name]['V_syn_AMPA']) for name in ['voltage_0','voltage_1']]
+            V_syn_NMDA=[max(dict_spine_vol[name]['V_syn_NMDA']) for name in ['voltage_0','voltage_1']]
         else:
             dict_spine_vol=read_from_pickle(loc[:loc.rfind('/')]+'/AMPA&NMDA_soma_pickles.p')['voltage']
             V_AMPA=[max(dict_spine_vol['V_AMPA'])]
             V_NMDA=[max(dict_spine_vol['V_NMDA'])]
+            V_AMPA=[np.max(dict_spine_vol['V_syn_AMPA'],axis=0)]
+            V_NMDA=[np.max(dict_spine_vol['V_syn_NMDA'],axis=0)]
 
         for i in range(get_n_spinese(cell_name)):
             Moo_dict = {}
@@ -93,6 +97,8 @@ for cell_name in read_from_pickle('cells_name2.p'): #['2017_03_04_A_6-7']:#
                         Moo_dict[value+'_'+value1]=result_dict[value][value1]
             Moo_dict['V_soma_NMDA']=V_NMDA[i]-Moo_dict['E_PAS']
             Moo_dict['V_soma_AMPA']=V_AMPA[i]-Moo_dict['E_PAS']
+            Moo_dict['V_syn_NMDA']=V_syn_NMDA[i]
+            Moo_dict['V_syn_AMPA']=V_syn_AMPA[i]
             moo_total_dict[passive_param_name]=Moo_dict
             for key, value in moo_total_dict.items():
                 dict_for_records = {}
