@@ -15,17 +15,20 @@ def add_figure(title,x_label,y_label):
 	plt.title(title,fontsize=15)
 	plt.xlabel(x_label)
 	plt.ylabel(y_label)
+	import seaborn as sns
+	sns.despine(top=True, right=True, left=False, bottom=False)
+
 	return figure
 
 
-def adgust_subplot(ax,title,x_label,y_label,latter='',titlesize=30,bottom_visiability=True):
+def adgust_subplot(ax,title,x_label,y_label,latter='',titlesize=30,bottom_visiability=True,xylabelsize=20,xytitlesize=20):
 	ax.text(-0.2, 1.05, latter, transform=ax.transAxes, size=22,weight="bold")
 	# ax.text(-0.1, 0.9, string.ascii_uppercase[i], transform=ax.transAxes, size=25)
 	# plt.rc('font', size=20)
-	plt.rc('axes', titlesize=20)     # fontsize of the axes title
-	plt.rc('axes', labelsize=20)    # fontsize of the x and y labels
-	plt.rc('xtick', labelsize=18)    # fontsize of the tick labels
-	plt.rc('ytick', labelsize=18) #controls default text sizes
+	plt.rc('axes', titlesize=xytitlesize)     # fontsize of the axes title
+	plt.rc('axes', labelsize=xylabelsize)    # fontsize of the x and y labels
+	# plt.rc('xtick', labelsize=18)    # fontsize of the tick labels
+	# plt.rc('ytick', labelsize=18) #controls default text sizes
 	# plt.rc('axes', titlesize=24)     # fontsize of the axes title
 	# plt.rc('axes', labelsize=24)    # fontsize of the x and y labels
 	# plt.rc('xtick', labelsize=18)    # fontsize of the tick labels
