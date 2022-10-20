@@ -37,7 +37,7 @@ def find_RA(file_dirr):
                 return passive_params
     raise 'Error no passive parameters founded'
 for cell_name in read_from_pickle(cells_name_place):
-
+    if '3-4' not in cell_name :continue
     passive_vals_dict= {}
     p='cells_outputs_data_short/'+cell_name+'/fit_short_pulse'+before_after+'/results_passive_fits.csv'
     print(cell_name)
