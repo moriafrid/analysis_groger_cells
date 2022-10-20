@@ -9,7 +9,8 @@ import pickle
 from add_figure import add_figure
 from calculate_F_factor import calculate_F_factor
 import sys
-
+import deap.tools
+# import deap
 from extra_fit_func import short_pulse_edges
 from read_spine_properties import *
 import logging
@@ -86,7 +87,7 @@ else:
     file_type=sys.argv[3] #hoc ar ASC
     passive_val={"RA":float(sys.argv[4]),"CM":float(sys.argv[5]),'RM':float(sys.argv[6])}
     passive_fit_condition=sys.argv[7]
-    passive_val_name=sys.argv[8]
+    passive_val_name=sys.argv[8]+'0'
     resize_dend_by = float(sys.argv[9]) #how much the cell sweel during the electrophisiology records
     shrinkage_by =float(sys.argv[10]) #how much srinkage the cell get between electrophysiology record and LM
     SPINE_START=int(sys.argv[11])
@@ -97,7 +98,7 @@ else:
     profile = sys.argv[16]
     RA=float(sys.argv[4])
     generation_size = 100
-    num_of_genarations = 1000
+    num_of_genarations = 500
 
 from_the_begin=True
 if cell_name in read_from_pickle('cells_sec_from_picture.p'):
@@ -682,7 +683,8 @@ def run(cell, seed=0):
         offspring_size=generation_size,  #– Number of offspring individuals in each generation
         #@# offspring_size=1 feels very small
         map_function=map_function,
-        seed=seed)  #– Random number generator seed
+        seed=seed,
+        hof=deap.tools.HallOfFame(50))  #– Random number generator seed
 
     data_bef = open(base_save_folder + 'befor_simulation.txt', 'w')
     data_bef.write('model description:\n'+model_description+'\n')
@@ -718,7 +720,7 @@ def run(cell, seed=0):
         plt.legend()
         plt.savefig(base_save_folder + 'before_fit_transient_RDSM.png')
         pickle.dump(fig, open(base_save_folder + 'before_fit_transient_RDSM.p', 'wb'))
-        plt.show()
+        # plt.show()
         plt.close()
     final_pop, hall_of_fame, logs, hist = optimisation.run(max_ngen=num_of_genarations, cp_filename=base_save_folder+'cp', continue_cp=True, cp_frequency=1)
 
