@@ -19,7 +19,7 @@ matplotlib.rcParams['svg.fonttype'] = 'none'
 print(sys.argv)
 if len(sys.argv) != 4:
     specipic_cell='*'
-    before_after='_after_shrink'
+    before_after='_before_shrink'
     specipic_moo='*'
     run_reorgenize=False
     print("sys.argv isn't run")
@@ -41,9 +41,36 @@ folder_= ''
 # folder_data2=folder_+'cells_outputs_data_short/'+specipic_cell+'/MOO_results_relative_strange'+before_after+specipic_moo+'/*/F_shrinkage=*/const_param/'
 save_name='/Voltage in neck'
 folders=[]
-for moo_file in MOO_file(before_after=before_after):
+for moo_file in MOO_file(before_after='_before_shrink')+MOO_file(before_after='_after_shrink'):
     folders+=glob(folder_+'cells_outputs_data_short/'+specipic_cell+'/'+moo_file+'/F_shrinkage=*/const_param/*/')
 
+def get_segment_length_lamda(seg):
+    """
+	return the segment  e_length
+	:param seg_len:
+	:param RM:
+	:param RA:
+	:return:
+	"""
+    sec = seg.sec
+    seg_len = sec.L/sec.nseg #micro meter
+    d = seg.diam #micro meter
+    R_total = 1.0 / seg.g_pas #Rm[cm^2*oum] sce.Ra[cm*oum]
+    lamda = np.sqrt((R_total / sec.Ra) * (d / 10000.0) / 4.0) #micro meter
+    return (float(seg_len) / 10000.0) / lamda
+
+def cumpute_distances(base_sec,base_seg=None):
+    sec_length=0
+    if not base_sec is None:
+        for seg in base_sec:
+            if seg<base_seg:
+                sec_length += get_segment_length_lamda(seg)
+
+    for sec in h.SectionRef(sec=base_sec).child:
+        for seg in sec:
+            sec_length += get_segment_length_lamda(seg)
+        cumpute_distances(sec)
+    return sec_length
 for curr_i, model_place in tqdm(enumerate(folders)):
     if 'syn_xyz' in model_place:
         sec_from_picture=False
@@ -104,7 +131,7 @@ for curr_i, model_place in tqdm(enumerate(folders)):
     imp_soma=h.Impedance()
     seg_for_record=model.soma[0](0.5)
     imp_soma.loc(seg_for_record,sec=seg_for_record.sec)
-    distance=[]
+    distance,lambdas=[],[]
     for sec,seg in zip(secs,segs):
         dict_spine_param=get_building_spine(cell_name,num)
         spine, syn_obj = loader.create_synapse(loader.get_sec(sec), seg,reletive_strengths[num], number=num,netstim=netstim)
@@ -127,7 +154,7 @@ for curr_i, model_place in tqdm(enumerate(folders)):
         # imps_spine_head.append(h.Impedance(sec=spine[1]))
         # imps_spine_head[num].loc(1) #spine_head
         imps_spine_head[num].loc(seg_for_record_head[num],sec=seg_for_record_head[num].sec) #spine_head
-
+        lambdas.append(cumpute_distances(loader.get_sec(sec),seg))
         distance.append(h.distance(model.soma[0](0.5),loader.get_sec(sec)(seg)))
         num+=1
 
@@ -156,7 +183,6 @@ for curr_i, model_place in tqdm(enumerate(folders)):
         imp.compute(0)
         Rin_head.append(imp.input(seg_for_record_head[num],sec=seg_for_record_head[num].sec))
         Rtrans_head.append(imp.transfer(seg_for_record_head[num],sec=seg_for_record_head[num].sec))
-        # Rtrans_head.append(imp.transfer(model.soma[0](0.5)))
     passive_propert_title='Rm='+str(round(1.0/model.soma[0].g_pas,2)) +' Ra='+str(round(model.soma[0].Ra,2))+' Cm='+str(round(model.soma[0].cm,2))
     cut_from_start_time=int(neuron_start_time/0.1)
 
@@ -191,6 +217,7 @@ for curr_i, model_place in tqdm(enumerate(folders)):
 
     pickle.dump(dicty, open(model_place+save_name+'_pickles.p', 'wb'))
     parameters_dict['distance']=distance
+    parameters_dict['lambda']=lambdas
     parameters_dict['W_AMPA']=loader.get_param('weight_AMPA')
     parameters_dict['W_NMDA']=loader.get_param('weight_NMDA')
     parameters_dict['tau1_AMPA']=loader.get_param('exp2syn_tau1')
@@ -200,6 +227,7 @@ for curr_i, model_place in tqdm(enumerate(folders)):
     parameters_dict['tau2_NMDA']=loader.get_param('NMDA_tau_d_NMDA')
     V_high_base_neck=np.amax(V_base_neck,axis=1)-loader.get_param('e_pas')
     V_high_spine_head=np.amax(V_spine,axis=1)-loader.get_param('e_pas')
+
     pickle.dump({'soma':{'Rin':Rin_soma},'neck_base':{'Rin':Rin_base,'Rtrans':Rtrans_base,'V_high':V_high_base_neck},
                  'spine_head':{'Rin':Rin_head,'Rtrans':Rtrans_head,'V_high':V_high_spine_head},'parameters':parameters_dict}, open(model_place+'/Rins_pickles.p', 'wb'))
 
