@@ -50,7 +50,7 @@ try:
 except:
     print(file)
 def find_RA(file_dirr):
-    for decided_passive_params in ['RA_min_error','RA_best_fit','RA=120','RA=150']:
+    for decided_passive_params in ['RA_min_error','RA_best_fit','RA=70','RA=120','RA=150']:
         if decided_passive_params in file:
             return decided_passive_params
 decided_passive_params=find_RA(file)
