@@ -15,8 +15,6 @@ import sys
 if len(sys.argv) != 3:
     specipic_cell='*'
     before_after='_after_shrink'
-
-
     print("sys.argv isn't run")
 else:
     print("the sys.argv len is correct",flush=True)
@@ -64,7 +62,7 @@ for curr_i, model_place in tqdm(enumerate(glob(folder_data1+'*')+glob(folder_dat
     netstim.noise = 0
     h.tstop = total_duration
 
-    secs,segs=get_sec_and_seg(cell_name,from_picture=sec_from_picture)
+    secs,segs=get_sec_and_seg(cell_name,from_picture=cell_name in read_from_pickle('cells_sec_from_picture.p'))
     num=0
     V_spine=[]
     spines=[]
