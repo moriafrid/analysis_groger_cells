@@ -1,9 +1,6 @@
 import os
-import shutil
 import sys
-from glob import glob
 from open_pickle import read_from_pickle
-from create_folder import create_folder_dirr
 
 if len(sys.argv)!=3:
     sec_from_picture=True
