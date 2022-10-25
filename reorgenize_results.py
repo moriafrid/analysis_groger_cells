@@ -51,7 +51,7 @@ def copy_file(copy,paste,extra_name=''):
 MOO_same,MOO_relative=MOO_file(before_after=before_after)
 
 for cell_name in read_from_pickle('cells_name2.p'):
-    # if not cell_name in ['2017_07_06_C_3-4','2017_04_03_B']:continue
+    if '3-4' not in cell_name:continue
     # if cell_name in read_from_pickle('cells_name2.p'):continue
     if cell_name in read_from_pickle('cells_sec_from_picture.p'):
         specipic_moo='_correct_seg_syn_from_picture'
@@ -59,7 +59,7 @@ for cell_name in read_from_pickle('cells_name2.p'):
         specipic_moo='_correct_seg_find_syn_xyz'
     # continue
 
-    if cell_name=='2017_07_06_C_3-4':
+    if cell_name in ['2017_07_06_C_3-4']:
         full=''
     else:
         full='_full_trace'
