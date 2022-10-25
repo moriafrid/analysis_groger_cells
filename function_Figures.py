@@ -224,7 +224,7 @@ def get_resistance_par(dirr,parameter):
 def get_MOO_result_parameters(cell_name,return_parameter,
                               passive_parameter=None,syn_num=None,relative=None,before_shrink='after',shrinkage_resize=['1.0','1.0'],
                               full_trace=True,from_picture=None,double_spine_area=False):
-    if cell_name in ['2017_07_06_C_3-4','2017_02_20_B']: full_trace=False
+    if cell_name in ['2017_07_06_C_3-4']: full_trace=False
     df=pd.read_csv('cells_initial_information/'+cell_name+'/results_MOO_Rin_result.csv',index_col=0)
     curr=df
     colombs=[]
