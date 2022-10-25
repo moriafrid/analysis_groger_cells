@@ -73,8 +73,8 @@ for cell_name in read_from_pickle('cells_name2.p'): #['2017_03_04_A_6-7']:#
             dict_spine_vol=read_from_pickle(loc[:loc.rfind('/')]+'/AMPA&NMDA_soma_pickles.p')['voltage']
             V_AMPA=[max(dict_spine_vol['V_AMPA'])]
             V_NMDA=[max(dict_spine_vol['V_NMDA'])]
-            V_AMPA=[np.max(dict_spine_vol['V_syn_AMPA'],axis=0)]
-            V_NMDA=[np.max(dict_spine_vol['V_syn_NMDA'],axis=0)]
+            V_syn_AMPA=np.max(dict_spine_vol['V_syn_AMPA'],axis=1)
+            V_syn_NMDA=np.max(dict_spine_vol['V_syn_NMDA'],axis=1)
 
         for i in range(get_n_spinese(cell_name)):
             Moo_dict = {}
