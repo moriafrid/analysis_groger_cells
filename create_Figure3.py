@@ -9,8 +9,8 @@ import numpy as np
 import string
 import sys
 if len(sys.argv)!=2:
-    folder2run='final_data/correct_seg_syn_from_picture'
-    folder2run=''
+    folder2run='final_data/total_moo'
+    # folder2run=''
     print("sys.argv not running" ,len(sys.argv))
 else:
     folder2run=sys.argv[1]
@@ -31,6 +31,7 @@ ax0_2 = plt.subplot2grid(shape=shapes, loc=(0, 1), colspan=1, rowspan=1)
 ax0_3 = plt.subplot2grid(shape=shapes, loc=(0, 2), colspan=1, rowspan=1)
 
 for i,cell_name in enumerate(read_from_pickle('cells_name2.p')):
+    if cell_name!='2017_04_03_B':continue
     if run_all:
         if cell_name in read_from_pickle('cells_sec_from_picture.p'): #cell that taken from picture
             folder2run='final_data/correct_seg_syn_from_picture'
