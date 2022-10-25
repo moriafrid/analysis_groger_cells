@@ -27,12 +27,12 @@ def adgust_subplot(ax,title,x_label,y_label,latter='',titlesize=30,bottom_visiab
 	# plt.rc('font', size=20)
 	plt.rc('axes', titlesize=xytitlesize)     # fontsize of the axes title
 	plt.rc('axes', labelsize=xylabelsize)    # fontsize of the x and y labels
-	# plt.rc('xtick', labelsize=18)    # fontsize of the tick labels
-	# plt.rc('ytick', labelsize=18) #controls default text sizes
+	plt.rc('xtick', labelsize=20)    # fontsize of the tick labels
+	plt.rc('ytick', labelsize=20) #controls default text sizes
 	# plt.rc('axes', titlesize=24)     # fontsize of the axes title
 	# plt.rc('axes', labelsize=24)    # fontsize of the x and y labels
-	# plt.rc('xtick', labelsize=18)    # fontsize of the tick labels
-	# plt.rc('ytick', labelsize=18)    # fontsize of the tick labels
+	plt.rc('xtick', labelsize=20)    # fontsize of the tick labels
+	plt.rc('ytick', labelsize=20)    # fontsize of the tick labels
 
 	#plt.rc('legend', fontsize=30)    # legend fontsize
 	# plt.rc('figure', titlesize=40)  # fontsize of the figure title
