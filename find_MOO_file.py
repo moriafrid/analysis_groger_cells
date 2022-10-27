@@ -1,3 +1,7 @@
+from glob import glob
+
+from tqdm import tqdm
+
 from open_pickle import read_from_pickle
 from read_spine_properties import get_n_spinese
 
@@ -22,3 +26,41 @@ def MOO_file(cell_name=None,before_after='_after_shrink'):
         return [MOO_relative]
     else:
         return [MOO_same]
+
+def check_if_continue(model_place,cell_name='None'):
+    cont=False
+    if cell_name is None:
+        cell_name=model_place.split('/')[1]
+    if 'RA=300' in model_place or 'RA=120' in model_place or 'RA=200' in model_place:
+        cont=True
+    if cell_name in ['2017_07_06_C_3-4']:
+        if 'full_trace' in model_place:
+            cont=True
+    else:
+        if not 'full_trace' in model_place:
+            cont=True
+    if cell_name in read_from_pickle('cells_sec_from_picture.p'):
+        if 'syn_xyz' in model_place:
+            cont=True
+    else:
+        if not 'syn_xyz' in model_place:
+            cont=True
+    if 'test' in model_place.split('/')[-1] or 'test' in model_place.split('/')[-2]:
+        cont=True
+    return cont
+
+def model2run(specipic_cell='*'):
+    folders=[]
+    folder_=''
+    if specipic_cell=='*':
+        for moo_file in MOO_file(before_after='_before_shrink')+MOO_file(before_after='_after_shrink'):
+            folders+=glob(folder_+'cells_outputs_data_short/'+specipic_cell+'/'+moo_file+'/F_shrinkage=*/const_param/*')
+    else:
+        for moo_file in MOO_file(specipic_cell,before_after='_before_shrink')+MOO_file(specipic_cell,before_after='_after_shrink'):
+            folders+=glob(folder_+'cells_outputs_data_short/'+specipic_cell+'/'+moo_file+'/F_shrinkage=*/const_param/*')
+    file2run=[]
+    for model_place in tqdm(folders):
+        if check_if_continue(model_place,cell_name=specipic_cell): continue
+        file2run.append(model_place.replace('//','/'))
+    print('length for model to run is' ,len(file2run))
+    return file2run
