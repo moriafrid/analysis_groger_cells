@@ -1,6 +1,5 @@
 import os
-
-from find_MOO_file import MOO_file
+from find_MOO_file import MOO_file, check_if_continue, model2run
 from open_MOO_after_fit import OPEN_RES
 import numpy as np
 from neuron import h
@@ -17,10 +16,8 @@ from find_MOO_file import MOO_file
 matplotlib.rcParams['pdf.fonttype'] = 42
 matplotlib.rcParams['svg.fonttype'] = 'none'
 print(sys.argv)
-if len(sys.argv) != 4:
+if len(sys.argv) != 2:
     specipic_cell='*'
-    before_after='_before_shrink'
-    specipic_moo='*'
     run_reorgenize=False
     print("sys.argv isn't run")
 else:
@@ -28,22 +25,15 @@ else:
     specipic_cell = sys.argv[1]
     if specipic_cell=='None':
         specipic_cell='*'
-    before_after=sys.argv[2]
-    specipic_moo= sys.argv[3]
-    if specipic_moo=='None':
-        specipic_moo='*'
         run_reorgenize=False
     else:
         run_reorgenize=True
 
 folder_= ''
-# folder_data1=folder_+'cells_outputs_data_short/'+specipic_cell+'/MOO_results_same_strange'+before_after+specipic_moo+'/*/F_shrinkage=*/const_param/'
-# folder_data2=folder_+'cells_outputs_data_short/'+specipic_cell+'/MOO_results_relative_strange'+before_after+specipic_moo+'/*/F_shrinkage=*/const_param/'
 save_name='/Voltage in neck'
 folders=[]
-for moo_file in MOO_file(before_after='_before_shrink')+MOO_file(before_after='_after_shrink'):
-    folders+=glob(folder_+'cells_outputs_data_short/'+specipic_cell+'/'+moo_file+'/F_shrinkage=*/const_param/*/')
 
+folders=[*set(folders)]
 def get_segment_length_lamda(seg):
     """
 	return the segment  e_length
@@ -71,7 +61,8 @@ def cumpute_distances(base_sec,base_seg=None):
             sec_length += get_segment_length_lamda(seg)
         cumpute_distances(sec)
     return sec_length
-for curr_i, model_place in tqdm(enumerate(folders)):
+
+for curr_i, model_place in tqdm(enumerate(model2run('2017_07_06_C_4-3'))):
     if 'syn_xyz' in model_place:
         sec_from_picture=False
     else:
@@ -85,10 +76,12 @@ for curr_i, model_place in tqdm(enumerate(folders)):
         print(model_place + '/hall_of_fame.p is not exsist' )
         continue
     psd_sizes=get_parameter(cell_name,'PSD')
+
     if 'relative' in model_place:
         argmax=np.argmax(psd_sizes)
         reletive_strengths=psd_sizes/psd_sizes[argmax]
     else:
+        # if get_n_spinese(cell_name)>1:continue
         reletive_strengths=np.ones(get_n_spinese(cell_name))
     RDSM_objective_file = folder_+'cells_initial_information/'+cell_name+"/mean_syn.p"
     V_data,T_data=read_from_pickle(RDSM_objective_file)
@@ -127,6 +120,7 @@ for curr_i, model_place in tqdm(enumerate(folders)):
     imps_spine_head=[]
     seg_for_record_base=[]
     seg_for_record_head=[]
+    g_spine_NMDA,g_spine_AMPA=[],[]
     # imp_soma=h.Impedance(sec=model.soma[0])
     imp_soma=h.Impedance()
     seg_for_record=model.soma[0](0.5)
@@ -151,6 +145,10 @@ for curr_i, model_place in tqdm(enumerate(folders)):
         seg_for_record_head.append(spine[1](1))
         imps_spine_head.append(h.Impedance())
 
+        g_spine_NMDA.append(h.Vector())
+        g_spine_NMDA[num].record(syn_obj[1][0]._ref_g_NMDA)
+        g_spine_AMPA.append(h.Vector())
+        g_spine_AMPA[num].record(syn_obj[0][0]._ref_g)
         # imps_spine_head.append(h.Impedance(sec=spine[1]))
         # imps_spine_head[num].loc(1) #spine_head
         imps_spine_head[num].loc(seg_for_record_head[num],sec=seg_for_record_head[num].sec) #spine_head
@@ -220,9 +218,9 @@ for curr_i, model_place in tqdm(enumerate(folders)):
     parameters_dict['lambda']=lambdas
     parameters_dict['W_AMPA']=loader.get_param('weight_AMPA')
     parameters_dict['W_NMDA']=loader.get_param('weight_NMDA')
+    parameters_dict['g_NMDA_spine']=[max(np.array(v)*1000) for v in g_spine_NMDA]
     parameters_dict['tau1_AMPA']=loader.get_param('exp2syn_tau1')
     parameters_dict['tau2_AMPA']=loader.get_param('exp2syn_tau2')
-
     parameters_dict['tau1_NMDA']=loader.get_param('NMDA_tau_r_NMDA')
     parameters_dict['tau2_NMDA']=loader.get_param('NMDA_tau_d_NMDA')
     V_high_base_neck=np.amax(V_base_neck,axis=1)-loader.get_param('e_pas')
@@ -244,7 +242,7 @@ os.system("python csv_for_MOO_results_final.py")
 if specipic_cell=='*':
     specipic_cell="None"
 if run_reorgenize:
-    os.system('python reorgenize_results.py '+ '_'+specipic_cell+' '+before_after+' '+specipic_moo)
+    os.system('python reorgenize_results.py None _after_shrink total_moo')
 
 
 

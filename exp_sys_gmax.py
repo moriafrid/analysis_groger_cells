@@ -1,4 +1,4 @@
-from find_MOO_file import MOO_file
+from find_MOO_file import MOO_file, model2run
 from open_MOO_after_fit import OPEN_RES
 import numpy as np
 # from neuron import h
@@ -15,10 +15,10 @@ import os
 matplotlib.rcParams['pdf.fonttype'] = 42
 matplotlib.rcParams['svg.fonttype'] = 'none'
 import sys
-if len(sys.argv) != 4:
+
+save_name='/g_max'
+if len(sys.argv) != 2:
     specipic_cell='*'
-    before_after='_after_shrink'
-    specipic_moo='_correct_seg*'
     run_reorgenize=False
     print("sys.argv isn't run")
 else:
@@ -26,21 +26,12 @@ else:
     specipic_cell = sys.argv[1]
     if specipic_cell=='None':
         specipic_cell='*'
-    before_after=sys.argv[2]
-    specipic_moo= sys.argv[3]
-    if specipic_moo=='None':
-        specipic_moo='*'
-        run_reorgenize=False
-    else:
-        run_reorgenize=True
-
+    run_reorgenize=True
+    print('run with sys.argv', sys.argv)
 folder_= ''
-save_name='/g_max'
-folders=[]
-for moo_file in MOO_file(before_after=before_after):
-    folders+=glob(folder_+'cells_outputs_data_short/'+specipic_cell+'/'+moo_file+'/F_shrinkage=*/const_param/*/')
 
-for curr_i, model_place in tqdm(enumerate(folders)):
+folders=[]
+for curr_i, model_place in tqdm(enumerate(model2run())):
     if 'syn_xyz' in model_place:
         sec_from_picture=False
     else:
@@ -148,5 +139,5 @@ os.system("sbatch execute_python_script.sh "+ "csv_for_MOO_results_final.py")
 if specipic_cell=='*':
     specipic_cell="None"
 if run_reorgenize:
-    os.system('python reorgenize_results.py '+ '_'+specipic_cell+' '+before_after+' '+specipic_moo)
+    os.system('python reorgenize_results.py None _after_shrink total_moo')
 

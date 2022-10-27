@@ -1,4 +1,4 @@
-from find_MOO_file import MOO_file
+from find_MOO_file import MOO_file, model2run
 from open_MOO_after_fit import OPEN_RES
 import numpy as np
 from neuron import h
@@ -13,23 +13,22 @@ from extraClasses import neuron_start_time
 import sys
 matplotlib.rcParams['pdf.fonttype'] = 42
 matplotlib.rcParams['svg.fonttype'] = 'none'
-if len(sys.argv) != 3:
-    specipic_cell='*'
-    before_after='_after_shrink'
 
+save_name='/Voltage Spine&Soma'
+if len(sys.argv) != 2:
+    specipic_cell='*'
+    run_reorgenize=False
+    print("sys.argv isn't run")
 else:
     print("the sys.argv len is correct",flush=True)
     specipic_cell = sys.argv[1]
-    before_after=sys.argv[2]
-
+    if specipic_cell=='None':
+        specipic_cell='*'
+    run_reorgenize=True
+    print('run with sys.argv', sys.argv)
 folder_= ''
-save_name='/Voltage Spine&Soma'
 
-folders=[]
-for moo_file in MOO_file(before_after=before_after):
-    folders+=glob(folder_+'cells_outputs_data_short/'+specipic_cell+'/'+moo_file+'/F_shrinkage=*/const_param/*/')
-
-for curr_i, model_place in tqdm(enumerate(folders)):
+for curr_i, model_place in tqdm(enumerate(model2run())):
     type=model_place.split('/')[-1]
     cell_name=model_place.split('/')[1]
     if type=='test': continue

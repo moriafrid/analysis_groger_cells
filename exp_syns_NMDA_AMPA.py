@@ -1,3 +1,4 @@
+from find_MOO_file import check_if_continue, MOO_file, model2run
 from open_MOO_after_fit import OPEN_RES
 import numpy as np
 from neuron import h
@@ -12,10 +13,10 @@ from extraClasses import neuron_start_time
 matplotlib.rcParams['pdf.fonttype'] = 42
 matplotlib.rcParams['svg.fonttype'] = 'none'
 import sys
-if len(sys.argv) != 4:
+save_name='/AMPA&NMDA_syns'
+
+if len(sys.argv) != 2:
     specipic_cell='*'
-    before_after='_after_shrink'
-    specipic_moo='_correct_seg*'
     run_reorgenize=False
     print("sys.argv isn't run")
 else:
@@ -23,27 +24,13 @@ else:
     specipic_cell = sys.argv[1]
     if specipic_cell=='None':
         specipic_cell='*'
-    before_after=sys.argv[2]
-    specipic_moo= sys.argv[3]
-    if specipic_moo=='None':
-        specipic_moo='*'
-        run_reorgenize=False
-    else:
-        run_reorgenize=True
-
+    run_reorgenize=True
     print('run with sys.argv', sys.argv)
-
 folder_= ''
 
-folder_= ''
-folder_data1=folder_+'cells_outputs_data_short/'+specipic_cell+'/MOO_results_same_strange'+before_after+'/*/F_shrinkage=*/const_param/'
-folder_data2=folder_+'cells_outputs_data_short/'+specipic_cell+'/MOO_results_relative_strange'+before_after+'/*/F_shrinkage=*/const_param/'
-save_name='/AMPA&NMDA_syns'
-for curr_i, model_place in tqdm(enumerate(glob(folder_data1+'*')+glob(folder_data2+'*'))):
-    print(model_place)
-    type=model_place.split('/')[-1]
+folders=[]
+for curr_i, model_place in tqdm(enumerate(model2run())):
     cell_name=model_place.split('/')[1]
-    if type=='test': continue
     try:loader = OPEN_RES(res_pos=model_place+'/', curr_i=curr_i)
     except:
        print(model_place + '/hall_of_fame.p is not exsist' )
