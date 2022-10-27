@@ -1,7 +1,7 @@
 import pandas as pd
 from tqdm import tqdm
 
-from find_MOO_file import MOO_file
+from find_MOO_file import MOO_file, check_if_continue, model2run
 from open_pickle import read_from_pickle
 from glob import glob
 from passive_val_function import *
@@ -25,20 +25,16 @@ folder_save="cells_outputs_data_short/"
 i=0
 # os.system('python run_analysis_fit_after_run.py')
 all_data_cell=[]
-for cell_name in read_from_pickle('cells_name2.p'): #['2017_03_04_A_6-7']:#
+for cell_name in read_from_pickle('cells_name2.p')[:]: #['2017_03_04_A_6-7']:#
     next_continue=False
     already_save=False
 
     print(cell_name)
     all_data = []
-    file=[]
-    for p in MOO_file(cell_name,before_after='_after_shrink')+MOO_file(cell_name,before_after='_before_shrink'):
-        for passive_param_name in ['RA_min_error','RA_best_fit','RA=70','RA=100','RA=120','RA=150','RA=200','RA=300']:
-            file+=glob(folder_save+cell_name+p+'/F_shrinkage=1.0*1.0/const_param/'+passive_param_name+'/Rins_pickles.p')
-            file+=glob(folder_save+cell_name+p+'/F_shrinkage=1.0*1.0/const_param/'+passive_param_name+'*/Rins_pickles.p')
 
     moo_total_dict={}
-    for loc in tqdm([*set(file)]):
+    for loc in tqdm(model2run(cell_name)):
+        loc=loc+'/Rins_pickles.p'
         moo_total_dict={}
         print(loc)
         # df = pd.read_csv('cells_initial_information/'+cell_name+'/results_passive_fits.csv')
@@ -78,7 +74,7 @@ for cell_name in read_from_pickle('cells_name2.p'): #['2017_03_04_A_6-7']:#
 
         for i in range(get_n_spinese(cell_name)):
             Moo_dict = {}
-            for value in ['PSD','distance','lambda']:
+            for value in ['PSD','distance','lambda','g_NMDA_spine']:
                 Moo_dict[value]=result_dict['parameters'][value][i]
             relative_PSD=result_dict['parameters']['PSD']/max(result_dict['parameters']['PSD'])
             for value in ['W_AMPA','W_NMDA']:
