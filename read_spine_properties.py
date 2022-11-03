@@ -1,6 +1,7 @@
 import pandas as pd
 from math import pi,sqrt
 import numpy as np
+from open_pickle import read_from_pickle
 
 def calculate_Rneck(cell_name,Ra,spine_num=None):
     L=np.array(get_parameter(cell_name,'neck_length',spine_num))
@@ -88,8 +89,20 @@ def get_building_spine(cell_name,spine_num):
     df = pd.read_excel('cells_initial_information/Data2.xlsx')
     parameter_cv=df[df['cell_name']==cell_name].reset_index()
     return {'NECK_LENGHT':parameter_cv['neck_length'][spine_num],'NECK_DIAM':parameter_cv['neck_diam'][spine_num],'HEAD_DIAM':get_R_head(cell_name,spine_num)*2}
-
-def get_spine_params(spine_type,cell_name=''):
+def get_full_param():
+    all_neck_L,all_neck_d,all_PSD,all_PSD_ration=[],[],[],[]
+    for cell_name in read_from_pickle('cells_name2.p'):
+        if cell_name=='2017_04_03_B':continue
+        neck_L=get_parameter(cell_name,'neck_length')
+        neck_d=get_parameter(cell_name,'neck_diam')
+        PSD=get_parameter(cell_name,'PSD')
+        PSD_ration=get_parameter(cell_name,'PSD/spine head')
+        all_neck_L=np.append(all_neck_L,neck_L)
+        all_neck_d=np.append(all_neck_d,neck_d)
+        all_PSD=np.append(all_PSD,PSD)
+        all_PSD_ration=np.append(all_PSD_ration,PSD_ration)
+    return all_neck_L,all_neck_d,all_PSD,all_PSD_ration
+def get_spine_params(spine_type='groger_spine',cell_name=''):
     # 'groger_spine' 'mouse_spine','human_spine','shaft_spine'
     if spine_type=='groger_spine':
         return get_building_spine(cell_name)['NECK_LENGHT'],get_building_spine(cell_name)['NECK_DIAM'],get_building_spine(cell_name)['HEAD_DIAM']
