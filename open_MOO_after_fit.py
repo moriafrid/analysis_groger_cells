@@ -100,7 +100,7 @@ class OPEN_RES():
     def get_sec(self,sec):
         return eval('self.hoc_model.'+sec)
     def create_synapse(self, sec, pos, weight, number=0,
-                       hall_of_fame_num=0, netstim=None, ignore_netstim=False):
+                       hall_of_fame_num=0, netstim=None, ignore_netstim=False,W_AMPA=None,W_NMDA=None):
 
         spine = self.create_spine(sec, pos, number=number,
                                   neck_diam=self.hall['spine'][number]["NECK_DIAM"],
@@ -115,7 +115,7 @@ class OPEN_RES():
             # spine_temp=spine
 
         if not ignore_netstim:
-            syn_obj = self._add_syn_on_sec(spine[1], weight, pos=position, hall_of_fame_num=hall_of_fame_num, netstim=netstim)
+            syn_obj = self._add_syn_on_sec(spine[1], weight, pos=position, hall_of_fame_num=hall_of_fame_num, netstim=netstim,W_AMPA=W_AMPA,W_NMDA=W_NMDA)
         else:
             syn_obj = None
         return spine, syn_obj
@@ -162,7 +162,7 @@ class OPEN_RES():
             return self.optimization_params_res[param_name][hall_num]
         raise Exception('parameter name isnt from: ' +self.optimization_params_res.keys()+" or "+ self.fixed_params_res.keys())
 
-    def _add_syn_on_sec(self, sec, weight, pos=1, netstim=None, hall_of_fame_num=0):
+    def _add_syn_on_sec(self, sec, weight, pos=1, netstim=None, hall_of_fame_num=0,W_AMPA=None,W_NMDA=None):
         if netstim == None:
             raise Exception('we need netstim!:)')
         AMPA_PART = self.sim.neuron.h.Exp2Syn(sec(pos))
@@ -177,8 +177,12 @@ class OPEN_RES():
         NMDA_PART.gama_NMDA = self.get_param('NMDA_gama_NMDA', hall_of_fame_num)
         netcon_AMPA = self.sim.neuron.h.NetCon(netstim, AMPA_PART)
         netcon_NMDA = self.sim.neuron.h.NetCon(netstim, NMDA_PART)
-        netcon_AMPA.weight[0] = self.get_param('weight_AMPA', hall_of_fame_num) * weight
-        netcon_NMDA.weight[0] = self.get_param('weight_NMDA', hall_of_fame_num) * weight
+        if W_AMPA is None:
+            W_AMPA=self.get_param('weight_AMPA', hall_of_fame_num) * weight
+        if W_NMDA is None:
+            W_NMDA=self.get_param('weight_NMDA', hall_of_fame_num) * weight
+        netcon_AMPA.weight[0] = W_AMPA
+        netcon_NMDA.weight[0] = W_NMDA
         # netcon_NMDA.weight[0]=0
         return [AMPA_PART, netcon_AMPA], [NMDA_PART, netcon_NMDA]
 
