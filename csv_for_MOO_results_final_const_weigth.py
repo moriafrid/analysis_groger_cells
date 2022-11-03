@@ -33,8 +33,8 @@ for cell_name in read_from_pickle('cells_name2.p')[:]: #['2017_03_04_A_6-7']:#
     all_data = []
 
     moo_total_dict={}
-    for loc in tqdm(model2run(cell_name)):
-        loc=loc+'/Rins_pickles.p'
+    for loc in tqdm(model2run(cell_name,shrinkage='F_shrinkage=1.0_dend*1.0')):
+        loc=loc+'/Rins_pickles_const_Weigth.p'
         moo_total_dict={}
         print(loc)
         # df = pd.read_csv('cells_initial_information/'+cell_name+'/results_passive_fits.csv')
@@ -78,7 +78,7 @@ for cell_name in read_from_pickle('cells_name2.p')[:]: #['2017_03_04_A_6-7']:#
                 Moo_dict[value]=result_dict['parameters'][value][i]
             relative_PSD=result_dict['parameters']['PSD']/max(result_dict['parameters']['PSD'])
             for value in ['W_AMPA','W_NMDA']:
-                Moo_dict[value]=result_dict['parameters'][value]*1000*relative_PSD[i]/sum(relative_PSD)
+                Moo_dict[value]=result_dict['parameters'][value]*1000 #relative_PSD[i]/sum(relative_PSD)
 
             for value in ['tau1_AMPA','tau2_AMPA','tau1_NMDA','tau2_NMDA','E_PAS','RA','RM','CM']:
                 Moo_dict[value]=result_dict['parameters'][value]
@@ -134,9 +134,9 @@ for cell_name in read_from_pickle('cells_name2.p')[:]: #['2017_03_04_A_6-7']:#
         # all_data.append(dict_for_records)
 
     output_df = pd.DataFrame.from_records(all_data)
-    output_df.to_csv(folder_data+cell_name+"/results_MOO"+save_moo+".csv", index=False)
+    output_df.to_csv(folder_data+cell_name+"/results_MOO_const_weigth"+save_moo+".csv", index=False)
 output_df_cells = pd.DataFrame.from_records(all_data_cell)
-output_df_cells.to_csv(folder_data+"/results_MOO"+save_moo+".csv", index=False)
+output_df_cells.to_csv(folder_data+"/results_MOO_const_weigth"+save_moo+".csv", index=False)
 
 
     # save_pickle_folder2=folder_+folder_data+cell_name
