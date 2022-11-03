@@ -22,6 +22,8 @@ else:
     if specipic_cell=='None':
         specipic_cell='*'
     before_after=sys.argv[2]
+    if eval(before_after) is None:
+        before_after='_after_shrink'
     specipic_moo_save= sys.argv[3]
 
 # specipic_moo_save=specipic_moo[1:]
@@ -78,6 +80,10 @@ for cell_name in read_from_pickle('cells_name2.p'):
     copy_file(glob(data_file+'/neuron_morphology_fig.p')[0],save_file)
     copy_file(glob(data_file+'data/cell_properties/morphology_z_correct_before_shrink.swc/diam_dis/diam-dis.p')[0],save_file,extra_name='before_shrink')
     copy_file(glob(data_file+'data/cell_properties/morphology_z_correct.swc/diam_dis/diam-dis.p')[0],save_file,extra_name='after_shrink')
+    save_file1='final_data/'+specipic_moo_save+'/diam_dis'
+
+    copy_file(glob(data_file+'data/cell_properties/morphology_z_correct.swc/diam_dis/diam-dis.p')[0],save_file1,extra_name=cell_name)
+
     copy_file(glob(data_file+'data/cell_properties/*XYZ.ASC/diam_dis/diam-dis.p')[0],save_file,extra_name='XYZ_ASC')
 
     copy_file(glob(data_file+'/data/electrophysio_records/syn/clear_syn_after_peeling.p')[0],save_file)
