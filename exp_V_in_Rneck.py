@@ -62,7 +62,7 @@ def cumpute_distances(base_sec,base_seg=None):
         cumpute_distances(sec)
     return sec_length
 
-for curr_i, model_place in tqdm(enumerate(model2run('2017_07_06_C_4-3'))):
+for curr_i, model_place in tqdm(enumerate(model2run())):
     if 'syn_xyz' in model_place:
         sec_from_picture=False
     else:
@@ -170,17 +170,17 @@ for curr_i, model_place in tqdm(enumerate(model2run('2017_07_06_C_4-3'))):
     Rin_soma=imp_soma.input(0.5,sec=model.soma[0])
 
     Rin_base,Rtrans_base=[],[]
-    for num,imp in enumerate(imps_base):
+    for num, imp in enumerate(imps_base):
         imp.compute(0)
         Rin_base.append(imp.input(seg_for_record_base[num],sec=seg_for_record_base[num].sec))
-        Rtrans_base.append(imp.transfer(seg_for_record_base[num],sec=seg_for_record_base[num].sec))
+        Rtrans_base.append(imp.transfer(model.soma[0](0.5),sec=model.soma[0]))
         # Rtrans_base.append(imp.transfer(model.soma[0](0.5)))
 
     Rin_head,Rtrans_head=[],[]
     for num,imp in enumerate(imps_spine_head):
         imp.compute(0)
         Rin_head.append(imp.input(seg_for_record_head[num],sec=seg_for_record_head[num].sec))
-        Rtrans_head.append(imp.transfer(seg_for_record_head[num],sec=seg_for_record_head[num].sec))
+        Rtrans_head.append(imp.transfer(model.soma[0](0.5),sec=model.soma[0]))
     passive_propert_title='Rm='+str(round(1.0/model.soma[0].g_pas,2)) +' Ra='+str(round(model.soma[0].Ra,2))+' Cm='+str(round(model.soma[0].cm,2))
     cut_from_start_time=int(neuron_start_time/0.1)
 
