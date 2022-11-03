@@ -20,6 +20,8 @@ if len(sys.argv) != 2:
     specipic_cell='*'
     run_reorgenize=False
     print("sys.argv isn't run")
+    W_AMPA=2/1000
+    W_NMDA=0
 else:
     print("the sys.argv len is correct",flush=True)
     specipic_cell = sys.argv[1]
@@ -30,7 +32,7 @@ else:
         run_reorgenize=True
 
 folder_= ''
-save_name='/Voltage in neck'
+save_name='/Voltage in neck same weigth to all'
 folders=[]
 
 folders=[*set(folders)]
@@ -62,14 +64,13 @@ def cumpute_distances(base_sec,base_seg=None):
         cumpute_distances(sec)
     return sec_length
 
-for curr_i, model_place in tqdm(enumerate(model2run('2017_07_06_C_4-3'))):
+for curr_i, model_place in tqdm(enumerate(model2run(shrinkage='F_shrinkage=1.0_dend*1.0'))):
     if 'syn_xyz' in model_place:
         sec_from_picture=False
     else:
         sec_from_picture=True
     type=model_place.split('/')[-1]
     cell_name=model_place.split('/')[1]
-    # if get_n_spinese(cell_name)==2:continue
     if type=='test': continue
     try:loader = OPEN_RES(res_pos=model_place+'/', curr_i=curr_i)
     except:
@@ -81,7 +82,6 @@ for curr_i, model_place in tqdm(enumerate(model2run('2017_07_06_C_4-3'))):
         argmax=np.argmax(psd_sizes)
         reletive_strengths=psd_sizes/psd_sizes[argmax]
     else:
-        # if get_n_spinese(cell_name)>1:continue
         reletive_strengths=np.ones(get_n_spinese(cell_name))
     RDSM_objective_file = folder_+'cells_initial_information/'+cell_name+"/mean_syn.p"
     V_data,T_data=read_from_pickle(RDSM_objective_file)
@@ -96,7 +96,6 @@ for curr_i, model_place in tqdm(enumerate(model2run('2017_07_06_C_4-3'))):
     # V_base=V_base+E_PAS
     model=None
     model=loader.get_model()
-
     h=loader.sim.neuron.h
     netstim = h.NetStim()  # the location of the NetStim does not matter
     netstim.number = 1
@@ -128,7 +127,7 @@ for curr_i, model_place in tqdm(enumerate(model2run('2017_07_06_C_4-3'))):
     distance,lambdas=[],[]
     for sec,seg in zip(secs,segs):
         dict_spine_param=get_building_spine(cell_name,num)
-        spine, syn_obj = loader.create_synapse(loader.get_sec(sec), seg,reletive_strengths[num], number=num,netstim=netstim)
+        spine, syn_obj = loader.create_synapse(loader.get_sec(sec), seg,reletive_strengths[num], number=num,netstim=netstim,W_AMPA=W_AMPA,W_NMDA=W_NMDA)
         spines.append(spine)
         syn_objs.append(syn_obj)
         V_spine.append(h.Vector())
@@ -216,8 +215,8 @@ for curr_i, model_place in tqdm(enumerate(model2run('2017_07_06_C_4-3'))):
     pickle.dump(dicty, open(model_place+save_name+'_pickles.p', 'wb'))
     parameters_dict['distance']=distance
     parameters_dict['lambda']=lambdas
-    parameters_dict['W_AMPA']=loader.get_param('weight_AMPA')
-    parameters_dict['W_NMDA']=loader.get_param('weight_NMDA')
+    parameters_dict['W_AMPA']=W_AMPA
+    parameters_dict['W_NMDA']=W_NMDA
     parameters_dict['g_NMDA_spine']=[max(np.array(v)*1000) for v in g_spine_NMDA]
     parameters_dict['tau1_AMPA']=loader.get_param('exp2syn_tau1')
     parameters_dict['tau2_AMPA']=loader.get_param('exp2syn_tau2')
@@ -227,7 +226,7 @@ for curr_i, model_place in tqdm(enumerate(model2run('2017_07_06_C_4-3'))):
     V_high_spine_head=np.amax(V_spine,axis=1)-loader.get_param('e_pas')
 
     pickle.dump({'soma':{'Rin':Rin_soma},'neck_base':{'Rin':Rin_base,'Rtrans':Rtrans_base,'V_high':V_high_base_neck},
-                 'spine_head':{'Rin':Rin_head,'Rtrans':Rtrans_head,'V_high':V_high_spine_head},'parameters':parameters_dict}, open(model_place+'/Rins_pickles.p', 'wb'))
+                 'spine_head':{'Rin':Rin_head,'Rtrans':Rtrans_head,'V_high':V_high_spine_head},'parameters':parameters_dict}, open(model_place+'/Rins_pickles_const_Weigth.p', 'wb'))
 
     plt.savefig(model_place+save_name+'.png')
     plt.savefig(model_place+save_name+'.pdf')
@@ -237,12 +236,9 @@ for curr_i, model_place in tqdm(enumerate(model2run('2017_07_06_C_4-3'))):
 
     loader.destroy()
     model.destroy()
-os.system("python csv_for_MOO_results_final.py")
+os.system("python csv_for_MOO_results_final_const_weigth.py")
 
-if specipic_cell=='*':
-    specipic_cell="None"
-if run_reorgenize:
-    os.system('python reorgenize_results.py None _after_shrink total_moo')
+
 
 
 
