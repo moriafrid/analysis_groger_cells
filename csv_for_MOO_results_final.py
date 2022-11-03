@@ -103,7 +103,7 @@ for cell_name in read_from_pickle('cells_name2.p')[:]: #['2017_03_04_A_6-7']:#
                 dict_for_records['full_trace']=full_trace
                 dict_for_records['passive_parameter']=passive_param_name
                 dict_for_records['RA']=result_dict['parameters']['RA']
-                dict_for_records['relative_relation']=result_dict['parameters']['reletive_strengths']
+                dict_for_records['relative_relation']=result_dict['parameters']['reletive_strengths'][i]
                 dict_for_records['relative']=np.mean(result_dict['parameters']['reletive_strengths'])<1
                 dict_for_records['shrinkage_resize']=shrinkage_resize
                 dict_for_records['double_spine_area']=double_spine_area
@@ -113,7 +113,8 @@ for cell_name in read_from_pickle('cells_name2.p')[:]: #['2017_03_04_A_6-7']:#
                 if value is not None:
                     dict_for_records.update(value)
                 all_data.append(dict_for_records)
-                if Moo_dict['RA']>50 and not next_continue:
+                if Moo_dict['RA']>60 and not next_continue:
+
                     if dict_for_records['before_shrink']=='before':continue
                     if cell_name=='2017_04_03_B' and dict_for_records['passive_parameter']!='RA=70':continue
                     if cell_name=='2017_07_06_C_3-4' and dict_for_records['full_trace']==True:continue
