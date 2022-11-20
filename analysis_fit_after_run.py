@@ -10,7 +10,6 @@ from extra_function import create_folder_dirr
 from tqdm import tqdm
 import matplotlib
 
-matplotlib.use('agg')
 matplotlib.rcParams['pdf.fonttype'] = 42
 matplotlib.rcParams['svg.fonttype'] = 'none'
 print(len(sys.argv),sys.argv,flush=True)
@@ -18,10 +17,10 @@ def find_nearest(array, values):
     indices = np.abs(np.subtract.outer(array, values)).argmin(0)
     return indices
 if len(sys.argv) != 7:
-    cell_name= '2017_03_04_A_6-7(0)(0)'
+    cell_name= '2017_03_04_A_6-7'
     file_type='z_correct.swc'
-    resize_diam_by=1.1
-    shrinkage_factor=1.1
+    resize_diam_by=1.0
+    shrinkage_factor=1.0
     SPINE_START=20
     double_spine_area='False'
     print("the function doesn't run with sys.argv",flush=True)
@@ -89,8 +88,8 @@ def analysis_fit(location):
 
 if __name__ == '__main__':
     print("Do analysis fit:", flush=True)
-    initial_folder1=folder_+save_dir+cell_name+'/fit_short_pulse/'
-    initial_folder=folder_+save_dir+cell_name+'/fit_short_pulse/'+file_type+'_SPINE_START='+str(SPINE_START)+'/'
+    initial_folder1=folder_+save_dir+cell_name+'/fit_short_pulse_after_shrink/'
+    initial_folder=folder_+save_dir+cell_name+'/fit_short_pulse_after_shrink/'+file_type+'_SPINE_START='+str(SPINE_START)+'/'
     initial_folder+="/dend*"+str(round(resize_diam_by,2))+'&F_shrinkage='+str(round(shrinkage_factor,2))
     if double_spine_area:
         initial_folder+='_double_spine_area'
@@ -102,8 +101,8 @@ if __name__ == '__main__':
         analysis_fit(loc)
 
 
-    initial_folder=folder_+save_dir+'/*/fit_short_pulse/'
-    paths=glob(save_dir+'/*/fit_short_pulse/*SPINE_START=*/*F_shrinkage=*/const_param/RA/Ra_const_errors.p')
+    initial_folder=folder_+save_dir+'/*/fit_short_pulse_after_shrink/'
+    paths=glob(save_dir+'/*/fit_short_pulse_after_shrink/z_correct.swc_SPINE_START=20/dend*1.0&F_shrinkage=1.0/const_param/RA/Ra_const_errors.p')
     for data in tqdm(paths):
         save_folder1=data[:data.rfind('/')]+'/analysis'
         try:os.mkdir(save_folder1)
@@ -117,6 +116,8 @@ if __name__ == '__main__':
         RMs=[value['RM'] for value in dict3['params']]
         CMs=[value['CM'] for value in dict3['params']]
         fig3=add_figure('RA const against errors\n'+file_type,'RA const','error')
+        fig3.set_size_inches(6,7)
+        fig3.subplots_adjust(left=0.2,right=0.95,top=0.9,bottom=0.15)
         plt.plot(RA0,errors)
         minimums_arg=np.argsort(errors)
         dict_minimums_total=[]
@@ -137,19 +138,23 @@ if __name__ == '__main__':
         plt.savefig(save_folder1+'/RA const against errors')
         plt.savefig(save_folder1+'/RA const against errors.pdf')
         pickle.dump(fig3, open(save_folder1+'/RA const against errors.p', 'wb'))
-        fig4=add_figure('RA const against errors choosing params','RA const','error')
+
+        fig4=add_figure('','RA [Ohm*cm]','error')
+        fig4.set_size_inches(6,5)
+        fig4.subplots_adjust(left=0.2,right=0.95,top=0.9,bottom=0.15)
         plt.plot(RA0,errors)
+        RA070= find_nearest(RA0,70)
         RA0120= find_nearest(RA0,120)
         RA0150= find_nearest(RA0,150)
         RA_min= minimums_arg[0]
         RA0_best_fit=find_nearest(errors[RA_min:],0.1)+RA_min
-        for mini,name in zip([RA0120,RA0150,RA_min,RA0_best_fit],['RA=120', 'RA=150','Ra_min','RA0_best_fit']):
+        for mini,name in zip([RA070,RA_min,RA0_best_fit],['RA=70','Ra_min','RA0_best_fit']):
             plt.plot(RA0[mini], errors[mini], '*',label=name+' RM=' + str(round(RMs[mini], 2)) + ' RA=' + str(round(RAs[mini], 2)) + ' CM=' + str(
-                         round(CMs[mini], 2)) + ' error=' +  str(round(errors[mini], 3)))
+                         round(CMs[mini], 2)) + ' error=' +  str(round(errors[mini], 3)),lw=8)
         plt.legend(loc='upper left')
         plt.savefig(save_folder1+'/RA const against errors2')
         pickle.dump(fig4, open(save_folder1+'/RA const against errors2.p', 'wb'))
-
+        # plt.show()
 
         end_plot=60
         fig5=add_figure('RA const against errors\n'+file_type,'RA const','error')
