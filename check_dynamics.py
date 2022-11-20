@@ -11,7 +11,7 @@ def check_dynamics(short_pulse,x_short_pulse,save_folder):
     plt.plot(x_short_pulse,short_pulse,'.')
     plt.savefig(save_folder+'/the short pulse')
     print("Done {0}".format(save_folder+'/short_pulse'))
-    fig=add_figure('2 part of short_pulse on each other','s','mV')
+    fig=add_figure('cell_name','s','mV')
     short_pulse_start,short_pulse_end,length=short_pulse_edges(cell_name)
 
     part1=short_pulse[short_pulse_start:short_pulse_end]-short_pulse[0]
@@ -30,7 +30,7 @@ def check_dynamics(short_pulse,x_short_pulse,save_folder):
     pickle.dump(fig, open(save_folder+'/check_dynamics.p', 'wb'))
 
     print("Done {0}".format(save_folder+'/short_pulse'))
-
+plt.show()
 
 
 
