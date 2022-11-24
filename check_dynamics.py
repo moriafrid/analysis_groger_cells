@@ -3,16 +3,14 @@ from add_figure import add_figure
 import pickle
 import matplotlib
 from extra_fit_func import short_pulse_edges
+from open_pickle import read_from_pickle
+
 matplotlib.rcParams['pdf.fonttype'] = 42
 matplotlib.rcParams['svg.fonttype'] = 'none'
-def check_dynamics(short_pulse,x_short_pulse,save_folder,ax=None):
-    cell_name=save_folder.split('/')[1]
-    add_figure('short_pulse','ms','mV')
-    plt.plot(x_short_pulse,short_pulse,'.')
-    plt.savefig(save_folder+'/the short pulse')
-    plt.close()
+def check_dynamics(cell_name,save_folder,ax=None,save_fig=True,plot_legend=True):
+    short_pulse,x_short_pulse=read_from_pickle('cells_outputs_data_short/'+cell_name+'/data/electrophysio_records/short_pulse/mean_short_pulse.p')
+
     print("Done {0}".format(save_folder+'/short_pulse'))
-    cell_name=save_folder.split('/')[1]
     if ax is None:
         fig=add_figure('','s','mV')
         fig.set_size_inches(5,5)
@@ -29,14 +27,16 @@ def check_dynamics(short_pulse,x_short_pulse,save_folder,ax=None):
         ax.plot(x_part1[:len(part2)]*1000,part2[:len(x_part1)],label='flip end')
     else:
         ax.plot(x_part1*1000,part2[:len(x_part1)],label='flip end')
+    if plot_legend:
+        ax.legend(loc='upper right',bbox_to_anchor=(1, 0.8),prop={'size': 10})
 
-    ax.legend()
-    plt.savefig(save_folder+'/check_dynamics.png')
-    plt.savefig(save_folder+'/check_dynamics.svg')
-    pickle.dump(fig, open(save_folder+'/check_dynamics.p', 'wb'))
-
+    if save_fig:
+        plt.savefig(save_folder+'/check_dynamics.png')
+        plt.savefig(save_folder+'/check_dynamics.svg')
+        pickle.dump(fig, open(save_folder+'/check_dynamics.p', 'wb'))
+        add_figure('short_pulse','ms','mV')
+        plt.plot(x_short_pulse,short_pulse,'.')
+        plt.savefig(save_folder+'/the short pulse')
+        plt.close()
     print("Done {0}".format(save_folder+'/short_pulse'))
-
-
-
 
