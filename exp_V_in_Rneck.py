@@ -69,6 +69,7 @@ for curr_i, model_place in tqdm(enumerate(model2run())):
         sec_from_picture=True
     type=model_place.split('/')[-1]
     cell_name=model_place.split('/')[1]
+    # if not '05_12_A' in model_place:continue
     # if get_n_spinese(cell_name)==2:continue
     if type=='test': continue
     try:loader = OPEN_RES(res_pos=model_place+'/', curr_i=curr_i)
