@@ -17,6 +17,7 @@ save_dir=save_folder+'Figure7_RA_influence/'
 create_folder_dirr(save_dir)
 scatter_size=5
 
+
 def create_fig_RA():
     fig1 = plt.figure(figsize=(18, 6))  # , sharex="row", sharey="row"
     shapes = (2, 5)
