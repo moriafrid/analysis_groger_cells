@@ -19,7 +19,7 @@ print(len(sys.argv),sys.argv,flush=True)
 
 if len(sys.argv) != 3:
     print("sys.argv not running and with length",len(sys.argv))
-    cell_name= '2017_04_03_B'
+    cell_name= '2017_07_06_C_3-4'
     file_type2read= 'z_correct_after_shrink.swc'
 else:
     print("sys.argv is correct and running")
@@ -33,7 +33,6 @@ print(cell_name, folder_+data_dir+"/"+cell_name+"/"+file_type2read)
 path_short_pulse=folder_+save_dir+'/'+cell_name+'/data/electrophysio_records/short_pulse/mean_short_pulse.p'
 # folder_save=folder_+save_dir+'/'+cell_name+'/data/cell_properties/'+file_type2read+'SPINE_START=20/dend*'++'&F_shrinkage'++'/diam_dis/'
 folder_save=folder_+save_dir+'/'+cell_name+'/data/cell_properties/'+file_type2read+'/diam_dis/'
-
 create_folder_dirr(folder_save)
 
 signal.signal(signal.SIGSEGV, SIGSEGV_signal_arises)
@@ -55,10 +54,12 @@ def add_sec(sec,cell):
 
 #track from the terminals to the soma
 def track_one(terminal,cell,ax):
+
     # h.distance(0, 0.5, sec=soma)
     sec=terminal
     dis=[]
     diam=[]
+
     syn_secs,syn_segs=get_sec_and_seg(cell_name)
     while sec !=cell.soma:
         # dis.append(h.distance(sec.parentseg()))
@@ -81,11 +82,15 @@ def track_one(terminal,cell,ax):
 # build the model
 ######################################################
 # h.load_file("/ems/elsc-labs/segev-i/moria.fridman/project/analysis_groger_cells/cells_initial_information/2017_03_04_A_6-7(0)(0)/03_24_A_11052017_Splice_Shrink_zvalue_LABEL_Bluecell_Zcorrected_by_Gregor.hoc")
-def diam_distance_plot(cell_name,file_type2read,data_dir= "cells_initial_information",ax=None,latter=''):
+def diam_distance_plot(cell_name,file_type2read,data_dir= "cells_initial_information",ax=None,latter='',save_fig=True,compossed_title=False):
     global syn_dis,syn_diam
     syn_dis,syn_diam=[],[]
     if ax==None:
-        fig=add_figure('diam-dis'+cell_name+' \n'+file_type2read,'distance from soma','diameter')
+        if not compossed_title:
+            title='diam-dis'+cell_name+' \n'+file_type2read
+        else:
+            title=cell_name
+        fig=add_figure(title,'distance from soma','diameter')
         ax=fig.axes[0]
     else:
         adgust_subplot(ax,cell_name,'distance from soma','diameter',latter=latter)
@@ -150,7 +155,6 @@ def diam_distance_plot(cell_name,file_type2read,data_dir= "cells_initial_informa
     for dend in cell.dend:
         length+=dend.L
     print("total dendritic length is ",length)
-    ax.text(-0.1, 1.1,'Total L='+str(round(length))+'um',transform=ax.transAxes,size=20)
     f.write("\nThe total dendritic length is "+str(length)+ "\n")
     f.close()
 
@@ -168,13 +172,17 @@ def diam_distance_plot(cell_name,file_type2read,data_dir= "cells_initial_informa
         if len(diam)==1:
             ax.plot(dis,diam,'*')
     i=0
-    for syn_dis1,syn_diam1 in zip(syn_dis,syn_diam):
-        ax.scatter(syn_dis1,syn_diam1,label='syn'+str(i)+'; dis='+str(round(syn_dis1,2))+'um')
+    for syn_dis1,syn_diam1 in zip(list(dict.fromkeys(syn_dis)),list(dict.fromkeys(syn_diam))):
+        ax.scatter(syn_dis1,syn_diam1,label='syn'+str(i)+' dis='+str(round(syn_dis1,2))+'um')
         i+=1
     plt.legend()
-    plt.savefig(folder_save+'diam-dis.png')
-    plt.savefig(folder_save+'diam-dis.pdf')
-    pickle.dump(fig, open(folder_save+'diam-dis.p', 'wb'))
-    plt.show()
+    ax.text(0.02, 0.02,'Total Length='+str(round(length))+'um',transform=ax.transAxes,size=12)
+
+    if save_fig:
+        plt.savefig(folder_save+'diam-dis.png')
+        plt.savefig(folder_save+'diam-dis.pdf')
+        pickle.dump(fig, open(folder_save+'diam-dis.p', 'wb'))
+        plt.show()
+    cell=None
 if __name__=="__main__":
-    diam_distance_plot(cell_name,file_type2read,data_dir= "cells_initial_information")
+    diam_distance_plot(cell_name,file_type2read,data_dir= "cells_initial_information",compossed_title=True)
