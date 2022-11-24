@@ -2,17 +2,16 @@ import matplotlib.pyplot as plt
 import matplotlib
 matplotlib.rcParams['pdf.fonttype'] = 42
 matplotlib.rcParams['svg.fonttype'] = 'none'
-def add_figure(title,x_label,y_label,titlesize=30,bottom_visiability=True,xylabelsize=20,xytitlesize=20):
+def add_figure(title,x_label,y_label,titlesize=20,bottom_visiability=True,xylabelsize=18,xytitlesize=18):
 	plt.close()
-	figure=plt.figure()
+	figure=plt.figure(figsize=(5, 5))
+	figure.subplots_adjust(left=0.2,right=0.9,top=0.9,bottom=0.15)
 	plt.rc('axes', titlesize=xytitlesize)     # fontsize of the axes title
 	plt.rc('axes', labelsize=xylabelsize)    # fontsize of the x and y labels
-	plt.rc('xtick', labelsize=20)    # fontsize of the tick labels
-	plt.rc('ytick', labelsize=20) #controls default text sizes
 	# plt.rc('axes', titlesize=24)     # fontsize of the axes title
 	# plt.rc('axes', labelsize=24)    # fontsize of the x and y labels
-	plt.rc('xtick', labelsize=20)    # fontsize of the tick labels
-	plt.rc('ytick', labelsize=20)    # fontsize of the tick labels
+	plt.rc('xtick', labelsize=15)    # fontsize of the tick labels
+	plt.rc('ytick', labelsize=15)    # fontsize of the tick labels
 	plt.title(title,fontsize=titlesize)
 	plt.xlabel(x_label)
 	plt.ylabel(y_label)
@@ -22,8 +21,8 @@ def add_figure(title,x_label,y_label,titlesize=30,bottom_visiability=True,xylabe
 	return figure
 
 
-def adgust_subplot(ax,title,x_label,y_label,latter='',titlesize=30,bottom_visiability=True,xylabelsize=20,xytitlesize=20,e_label=True):
-	ax.text(-0.2, 1.05, latter, transform=ax.transAxes, size=22,weight="bold")
+def adgust_subplot(ax,title,x_label,y_label,latter='',titlesize=20,bottom_visiability=True,xylabelsize=20,xytitlesize=20,e_label=True,xlatter=-0.2,ylatter=1.05):
+	ax.text(xlatter, ylatter, latter, transform=ax.transAxes, size=22,weight="bold")
 	# ax.text(-0.1, 0.9, string.ascii_uppercase[i], transform=ax.transAxes, size=25)
 	# plt.rc('font', size=20)
 	plt.rc('axes', titlesize=xytitlesize)     # fontsize of the axes title
