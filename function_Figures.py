@@ -129,7 +129,7 @@ def find_RA(file_dirr):
         try_find=glob(file_dirr+'/fit RA=*_'+passive_params+'.p')
         if len(try_find)>0:
             RA=float(re.findall(r"[-+]?(?:\d*\.\d+|\d+)", try_find[0].split('/')[-1])[0])
-            if RA>50:
+            if RA>60:
                 return passive_params
     raise 'Error no passive parameters founded'
 def plot_short_pulse_model(ax,dirr,antil_point=-1,show_legend=True,text_place=[0.6,0.9]):
@@ -156,9 +156,14 @@ def plot_short_pulse_model(ax,dirr,antil_point=-1,show_legend=True,text_place=[0
     add_scale_bar(ax,'fit_short_pulse',dirr)
     return ax
 
-def plot_syn_model(ax,dirr,start_point=600,show_legend=False):
+def plot_syn_model(ax,dirr,start_point=600,show_legend=False,xlabel=-0.1,ylabel=-0.02):
+    dirr=dirr.replace('//','/')
+    cell_name=dirr.split('/')[2]
+
     dict_syn=read_from_pickle(dirr)
     E_PAS=dict_syn['parameters']['E_PAS']
+    print(dirr,'is the dirr')
+    print(glob(dirr[:dirr.rfind('/')]+'/final_pop'+dirr[dirr.rfind('pickles_')+7:]))
     dict_result=read_from_pickle(glob(dirr[:dirr.rfind('/')]+'/final_pop'+dirr[dirr.rfind('pickles_')+7:])[0])
     T=dict_syn['time']
     V=dict_syn['voltage']
@@ -171,43 +176,59 @@ def plot_syn_model(ax,dirr,start_point=600,show_legend=False):
     place_text=0.5
     xplace=T[0]
     yplace=V['Model'][0]-E_PAS-0.3
-    ax.text(-0.1,-0.02,'g_max AMPA='+str(round(dict_result['mean_final_pop'][0]*1000,2))+' [nS]',c='#18852a',transform=ax.transAxes)#dict_result['parameters'][0]
-    ax.text(-0.1,-0.07,'g_max NMDA='+str(round(dict_result['mean_final_pop'][1]*1000,2))+' [nS]',c='#03b5fc',transform=ax.transAxes)#dict_result['parameters'][1]
+    AMPA=sum(get_MOO_result_parameters(cell_name,'W_AMPA'))#dict_result['mean_final_pop'][0]*1000,2)
+    NMDA=sum(get_MOO_result_parameters(cell_name,'g_NMDA_spine'))#dict_result['mean_final_pop'][1]*1000,2)
+
+    ax.text(xlabel,ylabel,'g_max AMPA='+str(round(AMPA,2))+' nS',c='#18852a',transform=ax.transAxes)#dict_result['parameters'][0]
+    ax.text(xlabel,ylabel-0.05,'g_max NMDA='+str(round(NMDA*1000,2))+' pS',c='#03b5fc',transform=ax.transAxes)#dict_result['parameters'][1]
     if show_legend:
         ax.legend(loc="upper left",prop={'size': legend_size})
     add_scale_bar(ax,'fit_syn')
 
-def plot_syn_model2(ax,dirr,start_point=0,show_legend=True,bbox_to_anchor=(1, 0.35)):
+def plot_syn_model2(ax,dirr,start_point=0,show_legend=True,bbox_to_anchor=(1, 0.35),legend_size=10,compress_legend=False):
+    dirr=dirr.replace('//','/')
+    cell_name=dirr.split('/')[2]
     dict_syn=read_from_pickle(dirr)
     E_PAS=dict_syn[-1]['parameters']['E_PAS']
     dict_result=read_from_pickle(glob(dirr[:dirr.rfind('/')]+'/final_pop'+dirr[dirr.rfind('pickles_')+7:])[0])
     T=dict_syn[0]['time']
     V=dict_syn[1]
     reletive_strengths=dict_syn[-1]['parameters']['reletive_strengths']
-    AMPA_weight=round(dict_result['mean_final_pop'][0]*1000,2)
-    NMDA_weight=round(dict_result['mean_final_pop'][1]*1000,2)
+    AMPA_weight=get_MOO_result_parameters(cell_name,'W_AMPA')#dict_result['mean_final_pop'][0]*1000,2)
+    NMDA_weight=get_MOO_result_parameters(cell_name,'g_NMDA_spine')#dict_result['mean_final_pop'][1]*1000,2)
+    # AMPA_weight=round(dict_result['mean_final_pop'][0]*1000,2)
+    # NMDA_weight=round(dict_result['mean_final_pop'][1]*1000,2)
     for k,color,label in zip(['voltage_all','voltage_0','voltage_1'],['black','#03d7fc','#fc8003'],['model','syn_0','syn1']):
         if k== 'voltage_all':
-            label_AMPA='AMPA '+str(AMPA_weight)+' nS'
-            label_NMDA='NMDA '+str(NMDA_weight)+' nS'
+            if not compress_legend:
+                label_AMPA='AMPA '+str(round(sum(AMPA_weight),2))+' nS'
+                label_NMDA='NMDA '+str(round(sum(NMDA_weight)*1000,2))+' pS'
+            else:
+                label_AMPA=''
+                label_NMDA=''
         else:
             num=int(re.findall(r'\d+', k)[0])
-            label_AMPA='AMPA '+str(round(AMPA_weight*reletive_strengths[num]/sum(reletive_strengths),3))+' nS'
-            label_NMDA='NMDA '+str(round(NMDA_weight*reletive_strengths[num]/sum(reletive_strengths),3))+' nS'
-#            label_AMPA='AMPA '+str(round(AMPA_weight*reletive_strengths[num]/sum(reletive_strengths),3))+' nS '+str(round(reletive_strengths[num]*100))+"%"
-#            label_NMDA='NMDA '+str(round(NMDA_weight*reletive_strengths[num]/sum(reletive_strengths),3))+' nS '+str(round(reletive_strengths[num]*100))+"%"
+            print(AMPA_weight,'')
+            label_AMPA='AMPA '+str(round(AMPA_weight[num],2))+' nS'
+            label_NMDA='NMDA '+str(round(NMDA_weight[num]*1000,2))+' pS'
+            #label_AMPA='AMPA '+str(round(AMPA_weight*reletive_strengths[num]/sum(reletive_strengths),3))+' pS'
+            #label_NMDA='NMDA '+str(round(NMDA_weight*reletive_strengths[num]/sum(reletive_strengths),3))+' pS'
+#            label_AMPA='AMPA '+str(round(AMPA_weight*reletive_strengths[num]/sum(reletive_strengths),3))+' pS '+str(round(reletive_strengths[num]*100))+"%"
+#            label_NMDA='NMDA '+str(round(NMDA_weight*reletive_strengths[num]/sum(reletive_strengths),3))+' pS '+str(round(reletive_strengths[num]*100))+"%"
 
         ax.plot(T[start_point:],V[k]['V_soma_AMPA'][start_point:]-E_PAS,'-',c=color,lw=3+addlw,label=label_AMPA,alpha=0.8)
         ax.plot(T[start_point:],V[k]['V_soma_NMDA'][start_point:]-E_PAS,'--',c=color,lw=3+addlw,label=label_NMDA,alpha=0.8)
-        # ax.text(200,place_text,dict_result['parameters'][0]+'='+str(round(dict_result['mean_final_pop'][0]*1000,2))+'[nS]',c=color)
-        # ax.text(200,place_text-0.2,dict_result['parameters'][1]+'='+str(round(dict_result['mean_final_pop'][1]*1000,2))+'[nS]',c=color)
-
-
-    ax.plot(T[start_point:],V['voltage_all']['experiment'][start_point:]-E_PAS,color = 'black',alpha=0.2,label='experiment',lw=12+addlw)
+        # ax.text(200,place_text,dict_result['parameters'][0]+'='+str(round(dict_result['mean_final_pop'][0]*1000,2))+'[pS]',c=color)
+        # ax.text(200,place_text-0.2,dict_result['parameters'][1]+'='+str(round(dict_result['mean_final_pop'][1]*1000,2))+'[pS]',c=color)
+    if compress_legend:
+        label_experiment=''
+    else:
+        label_experiment='experiment'
+    ax.plot(T[start_point:],V['voltage_all']['experiment'][start_point:]-E_PAS,color = 'black',alpha=0.2,label=label_experiment,lw=12+addlw)
     # place_text=0.5
     plt.rcParams.update({'font.size': text_size})
-    # ax.text(200,place_text,dict_result['parameters'][0]+'='+str(round(dict_result['mean_final_pop'][0]*1000,2))+'[nS]',c='#18852a')
-    # ax.text(200,place_text-0.2,dict_result['parameters'][1]+'='+str(round(dict_result['mean_final_pop'][1]*1000,2))+'[nS]',c='#03b5fc')
+    # ax.text(200,place_text,dict_result['parameters'][0]+'='+str(round(dict_result['mean_final_pop'][0]*1000,2))+'[pS]',c='#18852a')
+    # ax.text(200,place_text-0.2,dict_result['parameters'][1]+'='+str(round(dict_result['mean_final_pop'][1]*1000,2))+'[pS]',c='#03b5fc')
     if show_legend:
         ax.legend(loc="lower center", bbox_to_anchor=bbox_to_anchor,prop={'size': legend_size-2})
     add_scale_bar(ax,'fit_syn')
@@ -221,22 +242,35 @@ def get_resistance_par(dirr,parameter):
         found_path=found_path[0]
     return read_from_pickle(found_path)['parameters'][parameter]
 
-def get_MOO_result_parameters(cell_name,return_parameter,
-                              passive_parameter=None,syn_num=None,relative=None,before_shrink='after',shrinkage_resize=['1.0','1.0'],
-                              full_trace=True,from_picture=None,double_spine_area=False):
+def get_MOO_result_parameters2(cell_name,return_parameter,
+                              passive_parameter=None,syn_num=None,relative=None,before_shrink='after',shrinkage_resize='[1.0, 1.0]',
+                              full_trace=True,from_picture=None,double_spine_area=False,MOO_file='results_MOO_Rin_result'):
     if cell_name in ['2017_07_06_C_3-4']: full_trace=False
-    df=pd.read_csv('cells_initial_information/'+cell_name+'/results_MOO_Rin_result.csv',index_col=0)
+    df=pd.read_csv('cells_initial_information/'+cell_name+'/'+MOO_file+'.csv',index_col=0)
     curr=df
     colombs=[]
     if relative is None:
         relative=get_n_spinese(cell_name)>1
-    for v in ['passive_parameter','syn_num','before_shrink','full_trace','relative','from_picture']:
+    for v in ['passive_parameter','syn_num','before_shrink','full_trace','relative','from_picture','double_spine_area']:
         if not eval(v) is None:
             colombs.append((df[v] == eval(v)).to_numpy().astype(int))
+    colombs.append((df['shrinkage_resize'] == shrinkage_resize).to_numpy().astype(int))
+
     correct_col = np.mean(colombs, axis=0).astype(int).astype(bool)
     curr_df = df[correct_col]
     return curr_df[return_parameter].to_numpy()
-
+def get_MOO_result_parameters(cell_name=None,return_parameter='',MOO_file='results_MOO_Rin_result'):
+    # if cell_name in ['2017_07_06_C_3-4']: full_trace=False
+    df=pd.read_csv('cells_initial_information/'+MOO_file+'.csv')
+    curr=df
+    if not cell_name is None:
+        colombs=(df['cell_name'] == cell_name).to_numpy().astype(int)
+    else:
+        colombs=np.ones(len(df))
+    correct_col = colombs.astype(int).astype(bool)
+    curr_df = df[correct_col]
+    return curr_df[return_parameter].to_numpy()
+    
 def get_std_halloffame(cell_name,folder2run='final_data/total_moo/'):
     passive_param=find_RA(folder2run+cell_name+'/')
     print(passive_param)
@@ -253,12 +287,13 @@ def get_passive_val_name(dirr):
     raise "no passive_val_name in this dirr"
 
 
-def plot_neck_voltage(ax,dirr,start_point=900,bbox_to_anchor=(0.8, 0.5)):
+def plot_neck_voltage(ax,dirr,start_point=900,bbox_to_anchor=(0.8, 0.5),legend_size=10):
+    dirr=dirr.replace('//','/')
     dict_syn=read_from_pickle(dirr)
     passive_parameter=get_passive_val_name(dirr)
     cell_name=dirr.split('/')[2]
     RA=dict_syn['parameters']['RA']
-    Rin_base=get_MOO_result_parameters(cell_name,'neck_base_Rin',passive_parameter=passive_parameter)
+    Rin_base=get_MOO_result_parameters(cell_name,'neck_base_Rin')#,passive_parameter=passive_parameter)
     if len(Rin_base)>get_n_spinese(cell_name): raise "there is too many argue from Rin"
     # Rin_base=get_resistance_par(dirr)
     E_PAS=dict_syn['parameters']['E_PAS']
