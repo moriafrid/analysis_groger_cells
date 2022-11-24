@@ -6,7 +6,7 @@ from create_folder import create_folder_dirr
 from open_pickle import read_from_pickle
 from read_spine_properties import get_sec_and_seg, get_parameter, get_n_spinese, calculate_Rneck
 from function_Figures import find_RA, legend_size, get_MOO_result_parameters, plot_pickle, plot_short_pulse_model, \
-    plot_syn_model2, plot_syn_model
+    plot_syn_model2, plot_syn_model, get_MOO_result_parameters2
 import sys
 if len(sys.argv)!=2:
     save_folder='final_data/total_moo/'
@@ -42,25 +42,25 @@ def plot_passsive(ax1,ax2,decided_passive_params,base_dir0):
         plot_syn_model(ax2,glob(base_dir+'AMPA&NMDA_soma_pickles_*'+decided_passive_params+'.p')[0],show_legend=False)
 colors=['red','blue']
 for i,cell_name in enumerate(read_from_pickle('cells_name2.p')):
-    if cell_name!='2017_02_20_B':continue
+    # if cell_name!='2017_02_20_B':continue
     fig,ax1,ax2,ax3,ax4,ax5,ax6,ax7=create_fig_RA()
     adgust_subplot(ax2,'','','AMPA [nS]',bottom_visiability=False)
     adgust_subplot(ax5,'' ,'RA','NMDA [nS]')
     base_dir=save_folder+'/'+cell_name+'/'
     plot_pickle(ax1,base_dir+"RA const against errors2.p")
     # for passive_parameter in ['RA_min_error','RA=300','RA_best_fit']:
-    plot_passsive(ax3,ax4,find_RA(base_dir),base_dir)
+    plot_passsive(ax3,ax4,get_MOO_result_parameters(cell_name,'passive_parameter')[0],base_dir)
     if cell_name in ['2016_04_16_A','2017_05_08_A_4-5']:
         plot_passsive(ax6,ax7,'RA=200',base_dir)
     else:
         plot_passsive(ax6,ax7,'RA=300',base_dir)
     for num in range(get_n_spinese(cell_name)):
-        dictMOO={'syn_num':num,'from_picture':cell_name in read_from_pickle('cells_sec_from_picture.p'),'double_spine_area':False}
+        dictMOO={'relative':get_MOO_result_parameters(cell_name,'relative')[0],'syn_num':num,'from_picture':cell_name in read_from_pickle('cells_sec_from_picture.p'),'double_spine_area':False,'full_trace':get_MOO_result_parameters(cell_name,'full_trace')[0]}
         plot_dict={'color':colors[num],'label':cell_name,'lw':scatter_size-2}
-        PSD=get_MOO_result_parameters(cell_name,'PSD',**dictMOO)
-        RA=get_MOO_result_parameters(cell_name,'RA',**dictMOO)
-        W_AMPA=get_MOO_result_parameters(cell_name,'W_AMPA',**dictMOO)
-        W_NMDA=get_MOO_result_parameters(cell_name,'W_NMDA',**dictMOO)
+        PSD=get_MOO_result_parameters2(cell_name,'PSD',**dictMOO)
+        RA=get_MOO_result_parameters2(cell_name,'RA',**dictMOO)
+        W_AMPA=get_MOO_result_parameters2(cell_name,'W_AMPA',**dictMOO)
+        W_NMDA=get_MOO_result_parameters2(cell_name,'g_NMDA_spine',**dictMOO)
         ax2.scatter(RA,W_AMPA,**plot_dict)
         ax5.scatter(RA,W_NMDA,**plot_dict)
     plt.savefig(save_dir+cell_name+'RA.png')
@@ -109,12 +109,12 @@ for i,cell_name in enumerate(read_from_pickle('cells_name2.p')):
     adgust_subplot(eval('ax'+str(i)+'_1'),'' ,bottom_title,'NMDA [nS]',bottom_visiability=bottom_visiability,titlesize=20)
 
     for num in range(get_n_spinese(cell_name)):
-        dictMOO={'syn_num':num,'from_picture':cell_name in read_from_pickle('cells_sec_from_picture.p'),'double_spine_area':False}
-        PSD=get_MOO_result_parameters(cell_name,'PSD',**dictMOO)
+        dictMOO={'relative':get_MOO_result_parameters(cell_name,'relative')[0],'syn_num':num,'from_picture':cell_name in read_from_pickle('cells_sec_from_picture.p'),'double_spine_area':False,'full_trace':get_MOO_result_parameters(cell_name,'full_trace')[0]}
+        PSD=get_MOO_result_parameters2(cell_name,'PSD',**dictMOO)
         plot_dict={'color':colors[num],'label':PSD[num],'lw':scatter_size-2}
-        RA=get_MOO_result_parameters(cell_name,'RA',**dictMOO)
-        W_AMPA=get_MOO_result_parameters(cell_name,'W_AMPA',**dictMOO)
-        W_NMDA=get_MOO_result_parameters(cell_name,'W_NMDA',**dictMOO)
+        RA=get_MOO_result_parameters2(cell_name,'RA',**dictMOO)
+        W_AMPA=get_MOO_result_parameters2(cell_name,'W_AMPA',**dictMOO)
+        W_NMDA=get_MOO_result_parameters2(cell_name,'g_NMDA_spine',**dictMOO)
         eval('ax'+str(i)+'_0').scatter(RA,W_AMPA,**plot_dict)
         eval('ax'+str(i)+'_1').scatter(RA,W_NMDA,**plot_dict)
         eval('ax'+str(i)+'_1').legend()
