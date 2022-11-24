@@ -114,13 +114,17 @@ for cell_name in read_from_pickle('cells_name2.p')[:]: #['2017_03_04_A_6-7']:#
                     dict_for_records.update(value)
                 all_data.append(dict_for_records)
                 if Moo_dict['RA']>60 and not next_continue:
-
+                    if dict_for_records['shrinkage_resize']!=[1.0,1.0]:continue
                     if dict_for_records['before_shrink']=='before':continue
                     if cell_name=='2017_04_03_B' and dict_for_records['passive_parameter']!='RA=70':continue
                     if cell_name=='2017_07_06_C_3-4' and dict_for_records['full_trace']==True:continue
                     #if cell_name=='2017_04_03_B' and dict_for_records['before_shrink']=='after':continue
                     #if cell_name!='2017_04_03_B' and dict_for_records['before_shrink']=='before':continue
                     if (cell_name in read_from_pickle('cells_sec_from_picture.p') and dict_for_records['from_picture']) or (not cell_name in read_from_pickle('cells_sec_from_picture.p') and not dict_for_records['from_picture']):
+                        cell_param_dict=read_from_pickle('cells_initial_information/'+cell_name+'/cell_parameters_pickles.p')
+                        dict_for_records['total_L']=cell_param_dict['total_L']
+                        for j in range(get_n_spinese(cell_name)):
+                            dict_for_records['syn_distance_real']=cell_param_dict['syn'+str(j)+'_distance']
                         all_data_cell.append(dict_for_records)
                         already_save=True
         if already_save:
@@ -138,6 +142,7 @@ for cell_name in read_from_pickle('cells_name2.p')[:]: #['2017_03_04_A_6-7']:#
     output_df.to_csv(folder_data+cell_name+"/results_MOO"+save_moo+".csv", index=False)
 output_df_cells = pd.DataFrame.from_records(all_data_cell)
 output_df_cells.to_csv(folder_data+"/results_MOO"+save_moo+".csv", index=False)
+output_df_cells.to_csv("final_data/total_moo/final_results_MOO.csv", index=False)
 
 
     # save_pickle_folder2=folder_+folder_data+cell_name
