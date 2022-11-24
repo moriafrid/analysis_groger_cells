@@ -3,7 +3,7 @@ from add_figure import add_figure, adgust_subplot
 from create_folder import create_folder_dirr
 from open_pickle import read_from_pickle
 from read_spine_properties import get_sec_and_seg, get_parameter, get_n_spinese, calculate_Rneck
-from function_Figures import find_RA,legend_size
+from function_Figures import find_RA, legend_size, get_MOO_result_parameters
 from glob import glob
 import numpy as np
 import string
@@ -44,20 +44,22 @@ for i,cell_name in enumerate(read_from_pickle('cells_name2.p')):
 
     create_folder_dirr(save_dir)
     print(base_dir)
-    decided_passive_params=find_RA(base_dir)
-    dicty=read_from_pickle(glob(base_dir+'Rins_pickles*'+decided_passive_params+'.p')[0])
-    PSD=dicty['parameters']['PSD']
+    decided_passive_params=get_MOO_result_parameters(cell_name,'passive_parameter')[0]#find_RA(base_dir)
+    print(decided_passive_params)
+    # dicty=read_from_pickle(glob(base_dir+'Rins_pickles*'+decided_passive_params+'.p')[0])
+    PSD=get_MOO_result_parameters(cell_name,'PSD')#dicty['parameters']['PSD']
 
     adgust_subplot(ax0_1,'Distance from Soma','PSD','micron')
-    ax0_1.scatter(PSD,dicty['parameters']['distance'],lw=scatter_size)
+    # ax0_1.scatter(PSD,dicty['parameters']['distance'],lw=scatter_size)
+    ax0_1.scatter(PSD,get_MOO_result_parameters(cell_name,'distance'),lw=scatter_size)
 
     adgust_subplot(ax0_2,'PSD against AMPA','PSD','AMPA [nS]')
-    W_AMPA=np.array(dicty['parameters']['reletive_strengths']*dicty['parameters']['W_AMPA'])*1000 #nS
+    W_AMPA=get_MOO_result_parameters(cell_name,'W_AMPA')#np.array(dicty['parameters']['reletive_strengths']*dicty['parameters']['W_AMPA'])*1000 #nS
     ax0_2.scatter(PSD,W_AMPA,color=color,label=cell_name,lw=scatter_size)
     #ax0_1.legend()
 
     adgust_subplot(ax0_3,'PSD against NMDA','PSD','NMDA [nS]')
-    W_NMDA=np.array(dicty['parameters']['reletive_strengths']*dicty['parameters']['W_NMDA'])*1000 #nS
+    W_NMDA=get_MOO_result_parameters(cell_name,'g_NMDA_spine')#np.array(dicty['parameters']['reletive_strengths']*dicty['parameters']['W_NMDA'])*1000 #nS
     ax0_3.scatter(PSD,W_NMDA,marker='*',color=color,label=cell_name,lw=scatter_size)
     ax0_3.legend(loc="center right", bbox_to_anchor=(1.4, 0.4),prop={'size': legend_size+2})
 for n, ax in enumerate([ax0_1,ax0_2,ax0_3]):
@@ -66,7 +68,7 @@ for n, ax in enumerate([ax0_1,ax0_2,ax0_3]):
     ax.spines['right'].set_visible(False)
 plt.savefig(save_dir+'/AMPA_NMDA_dis_relation.png')
 plt.savefig(save_dir+'/AMPA_NMDA_dis_relation.svg')
-# plt.show()
+plt.show()
 plt.close()
 print('AMPA-NMDA figure is ready')
 
@@ -88,15 +90,15 @@ for i,cell_name in enumerate(read_from_pickle('cells_name2.p')):
     color=colors[i]
     base_dir=folder2run+'/'+cell_name+'/'
     decided_passive_params=find_RA(base_dir)
-    dicty=read_from_pickle(glob(base_dir+'Rins_pickles*'+decided_passive_params+'.p')[0])
-    PSD=dicty['parameters']['PSD']
+    # dicty=read_from_pickle(glob(base_dir+'Rins_pickles*'+decided_passive_params+'.p')[0])
+    PSD=get_MOO_result_parameters(cell_name,'PSD')#dicty['parameters']['PSD']
     adgust_subplot(ax0_1,'PSD against AMPA','PSD','AMPA [nS]')
-    W_AMPA=np.array(dicty['parameters']['reletive_strengths']*dicty['parameters']['W_AMPA'])*1000 #nS
+    W_AMPA=get_MOO_result_parameters(cell_name,'W_AMPA')#np.array(dicty['parameters']['reletive_strengths']*dicty['parameters']['W_AMPA'])*1000 #nS
     ax0_1.scatter(PSD,W_AMPA,color=color,label=cell_name,lw=scatter_size)
     #ax0_1.legend()
     
     adgust_subplot(ax0_2,'PSD against NMDA','PSD','NMDA [nS]')
-    W_NMDA=np.array(dicty['parameters']['reletive_strengths']*dicty['parameters']['W_NMDA'])*1000 #nS
+    W_NMDA=get_MOO_result_parameters(cell_name,'g_NMDA_spine')#np.array(dicty['parameters']['reletive_strengths']*dicty['parameters']['W_NMDA'])*1000 #nS
     ax0_2.scatter(PSD,W_NMDA,marker='*',color=color,label=cell_name,lw=scatter_size)
     ax0_2.legend(loc="center right", bbox_to_anchor=(1.6, 0.6),prop={'size': legend_size+5})
 for n, ax in enumerate([ax0_1,ax0_2]):
@@ -105,7 +107,7 @@ for n, ax in enumerate([ax0_1,ax0_2]):
     ax.spines['right'].set_visible(False)    
 plt.savefig(save_dir+'AMPA_NMDA_relation.png')
 plt.savefig(save_dir+'AMPA_NMDA_relation.svg')
-# plt.show()
+plt.show()
 print('AMPA-NMDA figure is ready')
    
 fig = plt.figure(figsize=(12, 12))  # , sharex="row", sharey="row"
@@ -132,17 +134,25 @@ for i,cell_name in enumerate(read_from_pickle('cells_name2.p')):
     base_dir=folder2run+'/'+cell_name+'/'
     decided_passive_params=find_RA(base_dir)
     dicty=read_from_pickle(glob(base_dir+'Rins_pickles*'+decided_passive_params+'.p')[0])
-    PSD=dicty['parameters']['PSD']
+    PSD=get_MOO_result_parameters(cell_name,'PSD')#dicty['parameters']['PSD']
 
     adgust_subplot(ax1,'R transfer syn','PSD','MOum',titlesize=titlesize)
-    ax1.scatter(PSD,dicty['spine_head']['Rtrans'],color=color,lw=scatter_size)
-    ax1.scatter(PSD,dicty['neck_base']['Rtrans'],marker='*',color=colors[i+1],lw=scatter_size-3)
+    ax1.scatter(PSD,get_MOO_result_parameters(cell_name,'spine_head_Rtrans'),color=color,lw=scatter_size)
+    ax1.scatter(PSD,get_MOO_result_parameters(cell_name,'sneck_base_Rtrans'),marker='*',color=colors[i+1],lw=scatter_size-3)
 
     adgust_subplot(ax2,'Rins','PSD','MOum',titlesize=titlesize)
-    ax2.scatter(PSD,dicty['spine_head']['Rin'],color=color)
-    ax2.scatter(PSD,dicty['neck_base']['Rin'],marker='*',color=colors[i+1],lw=scatter_size-3)
-    ax2.scatter(sum(PSD),dicty['soma']['Rin'],marker='^',color=color,lw=scatter_size-3)
+    ax2.scatter(PSD,get_MOO_result_parameters(cell_name,'spine_head_Rin'),color=color)
+    ax2.scatter(PSD,get_MOO_result_parameters(cell_name,'neck_base_Rin'),marker='*',color=colors[i+1],lw=scatter_size-3)
+    ax2.scatter(sum(PSD),get_MOO_result_parameters(cell_name,'soma_Rin'),marker='^',color=color,lw=scatter_size-3)
 
+    # adgust_subplot(ax1,'R transfer syn','PSD','MOum',titlesize=titlesize)
+    # ax1.scatter(PSD,dicty['spine_head']['Rtrans'],color=color,lw=scatter_size)
+    # ax1.scatter(PSD,dicty['neck_base']['Rtrans'],marker='*',color=colors[i+1],lw=scatter_size-3)
+    #
+    # adgust_subplot(ax2,'Rins','PSD','MOum',titlesize=titlesize)
+    # ax2.scatter(PSD,dicty['spine_head']['Rin'],color=color)
+    # ax2.scatter(PSD,dicty['neck_base']['Rin'],marker='*',color=colors[i+1],lw=scatter_size-3)
+    # ax2.scatter(sum(PSD),dicty['soma']['Rin'],marker='^',color=color,lw=scatter_size-3)
     
     adgust_subplot(ax3,'PSD against AMPA','PSD','AMPA [nS]',titlesize=titlesize)
     W_AMPA=np.array(dicty['parameters']['reletive_strengths']*dicty['parameters']['W_AMPA'])*1000 #nS
