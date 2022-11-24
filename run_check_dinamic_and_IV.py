@@ -46,4 +46,4 @@ for f in abf_files[:]:
 	with open(save_folder_IV_curve + 'max_vol_curr_inj.p', 'wb') as fr:
 		pickle.dump([maxi * t1.units, I * pq.pA], fr)
 	Rins=I_V_curve(maxi, I * pq.pA, save_folder_IV_curve+'/')
-	check_dynamics(short_pulse, T_short_pulse, create_folder_dirr(base_external_folder+'check_dynamic/'))
+	check_dynamics(cell_name, create_folder_dirr(base_external_folder+'check_dynamic/'))
