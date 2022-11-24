@@ -173,7 +173,7 @@ def diam_distance_plot(cell_name,file_type2read,data_dir= "cells_initial_informa
             ax.plot(dis,diam,'*')
     i=0
     for syn_dis1,syn_diam1 in zip(list(dict.fromkeys(syn_dis)),list(dict.fromkeys(syn_diam))):
-        ax.scatter(syn_dis1,syn_diam1,label='syn'+str(i)+' dis='+str(round(syn_dis1,2))+'um')
+        ax.scatter(syn_dis1,syn_diam1,label='distance='+str(round(syn_dis1,2))+'um')
         i+=1
     plt.legend()
     ax.text(0.02, 0.02,'Total Length='+str(round(length))+'um',transform=ax.transAxes,size=12)
