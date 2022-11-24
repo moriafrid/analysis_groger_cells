@@ -13,8 +13,8 @@ else:
     folder2run=sys.argv[1]
 print(folder2run)
 if __name__=='__main__':
-    for cell_name in read_from_pickle('cells_name2.p'):
-        if cell_name!='2017_04_03_B':continue
+    for cell_name in read_from_pickle('cells_name2.p')[:]:
+        # if cell_name!='2017_04_03_B':continue
         before_after='_after_shrink'
         #'final_data_after_shrink_with_mistak#
         base_dir=folder2run+'/'+cell_name+'/'
@@ -32,7 +32,7 @@ if __name__=='__main__':
 
         # plt.subplots_adjust(hspace=0.3, wspace=0.3)
 
-        decided_passive_params=find_RA(base_dir)
+        decided_passive_params=get_MOO_result_parameters(cell_name,'passive_parameter')[0]#find_RA(base_dir)
         # if cell_name in ['2017_03_04_A_6-7','2017_05_08_A_5-4']: decided_passive_params='RA_best_fit'
         if cell_name in read_from_pickle('cells_sec_from_picture.p'):
             from_picture=True
