@@ -3,7 +3,8 @@ from sklearn.metrics import r2_score
 from add_figure import add_figure, adgust_subplot
 from create_folder import create_folder_dirr
 from open_pickle import read_from_pickle
-from function_Figures import find_RA, legend_size, get_MOO_result_parameters, get_std_halloffame
+from function_Figures import find_RA, legend_size, get_MOO_result_parameters, get_std_halloffame, \
+    get_MOO_result_parameters2
 import numpy as np
 import sys
 from read_spine_properties import get_n_spinese
@@ -98,20 +99,22 @@ colors=['#1f77b4', '#ff7f0e', '#2ca02c', '#d62728', '#9467bd', '#8c564b', '#e377
 
 if __name__=='__main__':
     # adgust_subplot(ax8,'','Rneck [Mohm]','',latter='H')
-    all_W_AMPA,all_W_NMDA,all_V_NMDA,all_g_NMDA,all_PSD,all_color,all_RA=[],[],[],[],[],[],[]
+    all_W_AMPA,all_W_NMDA,all_V_NMDA,all_g_NMDA,all_PSD,all_color,all_color_included,all_RA=[],[],[],[],[],[],[],[]
     all_I_spine_head,all_I_spine_base,all_V_spine_head,all_V_spine_base,all_Rin_spine_head,all_Rin_spine_base,all_V_soma_NMDA=[],[],[],[],[],[],[]
-    all_Rin_soma,all_Rtrans_spine_head,all_Rtrans_spine_base,all_Rneck=[],[],[],[]
+    all_Rin_soma,all_Rtrans_spine_head,all_Rtrans_spine_base,all_Rneck,all_soma_EPSP=[],[],[],[],[]
     all_V_spine_head_const,all_Rin_spine_head_const=[],[]
     W_AMPA=[]
     all_W_AMPA_cumulativ,all_g_NMDA_cumulativ,all_PSD_cumulativ=[],[],[]
     for i,cell_name in enumerate(read_from_pickle('cells_name2.p')):
+        all_color_included=np.append(all_color_included,[colors[i]]*get_n_spinese(cell_name))
+
         if cell_name=='2017_04_03_B':continue
         j=0
         W_AMPA=[]
         while len(W_AMPA)==0:
             print(j)
             dictMOO={'passive_parameter':passive_parameter_names[j],'syn_num':None,'from_picture':cell_name in read_from_pickle('cells_sec_from_picture.p'),'double_spine_area':False}
-            #dictMOO={}
+            dictMOO={}
             RA=get_MOO_result_parameters(cell_name,'RA',**dictMOO)
             W_AMPA=get_MOO_result_parameters(cell_name,'W_AMPA',**dictMOO)
             W_NMDA=get_MOO_result_parameters(cell_name,'W_NMDA',**dictMOO)
@@ -136,7 +139,7 @@ if __name__=='__main__':
             W_NMDA,V_NMDA,V_soma_NMDA,g_NMDA=[None]*len(PSD),[None]*len(PSD),[None]*len(PSD),[None]*len(PSD)
         all_PSD=np.append(all_PSD, PSD)
         all_PSD_cumulativ=np.append(all_PSD_cumulativ,sum(all_PSD_cumulativ)+W_AMPA)
-
+        all_soma_EPSP=np.append(all_soma_EPSP,get_MOO_result_parameters(cell_name,'V_soma_AMPA'))
         all_color=np.append(all_color,[colors[i]]*get_n_spinese(cell_name))
         all_RA=np.append(all_RA, RA)
         all_W_AMPA=np.append(all_W_AMPA,W_AMPA)
@@ -180,7 +183,6 @@ if __name__=='__main__':
             all_Rtrans_spine_base_NMDA=np.append(all_Rtrans_spine_base_NMDA,all_Rtrans_spine_base[i])
             all_Rtrans_spine_head_NMDA=np.append(all_Rtrans_spine_head_NMDA,all_Rtrans_spine_head[i])
             all_Rneck_NMDA=np.append(all_Rneck_NMDA,all_Rneck[i])
-
     # fig=add_figure('','N','cumulative')
     # fig.set_size_inches(6,7)
     # fig.subplots_adjust(left=0.2,right=0.95,top=0.9,bottom=0.15)
@@ -202,23 +204,120 @@ if __name__=='__main__':
     # plt.show()
     # plt.close()
 
+    fig2 = plt.figure(figsize=(15, 11))  # , sharex="row", sharey="row"
+    # fig2 = plt.figure(figsize=(15, 6))  # , sharex="row", sharey="row"
+    fig2.subplots_adjust(left=0.1,right=0.95,top=0.9,bottom=0.1,hspace=0.3, wspace=0.25)
+    # fig2.subplots_adjust(left=0.1,right=0.95,top=0.9,bottom=0.15,hspace=0.25, wspace=0.2)
+    # fig2.subplots_adjust(left=0.05,right=0.99,top=0.95,bottom=0.05,hspace=0.2, wspace=0.25)
 
-    fig = plt.figure(figsize=(15, 10))  # , sharex="row", sharey="row"
-    fig.subplots_adjust(left=0.1,right=0.95,top=0.9,bottom=0.2,hspace=0.3, wspace=0.25)
     shapes = (2, 3)
+    plt.title('RA min error EPSP on spine and base')
+    ax1 = plt.subplot2grid(shape=shapes, loc=(0, 0), rowspan=1, colspan=1)
+    ax2 = plt.subplot2grid(shape=shapes, loc=(1, 0), colspan=1, rowspan=1)
+    ax3 = plt.subplot2grid(shape=shapes, loc=(0, 1), colspan=1, rowspan=1)
+    ax4 = plt.subplot2grid(shape=shapes, loc=(1, 1), colspan=1, rowspan=1)
+    ax5 = plt.subplot2grid(shape=shapes, loc=(0, 2), rowspan=1, colspan=1)
+    ax6 = plt.subplot2grid(shape=shapes, loc=(1, 2), colspan=1, rowspan=1)
+
+    adgust_subplot(ax1,'','','EPSP soma [mV]',latter='A')
+    adgust_subplot(ax2,'','PSD [um^2]','EPSP spine head [mV]',latter='D')
+    adgust_subplot(ax3,'','','',latter='B')
+    adgust_subplot(ax4,'','g AMPA [nS]','',latter='E')
+    adgust_subplot(ax5,'','','V NMDA soma',latter='C')
+    adgust_subplot(ax6,'','g activated NMDA [nS]','V NMDA spine',latter='F')
+
+    #dict4plot={'ax1':[all_PSD,all_V_spine_head],'ax2':[all_PSD,all_V_spine_base],'ax3':[all_W_AMPA,all_V_spine_head],
+   #  'ax4':[all_W_AMPA,all_V_spine_head],'ax5':[all_g_NMDA_NMDA,all_V_soma_NMDA_NMDA],'ax6':[all_g_NMDA_NMDA,all_V_spine_base_NMDA]}
+    print(get_MOO_result_parameters(None,'V_soma_AMPA'),len(get_MOO_result_parameters(None,'V_soma_AMPA')),len(all_PSD))
+    dict4plot={'ax1':[np.append(all_PSD,get_MOO_result_parameters('2017_04_03_B','PSD')),np.append(all_soma_EPSP,get_MOO_result_parameters('2017_04_03_B','V_soma_AMPA'))],'ax2':[np.append(all_PSD,get_MOO_result_parameters('2017_04_03_B','PSD')),np.append(all_V_spine_head,get_MOO_result_parameters('2017_04_03_B','spine_head_V_high'))],'ax3':[all_W_AMPA,all_soma_EPSP],
+     'ax4':[all_W_AMPA,all_V_spine_head],'ax5':[all_g_NMDA_NMDA,all_V_soma_NMDA_NMDA],'ax6':[all_g_NMDA_NMDA,all_V_spine_head_NMDA]}
+    # plot_dict={'color':all_color,'label':cell_name,'lw':scatter_size-2}
+    for key,item in dict4plot.items():
+        # if key in ['ax2','ax4','ax6']:continue
+        print(key)
+        if key in ['ax5','ax6']:
+            plot_dict={'color':all_color_NMDA,'lw':scatter_size-2}
+        elif key in ['ax1','ax2']:
+            plot_dict={'color':np.append(all_color,'red'),'lw':scatter_size-2}
+        else:
+            plot_dict={'color':all_color,'lw':scatter_size-2}
+        if key in ['ax1','ax3','ax5']:
+            plot_curve=True
+        else:
+            plot_curve=False
+        ax=eval(key)
+        ax.scatter(item[0],item[1],**plot_dict)
+        add_curve_fit(ax,item[0],item[1],start_in_zero=False,plot_curve=plot_curve)
+    # ax1.scatter(get_MOO_result_parameters('2017_04_03_B','PSD'),get_MOO_result_parameters('2017_04_03_B','V_soma_AMPA'),c='r',lw=scatter_size-2)
+    # ax2.scatter(get_MOO_result_parameters('2017_04_03_B','PSD'),get_MOO_result_parameters('2017_04_03_B','spine_head_V_high'),c='r',lw=scatter_size-2)
+    # add_curve_fit(ax5,dict4plot['ax5'][0],dict4plot['ax5'][1],start_in_zero=False,plot_curve=True)
+
+    plt.savefig(save_dir+'/V_high.png')
+    plt.savefig(save_dir+'/V_high.svg')
+    # plt.show()
+    plt.close()
+
+
+    fig = plt.figure(figsize=(15, 6))  # , sharex="row", sharey="row"
+    fig.subplots_adjust(left=0.1,right=0.95,top=0.85,bottom=0.15,hspace=0.01, wspace=0.3)
+    shapes = (1, 3)
     N=range(len(all_W_AMPA_cumulativ))
     ax1 = plt.subplot2grid(shape=shapes, loc=(0, 0), rowspan=1, colspan=1)
     ax2 = plt.subplot2grid(shape=shapes, loc=(0, 1), colspan=1, rowspan=1)
     ax3 = plt.subplot2grid(shape=shapes, loc=(0, 2), colspan=1, rowspan=1)
-    ax4 = plt.subplot2grid(shape=shapes, loc=(1, 0), rowspan=1, colspan=1)
-    ax5 = plt.subplot2grid(shape=shapes, loc=(1, 1), colspan=1, rowspan=1)
-    ax6 = plt.subplot2grid(shape=shapes, loc=(1, 2), colspan=1, rowspan=1)
-    adgust_subplot(ax1,'','','',latter='A')
-    adgust_subplot(ax2,'','','',latter='B')
-    adgust_subplot(ax3,'','','',latter='C')
-    adgust_subplot(ax4,'','PSD','',latter='D',e_label=False)
-    adgust_subplot(ax5,'','AMPA','',latter='E',e_label=False)
-    adgust_subplot(ax6,'','NMDA','',latter='F',e_label=False)
+
+    adgust_subplot(ax1,'','L[um]','Ra',latter='A')
+    adgust_subplot(ax2,'','L[um]','Cm',latter='B')
+    adgust_subplot(ax3,'','L[um]','Rm',latter='C')
+    L=get_MOO_result_parameters(None,'total_L')
+    dict4plot={'ax1':[L,get_MOO_result_parameters(None,'RA')],'ax2':[L,get_MOO_result_parameters(None,'RM')],'ax3':[L,get_MOO_result_parameters(None,'CM')]}
+    plot_dict={'color':all_color_included,'lw':scatter_size-2}
+    for key,item in dict4plot.items():
+        ax=eval(key)
+        ax.scatter(item[0],item[1],**plot_dict)
+        add_curve_fit(ax,item[0],item[1],start_in_zero=False,plot_curve=False)
+    add_curve_fit(ax2,dict4plot['ax2'][0],dict4plot['ax2'][1],start_in_zero=False,plot_curve=True)
+    add_curve_fit(ax3,dict4plot['ax3'][0],dict4plot['ax3'][1],start_in_zero=False,plot_curve=True)
+
+    plt.savefig(save_dir+'/passive correlation2.png')
+    plt.savefig(save_dir+'/passive correlation2.svg')
+    plt.show()
+    plt.close()
+
+    fig=add_figure('',"Neuron's length[um]",'Cm[mF/cm^2]')
+    fig.set_size_inches(6,7)
+    fig.subplots_adjust(left=0.2,right=0.95,top=0.9,bottom=0.15)
+    ax=fig.axes[0]
+    L=get_MOO_result_parameters(None,'total_L')
+    dict4plot={'ax1':[L,get_MOO_result_parameters(None,'RA')],'ax2':[L,get_MOO_result_parameters(None,'RM')],'ax3':[L,get_MOO_result_parameters(None,'CM')]}
+    for i,cell_name in enumerate(read_from_pickle('cells_name2.p')):
+        plot_dict={'color':colors[i],'lw':scatter_size-2,'label':cell_name}
+        ax.scatter(get_MOO_result_parameters(cell_name,'total_L')[0],get_MOO_result_parameters(cell_name,'CM')[0],**plot_dict)
+    add_curve_fit(ax,get_MOO_result_parameters(None,'total_L'),get_MOO_result_parameters(None,'CM'),start_in_zero=False,plot_curve=True)
+    ax.legend()
+    plt.savefig(save_dir+'/passive correlation.png')
+    plt.savefig(save_dir+'/passive correlation.svg')
+    # plt.show()
+    plt.close()
+    
+    #fig = plt.figure(figsize=(15, 10))  # , sharex="row", sharey="row"
+    #fig.subplots_adjust(left=0.1,right=0.95,top=0.9,bottom=0.2,hspace=0.3, wspace=0.25)
+    fig = plt.figure(figsize=(15, 6))  # , sharex="row", sharey="row"
+    fig.subplots_adjust(left=0.1,right=0.95,top=0.85,bottom=0.15,hspace=0.01, wspace=0.3)
+    shapes = (1, 3)
+    N=range(len(all_W_AMPA_cumulativ))
+    ax1 = plt.subplot2grid(shape=shapes, loc=(0, 0), rowspan=1, colspan=1)
+    ax2 = plt.subplot2grid(shape=shapes, loc=(0, 1), colspan=1, rowspan=1)
+    ax3 = plt.subplot2grid(shape=shapes, loc=(0, 2), colspan=1, rowspan=1)
+    #ax4 = plt.subplot2grid(shape=shapes, loc=(1, 0), rowspan=1, colspan=1)
+    #ax5 = plt.subplot2grid(shape=shapes, loc=(1, 1), colspan=1, rowspan=1)
+    #ax6 = plt.subplot2grid(shape=shapes, loc=(1, 2), colspan=1, rowspan=1)
+    adgust_subplot(ax1,'','PSD','',latter='A')
+    adgust_subplot(ax2,'','g AMPA','',latter='B')
+    adgust_subplot(ax3,'','g activated NMDA','',latter='C')
+    #adgust_subplot(ax4,'','PSD','',latter='D',e_label=False)
+    #adgust_subplot(ax5,'','g AMPA','',latter='E',e_label=False)
+    #adgust_subplot(ax6,'','g activated NMDA','',latter='F',e_label=False)
     ax2.hist(all_W_AMPA, bins=6)
     ax3.hist(all_g_NMDA_NMDA, bins=6)
     ax1.hist(all_PSD, bins=6)
@@ -230,51 +329,69 @@ if __name__=='__main__':
         all_PSD_cumulativ=np.append(all_PSD_cumulativ,sum(all_PSD[:i+1]))
         all_g_NMDA_cumulativ=np.append(all_g_NMDA_cumulativ,sum(all_g_NMDA_NMDA[:i+1]))
         N_cumulativ=np.append(N_cumulativ,sum(N[:i+1]))
-    ax4.plot(sorted(all_PSD),N,label='PSD')
-    ax5.plot(sorted(all_W_AMPA),N,label='g_AMPA')
-    ax6.plot(sorted(all_g_NMDA_NMDA),np.arange(len(all_g_NMDA_NMDA))+1,label='g_NMDA')
-    # ax4.plot(N,all_PSD_cumulativ,label='PSD')
-    # ax5.plot(N,all_W_AMPA_cumulativ,label='g_AMPA')
-    # ax6.plot(N,all_g_NMDA_cumulativ,label='g_NMDA')
+    #ax4.plot(sorted(all_PSD),N,label='PSD')
+    #ax5.plot(sorted(all_W_AMPA),N,label='g_AMPA')
+    #ax6.plot(sorted(all_g_NMDA_NMDA),np.arange(len(all_g_NMDA_NMDA))+1,label='g_NMDA')
+    
+    ## ax4.plot(N,all_PSD_cumulativ,label='PSD')
+    ## ax5.plot(N,all_W_AMPA_cumulativ,label='g_AMPA')
+    ## ax6.plot(N,all_g_NMDA_cumulativ,label='g_NMDA')
     plt.savefig(save_dir+'/hist param.png')
     plt.savefig(save_dir+'/hist param.svg')
     # plt.show()
     plt.close()
 
-    fig2 = plt.figure(figsize=(15, 10))  # , sharex="row", sharey="row"
-    fig2.subplots_adjust(left=0.1,right=0.95,top=0.9,bottom=0.1,hspace=0.3, wspace=0.25)
-    shapes = (2, 3)
+    #fig2 = plt.figure(figsize=(15, 10))  # , sharex="row", sharey="row"
+    #fig2.subplots_adjust(left=0.1,right=0.95,top=0.9,bottom=0.1,hspace=0.3, wspace=0.25)
+    fig2 = plt.figure(figsize=(15, 6))  # , sharex="row", sharey="row"
+    fig2.subplots_adjust(left=0.1,right=0.95,top=0.85,bottom=0.15,hspace=0.01, wspace=0.3)
+    shapes = (1, 3)
     plt.title('max EPSP  against resistance')
     ax1 = plt.subplot2grid(shape=shapes, loc=(0, 0), rowspan=1, colspan=1)
-    ax2 = plt.subplot2grid(shape=shapes, loc=(1, 0), colspan=1, rowspan=1)
+    #ax2 = plt.subplot2grid(shape=shapes, loc=(1, 0), colspan=1, rowspan=1)
     ax3 = plt.subplot2grid(shape=shapes, loc=(0, 1), colspan=1, rowspan=1)
-    ax4 = plt.subplot2grid(shape=shapes, loc=(1, 1), colspan=1, rowspan=1)
+    #ax4 = plt.subplot2grid(shape=shapes, loc=(1, 1), colspan=1, rowspan=1)
     ax5 = plt.subplot2grid(shape=shapes, loc=(0, 2), rowspan=1, colspan=1)
-    ax6 = plt.subplot2grid(shape=shapes, loc=(1, 2), colspan=1, rowspan=1)
+    #ax6 = plt.subplot2grid(shape=shapes, loc=(1, 2), colspan=1, rowspan=1)
 
-    adgust_subplot(ax1,'','Rin spine head [MOum]','EPSP  spine head [mV]',latter='A')
-    adgust_subplot(ax2,'','Rin spine base [MOum]','EPSP  spine base [mV]',latter='B')
-    adgust_subplot(ax3,'','Rtrans spine head [Oum]','EPSP  spine head [mV]',latter='C')
-    adgust_subplot(ax4,'','Rtrans spine base [Oum]','EPSP  spine base [mV]',latter='D')
-    adgust_subplot(ax5,'','Rneck [MOum*1e-2]','EPSP  spine head [mV]',latter='E')
-    adgust_subplot(ax6,'','Rneck [MOum*1e-2]','EPSP  spine base [mV]',latter='F')
+    adgust_subplot(ax1,'','Rin spine head [MOum]','V spine head [mV]',latter='A')
+    #adgust_subplot(ax2,'','Rin spine base [MOum]','EPSP  spine base [mV]',latter='B')
+    adgust_subplot(ax3,'','Rtrans spine head [Oum]','',latter='B')
+    #adgust_subplot(ax4,'','Rtrans spine base [Oum]','EPSP  spine base [mV]',latter='D')
+    adgust_subplot(ax5,'','Rneck [MOum*1e-2]','',latter='C')
+    #adgust_subplot(ax6,'','Rneck [MOum*1e-2]','EPSP  spine base [mV]',latter='F')
 
     dict4plot={'ax1':[all_Rin_spine_head,all_V_spine_head],'ax2':[all_Rin_spine_base,all_V_spine_base],'ax3':[all_Rtrans_spine_head,all_V_spine_head],
      'ax4':[all_Rtrans_spine_base,all_V_spine_base],'ax5':[all_Rneck,all_V_spine_head],'ax6':[all_Rneck,all_V_spine_base]}
     plot_dict={'color':all_color,'lw':scatter_size-2}
     # plot_dict={'color':all_color,'label':cell_name,'lw':scatter_size-2}
     for key,item in dict4plot.items():
+        if key in ['ax2','ax4','ax6']:continue
         ax=eval(key)
         ax.scatter(item[0],item[1],**plot_dict)
+        #if ax=='ax1':continue
         add_curve_fit(ax,item[0],item[1],start_in_zero=False,plot_curve=False)
-    ax1.scatter(all_Rin_spine_head_const,all_V_spine_head_const,color=all_color,lw=scatter_size-6,marker='*')
-    add_curve_fit(ax1,all_Rin_spine_head_const,all_V_spine_head_const,start_in_zero=False,plot_curve=False)
+    #ax1.scatter(all_Rin_spine_head_const,all_V_spine_head_const,color=all_color,lw=scatter_size-6,marker='*')
+    #add_curve_fit(ax1,all_Rin_spine_head_const,all_V_spine_head_const,start_in_zero=False,plot_curve=True)
 
     plt.savefig(save_dir+'/V againg resistance.png')
     plt.savefig(save_dir+'/V against resistance.svg')
     # plt.show()
     plt.close()
 
+    fig=add_figure('','Rin spine head [MOum]','V spine head [mV]')
+    fig.set_size_inches(6,7)
+    fig.subplots_adjust(left=0.2,right=0.95,top=0.9,bottom=0.15)
+    ax=fig.axes[0]
+    plot_dict={'lw':scatter_size-1,'color':all_color}
+    ax.scatter(all_Rin_spine_head,all_V_spine_head,**plot_dict)
+    add_curve_fit(ax,all_Rin_spine_head,all_V_spine_head,start_in_zero=False,plot_curve=False)
+
+    plt.savefig(save_dir+'/V againg Rin.png')
+    plt.savefig(save_dir+'/V against Rin.svg')
+    # plt.show()
+    plt.close()
+    
     fig=add_figure('','PSD [um^2]','Isyn [nA]')
     # fig = plt.gcf()
     fig.set_size_inches(6,7)
@@ -282,7 +399,7 @@ if __name__=='__main__':
     ax=fig.axes[0]
     plot_dict={'label':cell_name,'lw':scatter_size-1,'color':all_color}
     ax.scatter(all_PSD,all_I_spine_head,**plot_dict)
-    add_curve_fit(ax,all_PSD,all_I_spine_head,name_units='pA/um^2')
+    add_curve_fit(ax,all_PSD,all_I_spine_head,start_in_zero=False,name_units='pA/um^2')
     plt.savefig(save_dir+'/gregor-current_PSD1.png')
     plt.savefig(save_dir+'/gregor-current_PSD1.svg')
     # plt.show()
@@ -296,20 +413,29 @@ if __name__=='__main__':
     ax2 = plt.subplot2grid(shape=shapes, loc=(0, 1), colspan=1, rowspan=1)
     ax3 = plt.subplot2grid(shape=shapes, loc=(0, 2), colspan=1, rowspan=1)
 
-    adgust_subplot(ax1,'' ,'PSD [um^2]','gmax AMPA [nS]',latter='A')
+    adgust_subplot(ax1,'' ,'PSD [um^2]','g AMPA [nS]',latter='A')
     adgust_subplot(ax2,'','PSD [um^2]','g NMDA [nS]',latter='B')
-    adgust_subplot(ax3,'','gmax AMPA [nS]','g NMDA [mV]',latter='C')
-    dict4plot={'ax1':[all_PSD,all_W_AMPA,'m'],'ax2':[all_PSD,all_g_NMDA,'m'],'ax3':[all_W_AMPA,all_g_NMDA,'AMPA/NMDA']}
-    plot_dict={'label':cell_name,'lw':scatter_size-1,'color':all_color}
+    adgust_subplot(ax3,'','PSD [um^2]','g activated NMDA [nS]',latter='C')
+    dict4plot={'ax1':[all_PSD,all_W_AMPA,'m'],'ax2':[all_PSD,all_W_NMDA,'m'],'ax3':[all_W_AMPA,all_g_NMDA,'AMPA/NMDA']}
+    plot_dict={'lw':scatter_size-1,'color':all_color}
     for key,item in dict4plot.items():
         ax=eval(key)
         ax.scatter(item[0],item[1],**plot_dict)
         # add_curve_fit(ax,item[0],item[1],start_in_zero=False,plot_curve=False)
 
-    # ax3.legend(loc='upper right',bbox_to_anchor=(1.2, 0.55),prop={'size': legend_size-1})
+    for i,cell_name in enumerate(read_from_pickle('cells_name2.p')):
+        if cell_name =='2017_04_03_B':continue
+        g_NMDA_spine=get_MOO_result_parameters(cell_name,'g_NMDA_spine')
+
+        if sum(get_MOO_result_parameters(cell_name,'W_NMDA'))<=0.005*sum(get_MOO_result_parameters(cell_name,'PSD')/max(get_MOO_result_parameters(cell_name,'PSD'))):
+            g_NMDA_spine=[None]*len(g_NMDA_spine)
+        plot_dict={'label':cell_name,'lw':scatter_size-1,'color':colors[i]}
+        ax3.scatter(get_MOO_result_parameters(cell_name,'W_AMPA'),g_NMDA_spine,**plot_dict)
+    ax3.legend(loc='center right',bbox_to_anchor=(1.2, 0.32),prop={'size': legend_size-1})
 
     add_curve_fit(ax1,all_PSD, all_W_AMPA,'m',name_units='pS/um^2')
-    add_curve_fit(ax2,all_PSD_NMDA, all_g_NMDA_NMDA,'m',name_units='pS/um^2',start_in_zero=False)
+    add_curve_fit(ax2,all_PSD_NMDA, all_W_NMDA_NMDA,'m',name_units='pS/um^2',start_in_zero=False)
+    #add_curve_fit(ax2,all_PSD_NMDA, all_g_NMDA_NMDA,'m',name_units='pS/um^2',start_in_zero=False)
     add_curve_fit(ax3,all_W_AMPA_NMDA, all_g_NMDA_NMDA,'AMPA/NMDA',name_units='AU',x_m=0.62,start_in_zero=False)
 
     plt.savefig(save_dir+'/AMPA_NMDA_PSD_RA_min_error.png')
@@ -319,56 +445,17 @@ if __name__=='__main__':
 
 
 
-
-    fig2 = plt.figure(figsize=(15, 10))  # , sharex="row", sharey="row"
-    # fig2.subplots_adjust(left=0.05,right=0.99,top=0.95,bottom=0.05,hspace=0.2, wspace=0.25)
-    fig2.subplots_adjust(left=0.1,right=0.95,top=0.9,bottom=0.1,hspace=0.25, wspace=0.2)
-    shapes = (2, 3)
-    plt.title('RA min error EPSP on spine and base')
-    ax1 = plt.subplot2grid(shape=shapes, loc=(0, 0), rowspan=1, colspan=1)
-    ax2 = plt.subplot2grid(shape=shapes, loc=(1, 0), colspan=1, rowspan=1)
-    ax3 = plt.subplot2grid(shape=shapes, loc=(0, 1), colspan=1, rowspan=1)
-    ax4 = plt.subplot2grid(shape=shapes, loc=(1, 1), colspan=1, rowspan=1)
-    ax5 = plt.subplot2grid(shape=shapes, loc=(0, 2), rowspan=1, colspan=1)
-    ax6 = plt.subplot2grid(shape=shapes, loc=(1, 2), colspan=1, rowspan=1)
-
-    adgust_subplot(ax1,'','','EPSP spine head [mV]',latter='A')
-    adgust_subplot(ax2,'','PSD [um^2]','EPSP spine base [mV]',latter='B')
-    adgust_subplot(ax3,'','','',latter='C')
-    adgust_subplot(ax4,'','AMPA [nS]','',latter='D')
-    adgust_subplot(ax5,'','','',latter='E')
-    adgust_subplot(ax6,'','NMDA [nS]','',latter='F')
-
-
-    dict4plot={'ax1':[all_PSD,all_V_spine_head],'ax2':[all_PSD,all_V_spine_base],'ax3':[all_W_AMPA,all_V_spine_head],
-     'ax4':[all_W_AMPA,all_V_spine_base],'ax5':[all_g_NMDA_NMDA,all_V_spine_head_NMDA],'ax6':[all_g_NMDA_NMDA,all_V_spine_base_NMDA]}
-    # plot_dict={'color':all_color,'label':cell_name,'lw':scatter_size-2}
-    for key,item in dict4plot.items():
-        print(key)
-        if key in ['ax5','ax6']:
-            plot_dict={'color':all_color_NMDA,'lw':scatter_size-2}
-        else:
-            plot_dict={'color':all_color,'lw':scatter_size-2}
-        ax=eval(key)
-        ax.scatter(item[0],item[1],**plot_dict)
-        add_curve_fit(ax,item[0],item[1],start_in_zero=False,plot_curve=False)
-
-    plt.savefig(save_dir+'/V_high.png')
-    plt.savefig(save_dir+'/V_high.svg')
-    # plt.show()
-    plt.close()
-
     fig1 = plt.figure(figsize=(15, 6))  # , sharex="row", sharey="row"
-    fig1.subplots_adjust(left=0.1,right=0.95,top=0.85,bottom=0.15,hspace=0.01, wspace=0.25)
+    fig1.subplots_adjust(left=0.15,right=0.95,top=0.85,bottom=0.15,hspace=0.01, wspace=0.25)
     shapes = (1, 3)
-    plt.title('gmax AMPA against NMDA')
+    plt.title('g AMPA against NMDA')
     ax1 = plt.subplot2grid(shape=shapes, loc=(0, 0), rowspan=1, colspan=1)
     ax2 = plt.subplot2grid(shape=shapes, loc=(0, 1), colspan=1, rowspan=1)
     ax3 = plt.subplot2grid(shape=shapes, loc=(0, 2), colspan=1, rowspan=1)
 
-    adgust_subplot(ax1,'' ,'gmax AMPA [nS]','g NMDA [nS]',latter='A')
-    adgust_subplot(ax2,'','gmax AMPA [nS]','Vmax NMDA spine head [mV]',latter='B')
-    adgust_subplot(ax3,'','gmax AMPA [nS]','Vmax NMDA soma[mV]',latter='C')
+    adgust_subplot(ax1,'' ,'g AMPA [nS]','g NMDA [nS]',latter='A')
+    adgust_subplot(ax2,'','g AMPA [nS]','Vmax NMDA spine head [mV]',latter='B')
+    adgust_subplot(ax3,'','g AMPA [nS]','Vmax NMDA soma[mV]',latter='C')
     dict4plot={'ax1':[all_W_AMPA_NMDA,all_g_NMDA_NMDA],'ax2':[all_W_AMPA_NMDA,all_V_NMDA_NMDA],'ax3':[all_W_AMPA_NMDA,all_V_soma_NMDA_NMDA]}
     # plot_dict={'color':all_color,'label':cell_name,'lw':scatter_size-2}
     for key,item in dict4plot.items():
@@ -381,31 +468,32 @@ if __name__=='__main__':
     plt.savefig(save_dir+'/NMDA against AMPA.svg')
     plt.close()
 
-    fig1 = plt.figure(figsize=(20, 10))  # , sharex="row", sharey="row"
-    fig1.subplots_adjust(left=0.05,right=0.95,top=0.95,bottom=0.1,hspace=0.2, wspace=0.25)
-    shapes = (2, 4)
+    fig1 = plt.figure(figsize=(15, 10))  # , sharex="row", sharey="row"
+    fig1.subplots_adjust(left=0.1,right=0.95,top=0.95,bottom=0.1,hspace=0.2, wspace=0.25)
+    shapes = (2, 3)
     plt.title('RA min error Rneck against AMPA and NMDA')
 
     ax1 = plt.subplot2grid(shape=shapes, loc=(0, 0), rowspan=1, colspan=1)
     ax2 = plt.subplot2grid(shape=shapes, loc=(1, 0), colspan=1, rowspan=1)
-    ax3 = plt.subplot2grid(shape=shapes, loc=(0, 1), colspan=1, rowspan=1)
-    ax4 = plt.subplot2grid(shape=shapes, loc=(1, 1), rowspan=1, colspan=1)
-    ax5 = plt.subplot2grid(shape=shapes, loc=(0, 2), colspan=1, rowspan=1)
-    ax6 = plt.subplot2grid(shape=shapes, loc=(1, 2), colspan=1, rowspan=1)
-    ax7 = plt.subplot2grid(shape=shapes, loc=(0, 3), colspan=1, rowspan=1)
-    ax8 = plt.subplot2grid(shape=shapes, loc=(1, 3), colspan=1, rowspan=1)
+    #ax3 = plt.subplot2grid(shape=shapes, loc=(0, 1), colspan=1, rowspan=1)
+    #ax4 = plt.subplot2grid(shape=shapes, loc=(1, 1), rowspan=1, colspan=1)
+    ax5 = plt.subplot2grid(shape=shapes, loc=(0, 1), colspan=1, rowspan=1)
+    ax6 = plt.subplot2grid(shape=shapes, loc=(1, 1), colspan=1, rowspan=1)
+    ax7 = plt.subplot2grid(shape=shapes, loc=(0, 2), colspan=1, rowspan=1)
+    ax8 = plt.subplot2grid(shape=shapes, loc=(1, 2), colspan=1, rowspan=1)
 
-    adgust_subplot(ax1,'','','gmax AMPA [nS]',latter='A')
+    adgust_subplot(ax1,'','','g AMPA [nS]',latter='A')
     adgust_subplot(ax2,'','Rin spine head [Mohm]','g NMDA [nS]',latter='B')
-    adgust_subplot(ax3,'','','',latter='C')
-    adgust_subplot(ax4,'','Rin spine base [Mohm]','',latter='D')
-    adgust_subplot(ax5,'','','',latter='E')
-    adgust_subplot(ax6,'','Rtranfer [Mohm]','',latter='F')
-    adgust_subplot(ax7,'','','',latter='G')
-    adgust_subplot(ax8,'','Rneck [Mohm]','',latter='H')
+    #adgust_subplot(ax3,'','','',latter='C')
+    #adgust_subplot(ax4,'','Rin spine base [Mohm]','',latter='D')
+    adgust_subplot(ax5,'','','',latter='C')
+    adgust_subplot(ax6,'','Rtranfer [Mohm]','',latter='D')
+    adgust_subplot(ax7,'','','',latter='E')
+    adgust_subplot(ax8,'','Rneck [Mohm]','',latter='F')
     dict4plot={'ax1':[all_Rin_spine_head,all_W_AMPA],'ax3':[all_Rin_spine_base,all_W_AMPA],'ax5':[all_Rtrans_spine_base,all_W_AMPA],'ax7':[all_Rneck,all_W_AMPA],
                'ax2':[all_Rin_spine_head_NMDA,all_g_NMDA_NMDA],'ax4':[all_Rin_spine_base_NMDA,all_g_NMDA_NMDA],'ax6':[all_Rtrans_spine_base_NMDA,all_g_NMDA_NMDA],'ax8':[all_Rneck_NMDA,all_g_NMDA_NMDA]}
     for key,item in dict4plot.items():
+        if key in ['ax3','ax4']:continue
         if key in ['ax1','ax3','ax5','ax7']:
             plot_dict={'label':cell_name,'lw':scatter_size-1,'color':all_color}
         else:
@@ -428,9 +516,9 @@ if __name__=='__main__':
     ax0_3 = plt.subplot2grid(shape=shapes, loc=(0, 2), colspan=1, rowspan=1)
 
     adgust_subplot(ax0_1,'','distance [lambda]','PSD [um^2]','A')
-    adgust_subplot(ax0_2,'' ,'distance [lambda]','gmax AMPA [nS]','B')
+    adgust_subplot(ax0_2,'' ,'distance [lambda]','g AMPA [nS]','B')
     adgust_subplot(ax0_3,'','distance [lambda]','g NMDA [mV]','C')
-    # adgust_subplot(ax0_3,'','PSD/spine_head_area','gmax [mV]','C')
+    # adgust_subplot(ax0_3,'','PSD/spine_head_area',' [mV]','C')
 
     all_AMPA,all_NMDA,all_PSD,all_dis,all_dis_NMDA,all_g_NMDA=[],[],[],[],[],[]
     for i,cell_name in enumerate(read_from_pickle('cells_name2.p')):
@@ -439,6 +527,7 @@ if __name__=='__main__':
         W_AMPA=[]
         while len(W_AMPA)==0:
             dictMOO={'passive_parameter':passive_parameter_names[j],'syn_num':None,'from_picture':cell_name in read_from_pickle('cells_sec_from_picture.p'),'double_spine_area':False}
+            dictMOO={}
             RA=get_MOO_result_parameters(cell_name,'RA',**dictMOO)
             W_AMPA=get_MOO_result_parameters(cell_name,'W_AMPA',**dictMOO)
             W_NMDA=get_MOO_result_parameters(cell_name,'W_NMDA',**dictMOO)
@@ -487,9 +576,9 @@ if __name__=='__main__':
     ax0_3 = plt.subplot2grid(shape=shapes, loc=(0, 2), colspan=1, rowspan=1)
 
     adgust_subplot(ax0_1,'','distance [um]','PSD [um^2]','A')
-    adgust_subplot(ax0_2,'' ,'distance [um]','gmax AMPA [nS]','B')
-    adgust_subplot(ax0_3,'','distance [um]','g NMDA [mV]','C')
-    # adgust_subplot(ax0_3,'','PSD/spine_head_area','gmax [mV]','C')
+    adgust_subplot(ax0_2,'' ,'distance [um]','g  AMPA [nS]','B')
+    adgust_subplot(ax0_3,'','distance [um]','g activated NMDA [mV]','C')
+    # adgust_subplot(ax0_3,'','PSD/spine_head_area',' [mV]','C')
 
     all_AMPA,all_NMDA,all_PSD,all_dis,all_dis_NMDA,all_g_NMDA=[],[],[],[],[],[]
     for i,cell_name in enumerate(read_from_pickle('cells_name2.p')):
@@ -498,6 +587,7 @@ if __name__=='__main__':
         W_AMPA=[]
         while len(W_AMPA)==0:
             dictMOO={'passive_parameter':passive_parameter_names[j],'syn_num':None,'from_picture':cell_name in read_from_pickle('cells_sec_from_picture.p'),'double_spine_area':False}
+            dictMOO={}
             RA=get_MOO_result_parameters(cell_name,'RA',**dictMOO)
             W_AMPA=get_MOO_result_parameters(cell_name,'W_AMPA',**dictMOO)
             W_NMDA=get_MOO_result_parameters(cell_name,'W_NMDA',**dictMOO)
@@ -543,8 +633,8 @@ if __name__=='__main__':
     plt.title('RA=70')
     ax0_1 = plt.subplot2grid(shape=shapes, loc=(0, 0), rowspan=1, colspan=1)
     ax0_2 = plt.subplot2grid(shape=shapes, loc=(0, 1), colspan=1, rowspan=1)
-    adgust_subplot(ax0_1,'' ,'PSD [um^2]','gmax AMPA [nS]',latter='A')
-    adgust_subplot(ax0_2,'','PSD [um^2]','g NMDA [mV]',latter='B')
+    adgust_subplot(ax0_1,'' ,'PSD [um^2]','g AMPA [nS]',latter='A')
+    adgust_subplot(ax0_2,'','PSD [um^2]','g NMDA [nS]',latter='B')
     all_AMPA,all_NMDA,all_PSD,all_PSD_NMDA,all_g_NMDA=[],[],[],[],[]
     for i,cell_name in enumerate(read_from_pickle('cells_name2.p')):
         if cell_name=='2017_04_03_B':continue
@@ -552,12 +642,12 @@ if __name__=='__main__':
         W_AMPA=[]
         dictMOO={'passive_parameter':'RA=70','syn_num':None,'from_picture':cell_name in read_from_pickle('cells_sec_from_picture.p'),'double_spine_area':False}
         while len(W_AMPA)==0:
-            PSD=get_MOO_result_parameters(cell_name,'PSD',**dictMOO)
-            RA=get_MOO_result_parameters(cell_name,'RA',**dictMOO)
-            W_AMPA=get_MOO_result_parameters(cell_name,'W_AMPA',**dictMOO)
-            W_NMDA=get_MOO_result_parameters(cell_name,'W_NMDA',**dictMOO)
-            V_NMDA=get_MOO_result_parameters(cell_name,'V_syn_NMDA',**dictMOO)
-            g_NMDA=get_MOO_result_parameters(cell_name,'g_NMDA_spine',**dictMOO)
+            PSD=get_MOO_result_parameters2(cell_name,'PSD',**dictMOO)
+            RA=get_MOO_result_parameters2(cell_name,'RA',**dictMOO)
+            W_AMPA=get_MOO_result_parameters2(cell_name,'W_AMPA',**dictMOO)
+            W_NMDA=get_MOO_result_parameters2(cell_name,'W_NMDA',**dictMOO)
+            V_NMDA=get_MOO_result_parameters2(cell_name,'V_syn_NMDA',**dictMOO)
+            g_NMDA=get_MOO_result_parameters2(cell_name,'g_NMDA_spine',**dictMOO)
 
         if sum(W_NMDA)<=0.005*sum(PSD/max(PSD)):
             W_NMDA,V_NMDA,g_NMDA=[None]*len(PSD),[None]*len(PSD),[None]*len(PSD)
