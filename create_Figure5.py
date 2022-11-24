@@ -3,7 +3,7 @@ from add_figure import  adgust_subplot
 from create_folder import create_folder_dirr
 from open_pickle import read_from_pickle
 from read_spine_properties import get_sec_and_seg, get_parameter, get_n_spinese, calculate_Rneck
-from function_Figures import find_RA, legend_size, get_MOO_result_parameters
+from function_Figures import find_RA, legend_size, get_MOO_result_parameters, get_MOO_result_parameters2
 import numpy as np
 import sys
 if len(sys.argv)!=2:
@@ -22,8 +22,8 @@ shapes = (1, 2)
 fig1.subplots_adjust(left=0.1,right=0.90,top=0.85,bottom=0.15,hspace=0.01, wspace=0.2)
 ax0_1 = plt.subplot2grid(shape=shapes, loc=(0, 0), rowspan=1, colspan=1)
 ax0_2 = plt.subplot2grid(shape=shapes, loc=(0, 1), colspan=1, rowspan=1)
-adgust_subplot(ax0_1,'gmax AMPA diffrent Ra' ,'PSD','gmax AMPA [nS]','A')
-adgust_subplot(ax0_2,'gmax NMDA diffrent Ra','PSD','gmax NMDA [nS]','B')
+adgust_subplot(ax0_1,'' ,'PSD','gmax AMPA [nS]','A')
+adgust_subplot(ax0_2,'','PSD','gmax NMDA [nS]','B')
 all_AMPA,all_NMDA,all_PSD=[],[],[]
 # all_AMPA=np.zeros(9)
 for i,cell_name in enumerate(read_from_pickle('cells_name2.p')[:]):
@@ -32,11 +32,13 @@ for i,cell_name in enumerate(read_from_pickle('cells_name2.p')[:]):
     plot_dict={'color':colors[i],'lw':scatter_size-2}
     # for num in range(get_n_spinese(cell_name)):
     dictMOO={'from_picture':cell_name in read_from_pickle('cells_sec_from_picture.p'),'double_spine_area':False}
-    PSD=get_MOO_result_parameters(cell_name,'PSD',**dictMOO)
-    RA=get_MOO_result_parameters(cell_name,'RA',**dictMOO)
-    W_AMPA=get_MOO_result_parameters(cell_name,'W_AMPA',**dictMOO)
-    W_NMDA=get_MOO_result_parameters(cell_name,'W_NMDA',**dictMOO)
-    index2del1=np.unique(list(np.where(W_AMPA>7)[0])+list(np.where(W_NMDA>1.5)[0]))
+    dictMOO={'relative':get_MOO_result_parameters(cell_name,'relative')[0],'from_picture':cell_name in read_from_pickle('cells_sec_from_picture.p'),'double_spine_area':False,'full_trace':get_MOO_result_parameters(cell_name,'full_trace')[0]}
+
+    PSD=get_MOO_result_parameters2(cell_name,'PSD',**dictMOO)
+    RA=get_MOO_result_parameters2(cell_name,'RA',**dictMOO)
+    W_AMPA=get_MOO_result_parameters2(cell_name,'W_AMPA',**dictMOO)
+    W_NMDA=get_MOO_result_parameters2(cell_name,'g_NMDA_spine',**dictMOO)
+    index2del1=np.unique(list(np.where(W_AMPA>7)[0])+list(np.where(W_NMDA>1)[0]))
     index2del=[]
     if len(index2del1)>0:
         deleteRA=' delete RA '+str(RA[index2del1])
@@ -56,8 +58,7 @@ for i,cell_name in enumerate(read_from_pickle('cells_name2.p')[:]):
     W_NMDA=np.delete(W_NMDA,index2del)
     ax0_1.scatter(PSD,W_AMPA,**plot_dict)
     ax0_2.scatter(PSD,W_NMDA,**plot_dict,label=cell_name+deleteRA)
-    ax0_2.legend(loc="upper right", bbox_to_anchor=(1.2, 1),prop={'size': legend_size-2})
-    # all_AMPA[i]=W_AMPA
+    # ax0_2.legend(loc="upper right", bbox_to_anchor=(1.2, 1),prop={'size': legend_size-2})
     all_AMPA=np.append(all_AMPA, [W_AMPA])
     all_NMDA=np.append(all_NMDA, W_NMDA)
     all_PSD=np.append(all_PSD, PSD)
@@ -74,16 +75,18 @@ shapes = (1, 2)
 fig1.subplots_adjust(left=0.1,right=0.90,top=0.85,bottom=0.15,hspace=0.01, wspace=0.2)
 ax0_1 = plt.subplot2grid(shape=shapes, loc=(0, 0), rowspan=1, colspan=1)
 ax0_2 = plt.subplot2grid(shape=shapes, loc=(0, 1), colspan=1, rowspan=1)
-adgust_subplot(ax0_1,'gmax AMPA diffrent Ra' ,'PSD','gmax AMPA [nS]','A')
-adgust_subplot(ax0_2,'gmax NMDA diffrent Ra','PSD','gmax NMDA [nS]','B')
+adgust_subplot(ax0_1,'','PSD','gmax AMPA [nS]','A')
+adgust_subplot(ax0_2,'','PSD','gmax NMDA [nS]','B')
 for i,cell_name in enumerate(read_from_pickle('cells_name2.p')):
     plot_dict={'color':colors[i],'label':cell_name,'lw':scatter_size-2}
     # for num in range(get_n_spinese(cell_name)):
     dictMOO={'from_picture':cell_name in read_from_pickle('cells_sec_from_picture.p'),'double_spine_area':False}
-    PSD=get_MOO_result_parameters(cell_name,'PSD',**dictMOO)
-    RA=get_MOO_result_parameters(cell_name,'RA',**dictMOO)
-    W_AMPA=get_MOO_result_parameters(cell_name,'W_AMPA',**dictMOO)
-    W_NMDA=get_MOO_result_parameters(cell_name,'W_NMDA',**dictMOO)
+    dictMOO={'relative':get_MOO_result_parameters(cell_name,'relative')[0],'from_picture':cell_name in read_from_pickle('cells_sec_from_picture.p'),'double_spine_area':False,'full_trace':get_MOO_result_parameters(cell_name,'full_trace')[0]}
+
+    PSD=get_MOO_result_parameters2(cell_name,'PSD',**dictMOO)
+    RA=get_MOO_result_parameters2(cell_name,'RA',**dictMOO)
+    W_AMPA=get_MOO_result_parameters2(cell_name,'W_AMPA',**dictMOO)
+    W_NMDA=get_MOO_result_parameters2(cell_name,'g_NMDA_spine',**dictMOO)
     ax0_1.scatter(PSD,W_AMPA,**plot_dict)
     ax0_2.scatter(PSD,W_NMDA,**plot_dict)
     ax0_2.legend()
